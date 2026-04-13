@@ -52,7 +52,7 @@ body::before {
 }
 
 /* ── SCREENS ── */
-.screen { display: none; position: relative; z-index: 1; }
+.screen { display: none; position: relative; z-index: 1; min-height: 100vh; }
 .screen.active { display: block; }
 #screen-register.active { display: grid; }
 #screen-loading.active { display: flex; }
@@ -1267,7 +1267,8 @@ function configLoading(etapa) {
 }
 
 // ── API ──
-async function llamarAPI(prompt) {
+async function llamarAPI(prompt, prompt2) {
+  prompt2 = prompt2 || prompt;
   var response = await fetch(SERVER_URL + '/api/claude', {
     method: 'POST',
     headers: {
@@ -1289,13 +1290,36 @@ async function llamarAPI(prompt) {
   }
 
   var data = await response.json();
+
+  // Si stop_reason es tool_use, Claude necesita continuar — hacer segunda llamada
+  if (data.stop_reason === 'tool_use') {
+    var messages2 = [
+      { role: 'user', content: prompt2 || '' },
+      { role: 'assistant', content: data.content },
+      { role: 'user', content: 'Continuá y devolvé el JSON final basándote en la búsqueda que acabás de hacer.' }
+    ];
+    var response2 = await fetch(SERVER_URL + '/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 4000,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        messages: messages2
+      })
+    });
+    if (!response2.ok) throw new Error('Error en segunda llamada (' + response2.status + ').');
+    data = await response2.json();
+  }
+
   var texts = [];
   if (data.content) {
     data.content.forEach(function(block) {
-      if (block.type === 'text') texts.push(block.text);
+      if (block.type === 'text' && block.text && block.text.trim()) texts.push(block.text);
     });
   }
-  return texts.join('');
+  var joined = texts.join('');
+  return joined;
 }
 
 function parsearJSON(txt) {
