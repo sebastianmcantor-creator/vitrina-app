@@ -1267,29 +1267,48 @@ function configLoading(etapa) {
 }
 
 // ── API ──
+async function llamarRailway(payload) {
+  var MAX_INTENTOS = 3;
+  var PAUSA_MS = 3000;
+  var ultimoError = null;
+  for (var intento = 1; intento <= MAX_INTENTOS; intento++) {
+    try {
+      var response = await fetch(SERVER_URL + '/api/claude', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (response.status === 429 || response.status === 529 || response.status === 503) {
+        ultimoError = 'Estamos con mucha demanda. Reintentando (' + intento + '/' + MAX_INTENTOS + ')...';
+        if (intento < MAX_INTENTOS) {
+          await new Promise(function(r) { setTimeout(r, PAUSA_MS); });
+          continue;
+        }
+        throw new Error('El servicio está muy ocupado ahora. Esperá 30 segundos e intentá de nuevo.');
+      }
+      if (!response.ok) {
+        var status = response.status;
+        if (status === 401) throw new Error('Error de autenticación. Contactá al soporte.');
+        throw new Error('Error al conectar con el servidor (' + status + '). Intentá de nuevo.');
+      }
+      return await response.json();
+    } catch(e) {
+      if (intento === MAX_INTENTOS) throw e;
+      ultimoError = e.message;
+      await new Promise(function(r) { setTimeout(r, PAUSA_MS); });
+    }
+  }
+  throw new Error(ultimoError || 'Error desconocido.');
+}
+
 async function llamarAPI(prompt, prompt2) {
   prompt2 = prompt2 || prompt;
-  var response = await fetch(SERVER_URL + '/api/claude', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      max_tokens: 4000,
-      
-      messages: [{ role: 'user', content: prompt }]
-    })
+
+  var data = await llamarRailway({
+    model: MODEL,
+    max_tokens: 4000,
+    messages: [{ role: 'user', content: prompt }]
   });
-
-  if (!response.ok) {
-    var status = response.status;
-    if (status === 401) throw new Error('Error de autenticación. Contactá al soporte.');
-    if (status === 429) throw new Error('Demasiadas solicitudes. Esperá un momento e intentá de nuevo.');
-    throw new Error('Error al conectar con el servidor (' + status + '). Intentá de nuevo.');
-  }
-
-  var data = await response.json();
 
   // Si stop_reason es tool_use, Claude necesita continuar — hacer segunda llamada
   if (data.stop_reason === 'tool_use') {
@@ -1298,18 +1317,11 @@ async function llamarAPI(prompt, prompt2) {
       { role: 'assistant', content: data.content },
       { role: 'user', content: 'Continuá y devolvé el JSON final basándote en la búsqueda que acabás de hacer.' }
     ];
-    var response2 = await fetch(SERVER_URL + '/api/claude', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 4000,
-        
-        messages: messages2
-      })
+    data = await llamarRailway({
+      model: MODEL,
+      max_tokens: 4000,
+      messages: messages2
     });
-    if (!response2.ok) throw new Error('Error en segunda llamada (' + response2.status + ').');
-    data = await response2.json();
   }
 
   var texts = [];
@@ -1318,8 +1330,7 @@ async function llamarAPI(prompt, prompt2) {
       if (block.type === 'text' && block.text && block.text.trim()) texts.push(block.text);
     });
   }
-  var joined = texts.join('');
-  return joined;
+  return texts.join('');
 }
 
 function parsearJSON(txt) {
@@ -1539,8 +1550,9 @@ async function etapa2() {
     '3. Qué tipo de contenido publican y con qué frecuencia\n' +
     '4. Si responden comentarios y mensajes\n' +
     '5. Calidad visual del contenido\n\n' +
+    'REGLA IMPORTANTE: Solo afirmá datos que hayas podido verificar en la búsqueda. Si no podés acceder al contenido exacto (ej: si Instagram bloquea el detalle de posts), poné "No verificable" en ese campo. Nunca afirmes que NO usa algo (ej: Reels) si simplemente no pudiste verlo — en ese caso es "No verificable".\n\n' +
     'Devolvé ÚNICAMENTE este JSON (sin texto antes ni después, sin backticks):\n' +
-    '{"instagram":{"seguidores":"número real o estimado","publicaciones":"número","frecuencia":"ej: 3 veces/semana","formatos_usados":"Reels, Fotos, Stories, Highlights","usa_reels":"Sí / No / Poco","responde_comentarios":"Sí / No / A veces","tiene_link_bio":"Sí / No","etiqueta_ubicacion":"Sí / No","calidad_visual":"Alta / Media / Mejorable","engagement_estimado":"Alto / Medio / Bajo","bio_descripcion":"descripción de la bio actual","observacion":"análisis específico de 2-3 líneas"},"tiktok":{"estado":"Activo / Inactivo / Sin perfil","seguidores":"número o No encontrado","observacion":"observación o recomendación"},"puntaje_redes":70,"diagnostico_redes":"diagnóstico de 2-3 oraciones profesional","contenido":{"temas_principales":["tema 1","tema 2","tema 3"],"que_funciona":"qué tipo de contenido tiene mejor respuesta","que_falta":"qué contenido están perdiendo"},"metricas_comparativa":[{"metrica":"Seguidores Instagram","vos":"número","zona_promedio":"número estimado zona","estado":"ok/warn/bad"},{"metrica":"Frecuencia de publicación","vos":"X/semana","zona_promedio":"recomendado","estado":"ok/warn/bad"},{"metrica":"Uso de Reels","vos":"si/no","zona_promedio":"Obligatorio 2024","estado":"ok/warn/bad"},{"metrica":"Engagement rate","vos":"estimado%","zona_promedio":"promedio sector","estado":"ok/warn/bad"}],"acciones_inmediatas":[{"titulo":"acción 1","detalle":"descripción concreta"},{"titulo":"acción 2","detalle":"descripción"},{"titulo":"acción 3","detalle":"descripción"},{"titulo":"acción 4","detalle":"descripción"}]}';
+    '{"instagram":{"seguidores":"número real o estimado","publicaciones":"número o No verificable","frecuencia":"ej: 3 veces/semana o No verificable","formatos_usados":"lista de formatos detectados o No verificable","usa_reels":"Sí / No verificable — NUNCA pongas No a menos que hayas confirmado que no hay ningún Reel en el perfil","responde_comentarios":"Sí / No / A veces / No verificable","tiene_link_bio":"Sí / No / No verificable","etiqueta_ubicacion":"Sí / No / No verificable","calidad_visual":"Alta / Media / Mejorable / No verificable","engagement_estimado":"Alto / Medio / Bajo / No verificable","bio_descripcion":"texto de la bio actual o No verificable","observacion":"análisis específico de 2-3 líneas basado en lo que encontraste"},"tiktok":{"estado":"Activo / Inactivo / Sin perfil","seguidores":"número o No encontrado","observacion":"observación o recomendación"},"puntaje_redes":70,"diagnostico_redes":"diagnóstico de 2-3 oraciones profesional basado en lo verificado","contenido":{"temas_principales":["tema 1","tema 2","tema 3"],"que_funciona":"qué tipo de contenido tiene mejor respuesta o No verificable","que_falta":"qué contenido están perdiendo"},"metricas_comparativa":[{"metrica":"Seguidores Instagram","vos":"número","zona_promedio":"número estimado zona","estado":"ok/warn/bad"},{"metrica":"Frecuencia de publicación","vos":"X/semana o No verificable","zona_promedio":"recomendado","estado":"ok/warn/bad"},{"metrica":"Uso de Reels","vos":"Sí/No verificable","zona_promedio":"Obligatorio 2025","estado":"ok/warn/bad"},{"metrica":"Engagement rate","vos":"estimado% o No verificable","zona_promedio":"promedio sector","estado":"ok/warn/bad"}],"acciones_inmediatas":[{"titulo":"acción 1","detalle":"descripción concreta"},{"titulo":"acción 2","detalle":"descripción"},{"titulo":"acción 3","detalle":"descripción"},{"titulo":"acción 4","detalle":"descripción"}]}';
 
   try {
     var txt = await llamarAPI(prompt);
@@ -1584,14 +1596,17 @@ function mostrarEtapa2() {
   content += '<div class="metric-row"><span class="metric-label">Engagement estimado</span><span class="metric-val ' + (ig.engagement_estimado === 'Alto' ? 'good' : ig.engagement_estimado === 'Bajo' ? 'bad' : 'warn') + '">' + (ig.engagement_estimado || '—') + '</span></div>';
 
   var igChecks = [
-    [ig.usa_reels === 'Sí', 'Usa Reels — el formato con mayor alcance hoy', 'No usa Reels — está perdiendo el formato de mayor alcance orgánico'],
-    [ig.responde_comentarios === 'Sí', 'Responde comentarios — genera confianza y comunidad', 'No responde comentarios — pierde engagement y visibilidad'],
-    [ig.tiene_link_bio === 'Sí', 'Tiene link en bio — facilita que el cliente te encuentre', 'Sin link en bio — los seguidores no tienen dónde ir'],
-    [ig.etiqueta_ubicacion === 'Sí', 'Etiqueta ubicación — aparece en búsquedas locales', 'Sin etiqueta de ubicación — no aparece en búsquedas del barrio']
+    [ig.usa_reels === 'Sí', ig.usa_reels === 'No verificable', 'Usa Reels — el formato con mayor alcance hoy', 'No verificado si usa Reels — revisá el perfil para confirmarlo', 'No usa Reels — está perdiendo el formato de mayor alcance orgánico'],
+    [ig.responde_comentarios === 'Sí', ig.responde_comentarios === 'No verificable', 'Responde comentarios — genera confianza y comunidad', 'No se pudo verificar si responde comentarios', 'No responde comentarios — pierde engagement y visibilidad'],
+    [ig.tiene_link_bio === 'Sí', ig.tiene_link_bio === 'No verificable', 'Tiene link en bio — facilita que el cliente te encuentre', 'No se pudo verificar si tiene link en bio', 'Sin link en bio — los seguidores no tienen dónde ir'],
+    [ig.etiqueta_ubicacion === 'Sí', ig.etiqueta_ubicacion === 'No verificable', 'Etiqueta ubicación — aparece en búsquedas locales', 'No se pudo verificar si etiqueta ubicación', 'Sin etiqueta de ubicación — no aparece en búsquedas del barrio']
   ];
   content += '<div class="checklist" style="margin-top:14px;padding-top:14px;border-top:1px solid var(--cream2)">';
   igChecks.forEach(function(c) {
-    content += '<div class="check-item"><div class="check-icon ' + (c[0] ? 'check-ok' : 'check-bad') + '">' + (c[0] ? '✓' : '✗') + '</div><span>' + (c[0] ? c[1] : c[2]) + '</span></div>';
+    var cls = c[0] ? 'check-ok' : c[1] ? 'check-warn' : 'check-bad';
+    var ico = c[0] ? '✓' : c[1] ? '?' : '✗';
+    var txt = c[0] ? c[2] : c[1] ? c[3] : c[4];
+    content += '<div class="check-item"><div class="check-icon ' + cls + '">' + ico + '</div><span>' + txt + '</span></div>';
   });
   content += '</div>';
   if (ig.observacion) content += '<div style="font-size:13px;color:var(--muted);line-height:1.6;margin-top:14px;padding-top:14px;border-top:1px solid var(--cream2)">' + ig.observacion + '</div>';
