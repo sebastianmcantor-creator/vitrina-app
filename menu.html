@@ -5,35 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>La Panera Rosa — Menú</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #fdf8f4; --surface: #ffffff; --border: #ede8e2; --text: #1a1208;
-      --muted: #8a7a6a; --accent: #c8553d; --accent-light: #fdf0ec;
-      --tag-veg: #e8f5e9; --tag-veg-text: #2e7d32;
-      --tag-vegan: #e3f2fd; --tag-vegan-text: #1565c0;
-      --tag-celiac: #fff8e1; --tag-celiac-text: #f57f17;
-      --cart-bg: #1a1208; --cart-text: #fdf8f4;
+      --bg: #fdf8f4;
+      --surface: #ffffff;
+      --border: #ede8e2;
+      --text: #1a1208;
+      --muted: #8a7a6a;
+      --accent: #c8553d;
+      --accent-light: #fdf0ec;
+      --tag-veg: #e8f5e9;
+      --tag-veg-text: #2e7d32;
+      --tag-vegan: #e3f2fd;
+      --tag-vegan-text: #1565c0;
+      --tag-celiac: #fff8e1;
+      --tag-celiac-text: #f57f17;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+
     .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
     .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
     .restaurant-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--accent); }
     .restaurant-sub { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
-    .cart-btn { background: var(--cart-bg); color: var(--cart-text); border: none; border-radius: 24px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; }
+    .cart-btn { background: #1a1208; color: #fdf8f4; border: none; border-radius: 24px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; }
     .cart-count { background: var(--accent); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
+
     .cat-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; overflow-x: auto; scrollbar-width: none; }
     .cat-nav::-webkit-scrollbar { display: none; }
-    .cat-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+    .cat-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
     .cat-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
+
     .content { padding: 0 0 120px; }
     .category-section { padding: 24px 16px 8px; }
     .category-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 400; margin-bottom: 4px; }
     .category-desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
     .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; }
+    .item-img { width: 80px; height: 80px; border-radius: 10px; background: var(--accent-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
     .item-info { flex: 1; min-width: 0; }
-    .item-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    .item-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
     .item-desc { font-size: 12.5px; color: var(--muted); line-height: 1.5; margin-bottom: 8px; }
     .item-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
     .tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; }
@@ -43,11 +55,12 @@
     .tag-popular { background: #fce4ec; color: #c62828; }
     .item-bottom { display: flex; align-items: center; justify-content: space-between; }
     .item-price { font-size: 15px; font-weight: 500; }
-    .add-btn { background: var(--accent); color: white; border: none; border-radius: 20px; width: 32px; height: 32px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .add-btn { background: var(--accent); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; }
     .qty-control { display: flex; align-items: center; gap: 8px; }
-    .qty-btn { background: var(--border); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .qty-btn { background: var(--border); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); }
     .qty-num { font-size: 15px; font-weight: 500; min-width: 20px; text-align: center; }
-    .item-img { width: 80px; height: 80px; border-radius: 10px; background: var(--accent-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .divider { height: 1px; background: var(--border); margin: 8px 16px 0; }
+
     .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: none; }
     .cart-overlay.open { display: block; }
     .cart-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 201; max-height: 80vh; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s ease; padding: 0 0 32px; }
@@ -68,93 +81,128 @@
     .cart-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 500; margin-bottom: 14px; }
     .checkout-btn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; }
     .checkout-btn:disabled { opacity: 0.6; }
-    .mozo-fab { position: fixed; bottom: 24px; right: 20px; background: var(--cart-bg); color: var(--cart-text); border: none; border-radius: 28px; padding: 12px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 150; text-decoration: none; }
-    .divider { height: 1px; background: var(--border); margin: 8px 16px 0; }
-    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #1a1208; color: #fdf8f4; padding: 12px 20px; border-radius: 24px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
-    .toast.show { opacity: 1; }
+
+    .mozo-fab { position: fixed; bottom: 24px; right: 20px; background: #1a1208; color: #fdf8f4; border: none; border-radius: 28px; padding: 12px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 150; text-decoration: none; }
+
+    .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300; display: none; align-items: center; justify-content: center; }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box { background: #fff; border-radius: 20px; padding: 32px 28px; text-align: center; max-width: 280px; margin: 20px; }
   </style>
 </head>
 <body>
-  <div class="toast" id="toast"></div>
+
   <div class="header">
     <div class="header-top">
       <div>
         <div class="restaurant-name">La Panera Rosa</div>
         <div class="restaurant-sub">Recoleta · Non stop</div>
       </div>
-      <button class="cart-btn" onclick="toggleCart()">🛒 Mi pedido <span class="cart-count" id="cart-count">0</span></button>
+      <button class="cart-btn" onclick="toggleCart()">
+        🛒 Mi pedido
+        <span class="cart-count" id="cart-count">0</span>
+      </button>
     </div>
   </div>
+
   <div class="cat-nav">
-    <button class="cat-btn active" onclick="scrollTo('entradas')">Entradas</button>
-    <button class="cat-btn" onclick="scrollTo('ensaladas')">Ensaladas</button>
-    <button class="cat-btn" onclick="scrollTo('pastas')">Pastas</button>
-    <button class="cat-btn" onclick="scrollTo('sandwiches')">Sándwiches</button>
-    <button class="cat-btn" onclick="scrollTo('waffles')">Waffles</button>
-    <button class="cat-btn" onclick="scrollTo('postres')">Postres</button>
-    <button class="cat-btn" onclick="scrollTo('bebidas')">Bebidas</button>
+    <button class="cat-btn active" onclick="navScroll('entradas')">Entradas</button>
+    <button class="cat-btn" onclick="navScroll('ensaladas')">Ensaladas</button>
+    <button class="cat-btn" onclick="navScroll('pastas')">Pastas</button>
+    <button class="cat-btn" onclick="navScroll('sandwiches')">Sándwiches</button>
+    <button class="cat-btn" onclick="navScroll('waffles')">Waffles</button>
+    <button class="cat-btn" onclick="navScroll('postres')">Postres</button>
+    <button class="cat-btn" onclick="navScroll('bebidas')">Bebidas</button>
   </div>
+
   <div class="content">
+
     <div class="category-section" id="entradas">
-      <div class="category-title">Entradas</div><div class="category-desc">Para empezar o compartir</div>
+      <div class="category-title">Entradas</div>
+      <div class="category-desc">Para empezar o compartir</div>
       <div class="item-card"><div class="item-img">🥗</div><div class="item-info"><div class="item-name">Burrata con rúcula</div><div class="item-desc">Burrata fresca, rúcula selvática, nueces, tomates cherry y remolachas. Aceite de oliva extra virgen.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$9.800</div><div id="ctrl-1"></div></div></div></div>
       <div class="item-card"><div class="item-img">🍟</div><div class="item-info"><div class="item-name">Papas cheddar & romero</div><div class="item-desc">Papas fritas bañadas en cheddar fundido, romero fresco y dip de salsa criolla.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$7.200</div><div id="ctrl-2"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🥑</div><div class="item-info"><div class="item-name">Tosta palta & nuez</div><div class="item-desc">Pan de campo tostado con queso crema panera, palta slice, nueces y rúcula.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$8.500</div><div id="ctrl-3"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🥟</div><div class="item-info"><div class="item-name">Empanadas caseras (x3)</div><div class="item-desc">A elección: carne cortada a cuchillo, pollo especiado, jamón y queso, o humita.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$6.900</div><div id="ctrl-4"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🥑</div><div class="item-info"><div class="item-name">Tosta palta & nuez</div><div class="item-desc">Pan de campo tostado con queso crema panera, palta slice, nueces y rúcula. Opcional huevo poche.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$8.500</div><div id="ctrl-3"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🥟</div><div class="item-info"><div class="item-name">Empanadas caseras (x3)</div><div class="item-desc">A elección: carne cortada a cuchillo, pollo especiado, jamón y queso, o humita. Doradas al horno.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$6.900</div><div id="ctrl-4"></div></div></div></div>
     </div>
     <div class="divider"></div>
+
     <div class="category-section" id="ensaladas">
-      <div class="category-title">Ensaladas</div><div class="category-desc">Frescas y completas</div>
-      <div class="item-card"><div class="item-img">🥙</div><div class="item-info"><div class="item-name">Ensalada Panera</div><div class="item-desc">Pollo salteado con sésamo, mix de lechugas, boconcinos, tomates cherry, lajas de parmesano, almendras tostadas y aderezo aceto-miel.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$11.400</div><div id="ctrl-5"></div></div></div></div>
+      <div class="category-title">Ensaladas</div>
+      <div class="category-desc">Frescas y completas</div>
+      <div class="item-card"><div class="item-img">🥙</div><div class="item-info"><div class="item-name">Ensalada Panera</div><div class="item-desc">Pollo salteado con sésamo, mix de lechugas, boconcinos, tomates cherry, parmesano, almendras tostadas y aderezo aceto-miel. Con focaccia.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$11.400</div><div id="ctrl-5"></div></div></div></div>
       <div class="item-card"><div class="item-img">🥗</div><div class="item-info"><div class="item-name">Ensalada veggie caesar</div><div class="item-desc">Mix de lechugas, croutons, garrapiñada de semillas, queso parmesano y aderezo caesar.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$9.200</div><div id="ctrl-6"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🐟</div><div class="item-info"><div class="item-name">Ensalada de atún</div><div class="item-desc">Penne rigate en pesto, arroz yamaní, lomitos de atún, nueces, huevo duro, parmesano, lechugas, tomates cherry, palta y sésamo mix.</div><div class="item-tags"><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$12.800</div><div id="ctrl-7"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🐟</div><div class="item-info"><div class="item-name">Ensalada de atún</div><div class="item-desc">Penne rigate en pesto, arroz yamaní, lomitos de atún, nueces, huevo duro, parmesano, mix de lechugas, tomates cherry y palta.</div><div class="item-tags"><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$12.800</div><div id="ctrl-7"></div></div></div></div>
     </div>
     <div class="divider"></div>
+
     <div class="category-section" id="pastas">
-      <div class="category-title">Pastas</div><div class="category-desc">Elaboración propia, caseras</div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Ñoquis de papa caseros</div><div class="item-desc">Ñoquis de papa con salsa rosa cremosa. Opción: + pollo grillado.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$10.500</div><div id="ctrl-8"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Raviolones de calabaza</div><div class="item-desc">Raviolones rellenos de calabaza con crema, tomate cubeteado y verdeo rondelle.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$11.900</div><div id="ctrl-9"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Raviolones de salmón</div><div class="item-desc">Raviolones de salmón rosado con crema de eneldo, tomates cherry y alcaparras.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$14.200</div><div id="ctrl-10"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Sorrentinos de jamón y queso</div><div class="item-desc">Sorrentinos rellenos de jamón cocido y queso con trilogía de tomates.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$12.400</div><div id="ctrl-11"></div></div></div></div>
+      <div class="category-title">Pastas</div>
+      <div class="category-desc">Elaboración propia, caseras</div>
+      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Ñoquis de papa caseros</div><div class="item-desc">Ñoquis de papa con salsa rosa cremosa. Opción: + pollo grillado. También disponible con salsa blanca.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$10.500</div><div id="ctrl-8"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Raviolones de calabaza</div><div class="item-desc">Rellenos de calabaza con crema, tomate cubeteado fresco y verdeo rondelle. Masa casera.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$11.900</div><div id="ctrl-9"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Raviolones de salmón</div><div class="item-desc">Rellenos de salmón rosado con crema de eneldo, tomates cherry y alcaparras. Masa fresca.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$14.200</div><div id="ctrl-10"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Sorrentinos de jamón y queso</div><div class="item-desc">Rellenos de jamón cocido y queso con trilogía de tomates. Masa artesanal.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$12.400</div><div id="ctrl-11"></div></div></div></div>
     </div>
     <div class="divider"></div>
+
     <div class="category-section" id="sandwiches">
-      <div class="category-title">Sándwiches & Wraps</div><div class="category-desc">Con guarnición a elección</div>
-      <div class="item-card"><div class="item-img">🥪</div><div class="item-info"><div class="item-name">Smoked Lomito</div><div class="item-desc">Baguetín con lomito, cebolla caramelizada, queso fundido, lechuga, tomate y huevo a la plancha.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$13.800</div><div id="ctrl-12"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🥪</div><div class="item-info"><div class="item-name">Sándwich jamón & brie</div><div class="item-desc">Jamón crudo, queso brie, rúcula, tomates cherry y manteca de Dijon en baguetín.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$13.200</div><div id="ctrl-13"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🌯</div><div class="item-info"><div class="item-name">Wrap Panera</div><div class="item-desc">Tortilla con guacamole, pollo, lechuga capuchina, queso, morrones asados y huevo duro.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$12.600</div><div id="ctrl-14"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🌯</div><div class="item-info"><div class="item-name">Wrap Veggie</div><div class="item-desc">Tortilla con pesto de tomate, muzzalmendra, rúcula selvática, cebolla caramelizada y aceitunas.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span></div><div class="item-bottom"><div class="item-price">$11.400</div><div id="ctrl-15"></div></div></div></div>
+      <div class="category-title">Sándwiches & Wraps</div>
+      <div class="category-desc">Con guarnición a elección: papas fritas, rústicas o boniatos</div>
+      <div class="item-card"><div class="item-img">🥪</div><div class="item-info"><div class="item-name">Smoked Lomito</div><div class="item-desc">Baguetín con lomito vuelta y vuelta, cebolla caramelizada, queso fundido, lechuga, tomate y huevo a la plancha.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$13.800</div><div id="ctrl-12"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🥪</div><div class="item-info"><div class="item-name">Sándwich jamón & brie</div><div class="item-desc">Jamón crudo, queso brie, rúcula, tomates cherry y manteca de Dijon en baguetín. Con guarnición.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$13.200</div><div id="ctrl-13"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🌯</div><div class="item-info"><div class="item-name">Wrap Panera</div><div class="item-desc">Tortilla con guacamole, pollo, lechuga capuchina, queso, morrones asados y huevo duro. Con papas rústicas.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$12.600</div><div id="ctrl-14"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🌯</div><div class="item-info"><div class="item-name">Wrap Veggie</div><div class="item-desc">Tortilla con pesto de tomate, muzzalmendra, rúcula, cebolla caramelizada, tomates secos y frescos, aceitunas y pesto de albahaca.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span></div><div class="item-bottom"><div class="item-price">$11.400</div><div id="ctrl-15"></div></div></div></div>
     </div>
     <div class="divider"></div>
+
     <div class="category-section" id="waffles">
-      <div class="category-title">Waffles & Brunch</div><div class="category-desc">Especialidad de la casa</div>
-      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Waffle salado</div><div class="item-desc">Waffle relleno de jamón, huevo y queso cheddar con papas rústicas.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$10.900</div><div id="ctrl-16"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Keto breakfast</div><div class="item-desc">Tostada sin gluten con palta, huevos revueltos, tomate concasse y dips de frutos secos. Con yogurt y frutas.</div><div class="item-tags"><span class="tag tag-celiac">Sin TACC</span><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$14.500</div><div id="ctrl-17"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Pink Tower</div><div class="item-desc">Torre de waffles con frutos rojos, crema chantilly, dulce de leche y azúcar impalpable. Signature de la casa.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$12.800</div><div id="ctrl-18"></div></div></div></div>
+      <div class="category-title">Waffles & Brunch</div>
+      <div class="category-desc">Especialidad de la casa</div>
+      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Waffle salado</div><div class="item-desc">Waffle relleno de jamón, huevo y queso cheddar, con papas rústicas. Clásico de la casa.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$10.900</div><div id="ctrl-16"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Keto breakfast</div><div class="item-desc">Tostada sin gluten con palta slice, huevos revueltos, tomate concasse y dips de frutos secos. Con yogurt y frutas.</div><div class="item-tags"><span class="tag tag-celiac">Sin TACC</span><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$14.500</div><div id="ctrl-17"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Pink Tower</div><div class="item-desc">Torre de waffles con frutos rojos, crema chantilly, dulce de leche y azúcar impalpable. El postre signature de la casa.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$12.800</div><div id="ctrl-18"></div></div></div></div>
     </div>
     <div class="divider"></div>
+
     <div class="category-section" id="postres">
-      <div class="category-title">Postres</div><div class="category-desc">Elaboración propia</div>
-      <div class="item-card"><div class="item-img">🍮</div><div class="item-info"><div class="item-name">Flan con dulce de leche</div><div class="item-desc">Flan casero con dulce de leche artesanal y crema batida.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$6.400</div><div id="ctrl-19"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🎂</div><div class="item-info"><div class="item-name">Torta del día</div><div class="item-desc">Variedades: chocolate belga, lemon pie, carrot cake o cheesecake de frutos rojos.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$7.200</div><div id="ctrl-20"></div></div></div></div>
+      <div class="category-title">Postres</div>
+      <div class="category-desc">Elaboración propia</div>
+      <div class="item-card"><div class="item-img">🍮</div><div class="item-info"><div class="item-name">Flan con dulce de leche</div><div class="item-desc">Flan casero con dulce de leche artesanal y crema batida. Porción generosa.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$6.400</div><div id="ctrl-19"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🎂</div><div class="item-info"><div class="item-name">Torta del día</div><div class="item-desc">Variedades: chocolate belga, lemon pie, carrot cake o cheesecake de frutos rojos. Consultar disponibilidad.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$7.200</div><div id="ctrl-20"></div></div></div></div>
     </div>
     <div class="divider"></div>
+
     <div class="category-section" id="bebidas">
-      <div class="category-title">Bebidas</div><div class="category-desc">Jugos, cafés e infusiones</div>
-      <div class="item-card"><div class="item-img">🍊</div><div class="item-info"><div class="item-name">Jugo maracuyá & menta</div><div class="item-desc">Jugo natural de maracuyá, menta fresca, miel y limón.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$4.800</div><div id="ctrl-21"></div></div></div></div>
-      <div class="item-card"><div class="item-img">☕</div><div class="item-info"><div class="item-name">Capuchino italiano</div><div class="item-desc">Café, leche vaporizada, crema, chocolate y canela con crema batida.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$5.900</div><div id="ctrl-22"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍋</div><div class="item-info"><div class="item-name">Limonada de menta & jengibre</div><div class="item-desc">Limón exprimido, menta fresca, jengibre, miel y soda.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$4.200</div><div id="ctrl-23"></div></div></div></div>
+      <div class="category-title">Bebidas</div>
+      <div class="category-desc">Jugos, cafés e infusiones</div>
+      <div class="item-card"><div class="item-img">🍊</div><div class="item-info"><div class="item-name">Jugo maracuyá & menta</div><div class="item-desc">Jugo natural de maracuyá, menta fresca, miel y limón. Sin azúcar agregada.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$4.800</div><div id="ctrl-21"></div></div></div></div>
+      <div class="item-card"><div class="item-img">☕</div><div class="item-info"><div class="item-name">Capuchino italiano</div><div class="item-desc">Café, leche vaporizada, crema, chocolate y canela. Terminado con crema batida.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$5.900</div><div id="ctrl-22"></div></div></div></div>
+      <div class="item-card"><div class="item-img">🍋</div><div class="item-info"><div class="item-name">Limonada de menta & jengibre</div><div class="item-desc">Jugo de limón exprimido, menta fresca, jengibre, miel y soda.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$4.200</div><div id="ctrl-23"></div></div></div></div>
     </div>
+
   </div>
 
   <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
   <div class="cart-drawer" id="cart-drawer">
     <div class="cart-handle"></div>
-    <div class="cart-header"><div class="cart-title">Tu pedido</div><button class="cart-close" onclick="toggleCart()">×</button></div>
-    <div class="cart-items" id="cart-items"><div class="cart-empty">Tu carrito está vacío 🛒</div></div>
+    <div class="cart-header">
+      <div class="cart-title">Tu pedido</div>
+      <button class="cart-close" onclick="toggleCart()">×</button>
+    </div>
+    <div class="cart-items" id="cart-items">
+      <div class="cart-empty">Tu carrito está vacío 🛒</div>
+    </div>
     <div class="cart-footer" id="cart-footer" style="display:none">
       <div class="cart-total"><span>Total</span><span id="cart-total">$0</span></div>
       <button class="checkout-btn" id="checkout-btn" onclick="checkout()">Confirmar pedido →</button>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <div style="font-size:48px;margin-bottom:12px">🎉</div>
+      <div style="font-size:18px;font-weight:600;color:#1a1208;margin-bottom:8px">¡Pedido enviado!</div>
+      <div style="font-size:14px;color:#8a7a6a;line-height:1.5">Tu pedido ya está en cocina.<br>En breve te lo llevamos a la mesa.</div>
     </div>
   </div>
 
@@ -162,93 +210,167 @@
 
   <script>
     const BACKEND = 'https://proud-illumination-production-ed01.up.railway.app';
+
     const ITEMS = {
-      1:{name:'Burrata con rúcula',price:9800},2:{name:'Papas cheddar & romero',price:7200},
-      3:{name:'Tosta palta & nuez',price:8500},4:{name:'Empanadas caseras (x3)',price:6900},
-      5:{name:'Ensalada Panera',price:11400},6:{name:'Ensalada veggie caesar',price:9200},
-      7:{name:'Ensalada de atún',price:12800},8:{name:'Ñoquis de papa caseros',price:10500},
-      9:{name:'Raviolones de calabaza',price:11900},10:{name:'Raviolones de salmón',price:14200},
-      11:{name:'Sorrentinos de jamón y queso',price:12400},12:{name:'Smoked Lomito',price:13800},
-      13:{name:'Sándwich jamón & brie',price:13200},14:{name:'Wrap Panera',price:12600},
-      15:{name:'Wrap Veggie',price:11400},16:{name:'Waffle salado',price:10900},
-      17:{name:'Keto breakfast',price:14500},18:{name:'Pink Tower',price:12800},
-      19:{name:'Flan con dulce de leche',price:6400},20:{name:'Torta del día',price:7200},
-      21:{name:'Jugo maracuyá & menta',price:4800},22:{name:'Capuchino italiano',price:5900},
-      23:{name:'Limonada de menta & jengibre',price:4200}
+      1:  { name: 'Burrata con rúcula', price: 9800 },
+      2:  { name: 'Papas cheddar & romero', price: 7200 },
+      3:  { name: 'Tosta palta & nuez', price: 8500 },
+      4:  { name: 'Empanadas caseras (x3)', price: 6900 },
+      5:  { name: 'Ensalada Panera', price: 11400 },
+      6:  { name: 'Ensalada veggie caesar', price: 9200 },
+      7:  { name: 'Ensalada de atún', price: 12800 },
+      8:  { name: 'Ñoquis de papa caseros', price: 10500 },
+      9:  { name: 'Raviolones de calabaza', price: 11900 },
+      10: { name: 'Raviolones de salmón', price: 14200 },
+      11: { name: 'Sorrentinos de jamón y queso', price: 12400 },
+      12: { name: 'Smoked Lomito', price: 13800 },
+      13: { name: 'Sándwich jamón & brie', price: 13200 },
+      14: { name: 'Wrap Panera', price: 12600 },
+      15: { name: 'Wrap Veggie', price: 11400 },
+      16: { name: 'Waffle salado', price: 10900 },
+      17: { name: 'Keto breakfast', price: 14500 },
+      18: { name: 'Pink Tower', price: 12800 },
+      19: { name: 'Flan con dulce de leche', price: 6400 },
+      20: { name: 'Torta del día', price: 7200 },
+      21: { name: 'Jugo maracuyá & menta', price: 4800 },
+      22: { name: 'Capuchino italiano', price: 5900 },
+      23: { name: 'Limonada de menta & jengibre', price: 4200 }
     };
+
     let cart = {};
+
     const params = new URLSearchParams(window.location.search);
-    const mesa = params.get('mesa') || '1';
-    document.getElementById('mozo-fab').href = 'mozo.html?mesa=' + mesa;
+    const mesa = params.get('mesa') || '?';
+    const mozoFab = document.getElementById('mozo-fab');
+    mozoFab.href = 'mozo.html?mesa=' + mesa;
+
     Object.keys(ITEMS).forEach(id => renderCtrl(Number(id)));
 
     function renderCtrl(id) {
-      const el = document.getElementById('ctrl-' + id); if (!el) return;
+      const el = document.getElementById('ctrl-' + id);
+      if (!el) return;
       const qty = cart[id] || 0;
-      if (qty === 0) { el.innerHTML = '<button class="add-btn" onclick="addItem(' + id + ')">+</button>'; }
-      else { el.innerHTML = '<div class="qty-control"><button class="qty-btn" onclick="removeItem(' + id + ')">−</button><span class="qty-num">' + qty + '</span><button class="qty-btn" onclick="addItem(' + id + ')">+</button></div>'; }
+      if (qty === 0) {
+        el.innerHTML = '<button class="add-btn" onclick="addItem(' + id + ')">+</button>';
+      } else {
+        el.innerHTML = '<div class="qty-control">' +
+          '<button class="qty-btn" onclick="removeItem(' + id + ')">−</button>' +
+          '<span class="qty-num">' + qty + '</span>' +
+          '<button class="qty-btn" onclick="addItem(' + id + ')">+</button>' +
+          '</div>';
+      }
     }
-    function addItem(id) { cart[id] = (cart[id]||0)+1; renderCtrl(id); updateCartCount(); }
-    function removeItem(id) { if (!cart[id]) return; cart[id]--; if (!cart[id]) delete cart[id]; renderCtrl(id); updateCartCount(); if (document.getElementById('cart-drawer').classList.contains('open')) renderCartItems(); }
-    function updateCartCount() { document.getElementById('cart-count').textContent = Object.values(cart).reduce((a,b)=>a+b,0); }
-    function toggleCart() {
-      const o = document.getElementById('cart-overlay'), d = document.getElementById('cart-drawer');
-      if (!d.classList.contains('open')) { renderCartItems(); o.classList.add('open'); d.classList.add('open'); }
-      else { o.classList.remove('open'); d.classList.remove('open'); }
-    }
-    function renderCartItems() {
-      const c = document.getElementById('cart-items'), f = document.getElementById('cart-footer');
-      const ids = Object.keys(cart).filter(id=>cart[id]>0);
-      if (!ids.length) { c.innerHTML='<div class="cart-empty">Tu carrito está vacío 🛒</div>'; f.style.display='none'; return; }
-      let total=0, html='';
-      ids.forEach(id=>{ const it=ITEMS[id],qty=cart[id],sub=it.price*qty; total+=sub;
-        html+='<div class="cart-item"><div class="cart-item-name">'+it.name+'</div><div class="cart-item-qty"><button class="cart-qty-btn" onclick="removeItem('+id+')">−</button><span class="cart-qty-num">'+qty+'</span><button class="cart-qty-btn" onclick="addItem('+id+')">+</button></div><div class="cart-item-price">$'+sub.toLocaleString('es-AR')+'</div></div>';
-      });
-      c.innerHTML=html; document.getElementById('cart-total').textContent='$'+total.toLocaleString('es-AR'); f.style.display='block';
-    }
-    async function checkout() {
-    const ids = Object.keys(cart).filter(id => cart[id] > 0);
-    if (ids.length === 0) return;
-    const items = ids.map(id => ({ name: ITEMS[id].name, qty: cart[id], price: ITEMS[id].price }));
-    const mesaNum = new URLSearchParams(window.location.search).get("mesa") || "?";
-    fetch("https://proud-illumination-production-ed01.up.railway.app/api/pedido", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mesa: mesaNum, items })
-    }).then(() => {
-      cart = {};
-      Object.keys(ITEMS).forEach(id => renderCtrl(Number(id)));
-      updateCartCount();
-      toggleCart();
-      showConfirmacion();
-    }).catch(() => alert("Error al enviar el pedido. Intentá de nuevo."));
-  }
-  ));
-      try {
-        const res = await fetch(BACKEND+'/api/pedido',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mesa,items})});
-        if (!res.ok) throw new Error();
-        cart={}; Object.keys(ITEMS).forEach(id=>renderCtrl(Number(id))); updateCartCount(); toggleCart();
-        showToast('¡Pedido enviado a cocina! 🎉');
-      } catch(e) { showToast('Error al enviar. Reintentá.'); }
-      finally { btn.disabled=false; btn.textContent='Confirmar pedido →'; }
-    }
-    function showToast(msg) { const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500); }
-    const sections=['entradas','ensaladas','pastas','sandwiches','waffles','postres','bebidas'];
-    const catBtns=document.querySelectorAll('.cat-btn');
-    function scrollTo(id){document.getElementById(id).scrollIntoView({behavior:'smooth',block:'start'});}
-    window.addEventListener('scroll',()=>{ let cur=sections[0]; sections.forEach(id=>{const el=document.getElementById(id);if(el&&el.getBoundingClientRect().top<140)cur=id;}); catBtns.forEach((b,i)=>b.classList.toggle('active',sections[i]===cur)); });
 
-    function showConfirmacion() {
-      const div = document.createElement('div');
-      div.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:300;display:flex;align-items:center;justify-content:center;';
-      div.innerHTML = '<div style="background:#fff;border-radius:20px;padding:32px 28px;text-align:center;max-width:280px;margin:20px">' +
-        '<div style="font-size:48px;margin-bottom:12px">🎉</div>' +
-        '<div style="font-size:18px;font-weight:600;color:#1a1208;margin-bottom:8px">¡Pedido enviado!</div>' +
-        '<div style="font-size:14px;color:#8a7a6a;line-height:1.5">Tu pedido ya está en cocina.<br>En breve te lo llevamos a la mesa.</div>' +
-        '</div>';
-      document.body.appendChild(div);
-      setTimeout(() => div.remove(), 3500);
+    function addItem(id) {
+      cart[id] = (cart[id] || 0) + 1;
+      renderCtrl(id);
+      updateCartCount();
     }
+
+    function removeItem(id) {
+      if (!cart[id]) return;
+      cart[id]--;
+      if (cart[id] === 0) delete cart[id];
+      renderCtrl(id);
+      updateCartCount();
+      if (document.getElementById('cart-drawer').classList.contains('open')) renderCartItems();
+    }
+
+    function updateCartCount() {
+      const total = Object.values(cart).reduce((a, b) => a + b, 0);
+      document.getElementById('cart-count').textContent = total;
+    }
+
+    function toggleCart() {
+      const overlay = document.getElementById('cart-overlay');
+      const drawer = document.getElementById('cart-drawer');
+      const isOpen = drawer.classList.contains('open');
+      if (!isOpen) {
+        renderCartItems();
+        overlay.classList.add('open');
+        drawer.classList.add('open');
+      } else {
+        overlay.classList.remove('open');
+        drawer.classList.remove('open');
+      }
+    }
+
+    function renderCartItems() {
+      const container = document.getElementById('cart-items');
+      const footer = document.getElementById('cart-footer');
+      const ids = Object.keys(cart).filter(id => cart[id] > 0);
+      if (ids.length === 0) {
+        container.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛒</div>';
+        footer.style.display = 'none';
+        return;
+      }
+      let total = 0;
+      let html = '';
+      ids.forEach(id => {
+        const item = ITEMS[id];
+        const qty = cart[id];
+        const subtotal = item.price * qty;
+        total += subtotal;
+        html += '<div class="cart-item">' +
+          '<div class="cart-item-name">' + item.name + '</div>' +
+          '<div class="cart-item-qty">' +
+            '<button class="cart-qty-btn" onclick="removeItem(' + id + ')">−</button>' +
+            '<span class="cart-qty-num">' + qty + '</span>' +
+            '<button class="cart-qty-btn" onclick="addItem(' + id + ')">+</button>' +
+          '</div>' +
+          '<div class="cart-item-price">$' + subtotal.toLocaleString('es-AR') + '</div>' +
+          '</div>';
+      });
+      container.innerHTML = html;
+      document.getElementById('cart-total').textContent = '$' + total.toLocaleString('es-AR');
+      footer.style.display = 'block';
+    }
+
+    function checkout() {
+      const ids = Object.keys(cart).filter(id => cart[id] > 0);
+      if (ids.length === 0) return;
+      const items = ids.map(id => ({ name: ITEMS[id].name, qty: cart[id], price: ITEMS[id].price }));
+      const btn = document.getElementById('checkout-btn');
+      btn.textContent = 'Enviando pedido...';
+      btn.disabled = true;
+      fetch(BACKEND + '/api/pedido', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mesa: mesa, items: items })
+      }).then(r => r.json()).then(() => {
+        cart = {};
+        Object.keys(ITEMS).forEach(id => renderCtrl(Number(id)));
+        updateCartCount();
+        toggleCart();
+        document.getElementById('confirm-overlay').classList.add('open');
+        setTimeout(() => document.getElementById('confirm-overlay').classList.remove('open'), 3500);
+      }).catch(() => {
+        btn.textContent = 'Confirmar pedido →';
+        btn.disabled = false;
+        alert('Error al enviar el pedido. Intentá de nuevo.');
+      });
+    }
+
+    const sections = ['entradas','ensaladas','pastas','sandwiches','waffles','postres','bebidas'];
+    const catBtns = document.querySelectorAll('.cat-btn');
+
+    function navScroll(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const offset = el.getBoundingClientRect().top + window.scrollY - 100;
+      window.scrollTo({ top: offset, behavior: 'smooth' });
+    }
+
+    window.addEventListener('scroll', () => {
+      let current = sections[0];
+      sections.forEach(id => {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top < 110) current = id;
+      });
+      catBtns.forEach((btn, i) => {
+        btn.classList.toggle('active', sections[i] === current);
+      });
+    });
   </script>
 </body>
 </html>
