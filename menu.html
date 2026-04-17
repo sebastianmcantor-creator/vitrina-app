@@ -331,23 +331,22 @@
       if (ids.length === 0) return;
       const items = ids.map(id => ({ name: ITEMS[id].name, qty: cart[id], price: ITEMS[id].price }));
       const btn = document.getElementById('checkout-btn');
-      btn.textContent = 'Enviando pedido...';
+      btn.textContent = 'Procesando...';
       btn.disabled = true;
-      fetch(BACKEND + '/api/pedido', {
+      fetch(BACKEND + '/api/crear-pago', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ mesa: mesa, items: items })
-      }).then(r => r.json()).then(() => {
-        cart = {};
-        Object.keys(ITEMS).forEach(id => renderCtrl(Number(id)));
-        updateCartCount();
-        toggleCart();
-        document.getElementById('confirm-overlay').classList.add('open');
-        setTimeout(() => document.getElementById('confirm-overlay').classList.remove('open'), 3500);
+      }).then(r => r.json()).then(data => {
+        if (data.init_point) {
+          window.location.href = data.init_point;
+        } else {
+          throw new Error('Sin init_point');
+        }
       }).catch(() => {
         btn.textContent = 'Confirmar pedido →';
         btn.disabled = false;
-        alert('Error al enviar el pedido. Intentá de nuevo.');
+        alert('Error al procesar el pago. Intentá de nuevo.');
       });
     }
 
