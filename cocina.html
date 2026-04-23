@@ -136,6 +136,39 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.5; }
     }
+
+    .undo-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #2a2a2a;
+      border: 1px solid #3a3a3a;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: #aaa;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .undo-btn:not(:disabled):hover {
+      background: #333;
+      border-color: #c8a84a;
+      color: #c8a84a;
+    }
+
+    .undo-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .undo-detail {
+      font-size: 11px;
+      color: #666;
+      margin-top: 1px;
+    }
   </style>
 </head>
 <body>
@@ -145,9 +178,17 @@
     <div class="header-title">🍳 Panel de Cocina</div>
     <div class="header-sub">La Panera Rosa — Pedidos en tiempo real</div>
   </div>
-  <div class="conn-label">
-    <span class="status-dot" id="status-dot"></span>
-    <span id="conn-label">Conectando...</span>
+  <div style="display:flex;align-items:center;gap:16px">
+    <div>
+      <button class="undo-btn" id="undo-btn" disabled onclick="deshacerUltimoCambio()">
+        ↩ Deshacer
+      </button>
+      <div class="undo-detail" id="undo-detail"></div>
+    </div>
+    <div class="conn-label">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="conn-label">Conectando...</span>
+    </div>
   </div>
 </div>
 
@@ -164,6 +205,21 @@
 
   let pedidos = {};
   let ws;
+  let historial = []; // [{ id, estadoAnterior, mesa }]
+
+  function actualizarBotonDeshacer() {
+    const btn = document.getElementById('undo-btn');
+    const detail = document.getElementById('undo-detail');
+    if (historial.length === 0) {
+      btn.disabled = true;
+      detail.textContent = '';
+    } else {
+      const ultimo = historial[historial.length - 1];
+      const labels = { pendiente: 'Pendiente', preparando: 'Preparando', listo: 'Listo' };
+      btn.disabled = false;
+      detail.textContent = 'Mesa ' + ultimo.mesa + ' → ' + labels[ultimo.estadoAnterior];
+    }
+  }
 
   function connect() {
     ws = new WebSocket(BACKEND_WS);
@@ -229,12 +285,26 @@
   async function cambiarEstado(id) {
     const pedido = pedidos[id];
     if (!pedido || pedido.estado === 'listo') return;
+    const estadoAnterior = pedido.estado;
     const nuevoEstado = siguienteEstado(pedido.estado);
     await fetch(BACKEND + '/api/pedido/' + id + '/estado', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado: nuevoEstado })
     });
+    historial.push({ id, estadoAnterior, mesa: pedido.mesa });
+    actualizarBotonDeshacer();
+  }
+
+  async function deshacerUltimoCambio() {
+    if (historial.length === 0) return;
+    const { id, estadoAnterior } = historial.pop();
+    await fetch(BACKEND + '/api/pedido/' + id + '/estado', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ estado: estadoAnterior })
+    });
+    actualizarBotonDeshacer();
   }
 
   function badgeEstado(estado) {

@@ -285,7 +285,7 @@
     <div class="messages" id="messages">
       <div class="msg bot">
         <div class="msg-label">Mozo</div>
-        <div class="msg-bubble">¡Hola! Bienvenido a Chikpi 🫒 Soy tu asistente. Puedo ayudarte con el menú, ingredientes, opciones vegetarianas, veganas o aptas para celíacos. ¿En qué te puedo ayudar?</div>
+        <div class="msg-bubble">¡Hola! Bienvenido a La Panera Rosa 🥐 Soy Chikpi, tu asistente. Puedo ayudarte con el menú completo, ingredientes, opciones vegetarianas, veganas o aptas para celíacos, y hacerte recomendaciones. ¿En qué te puedo ayudar?</div>
       </div>
       <div class="msg typing" id="typing">
         <div class="msg-bubble">
@@ -296,8 +296,10 @@
 
     <div class="suggestions" id="suggestions">
       <button class="suggestion-btn" onclick="sendSuggestion('¿Qué opciones veganas tienen?')">Opciones veganas</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué me recomendás para compartir?')">Para compartir</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Tienen platos sin TACC?')">Sin TACC</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué platos son sin TACC?')">Sin TACC</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué waffles tienen?')">Waffles</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué me recomendás para desayunar?')">Desayuno</button>
+      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué pastas caseras tienen?')">Pastas</button>
     </div>
 
     <div class="error-msg" id="error-msg"></div>
@@ -317,50 +319,91 @@
     const BACKEND = 'https://proud-illumination-production-ed01.up.railway.app';
 
     const MENU = `
-MENÚ DE CHIKPI — Restaurante de cocina mediterránea y de Medio Oriente. Ubicado en Colegiales, Buenos Aires.
+MENÚ DE LA PANERA ROSA — Restaurante en Recoleta, Buenos Aires. Abierto non stop (todo el día).
 
-ENTRADAS Y PARA COMPARTIR:
-- Hummus clásico ($3.200): puré de garbanzos con tahini, limón y aceite de oliva. Apto vegano, celíaco.
-- Hummus con carne ($4.100): hummus clásico con carne de res especiada. Apto celíaco.
-- Baba ganoush ($3.000): berenjena asada, tahini, limón. Apto vegano, celíaco.
-- Falafel (6 unidades, $3.500): croquetas de garbanzo y hierbas. Apto vegano. Contiene gluten.
-- Fattoush ($2.800): ensalada mediterránea con tomate, pepino, menta y pan tostado. Apto vegano. Contiene gluten.
-- Tabla mezze para dos ($7.200): hummus + baba ganoush + falafel + pita. Ideal para compartir. Contiene gluten.
+ENTRADAS / PICOTEO:
+- Burrata con rúcula ($9.800): burrata fresca, rúcula selvática, nueces, tomates cherry y remolachas, aceite de oliva extra virgen. Vegetariano. Muy pedida.
+- Papas cheddar & romero ($7.200): papas fritas bañadas en cheddar fundido, romero fresco y dip de salsa criolla. Vegetariano. Contiene lácteos.
+- Empanadas caseras x3 ($6.900): a elección carne cortada a cuchillo, pollo especiado, jamón y queso, o humita. Doradas al horno. Contienen gluten y lácteos.
 
-PRINCIPALES:
-- Shawarma de pollo ($4.800): pan pita, pollo marinado, vegetales, salsa de yogur. Contiene gluten y lácteos.
-- Shawarma vegano ($4.200): pita, falafel, vegetales, tahini. Apto vegano. Contiene gluten.
-- Bowl mediterráneo ($4.500): arroz, garbanzos, vegetales asados, tahini. Apto vegano, celíaco.
-- Kofta de cordero ($5.200): brochette de cordero especiado con arroz y ensalada. Apto celíaco.
-- Wrap de berenjenas ($3.900): berenjenas asadas, queso feta, hierbas. Vegetariano. Contiene gluten y lácteos.
+TOSTAS:
+- Tosta palta & nuez ($8.500): pan de campo tostado, queso crema panera, palta slice, nueces y rúcula. Opcional: huevo poche. Vegetariano. Contiene gluten, lácteos y frutos secos.
 
-POSTRES:
-- Knafeh ($2.500): postre de queso con almíbar de rosas. Vegetariano. Contiene gluten y lácteos.
-- Baklava (2 unidades, $1.800): hojaldre con nueces y miel. Vegetariano. Contiene gluten y frutos secos.
-- Helado de tahini ($2.200): helado artesanal de sésamo. Vegetariano. Contiene lácteos.
+ENSALADAS:
+- Ensalada Panera ($11.400): pollo salteado con sésamo, mix de lechugas, bocconcinos, tomates cherry, parmesano, almendras tostadas y aderezo aceto-miel. Con focaccia. Contiene gluten, lácteos y frutos secos. Muy pedida.
+- Ensalada veggie caesar ($9.200): mix de lechugas, croutons, garrapiñada de semillas, queso parmesano y aderezo caesar. Vegetariano. Contiene gluten y lácteos.
+- Ensalada de atún ($12.800): penne rigate al pesto, arroz yamaní, lomitos de atún, nueces, huevo duro, parmesano, mix de lechugas, tomates cherry y palta. Sin TACC. Contiene pescado, frutos secos y lácteos.
 
-BEBIDAS:
-- Limonada de menta ($1.200): apto vegano, celíaco.
-- Agua ($600).
-- Vino de la casa (copa, $1.800).
-- Té árabe ($900): con hierbas y especias. Apto vegano, celíaco.
+CARNES:
+- Consultar al mozo por las opciones de carne disponibles. La carta varía según temporada.
+
+PASTAS CASERAS:
+- Ñoquis de papa caseros ($10.500): salsa rosa cremosa. Opción: agregar pollo grillado o salsa blanca. Vegetariano. Contiene gluten, lácteos y huevo. Muy pedidos.
+- Raviolones de calabaza ($11.900): rellenos de calabaza con crema, tomate cubeteado fresco y verdeo rondelle. Masa casera. Vegetariano. Contiene gluten, lácteos y huevo.
+- Raviolones de salmón ($14.200): rellenos de salmón rosado con crema de eneldo, tomates cherry y alcaparras. Masa fresca. Contiene gluten, pescado, lácteos y huevo.
+- Sorrentinos de jamón y queso ($12.400): rellenos de jamón cocido y queso, trilogía de tomates. Masa artesanal. Contiene gluten, lácteos y huevo.
+
+SANDWICHES:
+Todos vienen con guarnición a elección: papas fritas, rústicas o boniatos.
+- Smoked Lomito ($13.800): baguetín con lomito vuelta y vuelta, cebolla caramelizada, queso fundido, lechuga, tomate y huevo a la plancha. Contiene gluten y lácteos. Muy pedido.
+- Sándwich jamón & brie ($13.200): jamón crudo, queso brie, rúcula, tomates cherry y manteca de Dijon en baguetín. Contiene gluten y lácteos.
+- Wrap Panera ($12.600): tortilla con guacamole, pollo, lechuga capuchina, queso, morrones asados y huevo duro. Con papas rústicas. Contiene gluten y lácteos.
+- Wrap Veggie ($11.400): tortilla con pesto de tomate, muzzalmendra, rúcula, cebolla caramelizada, tomates secos y frescos, aceitunas y pesto de albahaca. Vegano. Contiene gluten y frutos secos.
+
+WAFFLES SALADOS:
+- Waffle salado ($10.900): waffle relleno de jamón, huevo y queso cheddar, con papas rústicas. Clásico de la casa. Contiene gluten, lácteos y huevo. Muy pedido.
+
+WAFFLES DULCES:
+- Pink Tower ($12.800): torre de waffles con frutos rojos, crema chantilly, dulce de leche y azúcar impalpable. Postre signature de la casa. Vegetariano. Contiene gluten, lácteos y huevo. Muy pedido.
+
+CREPES SALADOS:
+- Consultar al mozo por las opciones del día.
+
+CREPES DULCES:
+- Consultar al mozo por las opciones del día.
+
+PANCAKES:
+- Consultar al mozo por las opciones del día.
+
+TORTAS:
+- Torta del día ($7.200): según disponibilidad — chocolate belga, lemon pie, carrot cake o cheesecake de frutos rojos. Consultar al mozo. Vegetariano. Contiene gluten, lácteos y huevo.
+- Flan casero con dulce de leche ($6.400): flan casero con dulce de leche artesanal y crema batida. Sin TACC. Vegetariano. Contiene lácteos y huevo.
+
+DESAYUNOS Y MERIENDAS:
+- Keto breakfast ($14.500): tostada sin gluten con palta slice, huevos revueltos, tomate concasse y dips de frutos secos. Con yogurt y frutas. Sin TACC. Vegetariano. Contiene lácteos, huevo y frutos secos.
+- (También disponibles tostadas, medialunas y opciones del día. Consultar al mozo.)
+
+CAFETERÍA:
+- Capuchino italiano ($5.900): café, leche vaporizada, crema, chocolate y canela, terminado con crema batida. Vegetariano. Contiene lácteos y cafeína.
+- (También disponibles: café, cortado, latte, té e infusiones. Consultar al mozo.)
+
+JUGOS Y BEBIDAS:
+- Jugo maracuyá & menta ($4.800): jugo natural de maracuyá, menta fresca, miel y limón. Sin azúcar agregada. Vegano. Sin TACC.
+- Limonada de menta & jengibre ($4.200): limón exprimido, menta fresca, jengibre, miel y soda. Vegano. Sin TACC.
+- (También disponibles: agua, gaseosas, jugos del día. Consultar al mozo.)
+
+TRAGOS CON ALCOHOL:
+- Consultar al mozo por la carta de tragos y vinos.
 
 INFORMACIÓN IMPORTANTE:
-- Todos los platos se preparan en cocina compartida.
-- Opciones celíacas: los platos marcados no contienen gluten en sus ingredientes, pero consultar por contaminación cruzada.
-- El restaurante es pet-friendly en la vereda.
+- La Panera Rosa está en Recoleta, Buenos Aires. Abierto non stop todos los días.
+- Sin TACC confirmados en la carta: ensalada de atún, flan casero, keto breakfast, jugos y limonada. Para el resto, consultar por contaminación cruzada ya que la cocina es compartida.
+- Opciones veganas: Wrap Veggie, jugo maracuyá & menta, limonada de menta & jengibre.
+- Opciones vegetarianas: burrata, papas cheddar, tosta palta, ensalada veggie caesar, ñoquis, raviolones de calabaza, wrap veggie, pink tower, keto breakfast, tortas, flan, toda la cafetería y bebidas.
+- Precios en pesos argentinos, sujetos a cambios.
 `;
 
-    const SYSTEM_PROMPT = `Sos el asistente de Chikpi, un restaurante de cocina mediterránea y de Medio Oriente en Colegiales, Buenos Aires. Tu rol es el de un mozo digital amable, cálido y conocedor del menú.
+    const SYSTEM_PROMPT = `Sos Chikpi, el asistente digital de La Panera Rosa, un restaurante de cocina casera y brunch en Recoleta, Buenos Aires. Tu rol es el de un mozo digital amable, cálido y conocedor del menú.
 
 REGLAS ESTRICTAS:
-1. Solo respondés preguntas relacionadas con el menú, los platos, ingredientes, alérgenos, recomendaciones o información del restaurante.
-2. Si te preguntan algo que no está en el menú o no tiene que ver con Chikpi, respondés amablemente que solo podés ayudar con el menú del restaurante.
-3. Nunca inventés platos, precios ni información que no esté en el menú.
+1. Solo respondés preguntas relacionadas con el menú, los platos, ingredientes, alérgenos, recomendaciones o información del restaurante La Panera Rosa.
+2. Si te preguntan algo que no tiene que ver con el restaurante, respondés amablemente que solo podés ayudar con el menú.
+3. Nunca inventés platos, precios ni información que no esté en el menú. Si algo no está listado, decí que consulten al mozo.
 4. Usás un tono cálido, informal y porteño. Podés usar emojis con moderación.
-5. Cuando recomendés, basate en lo que el cliente necesita (vegano, compartir, sin TACC, etc.).
+5. Cuando recomendés, basate en lo que el cliente necesita (vegano, vegetariano, sin TACC, desayuno, para compartir, postre, etc.).
 6. Respondés en español rioplatense (vos, che, etc.).
 7. Tus respuestas son concisas, máximo 3-4 líneas. Si hay lista, usá viñetas cortas.
+8. Para las categorías Carnes, Crepes, Pancakes y Tragos con Alcohol, siempre indicá que consulten al mozo por las opciones del día.
 
 MENÚ DISPONIBLE:
 ${MENU}`;
