@@ -86,7 +86,16 @@
 
     .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300; display: none; align-items: center; justify-content: center; }
     .confirm-overlay.open { display: flex; }
-    .confirm-box { background: #fff; border-radius: 20px; padding: 32px 28px; text-align: center; max-width: 280px; margin: 20px; }
+    .confirm-box { background: #fff; border-radius: 20px; padding: 32px 28px; text-align: center; max-width: 300px; margin: 20px; width: 100%; }
+    .confirm-emoji { font-size: 52px; margin-bottom: 14px; transition: transform 0.3s ease; }
+    .confirm-title { font-size: 18px; font-weight: 600; color: #1a1208; margin-bottom: 8px; line-height: 1.3; }
+    .confirm-sub { font-size: 13px; color: #8a7a6a; line-height: 1.5; margin-bottom: 24px; }
+    .confirm-status-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; }
+    .confirm-step { width: 8px; height: 8px; border-radius: 50%; background: #ede8e2; transition: background 0.4s; }
+    .confirm-step.active { background: var(--accent); }
+    .confirm-step.done { background: #4caf50; }
+    .confirm-close { background: none; border: 1px solid #ede8e2; border-radius: 12px; padding: 10px 24px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: #8a7a6a; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+    .confirm-close:hover { border-color: #1a1208; color: #1a1208; }
   </style>
 </head>
 <body>
@@ -200,9 +209,15 @@
 
   <div class="confirm-overlay" id="confirm-overlay">
     <div class="confirm-box">
-      <div style="font-size:48px;margin-bottom:12px">🎉</div>
-      <div style="font-size:18px;font-weight:600;color:#1a1208;margin-bottom:8px">¡Pedido enviado!</div>
-      <div style="font-size:14px;color:#8a7a6a;line-height:1.5">Tu pedido ya está en cocina.<br>En breve te lo llevamos a la mesa.</div>
+      <div class="confirm-emoji" id="confirm-emoji">🎉</div>
+      <div class="confirm-title" id="confirm-title">Pedido recibido ✓</div>
+      <div class="confirm-sub" id="confirm-sub">Tu pedido ya está en cocina.</div>
+      <div class="confirm-status-bar">
+        <div class="confirm-step active" id="step-pendiente"></div>
+        <div class="confirm-step" id="step-preparando"></div>
+        <div class="confirm-step" id="step-listo"></div>
+      </div>
+      <button class="confirm-close" onclick="cerrarOverlay()">Cerrar</button>
     </div>
   </div>
 
@@ -326,6 +341,58 @@
       footer.style.display = 'block';
     }
 
+    let statusInterval = null;
+    let estadoActual = null;
+
+    const ESTADOS = {
+      pendiente:  { emoji: '🎉', title: 'Pedido recibido ✓',              sub: 'Tu pedido ya está en cocina.' },
+      preparando: { emoji: '🍳', title: 'Tu pedido se está preparando 🍳', sub: 'La cocina ya está en eso.' },
+      listo:      { emoji: '🎉', title: '¡Tu pedido está listo! 🎉',       sub: 'Ya te lo llevamos a la mesa.' },
+    };
+
+    function actualizarOverlayEstado(estado) {
+      if (estado === estadoActual) return;
+      estadoActual = estado;
+      const s = ESTADOS[estado] || ESTADOS.pendiente;
+      document.getElementById('confirm-emoji').textContent = s.emoji;
+      document.getElementById('confirm-title').textContent = s.title;
+      document.getElementById('confirm-sub').textContent   = s.sub;
+
+      const pasos = ['pendiente', 'preparando', 'listo'];
+      const idx = pasos.indexOf(estado);
+      pasos.forEach((p, i) => {
+        const el = document.getElementById('step-' + p);
+        el.className = 'confirm-step' + (i < idx ? ' done' : i === idx ? ' active' : '');
+      });
+    }
+
+    function cerrarOverlay() {
+      clearInterval(statusInterval);
+      statusInterval = null;
+      estadoActual = null;
+      document.getElementById('confirm-overlay').classList.remove('open');
+    }
+
+    function abrirOverlayEstado(pedidoId) {
+      estadoActual = null;
+      actualizarOverlayEstado('pendiente');
+      document.getElementById('confirm-overlay').classList.add('open');
+
+      async function poll() {
+        try {
+          const res = await fetch(BACKEND + '/pedidos');
+          if (!res.ok) return;
+          const lista = await res.json();
+          const pedido = lista.find(p => p.id === pedidoId);
+          if (pedido) actualizarOverlayEstado(pedido.estado);
+        } catch {}
+      }
+
+      poll();
+      clearInterval(statusInterval);
+      statusInterval = setInterval(poll, 5000);
+    }
+
     function checkout() {
       const ids = Object.keys(cart).filter(id => cart[id] > 0);
       if (ids.length === 0) return;
@@ -339,9 +406,11 @@
         body: JSON.stringify({ mesa: String(mesa), items: items })
       }).then(r => {
         if (!r.ok) throw new Error('Error ' + r.status);
+        return r.json();
+      }).then(pedido => {
         document.getElementById('cart-overlay').classList.remove('open');
         document.getElementById('cart-drawer').classList.remove('open');
-        document.getElementById('confirm-overlay').classList.add('open');
+        abrirOverlayEstado(pedido.id);
         cart = {};
         updateCartCount();
         btn.textContent = 'Confirmar pedido →';
