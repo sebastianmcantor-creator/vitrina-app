@@ -200,13 +200,18 @@
 </div>
 
 <script>
-  const BACKEND_WS = 'wss://proud-illumination-production-ed01.up.railway.app';
-  const BACKEND = 'https://proud-illumination-production-ed01.up.railway.app';
+  const API = 'https://vitrina-worker.vitrinaapp.workers.dev';
 
   let pedidos = {};
-  let ws;
-  let historial = []; // [{ id, estadoAnterior, mesa }]
+  let historial = [];
 
+  // ── Status indicator ─────────────────────────────────────────────────────────
+  function setStatus(online) {
+    document.getElementById('status-dot').classList.toggle('connected', online);
+    document.getElementById('conn-label').textContent = online ? 'En línea' : 'Sin conexión';
+  }
+
+  // ── Undo button ──────────────────────────────────────────────────────────────
   function actualizarBotonDeshacer() {
     const btn = document.getElementById('undo-btn');
     const detail = document.getElementById('undo-detail');
@@ -221,40 +226,29 @@
     }
   }
 
-  function connect() {
-    ws = new WebSocket(BACKEND_WS);
+  // ── Polling ──────────────────────────────────────────────────────────────────
+  async function fetchPedidos() {
+    try {
+      const res = await fetch(API + '/pedidos');
+      if (!res.ok) throw new Error();
+      const lista = await res.json();
 
-    ws.onopen = () => {
-      document.getElementById('status-dot').classList.add('connected');
-      document.getElementById('conn-label').textContent = 'Conectado';
-    };
+      const nuevos = lista.filter(p => !pedidos[p.id] && p.estado === 'pendiente');
+      if (nuevos.length > 0) playSound();
 
-    ws.onclose = () => {
-      document.getElementById('status-dot').classList.remove('connected');
-      document.getElementById('conn-label').textContent = 'Reconectando...';
-      setTimeout(connect, 3000);
-    };
+      pedidos = {};
+      lista
+        .filter(p => p.estado !== 'entregado')
+        .forEach(p => { pedidos[p.id] = p; });
 
-    ws.onerror = () => {
-      document.getElementById('conn-label').textContent = 'Error de conexión';
-    };
-
-    ws.onmessage = (e) => {
-      const msg = JSON.parse(e.data);
-      if (msg.type === 'init') {
-        msg.pedidos.forEach(p => { pedidos[p.id] = p; });
-        renderAll();
-      } else if (msg.type === 'nuevo_pedido') {
-        pedidos[msg.pedido.id] = msg.pedido;
-        renderAll();
-        playSound();
-      } else if (msg.type === 'actualizar_pedido') {
-        pedidos[msg.pedido.id] = msg.pedido;
-        renderAll();
-      }
-    };
+      setStatus(true);
+      renderAll();
+    } catch {
+      setStatus(false);
+    }
   }
 
+  // ── Sound ────────────────────────────────────────────────────────────────────
   function playSound() {
     try {
       const ctx = new AudioContext();
@@ -270,6 +264,7 @@
     } catch(e) {}
   }
 
+  // ── State helpers ────────────────────────────────────────────────────────────
   function siguienteEstado(estado) {
     if (estado === 'pendiente') return 'preparando';
     if (estado === 'preparando') return 'listo';
@@ -282,40 +277,59 @@
     return '✓ Listo';
   }
 
+  // ── Cambiar estado → PUT /pedidos/:id/estado ─────────────────────────────────
   async function cambiarEstado(id) {
     const pedido = pedidos[id];
     if (!pedido || pedido.estado === 'listo') return;
     const estadoAnterior = pedido.estado;
     const nuevoEstado = siguienteEstado(pedido.estado);
-    await fetch(BACKEND + '/api/pedido/' + id + '/estado', {
-      method: 'POST',
+
+    const res = await fetch(API + '/pedidos/' + id + '/estado', {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado: nuevoEstado })
     });
+    if (!res.ok) return;
+
+    pedidos[id] = { ...pedido, estado: nuevoEstado };
     historial.push({ id, estadoAnterior, mesa: pedido.mesa });
     actualizarBotonDeshacer();
+    renderAll();
   }
 
+  // ── Deshacer → PUT /pedidos/:id/estado con estado anterior ───────────────────
   async function deshacerUltimoCambio() {
     if (historial.length === 0) return;
     const { id, estadoAnterior } = historial.pop();
-    await fetch(BACKEND + '/api/pedido/' + id + '/estado', {
-      method: 'POST',
+
+    const res = await fetch(API + '/pedidos/' + id + '/estado', {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado: estadoAnterior })
     });
+    if (res.ok) {
+      const updated = await res.json();
+      pedidos[id] = updated;
+      renderAll();
+    }
     actualizarBotonDeshacer();
   }
 
+  // ── Render ───────────────────────────────────────────────────────────────────
   function badgeEstado(estado) {
     const labels = { pendiente: '⏳ Pendiente', preparando: '🔥 Preparando', listo: '✅ Listo' };
     const classes = { pendiente: 'badge-pendiente', preparando: 'badge-preparando', listo: 'badge-listo' };
     return '<span class="estado-badge ' + classes[estado] + '">' + labels[estado] + '</span>';
   }
 
+  function formatHora(iso) {
+    try { return new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }); }
+    catch { return iso; }
+  }
+
   function renderAll() {
     const boards = document.getElementById('boards');
-    const lista = Object.values(pedidos).sort((a, b) => b.timestamp - a.timestamp);
+    const lista = Object.values(pedidos).sort((a, b) => b.id - a.id);
 
     if (lista.length === 0) {
       boards.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div>Esperando pedidos...<br>Los pedidos aparecen acá en tiempo real.</div>';
@@ -323,16 +337,16 @@
     }
 
     boards.innerHTML = lista.map(p => {
-      const esNuevo = (Date.now() - p.timestamp) < 10000;
+      const esNuevo = p.estado === 'pendiente' && (Date.now() - new Date(p.hora).getTime()) < 30000;
       return '<div class="pedido-card ' + (p.estado === 'listo' ? 'listo' : '') + '" id="card-' + p.id + '">' +
         '<div class="pedido-header">' +
           '<div>' +
-            '<div class="mesa-label">Mesa ' + p.mesa + (esNuevo && p.estado === 'pendiente' ? '<span class="nuevo-badge">NUEVO</span>' : '') + '</div>' +
+            '<div class="mesa-label">Mesa ' + p.mesa + (esNuevo ? '<span class="nuevo-badge">NUEVO</span>' : '') + '</div>' +
             '<div class="pedido-id">Pedido #' + p.id + '</div>' +
           '</div>' +
           '<div style="text-align:right">' +
             badgeEstado(p.estado) +
-            '<div class="pedido-hora" style="margin-top:4px">' + p.hora + '</div>' +
+            '<div class="pedido-hora" style="margin-top:4px">' + formatHora(p.hora) + '</div>' +
           '</div>' +
         '</div>' +
         '<div class="pedido-items">' +
@@ -353,7 +367,9 @@
     }).join('');
   }
 
-  connect();
+  // ── Start ────────────────────────────────────────────────────────────────────
+  fetchPedidos();
+  setInterval(fetchPedidos, 10000);
 </script>
 </body>
 </html>
