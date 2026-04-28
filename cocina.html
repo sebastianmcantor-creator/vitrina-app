@@ -82,10 +82,10 @@
     .item-qty { color: #c8a84a; font-weight: 600; margin-right: 8px; }
     .item-name-cocina { flex: 1; }
 
-    .pedido-footer { padding: 12px 16px; border-top: 1px solid #2a2a2a; }
+    .pedido-footer { padding: 12px 16px; border-top: 1px solid #2a2a2a; display: flex; gap: 8px; }
 
     .estado-btn {
-      width: 100%;
+      flex: 1;
       border: none;
       border-radius: 10px;
       padding: 10px;
@@ -137,37 +137,23 @@
       50% { opacity: 0.5; }
     }
 
-    .undo-btn {
-      display: flex;
-      align-items: center;
-      gap: 6px;
+    .card-undo-btn {
+      flex-shrink: 0;
       background: #2a2a2a;
       border: 1px solid #3a3a3a;
       border-radius: 10px;
-      padding: 8px 14px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
-      font-weight: 500;
-      color: #aaa;
+      padding: 10px 13px;
+      font-size: 16px;
+      line-height: 1;
       cursor: pointer;
+      color: #888;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
 
-    .undo-btn:not(:disabled):hover {
+    .card-undo-btn:hover {
       background: #333;
       border-color: #c8a84a;
       color: #c8a84a;
-    }
-
-    .undo-btn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    .undo-detail {
-      font-size: 11px;
-      color: #666;
-      margin-top: 1px;
     }
   </style>
 </head>
@@ -178,17 +164,9 @@
     <div class="header-title">🍳 Panel de Cocina</div>
     <div class="header-sub">La Panera Rosa — Pedidos en tiempo real</div>
   </div>
-  <div style="display:flex;align-items:center;gap:16px">
-    <div>
-      <button class="undo-btn" id="undo-btn" disabled onclick="deshacerUltimoCambio()">
-        ↩ Deshacer
-      </button>
-      <div class="undo-detail" id="undo-detail"></div>
-    </div>
-    <div class="conn-label">
-      <span class="status-dot" id="status-dot"></span>
-      <span id="conn-label">Conectando...</span>
-    </div>
+  <div class="conn-label">
+    <span class="status-dot" id="status-dot"></span>
+    <span id="conn-label">Conectando...</span>
   </div>
 </div>
 
@@ -203,27 +181,12 @@
   const API = 'https://vitrina-worker.vitrinaapp.workers.dev';
 
   let pedidos = {};
-  let historial = [];
+  let historial = {};
 
   // ── Status indicator ─────────────────────────────────────────────────────────
   function setStatus(online) {
     document.getElementById('status-dot').classList.toggle('connected', online);
     document.getElementById('conn-label').textContent = online ? 'En línea' : 'Sin conexión';
-  }
-
-  // ── Undo button ──────────────────────────────────────────────────────────────
-  function actualizarBotonDeshacer() {
-    const btn = document.getElementById('undo-btn');
-    const detail = document.getElementById('undo-detail');
-    if (historial.length === 0) {
-      btn.disabled = true;
-      detail.textContent = '';
-    } else {
-      const ultimo = historial[historial.length - 1];
-      const labels = { pendiente: 'Pendiente', preparando: 'Preparando', listo: 'Listo' };
-      btn.disabled = false;
-      detail.textContent = 'Mesa ' + ultimo.mesa + ' → ' + labels[ultimo.estadoAnterior];
-    }
   }
 
   // ── Polling ──────────────────────────────────────────────────────────────────
@@ -292,15 +255,15 @@
     if (!res.ok) return;
 
     pedidos[id] = { ...pedido, estado: nuevoEstado };
-    historial.push({ id, estadoAnterior, mesa: pedido.mesa });
-    actualizarBotonDeshacer();
+    historial[id] = estadoAnterior;
     renderAll();
   }
 
-  // ── Deshacer → PUT /pedidos/:id/estado con estado anterior ───────────────────
-  async function deshacerUltimoCambio() {
-    if (historial.length === 0) return;
-    const { id, estadoAnterior } = historial.pop();
+  // ── Deshacer por card → PUT /pedidos/:id/estado con estado anterior ──────────
+  async function deshacerEnCard(id) {
+    const estadoAnterior = historial[id];
+    if (!estadoAnterior) return;
+    delete historial[id];
 
     const res = await fetch(API + '/pedidos/' + id + '/estado', {
       method: 'PUT',
@@ -312,7 +275,6 @@
       pedidos[id] = updated;
       renderAll();
     }
-    actualizarBotonDeshacer();
   }
 
   // ── Render ───────────────────────────────────────────────────────────────────
@@ -357,12 +319,15 @@
             '</div>'
           ).join('') +
         '</div>' +
-        (p.estado !== 'listo' ?
-          '<div class="pedido-footer">' +
-            '<button class="estado-btn ' + p.estado + '" onclick="cambiarEstado(' + p.id + ')">' +
-              labelEstado(p.estado) +
-            '</button>' +
-          '</div>' : '') +
+        (() => {
+          const av  = p.estado !== 'listo';
+          const des = !!historial[p.id];
+          if (!av && !des) return '';
+          return '<div class="pedido-footer">' +
+            (av  ? '<button class="estado-btn ' + p.estado + '" onclick="cambiarEstado(' + p.id + ')">' + labelEstado(p.estado) + '</button>' : '') +
+            (des ? '<button class="card-undo-btn" onclick="deshacerEnCard(' + p.id + ')" title="Deshacer">↩</button>' : '') +
+            '</div>';
+        })() +
       '</div>';
     }).join('');
   }
