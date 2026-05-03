@@ -30,6 +30,9 @@
 
     .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
     .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .pedidos-bar { margin-top: 12px; background: var(--accent-light); border: 1px solid color-mix(in srgb, var(--accent) 25%, white); border-radius: 10px; padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+    .pedidos-bar-text { font-size: 13px; color: var(--accent); font-weight: 500; }
+    .pedidos-bar-hint { font-size: 11px; color: var(--muted); }
     .restaurant-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--accent); }
     .restaurant-sub { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
     .cart-btn { background: #1a1208; color: #fdf8f4; border: none; border-radius: 24px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; }
@@ -134,6 +137,10 @@
         </button>
       </div>
     </div>
+    <div class="pedidos-bar" id="pedidos-bar" style="display:none" onclick="abrirOverlayEstado()">
+      <span class="pedidos-bar-text">📋 Ver estado de mis pedidos</span>
+      <span class="pedidos-bar-hint">Tocá para ver →</span>
+    </div>
     <nav class="cat-nav" id="cat-nav"></nav>
     <div class="content" id="content"></div>
   </div>
@@ -212,6 +219,7 @@
       document.getElementById('loading').style.display = 'none'
       document.getElementById('app').style.display = 'block'
 
+      updatePedidosBar()
       if (pedidosSesion.length) abrirOverlayEstado()
     }
 
@@ -389,6 +397,7 @@
         closeCart()
         cart = {}
         updateCartCount()
+        updatePedidosBar()
         abrirOverlayEstado()
       } catch (e) {
         alert('Error al enviar el pedido. Intentá de nuevo.')
@@ -454,6 +463,11 @@
       clearInterval(statusInterval)
       statusInterval = null
       document.getElementById('confirm-overlay').classList.remove('open')
+      updatePedidosBar()
+    }
+
+    function updatePedidosBar() {
+      document.getElementById('pedidos-bar').style.display = pedidosSesion.length ? 'flex' : 'none'
     }
 
     // ─── Cat nav scroll spy ────────────────────────────────────────────────────
@@ -479,6 +493,7 @@
     window.toggleCart = toggleCart
     window.checkout = checkout
     window.cerrarOverlay = cerrarOverlay
+    window.abrirOverlayEstado = abrirOverlayEstado
     window.navScroll = navScroll
 
     init()
