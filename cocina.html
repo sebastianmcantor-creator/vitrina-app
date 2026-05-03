@@ -9,332 +9,359 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #0f0f0f; font-family: 'DM Sans', sans-serif; color: #f0f0f0; min-height: 100vh; }
 
-    .header {
-      background: #1a1a1a;
-      border-bottom: 1px solid #2a2a2a;
-      padding: 16px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    #loading-screen, #login-screen, #error-screen {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 14px; padding: 20px; text-align: center; color: #666;
     }
 
+    .login-title { font-size: 22px; font-weight: 600; color: #f0f0f0; }
+    .login-sub { font-size: 14px; color: #666; }
+    .google-btn {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; color: #1a1208; border: none; border-radius: 10px;
+      padding: 12px 22px; font-family: 'DM Sans', sans-serif; font-size: 15px;
+      font-weight: 500; cursor: pointer; margin-top: 8px;
+    }
+    .google-btn:hover { background: #f5f5f5; }
+
+    #main-view { display: none; }
+
+    .header {
+      background: #1a1a1a; border-bottom: 1px solid #2a2a2a;
+      padding: 16px 24px; display: flex;
+      justify-content: space-between; align-items: center;
+      position: sticky; top: 0; z-index: 10;
+    }
     .header-title { font-size: 18px; font-weight: 600; }
     .header-sub { font-size: 12px; color: #666; margin-top: 2px; }
-
-    .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: #ff4444; display: inline-block; margin-right: 6px;
-    }
+    .conn-label { font-size: 12px; color: #888; display: flex; align-items: center; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4444; display: inline-block; margin-right: 6px; }
     .status-dot.connected { background: #44cc66; }
 
-    .conn-label { font-size: 12px; color: #888; display: flex; align-items: center; }
-
     .boards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 16px;
-      padding: 24px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px; padding: 24px;
     }
 
     .pedido-card {
-      background: #1a1a1a;
-      border: 1px solid #2a2a2a;
-      border-radius: 14px;
-      overflow: hidden;
+      background: #1a1a1a; border: 1px solid #2a2a2a;
+      border-radius: 14px; overflow: hidden;
       animation: slideIn 0.3s ease;
     }
-
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
-    .pedido-card.listo { border-color: #1a4a2a; opacity: 0.6; }
+    .pedido-card.status-ready { border-color: #1a4a2a; opacity: 0.6; }
 
     .pedido-header {
-      background: #222;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      background: #222; padding: 12px 16px;
+      display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid #2a2a2a;
     }
-
     .mesa-label { font-size: 16px; font-weight: 600; }
     .pedido-hora { font-size: 12px; color: #888; }
     .pedido-id { font-size: 11px; color: #555; }
 
     .pedido-items { padding: 14px 16px; }
-
     .pedido-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 7px 0;
-      border-bottom: 1px solid #1e1e1e;
-      font-size: 14px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 7px 0; border-bottom: 1px solid #1e1e1e; font-size: 14px;
     }
-
     .pedido-item:last-child { border-bottom: none; }
     .item-qty { color: #c8a84a; font-weight: 600; margin-right: 8px; }
     .item-name-cocina { flex: 1; }
 
     .pedido-footer { padding: 12px 16px; border-top: 1px solid #2a2a2a; display: flex; gap: 8px; }
-
     .estado-btn {
-      flex: 1;
-      border: none;
-      border-radius: 10px;
-      padding: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.15s;
+      flex: 1; border: none; border-radius: 10px; padding: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: opacity 0.15s;
     }
-
-    .estado-btn.pendiente { background: #c8a84a; color: #0f0f0f; }
-    .estado-btn.preparando { background: #2255cc; color: white; }
-    .estado-btn.listo { background: #22aa44; color: white; }
+    .estado-btn.pending, .estado-btn.confirmed { background: #c8a84a; color: #0f0f0f; }
+    .estado-btn.preparing { background: #2255cc; color: white; }
+    .estado-btn.ready { background: #22aa44; color: white; }
     .estado-btn:active { opacity: 0.8; }
+    .estado-btn:disabled { opacity: 0.4; cursor: default; }
 
-    .estado-badge {
-      font-size: 11px;
-      padding: 3px 8px;
-      border-radius: 8px;
-      font-weight: 500;
-    }
-
-    .badge-pendiente { background: #3a2e00; color: #c8a84a; }
-    .badge-preparando { background: #001a44; color: #6699ff; }
-    .badge-listo { background: #002211; color: #44cc66; }
-
-    .empty-state {
-      text-align: center;
-      color: #444;
-      padding: 80px 20px;
-      font-size: 15px;
-      grid-column: 1 / -1;
-    }
-
-    .empty-icon { font-size: 48px; margin-bottom: 12px; }
-
-    .nuevo-badge {
-      background: #c8553d;
-      color: white;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 6px;
-      margin-left: 6px;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
+    .estado-badge { font-size: 11px; padding: 3px 8px; border-radius: 8px; font-weight: 500; }
+    .badge-pending, .badge-confirmed { background: #3a2e00; color: #c8a84a; }
+    .badge-preparing { background: #001a44; color: #6699ff; }
+    .badge-ready { background: #002211; color: #44cc66; }
 
     .card-undo-btn {
-      flex-shrink: 0;
-      background: #2a2a2a;
-      border: 1px solid #3a3a3a;
-      border-radius: 10px;
-      padding: 10px 13px;
-      font-size: 16px;
-      line-height: 1;
-      cursor: pointer;
-      color: #888;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      flex-shrink: 0; background: #2a2a2a; border: 1px solid #3a3a3a;
+      border-radius: 10px; padding: 10px 13px; font-size: 16px; line-height: 1;
+      cursor: pointer; color: #888; transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
+    .card-undo-btn:hover { background: #333; border-color: #c8a84a; color: #c8a84a; }
 
-    .card-undo-btn:hover {
-      background: #333;
-      border-color: #c8a84a;
-      color: #c8a84a;
+    .nuevo-badge {
+      background: #c8553d; color: white; font-size: 10px;
+      padding: 2px 6px; border-radius: 6px; margin-left: 6px;
+      animation: pulse 1s infinite;
     }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+    .empty-state {
+      text-align: center; color: #444; padding: 80px 20px;
+      font-size: 15px; grid-column: 1 / -1;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
   </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <div class="header-title">🍳 Panel de Cocina</div>
-    <div class="header-sub">La Panera Rosa — Pedidos en tiempo real</div>
+<div id="loading-screen">Cargando…</div>
+
+<div id="login-screen" style="display:none">
+  <div style="font-size:48px">🍳</div>
+  <div class="login-title">Panel de Cocina</div>
+  <div class="login-sub">Iniciá sesión para ver los pedidos</div>
+  <button class="google-btn" onclick="loginGoogle()">
+    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 6.293C4.672 4.166 6.656 3.58 9 3.58z"/></svg>
+    Iniciar sesión con Google
+  </button>
+</div>
+
+<div id="error-screen" style="display:none">
+  <div style="font-size:48px">😕</div>
+  <div id="error-msg" style="color:#f0f0f0;font-size:16px"></div>
+</div>
+
+<div id="main-view">
+  <div class="header">
+    <div>
+      <div class="header-title">🍳 Panel de Cocina</div>
+      <div class="header-sub" id="rest-sub">Cargando…</div>
+    </div>
+    <div class="conn-label">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="conn-label">Conectando...</span>
+    </div>
   </div>
-  <div class="conn-label">
-    <span class="status-dot" id="status-dot"></span>
-    <span id="conn-label">Conectando...</span>
+  <div class="boards" id="boards">
+    <div class="empty-state">
+      <div class="empty-icon">🍽️</div>
+      Esperando pedidos…<br>Los pedidos aparecen acá en tiempo real.
+    </div>
   </div>
 </div>
 
-<div class="boards" id="boards">
-  <div class="empty-state">
-    <div class="empty-icon">🍽️</div>
-    Esperando pedidos...<br>Los pedidos aparecen acá en tiempo real.
-  </div>
-</div>
+<script type="module">
+  import { supabase } from './lib/supabase.js'
+  import { restaurants, orders } from './lib/db.js'
 
-<script>
-  const API = 'https://vitrina-worker.vitrinaapp.workers.dev';
+  const params = new URLSearchParams(location.search)
+  const slug = params.get('slug')
 
-  let pedidos = {};
-  let historial = {};
+  let rest = null
+  let pedidos = {}
+  let historial = {}
+  let pollInterval = null
 
-  // ── Status indicator ─────────────────────────────────────────────────────────
-  function setStatus(online) {
-    document.getElementById('status-dot').classList.toggle('connected', online);
-    document.getElementById('conn-label').textContent = online ? 'En línea' : 'Sin conexión';
+  // ── Auth ──────────────────────────────────────────────────────────────────────
+  async function init() {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      show('login-screen')
+      return
+    }
+    await startKitchen()
   }
 
-  // ── Polling ──────────────────────────────────────────────────────────────────
+  async function startKitchen() {
+    if (!slug) { showError('URL inválida — falta el parámetro slug.\nEjemplo: cocina.html?slug=mi-restaurante'); return }
+    try {
+      rest = await restaurants.getBySlug(slug)
+    } catch {
+      showError('No se encontró el restaurante "' + slug + '".')
+      return
+    }
+    document.getElementById('rest-sub').textContent = rest.name + ' — Pedidos en tiempo real'
+    show('main-view')
+    fetchPedidos()
+    pollInterval = setInterval(fetchPedidos, 10000)
+  }
+
+  window.loginGoogle = async function () {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: location.href },
+    })
+  }
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session && !rest) startKitchen()
+  })
+
+  // ── Helpers ───────────────────────────────────────────────────────────────────
+  function show(id) {
+    ['loading-screen','login-screen','error-screen','main-view'].forEach(s => {
+      document.getElementById(s).style.display = s === id ? (id === 'main-view' ? 'block' : 'flex') : 'none'
+    })
+  }
+
+  function showError(msg) {
+    document.getElementById('error-msg').textContent = msg
+    show('error-screen')
+  }
+
+  function setStatus(online) {
+    document.getElementById('status-dot').classList.toggle('connected', online)
+    document.getElementById('conn-label').textContent = online ? 'En línea' : 'Sin conexión'
+  }
+
+  // ── Polling ───────────────────────────────────────────────────────────────────
   async function fetchPedidos() {
     try {
-      const res = await fetch(API + '/pedidos');
-      if (!res.ok) throw new Error();
-      const lista = await res.json();
-
-      const nuevos = lista.filter(p => !pedidos[p.id] && p.estado === 'pendiente');
-      if (nuevos.length > 0) playSound();
-
-      pedidos = {};
-      lista
-        .filter(p => p.estado !== 'entregado')
-        .forEach(p => { pedidos[p.id] = p; });
-
-      setStatus(true);
-      renderAll();
+      const lista = await orders.listActive(rest.id)
+      const nuevos = lista.filter(p => !pedidos[p.id] && (p.status === 'pending' || p.status === 'confirmed'))
+      if (nuevos.length > 0) playSound()
+      pedidos = {}
+      lista.forEach(p => { pedidos[p.id] = p })
+      setStatus(true)
+      renderAll()
     } catch {
-      setStatus(false);
+      setStatus(false)
     }
   }
 
-  // ── Sound ────────────────────────────────────────────────────────────────────
+  // ── Sound ─────────────────────────────────────────────────────────────────────
   function playSound() {
     try {
-      const ctx = new AudioContext();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-      osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 0.4);
-    } catch(e) {}
+      const ctx = new AudioContext()
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.frequency.value = 880
+      gain.gain.setValueAtTime(0.3, ctx.currentTime)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4)
+      osc.start(ctx.currentTime)
+      osc.stop(ctx.currentTime + 0.4)
+    } catch {}
   }
 
-  // ── State helpers ────────────────────────────────────────────────────────────
-  function siguienteEstado(estado) {
-    if (estado === 'pendiente') return 'preparando';
-    if (estado === 'preparando') return 'listo';
-    return 'listo';
+  // ── State transitions ─────────────────────────────────────────────────────────
+  function siguienteEstado(status) {
+    if (status === 'pending' || status === 'confirmed') return 'preparing'
+    if (status === 'preparing') return 'ready'
+    return 'delivered'
   }
 
-  function labelEstado(estado) {
-    if (estado === 'pendiente') return '▶ Empezar a preparar';
-    if (estado === 'preparando') return '✓ Marcar como listo';
-    return '✓ Listo';
+  function labelBtn(status) {
+    if (status === 'pending' || status === 'confirmed') return '▶ Empezar a preparar'
+    if (status === 'preparing') return '✓ Marcar como listo'
+    return '✓ Marcar entregado'
   }
 
-  // ── Cambiar estado → PUT /pedidos/:id/estado ─────────────────────────────────
   async function cambiarEstado(id) {
-    const pedido = pedidos[id];
-    if (!pedido || pedido.estado === 'listo') return;
-    const estadoAnterior = pedido.estado;
-    const nuevoEstado = siguienteEstado(pedido.estado);
+    const pedido = pedidos[id]
+    if (!pedido || pedido.status === 'delivered') return
+    const anterior = pedido.status
+    const siguiente = siguienteEstado(anterior)
 
-    const res = await fetch(API + '/pedidos/' + id + '/estado', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ estado: nuevoEstado })
-    });
-    if (!res.ok) return;
+    const btn = document.querySelector('#card-' + id.replace(/-/g,'_') + ' .estado-btn')
+    if (btn) { btn.disabled = true }
 
-    pedidos[id] = { ...pedido, estado: nuevoEstado };
-    historial[id] = estadoAnterior;
-    renderAll();
-  }
-
-  // ── Deshacer por card → PUT /pedidos/:id/estado con estado anterior ──────────
-  async function deshacerEnCard(id) {
-    const estadoAnterior = historial[id];
-    if (!estadoAnterior) return;
-    delete historial[id];
-
-    const res = await fetch(API + '/pedidos/' + id + '/estado', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ estado: estadoAnterior })
-    });
-    if (res.ok) {
-      const updated = await res.json();
-      pedidos[id] = updated;
-      renderAll();
+    try {
+      const updated = await orders.updateStatus(id, siguiente)
+      pedidos[id] = { ...pedido, ...updated }
+      historial[id] = anterior
+    } catch {
+      if (btn) { btn.disabled = false }
+      return
     }
+    renderAll()
   }
 
-  // ── Render ───────────────────────────────────────────────────────────────────
-  function badgeEstado(estado) {
-    const labels = { pendiente: '⏳ Pendiente', preparando: '🔥 Preparando', listo: '✅ Listo' };
-    const classes = { pendiente: 'badge-pendiente', preparando: 'badge-preparando', listo: 'badge-listo' };
-    return '<span class="estado-badge ' + classes[estado] + '">' + labels[estado] + '</span>';
+  async function deshacerEnCard(id) {
+    const anterior = historial[id]
+    if (!anterior) return
+    delete historial[id]
+    try {
+      const updated = await orders.updateStatus(id, anterior)
+      pedidos[id] = { ...pedidos[id], ...updated }
+    } catch {
+      historial[id] = anterior
+      return
+    }
+    renderAll()
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────────────
+  const BADGE_LABEL = {
+    pending: '⏳ Pendiente', confirmed: '⏳ Pendiente',
+    preparing: '🔥 Preparando', ready: '✅ Listo',
+  }
+  const BADGE_CLASS = {
+    pending: 'badge-pending', confirmed: 'badge-confirmed',
+    preparing: 'badge-preparing', ready: 'badge-ready',
   }
 
   function formatHora(iso) {
-    try { return new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }); }
-    catch { return iso; }
+    try { return new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' }) }
+    catch { return iso }
   }
 
   function renderAll() {
-    const boards = document.getElementById('boards');
-    const lista = Object.values(pedidos).sort((a, b) => b.id - a.id);
+    const boards = document.getElementById('boards')
+    const lista = Object.values(pedidos).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 
     if (lista.length === 0) {
-      boards.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div>Esperando pedidos...<br>Los pedidos aparecen acá en tiempo real.</div>';
-      return;
+      boards.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div>Esperando pedidos…<br>Los pedidos aparecen acá en tiempo real.</div>'
+      return
     }
 
     boards.innerHTML = lista.map(p => {
-      const esNuevo = p.estado === 'pendiente' && (Date.now() - new Date(p.hora).getTime()) < 30000;
-      return '<div class="pedido-card ' + (p.estado === 'listo' ? 'listo' : '') + '" id="card-' + p.id + '">' +
-        '<div class="pedido-header">' +
-          '<div>' +
-            '<div class="mesa-label">Mesa ' + p.mesa + (esNuevo ? '<span class="nuevo-badge">NUEVO</span>' : '') + '</div>' +
-            '<div class="pedido-id">Pedido #' + p.id + '</div>' +
-          '</div>' +
-          '<div style="text-align:right">' +
-            badgeEstado(p.estado) +
-            '<div class="pedido-hora" style="margin-top:4px">' + formatHora(p.hora) + '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="pedido-items">' +
-          p.items.map(item =>
-            '<div class="pedido-item">' +
-              '<span class="item-qty">x' + item.qty + '</span>' +
-              '<span class="item-name-cocina">' + item.name + '</span>' +
-            '</div>'
-          ).join('') +
-        '</div>' +
-        (() => {
-          const av  = p.estado !== 'listo';
-          const des = !!historial[p.id];
-          if (!av && !des) return '';
-          return '<div class="pedido-footer">' +
-            (av  ? '<button class="estado-btn ' + p.estado + '" onclick="cambiarEstado(' + p.id + ')">' + labelEstado(p.estado) + '</button>' : '') +
-            (des ? '<button class="card-undo-btn" onclick="deshacerEnCard(' + p.id + ')" title="Deshacer">↩</button>' : '') +
-            '</div>';
-        })() +
-      '</div>';
-    }).join('');
+      const esNuevo = (p.status === 'pending' || p.status === 'confirmed')
+        && (Date.now() - new Date(p.created_at).getTime()) < 30000
+      const cardId = 'card-' + p.id.replace(/-/g, '_')
+      const isDone = p.status === 'ready' || p.status === 'delivered'
+      const canAct = !isDone
+      const canUndo = !!historial[p.id]
+      const items = p.order_items || []
+
+      return '<div class="pedido-card' + (p.status === 'ready' ? ' status-ready' : '') + '" id="' + cardId + '">'
+        + '<div class="pedido-header">'
+        +   '<div>'
+        +     '<div class="mesa-label">' + (p.table_number != null ? 'Mesa ' + p.table_number : 'Sin mesa')
+        +       (esNuevo ? '<span class="nuevo-badge">NUEVO</span>' : '') + '</div>'
+        +     '<div class="pedido-id">Pedido #' + p.id.slice(-6).toUpperCase() + '</div>'
+        +   '</div>'
+        +   '<div style="text-align:right">'
+        +     '<span class="estado-badge ' + (BADGE_CLASS[p.status] || '') + '">' + (BADGE_LABEL[p.status] || p.status) + '</span>'
+        +     '<div class="pedido-hora" style="margin-top:4px">' + formatHora(p.created_at) + '</div>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="pedido-items">'
+        + items.map(item =>
+            '<div class="pedido-item">'
+            + '<span class="item-qty">x' + item.quantity + '</span>'
+            + '<span class="item-name-cocina">' + esc(item.name) + '</span>'
+            + '</div>'
+          ).join('')
+        + '</div>'
+        + (canAct || canUndo
+          ? '<div class="pedido-footer">'
+            + (canAct ? '<button class="estado-btn ' + p.status + '" onclick="cambiarEstado(\'' + p.id + '\')">' + labelBtn(p.status) + '</button>' : '')
+            + (canUndo ? '<button class="card-undo-btn" onclick="deshacerEnCard(\'' + p.id + '\')" title="Deshacer">↩</button>' : '')
+            + '</div>'
+          : '')
+        + '</div>'
+    }).join('')
   }
 
-  // ── Start ────────────────────────────────────────────────────────────────────
-  fetchPedidos();
-  setInterval(fetchPedidos, 10000);
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+  }
+
+  window.cambiarEstado = cambiarEstado
+  window.deshacerEnCard = deshacerEnCard
+
+  init()
 </script>
 </body>
 </html>

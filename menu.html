@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>La Panera Rosa — Menú</title>
+  <title>Menú</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
@@ -13,17 +13,20 @@
       --border: #ede8e2;
       --text: #1a1208;
       --muted: #8a7a6a;
-      --accent: #c8553d;
-      --accent-light: #fdf0ec;
-      --tag-veg: #e8f5e9;
-      --tag-veg-text: #2e7d32;
-      --tag-vegan: #e3f2fd;
-      --tag-vegan-text: #1565c0;
-      --tag-celiac: #fff8e1;
-      --tag-celiac-text: #f57f17;
+      --accent: #B85A30;
+      --accent-light: color-mix(in srgb, var(--accent) 12%, white);
+      --tag-veg: #e8f5e9; --tag-veg-text: #2e7d32;
+      --tag-vegan: #e3f2fd; --tag-vegan-text: #1565c0;
+      --tag-celiac: #fff8e1; --tag-celiac-text: #f57f17;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
+
+    #loading, #error-view {
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--muted); font-size: 15px; gap: 10px; padding: 20px; text-align: center;
+    }
 
     .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
     .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
@@ -43,6 +46,7 @@
     .category-desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
 
     .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; }
+    .item-card.item-unavailable { opacity: 0.5; }
     .item-img { width: 80px; height: 80px; border-radius: 10px; background: var(--accent-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
     .item-info { flex: 1; min-width: 0; }
     .item-name { font-size: 15px; font-weight: 500; margin-bottom: 4px; line-height: 1.3; }
@@ -53,6 +57,8 @@
     .tag-vegan { background: var(--tag-vegan); color: var(--tag-vegan-text); }
     .tag-celiac { background: var(--tag-celiac); color: var(--tag-celiac-text); }
     .tag-popular { background: #fce4ec; color: #c62828; }
+    .tag-spicy { background: #fbe9e7; color: #bf360c; }
+    .tag-new { background: #e8eaf6; color: #283593; }
     .item-bottom { display: flex; align-items: center; justify-content: space-between; }
     .item-price { font-size: 15px; font-weight: 500; }
     .add-btn { background: var(--accent); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; }
@@ -109,95 +115,27 @@
 </head>
 <body>
 
-  <div class="header">
-    <div class="header-top">
-      <div>
-        <div class="restaurant-name">La Panera Rosa</div>
-        <div class="restaurant-sub">Recoleta · Non stop</div>
+  <div id="loading">Cargando menú…</div>
+  <div id="error-view" style="display:none">
+    <div style="font-size:36px">😕</div>
+    <div id="error-msg">No se encontró el menú.</div>
+  </div>
+
+  <div id="app" style="display:none">
+    <div class="header">
+      <div class="header-top">
+        <div>
+          <div class="restaurant-name" id="rest-name"></div>
+          <div class="restaurant-sub" id="rest-sub"></div>
+        </div>
+        <button class="cart-btn" onclick="toggleCart()">
+          🛒 Mi pedido
+          <span class="cart-count" id="cart-count">0</span>
+        </button>
       </div>
-      <button class="cart-btn" onclick="toggleCart()">
-        🛒 Mi pedido
-        <span class="cart-count" id="cart-count">0</span>
-      </button>
     </div>
-  </div>
-
-  <div class="cat-nav">
-    <button class="cat-btn active" onclick="navScroll('entradas')">Entradas</button>
-    <button class="cat-btn" onclick="navScroll('ensaladas')">Ensaladas</button>
-    <button class="cat-btn" onclick="navScroll('pastas')">Pastas</button>
-    <button class="cat-btn" onclick="navScroll('sandwiches')">Sándwiches</button>
-    <button class="cat-btn" onclick="navScroll('waffles')">Waffles</button>
-    <button class="cat-btn" onclick="navScroll('postres')">Postres</button>
-    <button class="cat-btn" onclick="navScroll('bebidas')">Bebidas</button>
-  </div>
-
-  <div class="content">
-
-    <div class="category-section" id="entradas">
-      <div class="category-title">Entradas</div>
-      <div class="category-desc">Para empezar o compartir</div>
-      <div class="item-card"><div class="item-img">🥗</div><div class="item-info"><div class="item-name">Burrata con rúcula</div><div class="item-desc">Burrata fresca, rúcula selvática, nueces, tomates cherry y remolachas. Aceite de oliva extra virgen.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$9.800</div><div id="ctrl-1"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍟</div><div class="item-info"><div class="item-name">Papas cheddar & romero</div><div class="item-desc">Papas fritas bañadas en cheddar fundido, romero fresco y dip de salsa criolla.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$7.200</div><div id="ctrl-2"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🥑</div><div class="item-info"><div class="item-name">Tosta palta & nuez</div><div class="item-desc">Pan de campo tostado con queso crema panera, palta slice, nueces y rúcula. Opcional huevo poche.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$8.500</div><div id="ctrl-3"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🥟</div><div class="item-info"><div class="item-name">Empanadas caseras (x3)</div><div class="item-desc">A elección: carne cortada a cuchillo, pollo especiado, jamón y queso, o humita. Doradas al horno.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$6.900</div><div id="ctrl-4"></div></div></div></div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="category-section" id="ensaladas">
-      <div class="category-title">Ensaladas</div>
-      <div class="category-desc">Frescas y completas</div>
-      <div class="item-card"><div class="item-img">🥙</div><div class="item-info"><div class="item-name">Ensalada Panera</div><div class="item-desc">Pollo salteado con sésamo, mix de lechugas, boconcinos, tomates cherry, parmesano, almendras tostadas y aderezo aceto-miel. Con focaccia.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$11.400</div><div id="ctrl-5"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🥗</div><div class="item-info"><div class="item-name">Ensalada veggie caesar</div><div class="item-desc">Mix de lechugas, croutons, garrapiñada de semillas, queso parmesano y aderezo caesar.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$9.200</div><div id="ctrl-6"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🐟</div><div class="item-info"><div class="item-name">Ensalada de atún</div><div class="item-desc">Penne rigate en pesto, arroz yamaní, lomitos de atún, nueces, huevo duro, parmesano, mix de lechugas, tomates cherry y palta.</div><div class="item-tags"><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$12.800</div><div id="ctrl-7"></div></div></div></div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="category-section" id="pastas">
-      <div class="category-title">Pastas</div>
-      <div class="category-desc">Elaboración propia, caseras</div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Ñoquis de papa caseros</div><div class="item-desc">Ñoquis de papa con salsa rosa cremosa. Opción: + pollo grillado. También disponible con salsa blanca.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$10.500</div><div id="ctrl-8"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Raviolones de calabaza</div><div class="item-desc">Rellenos de calabaza con crema, tomate cubeteado fresco y verdeo rondelle. Masa casera.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$11.900</div><div id="ctrl-9"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Raviolones de salmón</div><div class="item-desc">Rellenos de salmón rosado con crema de eneldo, tomates cherry y alcaparras. Masa fresca.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$14.200</div><div id="ctrl-10"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍝</div><div class="item-info"><div class="item-name">Sorrentinos de jamón y queso</div><div class="item-desc">Rellenos de jamón cocido y queso con trilogía de tomates. Masa artesanal.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$12.400</div><div id="ctrl-11"></div></div></div></div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="category-section" id="sandwiches">
-      <div class="category-title">Sándwiches & Wraps</div>
-      <div class="category-desc">Con guarnición a elección: papas fritas, rústicas o boniatos</div>
-      <div class="item-card"><div class="item-img">🥪</div><div class="item-info"><div class="item-name">Smoked Lomito</div><div class="item-desc">Baguetín con lomito vuelta y vuelta, cebolla caramelizada, queso fundido, lechuga, tomate y huevo a la plancha.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$13.800</div><div id="ctrl-12"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🥪</div><div class="item-info"><div class="item-name">Sándwich jamón & brie</div><div class="item-desc">Jamón crudo, queso brie, rúcula, tomates cherry y manteca de Dijon en baguetín. Con guarnición.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$13.200</div><div id="ctrl-13"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🌯</div><div class="item-info"><div class="item-name">Wrap Panera</div><div class="item-desc">Tortilla con guacamole, pollo, lechuga capuchina, queso, morrones asados y huevo duro. Con papas rústicas.</div><div class="item-tags"></div><div class="item-bottom"><div class="item-price">$12.600</div><div id="ctrl-14"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🌯</div><div class="item-info"><div class="item-name">Wrap Veggie</div><div class="item-desc">Tortilla con pesto de tomate, muzzalmendra, rúcula, cebolla caramelizada, tomates secos y frescos, aceitunas y pesto de albahaca.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span></div><div class="item-bottom"><div class="item-price">$11.400</div><div id="ctrl-15"></div></div></div></div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="category-section" id="waffles">
-      <div class="category-title">Waffles & Brunch</div>
-      <div class="category-desc">Especialidad de la casa</div>
-      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Waffle salado</div><div class="item-desc">Waffle relleno de jamón, huevo y queso cheddar, con papas rústicas. Clásico de la casa.</div><div class="item-tags"><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$10.900</div><div id="ctrl-16"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Keto breakfast</div><div class="item-desc">Tostada sin gluten con palta slice, huevos revueltos, tomate concasse y dips de frutos secos. Con yogurt y frutas.</div><div class="item-tags"><span class="tag tag-celiac">Sin TACC</span><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$14.500</div><div id="ctrl-17"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🧇</div><div class="item-info"><div class="item-name">Pink Tower</div><div class="item-desc">Torre de waffles con frutos rojos, crema chantilly, dulce de leche y azúcar impalpable. El postre signature de la casa.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-popular">⭐ Popular</span></div><div class="item-bottom"><div class="item-price">$12.800</div><div id="ctrl-18"></div></div></div></div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="category-section" id="postres">
-      <div class="category-title">Postres</div>
-      <div class="category-desc">Elaboración propia</div>
-      <div class="item-card"><div class="item-img">🍮</div><div class="item-info"><div class="item-name">Flan con dulce de leche</div><div class="item-desc">Flan casero con dulce de leche artesanal y crema batida. Porción generosa.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$6.400</div><div id="ctrl-19"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🎂</div><div class="item-info"><div class="item-name">Torta del día</div><div class="item-desc">Variedades: chocolate belga, lemon pie, carrot cake o cheesecake de frutos rojos. Consultar disponibilidad.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$7.200</div><div id="ctrl-20"></div></div></div></div>
-    </div>
-    <div class="divider"></div>
-
-    <div class="category-section" id="bebidas">
-      <div class="category-title">Bebidas</div>
-      <div class="category-desc">Jugos, cafés e infusiones</div>
-      <div class="item-card"><div class="item-img">🍊</div><div class="item-info"><div class="item-name">Jugo maracuyá & menta</div><div class="item-desc">Jugo natural de maracuyá, menta fresca, miel y limón. Sin azúcar agregada.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$4.800</div><div id="ctrl-21"></div></div></div></div>
-      <div class="item-card"><div class="item-img">☕</div><div class="item-info"><div class="item-name">Capuchino italiano</div><div class="item-desc">Café, leche vaporizada, crema, chocolate y canela. Terminado con crema batida.</div><div class="item-tags"><span class="tag tag-veg">Vegetariano</span></div><div class="item-bottom"><div class="item-price">$5.900</div><div id="ctrl-22"></div></div></div></div>
-      <div class="item-card"><div class="item-img">🍋</div><div class="item-info"><div class="item-name">Limonada de menta & jengibre</div><div class="item-desc">Jugo de limón exprimido, menta fresca, jengibre, miel y soda.</div><div class="item-tags"><span class="tag tag-vegan">Vegano</span><span class="tag tag-celiac">Sin TACC</span></div><div class="item-bottom"><div class="item-price">$4.200</div><div id="ctrl-23"></div></div></div></div>
-    </div>
-
+    <nav class="cat-nav" id="cat-nav"></nav>
+    <div class="content" id="content"></div>
   </div>
 
   <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
@@ -225,230 +163,325 @@
     </div>
   </div>
 
-  <a class="mozo-fab" id="mozo-fab" href="mozo.html" target="_blank">💬 Consultá al mozo</a>
+  <a class="mozo-fab" id="mozo-fab" href="mozo.html">💬 Consultá al mozo</a>
 
-  <script>
-    const BACKEND = 'https://vitrina-worker.vitrinaapp.workers.dev';
+  <script type="module">
+    import { restaurants, orders, orderSessions, orderItems } from './lib/db.js'
+    import { supabase } from './lib/supabase.js'
 
-    const ITEMS = {
-      1:  { name: 'Burrata con rúcula', price: 9800 },
-      2:  { name: 'Papas cheddar & romero', price: 7200 },
-      3:  { name: 'Tosta palta & nuez', price: 8500 },
-      4:  { name: 'Empanadas caseras (x3)', price: 6900 },
-      5:  { name: 'Ensalada Panera', price: 11400 },
-      6:  { name: 'Ensalada veggie caesar', price: 9200 },
-      7:  { name: 'Ensalada de atún', price: 12800 },
-      8:  { name: 'Ñoquis de papa caseros', price: 10500 },
-      9:  { name: 'Raviolones de calabaza', price: 11900 },
-      10: { name: 'Raviolones de salmón', price: 14200 },
-      11: { name: 'Sorrentinos de jamón y queso', price: 12400 },
-      12: { name: 'Smoked Lomito', price: 13800 },
-      13: { name: 'Sándwich jamón & brie', price: 13200 },
-      14: { name: 'Wrap Panera', price: 12600 },
-      15: { name: 'Wrap Veggie', price: 11400 },
-      16: { name: 'Waffle salado', price: 10900 },
-      17: { name: 'Keto breakfast', price: 14500 },
-      18: { name: 'Pink Tower', price: 12800 },
-      19: { name: 'Flan con dulce de leche', price: 6400 },
-      20: { name: 'Torta del día', price: 7200 },
-      21: { name: 'Jugo maracuyá & menta', price: 4800 },
-      22: { name: 'Capuchino italiano', price: 5900 },
-      23: { name: 'Limonada de menta & jengibre', price: 4200 }
-    };
-
-    let cart = {};
-
-    const params = new URLSearchParams(window.location.search);
-    const mesa = params.get('mesa') || '?';
-    const SESSION_KEY = 'vitrina_pedidos_' + mesa;
-    let pedidosSesion = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '[]');
-    const mozoFab = document.getElementById('mozo-fab');
-    mozoFab.href = 'mozo.html?mesa=' + mesa;
-
-    Object.keys(ITEMS).forEach(id => renderCtrl(Number(id)));
-
-    function renderCtrl(id) {
-      const el = document.getElementById('ctrl-' + id);
-      if (!el) return;
-      const qty = cart[id] || 0;
-      if (qty === 0) {
-        el.innerHTML = '<button class="add-btn" onclick="addItem(' + id + ')">+</button>';
-      } else {
-        el.innerHTML = '<div class="qty-control">' +
-          '<button class="qty-btn" onclick="removeItem(' + id + ')">−</button>' +
-          '<span class="qty-num">' + qty + '</span>' +
-          '<button class="qty-btn" onclick="addItem(' + id + ')">+</button>' +
-          '</div>';
-      }
+    const TAG_MAP = {
+      veg:     { label: 'Vegetariano', cls: 'tag-veg' },
+      vegan:   { label: 'Vegano',      cls: 'tag-vegan' },
+      celiac:  { label: 'Sin TACC',    cls: 'tag-celiac' },
+      popular: { label: '⭐ Popular',  cls: 'tag-popular' },
+      spicy:   { label: '🌶️ Picante', cls: 'tag-spicy' },
+      new:     { label: '🆕 Nuevo',    cls: 'tag-new' },
     }
 
+    const params = new URLSearchParams(location.search)
+    const slug = params.get('slug')
+    const mesa = params.get('mesa') !== null ? Number(params.get('mesa')) : null
+
+    let rest = null
+    let itemsById = {}
+    let catIds = []
+    let cart = {}
+    const SESSION_KEY = 'vitrina_orders_' + slug + '_' + (mesa ?? 'x')
+    let pedidosSesion = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '[]')
+    let statusInterval = null
+
+    // ─── Init ──────────────────────────────────────────────────────────────────
+    async function init() {
+      if (!slug) { showError('URL inválida — falta el parámetro slug.'); return }
+      try {
+        rest = await restaurants.getBySlug(slug)
+      } catch {
+        showError('No se encontró el menú. Verificá el enlace.')
+        return
+      }
+
+      document.documentElement.style.setProperty('--accent', rest.primary_color || '#B85A30')
+      document.title = rest.name + ' — Menú'
+      document.getElementById('rest-name').textContent = rest.name
+      const sub = [rest.tagline, rest.address].filter(Boolean).join(' · ')
+      document.getElementById('rest-sub').textContent = sub || rest.city || ''
+      document.getElementById('mozo-fab').href = 'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? '')
+
+      buildMenu()
+
+      document.getElementById('loading').style.display = 'none'
+      document.getElementById('app').style.display = 'block'
+
+      if (pedidosSesion.length) abrirOverlayEstado()
+    }
+
+    function showError(msg) {
+      document.getElementById('loading').style.display = 'none'
+      document.getElementById('error-msg').textContent = msg
+      document.getElementById('error-view').style.display = 'flex'
+    }
+
+    // ─── Menu rendering ────────────────────────────────────────────────────────
+    function buildMenu() {
+      const cats = (rest.menu_categories || [])
+        .filter(c => c.is_visible)
+        .sort((a, b) => a.sort_order - b.sort_order)
+      catIds = cats.map(c => c.id)
+
+      cats.forEach(cat => {
+        ;(cat.menu_items || []).forEach(item => { itemsById[item.id] = item })
+      })
+
+      document.getElementById('cat-nav').innerHTML = cats.map((cat, i) =>
+        '<button class="cat-btn' + (i === 0 ? ' active' : '') + '" data-id="' + cat.id + '" onclick="navScroll(\'cat-' + cat.id + '\')">'
+        + (cat.emoji ? cat.emoji + ' ' : '') + esc(cat.name) + '</button>'
+      ).join('')
+
+      document.getElementById('content').innerHTML = cats.map((cat, i) => {
+        const items = (cat.menu_items || [])
+          .filter(item => item.is_visible)
+          .sort((a, b) => a.sort_order - b.sort_order)
+        return '<div class="category-section" id="cat-' + cat.id + '">'
+          + '<div class="category-title">' + (cat.emoji ? cat.emoji + ' ' : '') + esc(cat.name) + '</div>'
+          + (cat.description ? '<div class="category-desc">' + esc(cat.description) + '</div>' : '')
+          + items.map(itemCardHtml).join('')
+          + '</div>'
+          + (i < cats.length - 1 ? '<div class="divider"></div>' : '')
+      }).join('')
+
+      Object.keys(itemsById).forEach(renderCtrl)
+    }
+
+    function itemCardHtml(item) {
+      const key = item.id.replace(/-/g, '_')
+      const price = Number(item.price)
+      const tags = (item.tags || []).map(t => {
+        const m = TAG_MAP[t]
+        return m ? '<span class="tag ' + m.cls + '">' + m.label + '</span>' : ''
+      }).filter(Boolean).join('')
+      const img = item.image_url
+        ? '<img src="' + esc(item.image_url) + '" alt="" style="width:80px;height:80px;border-radius:10px;object-fit:cover;flex-shrink:0;">'
+        : '<div class="item-img">' + (item.emoji || '🍽️') + '</div>'
+      return '<div class="item-card' + (!item.is_available ? ' item-unavailable' : '') + '">'
+        + img
+        + '<div class="item-info">'
+        + '<div class="item-name">' + esc(item.name)
+        + (!item.is_available ? ' <span style="font-size:11px;color:#aaa;font-weight:400">(no disponible)</span>' : '')
+        + '</div>'
+        + (item.description ? '<div class="item-desc">' + esc(item.description) + '</div>' : '')
+        + (tags ? '<div class="item-tags">' + tags + '</div>' : '')
+        + '<div class="item-bottom">'
+        + '<div class="item-price">$' + price.toLocaleString('es-AR') + '</div>'
+        + '<div id="ctrl-' + key + '"></div>'
+        + '</div></div></div>'
+    }
+
+    function esc(s) {
+      return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    }
+
+    function renderCtrl(id) {
+      const key = id.replace(/-/g, '_')
+      const el = document.getElementById('ctrl-' + key)
+      if (!el) return
+      const item = itemsById[id]
+      if (!item?.is_available) { el.innerHTML = ''; return }
+      const qty = cart[id] || 0
+      el.innerHTML = qty === 0
+        ? '<button class="add-btn" onclick="addItem(\'' + id + '\')">+</button>'
+        : '<div class="qty-control">'
+          + '<button class="qty-btn" onclick="removeItem(\'' + id + '\')">−</button>'
+          + '<span class="qty-num">' + qty + '</span>'
+          + '<button class="qty-btn" onclick="addItem(\'' + id + '\')">+</button>'
+          + '</div>'
+    }
+
+    // ─── Cart ──────────────────────────────────────────────────────────────────
     function addItem(id) {
-      cart[id] = (cart[id] || 0) + 1;
-      renderCtrl(id);
-      updateCartCount();
+      cart[id] = (cart[id] || 0) + 1
+      renderCtrl(id)
+      updateCartCount()
+      if (document.getElementById('cart-drawer').classList.contains('open')) renderCartItems()
     }
 
     function removeItem(id) {
-      if (!cart[id]) return;
-      cart[id]--;
-      if (cart[id] === 0) delete cart[id];
-      renderCtrl(id);
-      updateCartCount();
-      if (document.getElementById('cart-drawer').classList.contains('open')) renderCartItems();
+      if (!cart[id]) return
+      cart[id]--
+      if (!cart[id]) delete cart[id]
+      renderCtrl(id)
+      updateCartCount()
+      if (document.getElementById('cart-drawer').classList.contains('open')) renderCartItems()
     }
 
     function updateCartCount() {
-      const total = Object.values(cart).reduce((a, b) => a + b, 0);
-      document.getElementById('cart-count').textContent = total;
+      document.getElementById('cart-count').textContent = Object.values(cart).reduce((a, b) => a + b, 0)
     }
 
     function toggleCart() {
-      const overlay = document.getElementById('cart-overlay');
-      const drawer = document.getElementById('cart-drawer');
-      const isOpen = drawer.classList.contains('open');
-      if (!isOpen) {
-        renderCartItems();
-        overlay.classList.add('open');
-        drawer.classList.add('open');
-      } else {
-        overlay.classList.remove('open');
-        drawer.classList.remove('open');
-      }
+      const drawer = document.getElementById('cart-drawer')
+      const open = drawer.classList.contains('open')
+      if (!open) renderCartItems()
+      document.getElementById('cart-overlay').classList.toggle('open', !open)
+      drawer.classList.toggle('open', !open)
+    }
+
+    function closeCart() {
+      document.getElementById('cart-overlay').classList.remove('open')
+      document.getElementById('cart-drawer').classList.remove('open')
     }
 
     function renderCartItems() {
-      const container = document.getElementById('cart-items');
-      const footer = document.getElementById('cart-footer');
-      const ids = Object.keys(cart).filter(id => cart[id] > 0);
-      if (ids.length === 0) {
-        container.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛒</div>';
-        footer.style.display = 'none';
-        return;
+      const container = document.getElementById('cart-items')
+      const footer = document.getElementById('cart-footer')
+      const ids = Object.keys(cart).filter(id => cart[id] > 0)
+      if (!ids.length) {
+        container.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛒</div>'
+        footer.style.display = 'none'
+        return
       }
-      let total = 0;
-      let html = '';
-      ids.forEach(id => {
-        const item = ITEMS[id];
-        const qty = cart[id];
-        const subtotal = item.price * qty;
-        total += subtotal;
-        html += '<div class="cart-item">' +
-          '<div class="cart-item-name">' + item.name + '</div>' +
-          '<div class="cart-item-qty">' +
-            '<button class="cart-qty-btn" onclick="removeItem(' + id + ')">−</button>' +
-            '<span class="cart-qty-num">' + qty + '</span>' +
-            '<button class="cart-qty-btn" onclick="addItem(' + id + ')">+</button>' +
-          '</div>' +
-          '<div class="cart-item-price">$' + subtotal.toLocaleString('es-AR') + '</div>' +
-          '</div>';
-      });
-      container.innerHTML = html;
-      document.getElementById('cart-total').textContent = '$' + total.toLocaleString('es-AR');
-      footer.style.display = 'block';
+      let total = 0
+      container.innerHTML = ids.map(id => {
+        const item = itemsById[id]
+        const qty = cart[id]
+        const sub = Number(item.price) * qty
+        total += sub
+        return '<div class="cart-item">'
+          + '<div class="cart-item-name">' + esc(item.name) + '</div>'
+          + '<div class="cart-item-qty">'
+          + '<button class="cart-qty-btn" onclick="removeItem(\'' + id + '\')">−</button>'
+          + '<span class="cart-qty-num">' + qty + '</span>'
+          + '<button class="cart-qty-btn" onclick="addItem(\'' + id + '\')">+</button>'
+          + '</div>'
+          + '<div class="cart-item-price">$' + sub.toLocaleString('es-AR') + '</div>'
+          + '</div>'
+      }).join('')
+      document.getElementById('cart-total').textContent = '$' + total.toLocaleString('es-AR')
+      footer.style.display = 'block'
     }
 
-    let statusInterval = null;
+    // ─── Checkout ──────────────────────────────────────────────────────────────
+    async function checkout() {
+      const ids = Object.keys(cart).filter(id => cart[id] > 0)
+      if (!ids.length) return
+      const btn = document.getElementById('checkout-btn')
+      btn.textContent = 'Enviando...'
+      btn.disabled = true
+      try {
+        const session = mesa != null ? await orderSessions.getOrCreate(rest.id, mesa) : null
+        const total = ids.reduce((s, id) => s + Number(itemsById[id].price) * cart[id], 0)
+        const order = await orders.create({
+          restaurant_id: rest.id,
+          session_id: session?.id ?? null,
+          table_number: mesa ?? null,
+          total,
+        })
+        await orderItems.createBatch(ids.map(id => ({
+          order_id: order.id,
+          menu_item_id: id,
+          name: itemsById[id].name,
+          price: Number(itemsById[id].price),
+          quantity: cart[id],
+        })))
+        pedidosSesion.push(order.id)
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(pedidosSesion))
+        closeCart()
+        cart = {}
+        updateCartCount()
+        abrirOverlayEstado()
+      } catch (e) {
+        alert('Error al enviar el pedido. Intentá de nuevo.')
+      }
+      btn.textContent = 'Confirmar pedido →'
+      btn.disabled = false
+    }
 
-    function pasoHtml(estado) {
-      const pasos  = ['pendiente', 'preparando', 'listo'];
-      const icons  = ['✓', '🍳', '🎉'];
-      const labels = ['Recibido', 'Preparando', 'Listo'];
-      const idx = pasos.indexOf(estado);
-      let html = '<div class="confirm-steps">';
-      pasos.forEach((p, i) => {
-        const done = i < idx, active = i === idx;
-        html += '<div class="cstep">' +
-          '<div class="cstep-dot' + (done ? ' done' : active ? ' active' : '') + '">' + icons[i] + '</div>' +
-          '<div class="cstep-label' + (done ? ' done' : active ? ' active' : '') + '">' + labels[i] + '</div>' +
-          '</div>';
-        if (i < 2) html += '<div class="cstep-line' + (i < idx ? ' done' : '') + '"></div>';
-      });
-      return html + '</div>';
+    // ─── Order status overlay ──────────────────────────────────────────────────
+    function statusStep(status) {
+      if (status === 'pending' || status === 'confirmed') return 0
+      if (status === 'preparing') return 1
+      return 2
+    }
+
+    function pasoHtml(status) {
+      const icons  = ['✓', '🍳', '🎉']
+      const labels = ['Recibido', 'Preparando', 'Listo']
+      const idx = statusStep(status)
+      let html = '<div class="confirm-steps">'
+      labels.forEach((label, i) => {
+        const done = i < idx, active = i === idx
+        html += '<div class="cstep">'
+          + '<div class="cstep-dot' + (done ? ' done' : active ? ' active' : '') + '">' + icons[i] + '</div>'
+          + '<div class="cstep-label' + (done ? ' done' : active ? ' active' : '') + '">' + label + '</div>'
+          + '</div>'
+        if (i < 2) html += '<div class="cstep-line' + (i < idx ? ' done' : '') + '"></div>'
+      })
+      return html + '</div>'
     }
 
     function renderConfirmList(lista) {
       document.getElementById('confirm-list').innerHTML = pedidosSesion.map(id => {
-        const p = lista.find(x => Number(x.id) === Number(id));
-        if (!p) return '';
-        return '<div class="confirm-pedido' + (p.estado === 'listo' ? ' listo' : '') + '">' +
-          '<div class="confirm-pedido-num">Pedido #' + p.id + '</div>' +
-          pasoHtml(p.estado) +
-          '</div>';
-      }).filter(Boolean).join('');
-    }
-
-    function cerrarOverlay() {
-      clearInterval(statusInterval);
-      statusInterval = null;
-      document.getElementById('confirm-overlay').classList.remove('open');
+        const p = lista.find(x => x.id === id)
+        if (!p) return ''
+        const done = p.status === 'delivered' || p.status === 'cancelled'
+        return '<div class="confirm-pedido' + (done ? ' listo' : '') + '">'
+          + '<div class="confirm-pedido-num">Pedido #' + p.id.slice(-6).toUpperCase() + '</div>'
+          + pasoHtml(p.status)
+          + '</div>'
+      }).filter(Boolean).join('')
     }
 
     function abrirOverlayEstado() {
-      document.getElementById('confirm-mesa-label').textContent = 'Mesa ' + mesa;
-      document.getElementById('confirm-overlay').classList.add('open');
-      if (statusInterval) return;
+      document.getElementById('confirm-mesa-label').textContent = mesa != null ? 'Mesa ' + mesa : 'Pedido a retirar'
+      document.getElementById('confirm-overlay').classList.add('open')
+      if (statusInterval) return
       async function poll() {
+        if (!pedidosSesion.length) return
         try {
-          const res = await fetch(BACKEND + '/pedidos');
-          if (!res.ok) return;
-          renderConfirmList(await res.json());
+          const { data } = await supabase
+            .from('orders')
+            .select('id, status')
+            .in('id', pedidosSesion)
+          if (data) renderConfirmList(data)
         } catch {}
       }
-      poll();
-      statusInterval = setInterval(poll, 5000);
+      poll()
+      statusInterval = setInterval(poll, 5000)
     }
 
-    function checkout() {
-      const ids = Object.keys(cart).filter(id => cart[id] > 0);
-      if (ids.length === 0) return;
-      const items = ids.map(id => ({ name: ITEMS[id].name, qty: cart[id], price: ITEMS[id].price }));
-      const btn = document.getElementById('checkout-btn');
-      btn.textContent = 'Enviando pedido...';
-      btn.disabled = true;
-      fetch(BACKEND + '/pedidos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mesa: String(mesa), items: items })
-      }).then(r => {
-        if (!r.ok) throw new Error('Error ' + r.status);
-        return r.json();
-      }).then(pedido => {
-        document.getElementById('cart-overlay').classList.remove('open');
-        document.getElementById('cart-drawer').classList.remove('open');
-        pedidosSesion.push(pedido.id);
-        sessionStorage.setItem(SESSION_KEY, JSON.stringify(pedidosSesion));
-        abrirOverlayEstado();
-        cart = {};
-        updateCartCount();
-        btn.textContent = 'Confirmar pedido →';
-        btn.disabled = false;
-      }).catch(() => {
-        btn.textContent = 'Confirmar pedido →';
-        btn.disabled = false;
-        alert('Error al enviar el pedido. Intentá de nuevo.');
-      });
+    function cerrarOverlay() {
+      clearInterval(statusInterval)
+      statusInterval = null
+      document.getElementById('confirm-overlay').classList.remove('open')
     }
 
-    const sections = ['entradas','ensaladas','pastas','sandwiches','waffles','postres','bebidas'];
-    const catBtns = document.querySelectorAll('.cat-btn');
-
+    // ─── Cat nav scroll spy ────────────────────────────────────────────────────
     function navScroll(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const offset = el.getBoundingClientRect().top + window.scrollY - 100;
-      window.scrollTo({ top: offset, behavior: 'smooth' });
+      const el = document.getElementById(id)
+      if (!el) return
+      window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' })
     }
 
     window.addEventListener('scroll', () => {
-      let current = sections[0];
-      sections.forEach(id => {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top < 110) current = id;
-      });
-      catBtns.forEach((btn, i) => {
-        btn.classList.toggle('active', sections[i] === current);
-      });
-    });
+      let current = catIds[0]
+      catIds.forEach(id => {
+        const el = document.getElementById('cat-' + id)
+        if (el && el.getBoundingClientRect().top < 110) current = id
+      })
+      document.querySelectorAll('.cat-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.id === current)
+      })
+    })
+
+    window.addItem = addItem
+    window.removeItem = removeItem
+    window.toggleCart = toggleCart
+    window.checkout = checkout
+    window.cerrarOverlay = cerrarOverlay
+    window.navScroll = navScroll
+
+    init()
   </script>
 </body>
 </html>
