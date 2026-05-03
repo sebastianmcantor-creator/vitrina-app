@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitrina — Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:        #1C1612;
+  --ink2:       #2E2620;
+  --terra:      #B85A30;
+  --terra2:     #D4724E;
+  --terra-pale: #F2E6DF;
+  --gold:       #C8963C;
+  --gold-pale:  #FAF3E4;
+  --sage:       #5A7A5E;
+  --sage-pale:  #E8F0E4;
+  --cream:      #F7F2EA;
+  --cream2:     #EDE5D8;
+  --white:      #FDFAF6;
+  --muted:      #8A7E74;
+  --border:     #DDD5C8;
+  --card:       #FEFCF8;
+  --bad:        #B83030;
+  --bad-pale:   #FFF0F0;
+  --sidebar-w:  240px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  height: 100%;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  background: var(--cream);
+  color: var(--ink);
+}
+
+/* ═══════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════ */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--ink2);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform 0.25s ease;
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sidebar-logo-icon {
+  width: 34px; height: 34px;
+  background: var(--terra);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; flex-shrink: 0;
+}
+.sidebar-logo-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: -0.3px;
+}
+
+.sidebar-restaurant {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.sidebar-rest-label {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.35);
+  margin-bottom: 4px;
+}
+.sidebar-rest-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sidebar-rest-plan {
+  font-size: 11px;
+  color: var(--gold);
+  margin-top: 2px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  font-size: 14px;
+  color: rgba(255,255,255,.6);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  text-decoration: none;
+}
+.nav-item:hover { background: rgba(255,255,255,.06); color: var(--white); }
+.nav-item.active { background: var(--terra); color: var(--white); }
+.nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  background: var(--terra);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px;
+}
+.nav-section-label {
+  font-size: 10px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.25);
+  padding: 16px 12px 6px;
+}
+
+.sidebar-user {
+  padding: 14px 16px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--terra-pale);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--terra);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.user-avatar img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.user-info { flex: 1; min-width: 0; }
+.user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-role { font-size: 11px; color: rgba(255,255,255,.4); }
+.btn-logout {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,.4);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.12s;
+  flex-shrink: 0;
+}
+.btn-logout:hover { color: var(--bad); }
+
+/* ── Main ── */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ── Topbar (mobile) ── */
+.topbar {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--ink2);
+  color: var(--white);
+  padding: 14px 20px;
+  position: sticky;
+  top: 0; z-index: 90;
+}
+.topbar-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+}
+.btn-menu-toggle {
+  background: none; border: none;
+  color: var(--white); font-size: 22px;
+  cursor: pointer; padding: 2px;
+}
+
+/* ── Content ── */
+.content {
+  flex: 1;
+  padding: 32px 36px;
+  max-width: 900px;
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.1;
+}
+.page-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ── Secciones del panel ── */
+.panel-section { display: none; }
+.panel-section.active { display: block; }
+
+/* ── Card ── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 28px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Form ── */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-grid.full { grid-template-columns: 1fr; }
+.form-field { display: flex; flex-direction: column; gap: 6px; }
+.form-field.col-2 { grid-column: span 2; }
+.form-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink2);
+  letter-spacing: 0.01em;
+}
+.form-label span {
+  color: var(--terra);
+  margin-left: 2px;
+}
+.form-input, .form-textarea, .form-select {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--ink);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  width: 100%;
+  outline: none;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px rgba(184,90,48,.1);
+}
+.form-input.error, .form-textarea.error { border-color: var(--bad); }
+.form-textarea { resize: vertical; min-height: 88px; }
+.form-hint {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: -2px;
+}
+.form-hint.error { color: var(--bad); }
+
+/* Slug preview */
+.slug-preview {
+  display: flex;
+  align-items: center;
+  background: var(--cream2);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.slug-prefix {
+  padding: 10px 10px 10px 14px;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--cream);
+}
+.slug-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 10px 14px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+}
+.slug-status {
+  font-size: 16px;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+
+/* Color picker */
+.color-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.color-swatch {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.color-swatch input[type="color"] {
+  width: 100%; height: 100%;
+  border: none; cursor: pointer;
+  padding: 0; background: none;
+  opacity: 0.01; /* el swatch de fondo muestra el color */
+}
+.color-hex {
+  font-size: 14px;
+  color: var(--ink);
+  font-family: 'Outfit', monospace;
+}
+.color-presets {
+  display: flex; gap: 6px; flex-wrap: wrap;
+}
+.color-dot {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.1s;
+  flex-shrink: 0;
+}
+.color-dot:hover { transform: scale(1.15); }
+.color-dot.selected { border-color: var(--ink); }
+
+/* Open/closed toggle */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+.toggle-info .toggle-label { font-size: 14px; font-weight: 500; }
+.toggle-info .toggle-desc { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.toggle {
+  position: relative;
+  width: 44px; height: 24px;
+  flex-shrink: 0;
+}
+.toggle input { display: none; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.toggle input:checked + .toggle-track { background: var(--sage); }
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 18px; height: 18px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+.toggle input:checked + .toggle-track::after { transform: translateX(20px); }
+
+/* ── Botones de acción ── */
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.btn-primary {
+  background: var(--terra);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 11px 24px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-primary:hover { background: var(--terra2); }
+.btn-primary:active { transform: scale(0.97); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn-secondary {
+  background: var(--white);
+  color: var(--ink);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: border-color 0.12s;
+}
+.btn-secondary:hover { border-color: var(--ink2); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink2);
+  color: var(--white);
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.2);
+  z-index: 500;
+  transition: transform 0.3s cubic-bezier(.34,1.56,.64,1);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { background: var(--sage); }
+.toast.error   { background: var(--bad); }
+
+/* ── Pantalla de setup (restaurante nuevo) ── */
+.setup-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  gap: 24px;
+}
+.setup-icon {
+  font-size: 52px;
+  line-height: 1;
+}
+.setup-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.setup-subtitle {
+  font-size: 14.5px;
+  color: var(--muted);
+  max-width: 380px;
+  line-height: 1.6;
+  margin-top: -12px;
+}
+
+/* ── Coming soon ── */
+.coming-soon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 80px 24px;
+  gap: 12px;
+  text-align: center;
+  color: var(--muted);
+}
+.coming-soon-icon { font-size: 40px; }
+.coming-soon-label { font-size: 16px; font-weight: 500; color: var(--ink2); }
+.coming-soon-desc { font-size: 13.5px; }
+
+/* ── Loading skeleton ── */
+.skeleton-line {
+  height: 14px;
+  background: linear-gradient(90deg, var(--cream2) 25%, var(--border) 50%, var(--cream2) 75%);
+  background-size: 200% 100%;
+  border-radius: 7px;
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* ── Mobile overlay ── */
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 99;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.open { display: block; }
+  .main { margin-left: 0; }
+  .topbar { display: flex; }
+  .content { padding: 20px 18px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-field.col-2 { grid-column: span 1; }
+  .page-title { font-size: 24px; }
+}
+@media (max-width: 500px) {
+  .actions { flex-direction: column; align-items: stretch; }
+  .btn-primary, .btn-secondary { text-align: center; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<div class="layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">🪟</div>
+      <div class="sidebar-logo-name">Vitrina</div>
+    </div>
+
+    <div class="sidebar-restaurant" id="sidebar-restaurant" style="display:none">
+      <div class="sidebar-rest-label">Restaurante</div>
+      <div class="sidebar-rest-name" id="sidebar-rest-name">—</div>
+      <div class="sidebar-rest-plan" id="sidebar-rest-plan">Plan Free</div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Gestión</div>
+      <button class="nav-item active" data-section="info" onclick="switchSection('info', this)">
+        <span class="nav-icon">🏪</span> Información
+      </button>
+      <button class="nav-item" data-section="menu" onclick="switchSection('menu', this)">
+        <span class="nav-icon">📋</span> Menú
+      </button>
+      <button class="nav-item" data-section="mesas" onclick="switchSection('mesas', this)">
+        <span class="nav-icon">🪑</span> Mesas
+      </button>
+      <button class="nav-item" data-section="pedidos" onclick="switchSection('pedidos', this)">
+        <span class="nav-icon">🔔</span> Pedidos
+      </button>
+
+      <div class="nav-section-label">Negocio</div>
+      <button class="nav-item" data-section="estadisticas" onclick="switchSection('estadisticas', this)">
+        <span class="nav-icon">📊</span> Estadísticas
+      </button>
+      <button class="nav-item" data-section="config" onclick="switchSection('config', this)">
+        <span class="nav-icon">⚙️</span> Configuración
+      </button>
+    </nav>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <div class="user-info">
+        <div class="user-name" id="user-name">Cargando...</div>
+        <div class="user-role">Propietario</div>
+      </div>
+      <button class="btn-logout" title="Cerrar sesión" onclick="handleLogout()">⎋</button>
+    </div>
+
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+
+    <!-- Topbar mobile -->
+    <div class="topbar">
+      <div class="topbar-logo">🪟 Vitrina</div>
+      <button class="btn-menu-toggle" onclick="openSidebar()">☰</button>
+    </div>
+
+    <div class="content">
+
+      <!-- ══ PANTALLA: sin restaurante ══ -->
+      <div id="section-setup" class="panel-section active">
+        <div class="setup-screen">
+          <div class="setup-icon">🏪</div>
+          <div class="setup-title">Creá tu restaurante</div>
+          <div class="setup-subtitle">Completá la información básica para empezar a gestionar tu menú y pedidos.</div>
+          <div style="width:100%; max-width:480px">
+            <div class="card" style="text-align:left">
+              <div class="form-grid full">
+                <div class="form-field">
+                  <label class="form-label">Nombre del restaurante <span>*</span></label>
+                  <input type="text" class="form-input" id="setup-name" placeholder="La Panera Rosa" oninput="autoSlug()">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">URL pública <span>*</span></label>
+                  <div class="slug-preview">
+                    <span class="slug-prefix">vitrinaapp.com.ar/</span>
+                    <input type="text" class="slug-input" id="setup-slug" placeholder="la-panera-rosa" oninput="checkSlug()">
+                    <span class="slug-status" id="setup-slug-status"></span>
+                  </div>
+                  <span class="form-hint">Solo letras minúsculas, números y guiones.</span>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Ciudad</label>
+                  <input type="text" class="form-input" id="setup-city" placeholder="Buenos Aires">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Teléfono</label>
+                  <input type="text" class="form-input" id="setup-phone" placeholder="+54 11 1234-5678">
+                </div>
+              </div>
+              <div class="actions" style="margin-top:24px">
+                <button class="btn-primary" style="width:100%" id="btn-create-rest" onclick="createRestaurant()">
+                  Crear restaurante
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SECCIÓN: Información ══ -->
+      <div id="section-info" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">Información del restaurante</div>
+          <div class="page-subtitle">Datos que aparecen en tu menú público y en Vitrina.</div>
+        </div>
+
+        <!-- Identidad -->
+        <div class="card">
+          <div class="card-title">🏷️ Identidad</div>
+          <div class="form-grid">
+            <div class="form-field col-2">
+              <label class="form-label">Nombre <span>*</span></label>
+              <input type="text" class="form-input" id="f-name" placeholder="La Panera Rosa">
+            </div>
+            <div class="form-field col-2">
+              <label class="form-label">Tagline</label>
+              <input type="text" class="form-input" id="f-tagline" placeholder="El sabor de siempre, en cada bocado.">
+            </div>
+            <div class="form-field col-2">
+              <label class="form-label">Descripción</label>
+              <textarea class="form-textarea" id="f-description" placeholder="Contá de qué se trata tu restaurante…"></textarea>
+            </div>
+            <div class="form-field col-2">
+              <label class="form-label">URL pública <span>*</span></label>
+              <div class="slug-preview">
+                <span class="slug-prefix">vitrinaapp.com.ar/</span>
+                <input type="text" class="slug-input" id="f-slug" oninput="checkSlugEdit()">
+                <span class="slug-status" id="f-slug-status"></span>
+              </div>
+              <span class="form-hint" id="f-slug-hint">Solo letras minúsculas, números y guiones.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contacto -->
+        <div class="card">
+          <div class="card-title">📍 Contacto y ubicación</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">Teléfono</label>
+              <input type="text" class="form-input" id="f-phone" placeholder="+54 11 1234-5678">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="f-email" placeholder="hola@lapanerosa.com">
+            </div>
+            <div class="form-field col-2">
+              <label class="form-label">Dirección</label>
+              <input type="text" class="form-input" id="f-address" placeholder="Av. Santa Fe 1234, Recoleta">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Ciudad</label>
+              <input type="text" class="form-input" id="f-city" placeholder="Buenos Aires">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Moneda</label>
+              <select class="form-select" id="f-currency">
+                <option value="ARS">ARS — Peso argentino</option>
+                <option value="USD">USD — Dólar</option>
+                <option value="CLP">CLP — Peso chileno</option>
+                <option value="COP">COP — Peso colombiano</option>
+                <option value="MXN">MXN — Peso mexicano</option>
+                <option value="BRL">BRL — Real brasileño</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Apariencia -->
+        <div class="card">
+          <div class="card-title">🎨 Apariencia</div>
+          <div class="form-field">
+            <label class="form-label">Color principal</label>
+            <div class="color-picker-row">
+              <div class="color-swatch" id="color-swatch">
+                <input type="color" id="f-color" value="#B85A30" oninput="onColorChange(this.value)">
+              </div>
+              <span class="color-hex" id="color-hex">#B85A30</span>
+            </div>
+            <div class="color-presets" style="margin-top:10px" id="color-presets"></div>
+            <span class="form-hint">Se usa en botones y acentos del menú público.</span>
+          </div>
+        </div>
+
+        <!-- Estado -->
+        <div class="card">
+          <div class="card-title">🔘 Estado</div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Restaurante abierto</div>
+              <div class="toggle-desc">Cuando está desactivado, el menú muestra "Cerrado" a los clientes.</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="f-is-open" checked>
+              <div class="toggle-track"></div>
+            </label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <div class="toggle-label">Perfil activo</div>
+              <div class="toggle-desc">Desactivar oculta el restaurante de todos los canales públicos.</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="f-is-active" checked>
+              <div class="toggle-track"></div>
+            </label>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" id="btn-save" onclick="saveRestaurant()">
+            Guardar cambios
+          </button>
+          <button class="btn-secondary" onclick="loadRestaurant()">Descartar</button>
+        </div>
+      </div>
+
+      <!-- ══ Secciones proximamente ══ -->
+      <div id="section-menu" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">Menú</div>
+        </div>
+        <div class="coming-soon">
+          <div class="coming-soon-icon">📋</div>
+          <div class="coming-soon-label">Editor de menú</div>
+          <div class="coming-soon-desc">Próximamente: categorías, platos, precios e imágenes.</div>
+        </div>
+      </div>
+
+      <div id="section-mesas" class="panel-section">
+        <div class="page-header"><div class="page-title">Mesas</div></div>
+        <div class="coming-soon">
+          <div class="coming-soon-icon">🪑</div>
+          <div class="coming-soon-label">Gestión de mesas</div>
+          <div class="coming-soon-desc">Próximamente: configurá tus mesas y generá códigos QR.</div>
+        </div>
+      </div>
+
+      <div id="section-pedidos" class="panel-section">
+        <div class="page-header"><div class="page-title">Pedidos</div></div>
+        <div class="coming-soon">
+          <div class="coming-soon-icon">🔔</div>
+          <div class="coming-soon-label">Pedidos en tiempo real</div>
+          <div class="coming-soon-desc">Próximamente: seguimiento en vivo de todos los pedidos.</div>
+        </div>
+      </div>
+
+      <div id="section-estadisticas" class="panel-section">
+        <div class="page-header"><div class="page-title">Estadísticas</div></div>
+        <div class="coming-soon">
+          <div class="coming-soon-icon">📊</div>
+          <div class="coming-soon-label">Dashboard de métricas</div>
+          <div class="coming-soon-desc">Próximamente: ventas, platos más pedidos y horarios pico.</div>
+        </div>
+      </div>
+
+      <div id="section-config" class="panel-section">
+        <div class="page-header"><div class="page-title">Configuración</div></div>
+        <div class="coming-soon">
+          <div class="coming-soon-icon">⚙️</div>
+          <div class="coming-soon-label">Configuración avanzada</div>
+          <div class="coming-soon-desc">Próximamente: equipo, integraciones y plan.</div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+
+</div><!-- /layout -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { requireAuth, signOut } from './lib/auth.js'
+import { profiles, restaurants } from './lib/db.js'
+
+// ── Estado global ──
+let currentUser = null
+let currentRestaurant = null
+let slugCheckTimer = null
+
+const COLOR_PRESETS = [
+  '#B85A30', '#C8963C', '#5A7A5E', '#3B6B9E',
+  '#9B3B7A', '#2C6E6A', '#8B4513', '#4A4A8A',
+]
+
+// ─────────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    currentUser = await requireAuth('/login.html')
+    renderUser(currentUser)
+    await loadRestaurant()
+    renderColorPresets()
+  } catch (e) {
+    // requireAuth ya redirigió; este catch es por errores reales
+    showToast('Error al cargar el panel: ' + e.message, 'error')
+  }
+})
+
+// ─────────────────────────────────────────────
+// Render helpers
+// ─────────────────────────────────────────────
+function renderUser(user) {
+  const name = user.user_metadata?.full_name || user.email || 'Usuario'
+  const avatar = user.user_metadata?.avatar_url
+
+  document.getElementById('user-name').textContent = name.split(' ')[0]
+  const avatarEl = document.getElementById('user-avatar')
+  if (avatar) {
+    avatarEl.innerHTML = `<img src="${avatar}" alt="${name}">`
+  } else {
+    avatarEl.textContent = name[0].toUpperCase()
+  }
+}
+
+function renderSidebarRestaurant(rest) {
+  const el = document.getElementById('sidebar-restaurant')
+  el.style.display = 'block'
+  document.getElementById('sidebar-rest-name').textContent = rest.name
+  document.getElementById('sidebar-rest-plan').textContent =
+    ({ free: 'Plan Free', starter: 'Plan Starter', pro: 'Plan Pro' })[rest.plan] ?? rest.plan
+}
+
+function fillForm(rest) {
+  document.getElementById('f-name').value        = rest.name        || ''
+  document.getElementById('f-tagline').value     = rest.tagline     || ''
+  document.getElementById('f-description').value = rest.description || ''
+  document.getElementById('f-slug').value        = rest.slug        || ''
+  document.getElementById('f-phone').value       = rest.phone       || ''
+  document.getElementById('f-email').value       = rest.email       || ''
+  document.getElementById('f-address').value     = rest.address     || ''
+  document.getElementById('f-city').value        = rest.city        || ''
+  document.getElementById('f-currency').value    = rest.currency    || 'ARS'
+  document.getElementById('f-is-open').checked   = rest.is_open     ?? true
+  document.getElementById('f-is-active').checked = rest.is_active   ?? true
+  onColorChange(rest.primary_color || '#B85A30')
+}
+
+function renderColorPresets() {
+  const container = document.getElementById('color-presets')
+  container.innerHTML = COLOR_PRESETS.map(c => `
+    <div class="color-dot" style="background:${c}" title="${c}"
+      onclick="window.selectPresetColor('${c}')"></div>
+  `).join('')
+}
+
+// ─────────────────────────────────────────────
+// Cargar restaurante
+// ─────────────────────────────────────────────
+window.loadRestaurant = async function () {
+  try {
+    const list = await restaurants.listByUser(currentUser.id)
+
+    if (!list || list.length === 0) {
+      showSection('setup')
+      return
+    }
+
+    currentRestaurant = list[0]
+    renderSidebarRestaurant(currentRestaurant)
+    fillForm(currentRestaurant)
+    showSection('info')
+  } catch (e) {
+    showToast('Error cargando restaurante: ' + e.message, 'error')
+  }
+}
+
+// ─────────────────────────────────────────────
+// Crear restaurante (setup)
+// ─────────────────────────────────────────────
+window.createRestaurant = async function () {
+  const name = document.getElementById('setup-name').value.trim()
+  const slug = document.getElementById('setup-slug').value.trim()
+  const city = document.getElementById('setup-city').value.trim()
+  const phone = document.getElementById('setup-phone').value.trim()
+
+  if (!name || !slug) {
+    showToast('El nombre y la URL son obligatorios.', 'error')
+    return
+  }
+
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    showToast('La URL solo puede tener letras minúsculas, números y guiones.', 'error')
+    return
+  }
+
+  const btn = document.getElementById('btn-create-rest')
+  btn.disabled = true
+  btn.textContent = 'Creando...'
+
+  try {
+    const available = await restaurants.isSlugAvailable(slug)
+    if (!available) {
+      showToast('Esa URL ya está en uso. Elegí otra.', 'error')
+      btn.disabled = false
+      btn.textContent = 'Crear restaurante'
+      return
+    }
+
+    currentRestaurant = await restaurants.create({
+      name, slug, city, phone,
+      owner_id: currentUser.id,
+    })
+
+    renderSidebarRestaurant(currentRestaurant)
+    fillForm(currentRestaurant)
+    showSection('info')
+    showToast('¡Restaurante creado! 🎉', 'success')
+  } catch (e) {
+    showToast('Error al crear: ' + e.message, 'error')
+    btn.disabled = false
+    btn.textContent = 'Crear restaurante'
+  }
+}
+
+// ─────────────────────────────────────────────
+// Guardar cambios
+// ─────────────────────────────────────────────
+window.saveRestaurant = async function () {
+  if (!currentRestaurant) return
+
+  const slug = document.getElementById('f-slug').value.trim()
+
+  if (!document.getElementById('f-name').value.trim()) {
+    showToast('El nombre no puede estar vacío.', 'error')
+    return
+  }
+  if (!/^[a-z0-9-]+$/.test(slug)) {
+    showToast('La URL solo puede tener letras minúsculas, números y guiones.', 'error')
+    return
+  }
+
+  const btn = document.getElementById('btn-save')
+  btn.disabled = true
+  btn.textContent = 'Guardando...'
+
+  try {
+    if (slug !== currentRestaurant.slug) {
+      const available = await restaurants.isSlugAvailable(slug, currentRestaurant.id)
+      if (!available) {
+        showToast('Esa URL ya está en uso. Elegí otra.', 'error')
+        btn.disabled = false
+        btn.textContent = 'Guardar cambios'
+        return
+      }
+    }
+
+    const updates = {
+      name:          document.getElementById('f-name').value.trim(),
+      tagline:       document.getElementById('f-tagline').value.trim() || null,
+      description:   document.getElementById('f-description').value.trim() || null,
+      slug,
+      phone:         document.getElementById('f-phone').value.trim() || null,
+      email:         document.getElementById('f-email').value.trim() || null,
+      address:       document.getElementById('f-address').value.trim() || null,
+      city:          document.getElementById('f-city').value.trim() || null,
+      currency:      document.getElementById('f-currency').value,
+      primary_color: document.getElementById('f-color').value,
+      is_open:       document.getElementById('f-is-open').checked,
+      is_active:     document.getElementById('f-is-active').checked,
+    }
+
+    currentRestaurant = await restaurants.update(currentRestaurant.id, updates)
+    renderSidebarRestaurant(currentRestaurant)
+    showToast('Cambios guardados ✓', 'success')
+  } catch (e) {
+    showToast('Error al guardar: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Guardar cambios'
+  }
+}
+
+// ─────────────────────────────────────────────
+// Slug helpers
+// ─────────────────────────────────────────────
+function toSlug(str) {
+  return str
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '') // quitar acentos
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
+
+window.autoSlug = function () {
+  const name = document.getElementById('setup-name').value
+  const slugInput = document.getElementById('setup-slug')
+  slugInput.value = toSlug(name)
+  window.checkSlug()
+}
+
+async function checkSlugField(inputId, statusId, excludeId = null) {
+  const val = document.getElementById(inputId).value.trim()
+  const statusEl = document.getElementById(statusId)
+
+  clearTimeout(slugCheckTimer)
+
+  if (!val || !/^[a-z0-9-]+$/.test(val)) {
+    statusEl.textContent = val ? '✗' : ''
+    return
+  }
+
+  statusEl.textContent = '⋯'
+  slugCheckTimer = setTimeout(async () => {
+    try {
+      const available = await restaurants.isSlugAvailable(val, excludeId)
+      statusEl.textContent = available ? '✓' : '✗'
+    } catch {
+      statusEl.textContent = ''
+    }
+  }, 500)
+}
+
+window.checkSlug     = () => checkSlugField('setup-slug', 'setup-slug-status')
+window.checkSlugEdit = () => checkSlugField('f-slug', 'f-slug-status', currentRestaurant?.id)
+
+// ─────────────────────────────────────────────
+// Color picker
+// ─────────────────────────────────────────────
+window.onColorChange = function (val) {
+  document.getElementById('f-color').value  = val
+  document.getElementById('color-hex').textContent = val.toUpperCase()
+  document.getElementById('color-swatch').style.background = val
+
+  document.querySelectorAll('.color-dot').forEach(dot => {
+    dot.classList.toggle('selected', dot.style.background === val ||
+      dot.getAttribute('title') === val.toUpperCase())
+  })
+}
+
+window.selectPresetColor = function (color) {
+  onColorChange(color)
+}
+
+// ─────────────────────────────────────────────
+// Navegación
+// ─────────────────────────────────────────────
+window.switchSection = function (name, btn) {
+  if (!currentRestaurant && name !== 'setup') {
+    showToast('Primero creá tu restaurante.', 'error')
+    return
+  }
+  showSection(name)
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'))
+  if (btn) btn.classList.add('active')
+  closeSidebar()
+}
+
+function showSection(name) {
+  document.querySelectorAll('.panel-section').forEach(el => el.classList.remove('active'))
+  document.getElementById(`section-${name}`)?.classList.add('active')
+}
+
+// ─────────────────────────────────────────────
+// Sidebar mobile
+// ─────────────────────────────────────────────
+window.openSidebar = function () {
+  document.getElementById('sidebar').classList.add('open')
+  document.getElementById('sidebar-overlay').classList.add('open')
+}
+window.closeSidebar = function () {
+  document.getElementById('sidebar').classList.remove('open')
+  document.getElementById('sidebar-overlay').classList.remove('open')
+}
+
+// ─────────────────────────────────────────────
+// Auth
+// ─────────────────────────────────────────────
+window.handleLogout = async function () {
+  await signOut('/login.html')
+}
+
+// ─────────────────────────────────────────────
+// Toast
+// ─────────────────────────────────────────────
+let toastTimer = null
+window.showToast = function (msg, type = 'default') {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.className = `toast ${type} show`
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3200)
+}
+</script>
+</body>
+</html>
