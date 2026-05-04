@@ -152,7 +152,7 @@ Sección para invitar colaboradores (mozos, cocineros) al restaurante.
 
 ## Deuda técnica
 
-- [ ] El Cloudflare Worker (`vitrina-worker.vitrinaapp.workers.dev`) ya no se usa en menu.html/cocina.html pero sigue desplegado. Se puede dar de baja cuando todo esté probado en producción.
+- [x] Cloudflare Worker (`vitrina-worker.vitrinaapp.workers.dev`) — eliminado del código. Borrar desde Cloudflare Dashboard → Workers & Pages → vitrina-worker → Delete.
 - [ ] `mozo.html` usa un backend Railway (`proud-illumination-production-ed01.up.railway.app`) para llamar a la API de Claude. Si ese servicio se cae, el asistente no funciona. Evaluar migrar a Cloudflare Workers AI o mantener como está.
 - [x] `orders.getByIds()` eliminado de db.js (código muerto).
 
