@@ -7,15 +7,19 @@
 
 ## 🚨 SQL pendiente (Sebastián debe correr esto en Supabase)
 
+### ✅ orders_public_select — Ejecutado el 2026-05-03
+
+### ⏳ Email en profiles (necesario para gestión de equipo)
+
 Supabase Dashboard → SQL Editor → New query:
 
 ```sql
--- Permite que clientes sin login lean el estado de sus pedidos (overlay de menu.html)
-CREATE POLICY "orders_public_select" ON public.orders
-  FOR SELECT USING (TRUE);
+-- Agrega columna email a profiles para búsqueda de colaboradores
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;
+CREATE INDEX IF NOT EXISTS profiles_email_idx ON public.profiles(email);
 ```
 
-✅ **Ejecutado el 2026-05-03.**
+Sin esto, el botón "Agregar colaborador" no puede encontrar usuarios por email.
 
 ---
 
@@ -127,7 +131,7 @@ if (!rest.is_open) {
 }
 ```
 
-### [ ] Manejo de sesión expirada en cocina.html
+### [x] Manejo de sesión expirada en cocina.html
 Si el token de Supabase expira durante la sesión (turno largo), reautenticar silenciosamente.
 
 **Cómo:** Escuchar `supabase.auth.onAuthStateChange` y si el evento es `SIGNED_OUT`, mostrar el botón de login de nuevo sin recargar la página.
@@ -147,7 +151,7 @@ La política actual `tables_staff_all` requiere auth para leer mesas.
 `orders.listActive()` incluye `table_number` (INTEGER) que es suficiente para mostrar "Mesa X".
 ✅ No es bloqueante — cocina ya muestra el número de mesa sin necesitar la tabla de mesas.
 
-### [ ] Gestión de staff en panel
+### [x] Gestión de staff en panel
 Sección para invitar colaboradores (mozos, cocineros) al restaurante.
 
 **Schema ya existe:** tabla `restaurant_staff` con `user_id`, `role`, `restaurant_id`.
