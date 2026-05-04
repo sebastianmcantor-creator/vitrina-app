@@ -91,6 +91,8 @@
     .checkout-btn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; }
     .checkout-btn:disabled { opacity: 0.6; }
 
+    .cerrado-banner { background: #fff3cd; border-bottom: 1px solid #ffc107; padding: 10px 20px; display: none; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; color: #856404; }
+    .mesa-warning { font-size: 12px; color: #856404; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; display: none; }
     .mozo-fab { position: fixed; bottom: 24px; right: 20px; background: #1a1208; color: #fdf8f4; border: none; border-radius: 28px; padding: 12px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 150; text-decoration: none; }
 
     .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300; display: none; align-items: center; justify-content: center; }
@@ -137,6 +139,7 @@
         </button>
       </div>
     </div>
+    <div class="cerrado-banner" id="cerrado-banner">🔒 El restaurante está cerrado temporalmente</div>
     <div class="pedidos-bar" id="pedidos-bar" style="display:none" onclick="abrirOverlayEstado()">
       <span class="pedidos-bar-text">📋 Ver estado de mis pedidos</span>
       <span class="pedidos-bar-hint">Tocá para ver →</span>
@@ -157,6 +160,7 @@
     </div>
     <div class="cart-footer" id="cart-footer" style="display:none">
       <div class="cart-total"><span>Total</span><span id="cart-total">$0</span></div>
+      <div class="mesa-warning" id="mesa-warning">⚠️ No se detectó número de mesa. Pedí al mozo que te escanee el QR correcto.</div>
       <button class="checkout-btn" id="checkout-btn" onclick="checkout()">Confirmar pedido →</button>
     </div>
   </div>
@@ -218,6 +222,17 @@
 
       document.getElementById('loading').style.display = 'none'
       document.getElementById('app').style.display = 'block'
+
+      if (!rest.is_open) {
+        document.getElementById('cerrado-banner').style.display = 'flex'
+        const btn = document.getElementById('checkout-btn')
+        btn.disabled = true
+        btn.textContent = 'Restaurante cerrado'
+      }
+
+      if (mesa === null || isNaN(mesa)) {
+        document.getElementById('mesa-warning').style.display = 'block'
+      }
 
       updatePedidosBar()
       if (pedidosSesion.length) abrirOverlayEstado()

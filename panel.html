@@ -1170,6 +1170,11 @@ html, body {
         <label class="form-label">Descripción</label>
         <textarea class="form-textarea" id="item-desc" placeholder="Descripción opcional..." style="min-height:64px"></textarea>
       </div>
+      <div class="form-field" style="margin-bottom:14px">
+        <label class="form-label">URL de imagen</label>
+        <input class="form-input" id="item-image-url" placeholder="https://... (opcional)">
+        <span class="form-hint">Imagen que se muestra en el menú público.</span>
+      </div>
       <div class="form-field">
         <label class="form-label">Etiquetas</label>
         <div class="tag-chips" id="item-tags-picker"></div>
@@ -1652,10 +1657,11 @@ window.openItemModal = function (catId, itemId = null) {
   editingItemCatId = catId
   editingItem = itemId ? Object.values(menuItemsMap).flat().find(i => i.id === itemId) : null
   document.getElementById('modal-item-title').textContent = editingItem ? 'Editar plato' : 'Nuevo plato'
-  document.getElementById('item-name').value  = editingItem?.name        || ''
-  document.getElementById('item-price').value = editingItem?.price       ?? ''
-  document.getElementById('item-emoji').value = editingItem?.emoji       || ''
-  document.getElementById('item-desc').value  = editingItem?.description || ''
+  document.getElementById('item-name').value      = editingItem?.name        || ''
+  document.getElementById('item-price').value     = editingItem?.price       ?? ''
+  document.getElementById('item-emoji').value     = editingItem?.emoji       || ''
+  document.getElementById('item-desc').value      = editingItem?.description || ''
+  document.getElementById('item-image-url').value = editingItem?.image_url   || ''
   SELECTED_TAGS.clear()
   ;(editingItem?.tags ?? []).forEach(t => SELECTED_TAGS.add(t))
   document.getElementById('item-tags-picker').innerHTML = TAGS.map(t =>
@@ -1681,7 +1687,8 @@ window.saveItemModal = async function () {
     const payload = {
       name, price,
       emoji:        document.getElementById('item-emoji').value.trim() || null,
-      description:  document.getElementById('item-desc').value.trim()  || null,
+      description:  document.getElementById('item-desc').value.trim()      || null,
+      image_url:    document.getElementById('item-image-url').value.trim() || null,
       tags:         [...SELECTED_TAGS],
       restaurant_id: currentRestaurant.id,
       category_id:   editingItemCatId,
@@ -1770,11 +1777,22 @@ function renderMesas() {
           <button class="btn-copy-url" title="${url}" onclick="copyMesaUrl('${url}', this)">
             📋 Copiar URL
           </button>
+          <button class="btn-icon" onclick="downloadQr(${t.number})" title="Descargar QR">⬇️</button>
           <button class="btn-icon" onclick="openMesaModal('${t.id}')" title="Editar">✏️</button>
           <button class="btn-icon danger" onclick="deleteMesa('${t.id}')" title="Eliminar">🗑️</button>
         </div>
       </div>`
   }).join('') + '</div>'
+}
+
+window.downloadQr = function (number) {
+  const url    = menuUrl(number)
+  const qrUrl  = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=' + encodeURIComponent(url)
+  const a      = document.createElement('a')
+  a.href       = qrUrl
+  a.download   = 'qr-mesa-' + number + '.png'
+  a.target     = '_blank'
+  a.click()
 }
 
 window.copyMesaUrl = async function (url, btn) {
