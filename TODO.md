@@ -21,7 +21,7 @@ CREATE POLICY "orders_public_select" ON public.orders
 
 ## Prioridad 1 — Tiempo real en cocina
 
-### [ ] Supabase Realtime en cocina.html
+### [x] Supabase Realtime en cocina.html
 Reemplazar el `setInterval(fetchPedidos, 10000)` por un canal Realtime de Supabase.
 
 **Cómo:**
@@ -42,14 +42,14 @@ Mantener el fetch inicial para cargar el estado actual. Cancelar suscripción si
 
 **Nota:** Requiere que Supabase Realtime esté habilitado para la tabla `orders` en el dashboard (Database → Replication → supabase_realtime publication → agregar tabla orders).
 
-### [ ] Supabase Realtime en menu.html (overlay de estado)
+### [x] Supabase Realtime en menu.html (overlay de estado)
 Reemplazar `setInterval(poll, 5000)` por Realtime en `abrirOverlayEstado()`. Misma mecánica que cocina.
 
 ---
 
 ## Prioridad 2 — Panel: completar secciones
 
-### [ ] Sección Pedidos en panel.html
+### [x] Sección Pedidos en panel.html
 Vista de pedidos activos del restaurante, similar a cocina.html pero integrada al panel.
 
 **Cómo:**
@@ -59,7 +59,7 @@ Vista de pedidos activos del restaurante, similar a cocina.html pero integrada a
 - Botones para cambiar estado (misma lógica que cocina.html)
 - Polling o Realtime (hacer después de Prioridad 1)
 
-### [ ] Links rápidos en panel.html
+### [x] Links rápidos en panel.html
 Agregar en la sección Información (debajo de las acciones de guardar) un bloque con:
 - Botón "Ver menú público" → abre `menu.html?slug={slug}` en nueva pestaña
 - Botón "Panel de cocina" → abre `cocina.html?slug={slug}` en nueva pestaña
@@ -71,7 +71,7 @@ Agregar en la sección Información (debajo de las acciones de guardar) un bloqu
 
 ## Prioridad 3 — Estadísticas básicas
 
-### [ ] Sección Estadísticas en panel.html
+### [x] Sección Estadísticas en panel.html
 Reemplazar "coming soon" con un dashboard básico.
 
 **Métricas a mostrar:**
@@ -102,7 +102,7 @@ Calcular métricas en el frontend a partir del array devuelto.
 
 ## Prioridad 4 — Pulido y UX
 
-### [ ] Descargar/imprimir QR desde panel (sección Mesas)
+### [x] Descargar/imprimir QR desde panel (sección Mesas)
 En cada mesa-card, agregar botón "⬇️ Descargar QR" que descargue la imagen del QR.
 
 **Cómo:**
@@ -117,7 +117,7 @@ async function downloadQr(number) {
 }
 ```
 
-### [ ] Estado "Cerrado" en menu.html
+### [x] Estado "Cerrado" en menu.html
 Si `rest.is_open === false`, mostrar un banner en el header: "🔒 El restaurante está cerrado" y deshabilitar el botón de checkout.
 
 **Cómo:** En `init()` de menu.html, después de cargar `rest`, agregar:
@@ -132,10 +132,10 @@ Si el token de Supabase expira durante la sesión (turno largo), reautenticar si
 
 **Cómo:** Escuchar `supabase.auth.onAuthStateChange` y si el evento es `SIGNED_OUT`, mostrar el botón de login de nuevo sin recargar la página.
 
-### [ ] Validación de mesa en menu.html
+### [x] Validación de mesa en menu.html
 Si `?mesa=` está ausente o no es un número válido, mostrar un aviso (no bloquear el menú pero no permitir confirmar pedido sin mesa).
 
-### [ ] Imagen de plato en editor de menú (panel)
+### [x] Imagen de plato en editor de menú (panel)
 El campo `image_url` existe en `menu_items` pero no está en el modal. Agregar un campo de URL de imagen en el modal de plato.
 
 ---
@@ -184,6 +184,6 @@ Dueño en panel
         └─> info restaurante          ✅
         └─> editor de menú            ✅
         └─> gestión de mesas + QR     ✅
-        └─> pedidos en tiempo real    ⏳ pendiente
-        └─> estadísticas              ⏳ pendiente
+        └─> pedidos en tiempo real    ✅ funciona (Realtime)
+        └─> estadísticas              ✅ funciona (KPIs + gráfico + top platos)
 ```
