@@ -1424,6 +1424,7 @@ window.loadRestaurant = async function () {
     renderSidebarRestaurant(currentRestaurant)
     fillForm(currentRestaurant)
     showSection('info')
+    initPedidosBadge()
   } catch (e) {
     showToast('Error cargando restaurante: ' + e.message, 'error')
   }
@@ -1469,6 +1470,7 @@ window.createRestaurant = async function () {
     renderSidebarRestaurant(currentRestaurant)
     fillForm(currentRestaurant)
     showSection('info')
+    initPedidosBadge()
     showToast('¡Restaurante creado! 🎉', 'success')
   } catch (e) {
     showToast('Error al crear: ' + e.message, 'error')
@@ -2000,6 +2002,36 @@ window.deleteMesa = async function (tableId) {
 // ═══════════════════════════════════════════
 let pedidosMap = {}
 let pedidosChannel = null
+let badgeChannel = null
+
+// Suscripción liviana siempre activa: solo actualiza el badge del sidebar
+function initPedidosBadge() {
+  if (!currentRestaurant) return
+  orders.listActive(currentRestaurant.id)
+    .then(list => setBadgeCount(list.length))
+    .catch(() => {})
+
+  if (badgeChannel) supabase.removeChannel(badgeChannel)
+  badgeChannel = supabase
+    .channel('badge-' + currentRestaurant.id)
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'orders',
+      filter: 'restaurant_id=eq.' + currentRestaurant.id,
+    }, async () => {
+      try {
+        const list = await orders.listActive(currentRestaurant.id)
+        setBadgeCount(list.length)
+      } catch {}
+    })
+    .subscribe()
+}
+
+function setBadgeCount(count) {
+  const badge = document.getElementById('pedidos-badge')
+  if (!badge) return
+  badge.textContent = count
+  badge.style.display = count > 0 ? '' : 'none'
+}
 
 const STATUS_LABELS = {
   pending:   'Pendiente',
@@ -2079,11 +2111,7 @@ function renderPedidos() {
   if (!container) return
   const list = Object.values(pedidosMap).sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
 
-  const badge = document.getElementById('pedidos-badge')
-  if (badge) {
-    badge.textContent = list.length
-    badge.style.display = list.length ? '' : 'none'
-  }
+  setBadgeCount(list.length)
 
   if (!list.length) {
     container.innerHTML = `

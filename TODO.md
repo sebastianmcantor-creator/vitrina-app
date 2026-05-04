@@ -9,17 +9,7 @@
 
 ### ✅ orders_public_select — Ejecutado el 2026-05-03
 
-### ⏳ Email en profiles (necesario para gestión de equipo)
-
-Supabase Dashboard → SQL Editor → New query:
-
-```sql
--- Agrega columna email a profiles para búsqueda de colaboradores
-ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS email text;
-CREATE INDEX IF NOT EXISTS profiles_email_idx ON public.profiles(email);
-```
-
-Sin esto, el botón "Agregar colaborador" no puede encontrar usuarios por email.
+### ✅ Email en profiles — Ejecutado el 2026-05-03
 
 ---
 
@@ -164,7 +154,17 @@ Sección para invitar colaboradores (mozos, cocineros) al restaurante.
 
 - [ ] El Cloudflare Worker (`vitrina-worker.vitrinaapp.workers.dev`) ya no se usa en menu.html/cocina.html pero sigue desplegado. Se puede dar de baja cuando todo esté probado en producción.
 - [ ] `mozo.html` usa un backend Railway (`proud-illumination-production-ed01.up.railway.app`) para llamar a la API de Claude. Si ese servicio se cae, el asistente no funciona. Evaluar migrar a Cloudflare Workers AI o mantener como está.
-- [ ] `orders.getByIds()` en db.js fue agregado pero no se usa (se pollea directo con `supabase.from('orders').select()` en menu.html). Unificar cuando se pase a Realtime.
+- [x] `orders.getByIds()` eliminado de db.js (código muerto).
+
+### ⏳ SQL opcional — Policy de lectura de profiles
+
+Si la gestión de equipo falla al buscar colaboradores por email, correr:
+
+```sql
+-- Permite que usuarios autenticados lean todos los perfiles (necesario para buscar por email)
+CREATE POLICY "authenticated_read_profiles" ON public.profiles
+  FOR SELECT TO authenticated USING (true);
+```
 
 ---
 
@@ -173,21 +173,26 @@ Sección para invitar colaboradores (mozos, cocineros) al restaurante.
 ```
 Cliente escanea QR (mesa X)
   └─> menu.html?slug=X&mesa=N        ✅ funciona
-        └─> pide con carrito           ✅ funciona
-        └─> confirma → Supabase        ✅ funciona (requiere SQL orders_public_select)
-        └─> overlay estado pedido      ✅ funciona (polling 5s, mejorar con Realtime)
-        └─> "Consultá al mozo"         ✅ funciona (Claude via Railway)
+        └─> banner "cerrado" si is_open=false ✅
+        └─> advertencia si falta ?mesa  ✅
+        └─> pide con carrito           ✅
+        └─> confirma → Supabase        ✅
+        └─> overlay estado Realtime    ✅
+        └─> "Consultá al mozo"         ✅ (Claude via Railway)
 
 Staff en cocina
-  └─> cocina.html?slug=X             ✅ funciona (polling 10s, mejorar con Realtime)
-        └─> login Google              ✅ funciona
-        └─> ver/cambiar estados       ✅ funciona
+  └─> cocina.html?slug=X             ✅
+        └─> login Google              ✅
+        └─> ver/cambiar estados       ✅ (Realtime)
+        └─> sesión expirada → re-login ✅
 
 Dueño en panel
-  └─> panel.html                     ✅ funciona
+  └─> panel.html                     ✅
         └─> info restaurante          ✅
-        └─> editor de menú            ✅
-        └─> gestión de mesas + QR     ✅
-        └─> pedidos en tiempo real    ✅ funciona (Realtime)
-        └─> estadísticas              ✅ funciona (KPIs + gráfico + top platos)
+        └─> links rápidos (menú/cocina/mozo) ✅
+        └─> editor de menú + imagen   ✅
+        └─> gestión de mesas + QR     ✅ (descarga QR 400px)
+        └─> pedidos Realtime + badge global ✅
+        └─> estadísticas (KPIs + gráfico + top platos) ✅
+        └─> configuración / equipo    ✅ (agregar/editar/eliminar staff)
 ```
