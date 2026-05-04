@@ -606,6 +606,74 @@ html, body {
 }
 .tag-chip.selected { border-color:var(--terra); background:var(--terra-pale); color:var(--terra); }
 
+/* ── Mesas ── */
+.mesas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+}
+.mesa-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.mesa-card-top {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+.mesa-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--terra);
+  line-height: 1;
+}
+.mesa-label-text {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.mesa-qr {
+  width: 120px;
+  height: 120px;
+  border-radius: 10px;
+  margin: 12px 0 0;
+  display: block;
+  background: var(--cream2);
+}
+.mesa-card-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-copy-url {
+  flex: 1;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color .12s, color .12s;
+}
+.btn-copy-url:hover { border-color: var(--terra); color: var(--terra); }
+
 /* ── Coming soon ── */
 .coming-soon {
   display: flex;
@@ -904,11 +972,19 @@ html, body {
       </div>
 
       <div id="section-mesas" class="panel-section">
-        <div class="page-header"><div class="page-title">Mesas</div></div>
-        <div class="coming-soon">
-          <div class="coming-soon-icon">🪑</div>
-          <div class="coming-soon-label">Gestión de mesas</div>
-          <div class="coming-soon-desc">Próximamente: configurá tus mesas y generá códigos QR.</div>
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div>
+            <div class="page-title">Mesas</div>
+            <div class="page-subtitle">Cada mesa tiene una URL única para que los clientes pidan desde su lugar.</div>
+          </div>
+          <button class="btn-primary" onclick="openMesaModal()" style="flex-shrink:0;margin-top:4px">+ Agregar mesa</button>
+        </div>
+        <div id="mesas-body">
+          <div class="coming-soon">
+            <div class="coming-soon-icon">🪑</div>
+            <div class="coming-soon-label">Sin mesas todavía</div>
+            <div class="coming-soon-desc">Agregá la primera mesa para generar su código QR.</div>
+          </div>
         </div>
       </div>
 
@@ -946,6 +1022,36 @@ html, body {
 
 <!-- Toast -->
 <div class="toast" id="toast"></div>
+
+<!-- Modal: mesa -->
+<div class="modal-overlay" id="modal-mesa" onclick="if(event.target===this)closeModal('modal-mesa')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-mesa-title">Nueva mesa</div>
+      <button class="modal-close" onclick="closeModal('modal-mesa')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:100px 1fr;gap:14px">
+        <div class="form-field">
+          <label class="form-label">Número <span>*</span></label>
+          <input class="form-input" id="mesa-number" type="number" min="1" step="1" placeholder="1" style="text-align:center">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Nombre opcional</label>
+          <input class="form-input" id="mesa-label" placeholder="Ej: Terraza, Barra, VIP">
+        </div>
+      </div>
+      <div class="form-field" style="margin-top:14px">
+        <label class="form-label">Capacidad</label>
+        <input class="form-input" id="mesa-capacity" type="number" min="1" step="1" placeholder="4">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-mesa')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-mesa" onclick="saveMesaModal()">Guardar</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal: categoría -->
 <div class="modal-overlay" id="modal-cat" onclick="if(event.target===this)closeModal('modal-cat')">
@@ -1017,7 +1123,7 @@ html, body {
 
 <script type="module">
 import { requireAuth, signOut } from './lib/auth.js'
-import { profiles, restaurants, menuCategories, menuItems } from './lib/db.js'
+import { profiles, restaurants, menuCategories, menuItems, restaurantTables } from './lib/db.js'
 
 // ── Estado global ──
 let currentUser = null
@@ -1293,7 +1399,8 @@ window.switchSection = function (name, btn) {
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'))
   if (btn) btn.classList.add('active')
   closeSidebar()
-  if (name === 'menu') loadMenu()
+  if (name === 'menu')  loadMenu()
+  if (name === 'mesas') loadMesas()
 }
 
 function showSection(name) {
@@ -1543,6 +1650,120 @@ window.toggleItemAvail = async function (itemId, available) {
     for (const catId in menuItemsMap)
       menuItemsMap[catId] = menuItemsMap[catId].map(i => i.id === itemId ? { ...i, is_available: available } : i)
     document.getElementById(`item-row-${itemId}`)?.classList.toggle('unavailable', !available)
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+// ═══════════════════════════════════════════
+// MESAS
+// ═══════════════════════════════════════════
+let mesasList = []
+let editingMesa = null
+
+window.loadMesas = async function () {
+  if (!currentRestaurant) return
+  try {
+    mesasList = await restaurantTables.listByRestaurant(currentRestaurant.id)
+    renderMesas()
+  } catch (e) {
+    showToast('Error cargando mesas: ' + e.message, 'error')
+  }
+}
+
+function menuUrl(number) {
+  return 'https://vitrinaapp.com.ar/menu.html?slug=' + currentRestaurant.slug + '&mesa=' + number
+}
+
+function renderMesas() {
+  const container = document.getElementById('mesas-body')
+  if (!mesasList.length) {
+    container.innerHTML = `
+      <div class="coming-soon">
+        <div class="coming-soon-icon">🪑</div>
+        <div class="coming-soon-label">Sin mesas todavía</div>
+        <div class="coming-soon-desc">Agregá la primera mesa para generar su código QR.</div>
+      </div>`
+    return
+  }
+  container.innerHTML = '<div class="mesas-grid">' + mesasList.map(t => {
+    const url = menuUrl(t.number)
+    const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' + encodeURIComponent(url)
+    return `
+      <div class="mesa-card">
+        <div class="mesa-card-top">
+          <div class="mesa-num">${t.number}</div>
+          <div class="mesa-label-text">${escHtml(t.label || 'Mesa ' + t.number)}</div>
+          <img class="mesa-qr" src="${qrSrc}" alt="QR mesa ${t.number}" loading="lazy">
+        </div>
+        <div class="mesa-card-footer">
+          <button class="btn-copy-url" title="${url}" onclick="copyMesaUrl('${url}', this)">
+            📋 Copiar URL
+          </button>
+          <button class="btn-icon" onclick="openMesaModal('${t.id}')" title="Editar">✏️</button>
+          <button class="btn-icon danger" onclick="deleteMesa('${t.id}')" title="Eliminar">🗑️</button>
+        </div>
+      </div>`
+  }).join('') + '</div>'
+}
+
+window.copyMesaUrl = async function (url, btn) {
+  try {
+    await navigator.clipboard.writeText(url)
+    const orig = btn.textContent
+    btn.textContent = '✓ Copiado'
+    setTimeout(() => { btn.textContent = orig }, 1800)
+  } catch {
+    showToast('No se pudo copiar al portapapeles.', 'error')
+  }
+}
+
+window.openMesaModal = function (tableId = null) {
+  editingMesa = tableId ? mesasList.find(t => t.id === tableId) : null
+  document.getElementById('modal-mesa-title').textContent = editingMesa ? 'Editar mesa' : 'Nueva mesa'
+  const nextNum = mesasList.length ? Math.max(...mesasList.map(t => t.number)) + 1 : 1
+  document.getElementById('mesa-number').value   = editingMesa?.number   ?? nextNum
+  document.getElementById('mesa-label').value    = editingMesa?.label    ?? ''
+  document.getElementById('mesa-capacity').value = editingMesa?.capacity ?? 4
+  document.getElementById('modal-mesa').classList.add('open')
+  setTimeout(() => document.getElementById('mesa-number').focus(), 80)
+}
+
+window.saveMesaModal = async function () {
+  const number   = parseInt(document.getElementById('mesa-number').value)
+  const label    = document.getElementById('mesa-label').value.trim() || null
+  const capacity = parseInt(document.getElementById('mesa-capacity').value) || 4
+  if (!number || number < 1) { showToast('El número de mesa es obligatorio.', 'error'); return }
+
+  const duplicate = mesasList.find(t => t.number === number && t.id !== editingMesa?.id)
+  if (duplicate) { showToast('Ya existe una mesa con ese número.', 'error'); return }
+
+  const btn = document.getElementById('btn-save-mesa')
+  btn.disabled = true; btn.textContent = 'Guardando...'
+  try {
+    if (editingMesa) {
+      const updated = await restaurantTables.update(editingMesa.id, { number, label, capacity })
+      mesasList = mesasList.map(t => t.id === editingMesa.id ? { ...t, ...updated } : t)
+    } else {
+      const created = await restaurantTables.create({ restaurant_id: currentRestaurant.id, number, label, capacity })
+      mesasList.push(created)
+      mesasList.sort((a, b) => a.number - b.number)
+    }
+    closeModal('modal-mesa')
+    renderMesas()
+    showToast(editingMesa ? 'Mesa actualizada ✓' : 'Mesa creada ✓', 'success')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar'
+  }
+}
+
+window.deleteMesa = async function (tableId) {
+  if (!confirm('¿Eliminar esta mesa?')) return
+  try {
+    await restaurantTables.delete(tableId)
+    mesasList = mesasList.filter(t => t.id !== tableId)
+    renderMesas()
+    showToast('Mesa eliminada', 'success')
   } catch (e) { showToast('Error: ' + e.message, 'error') }
 }
 
