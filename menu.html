@@ -445,7 +445,9 @@
       document.getElementById('confirm-mesa-label').textContent = mesa != null ? 'Mesa ' + mesa : 'Pedido a retirar'
       document.getElementById('confirm-overlay').classList.add('open')
       if (statusInterval) return
-      async function poll() {
+
+      // Carga inicial
+      async function fetchEstados() {
         if (!pedidosSesion.length) return
         try {
           const { data } = await supabase
@@ -455,16 +457,38 @@
           if (data) renderConfirmList(data)
         } catch {}
       }
-      poll()
-      statusInterval = setInterval(poll, 5000)
+      fetchEstados()
+
+      // Realtime: escuchar cambios en los pedidos de esta sesión
+      statusInterval = supabase
+        .channel('estado-pedidos-' + SESSION_KEY)
+        .on('postgres_changes', {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'orders',
+        }, payload => {
+          if (!pedidosSesion.includes(payload.new.id)) return
+          renderConfirmList(pedidosSesion.map(id =>
+            id === payload.new.id ? payload.new : { id, status: 'pending' }
+          ))
+          // Re-fetch todos para tener el estado completo
+          fetchEstados()
+        })
+        .subscribe()
     }
 
     function cerrarOverlay() {
-      clearInterval(statusInterval)
-      statusInterval = null
+      if (statusInterval) {
+        supabase.removeChannel(statusInterval)
+        statusInterval = null
+      }
       document.getElementById('confirm-overlay').classList.remove('open')
       updatePedidosBar()
     }
+
+    window.addEventListener('beforeunload', () => {
+      if (statusInterval) supabase.removeChannel(statusInterval)
+    })
 
     function updatePedidosBar() {
       document.getElementById('pedidos-bar').style.display = pedidosSesion.length ? 'flex' : 'none'

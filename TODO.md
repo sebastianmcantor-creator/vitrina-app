@@ -15,7 +15,7 @@ CREATE POLICY "orders_public_select" ON public.orders
   FOR SELECT USING (TRUE);
 ```
 
-**Sin esto el overlay de estado de pedidos en menu.html no muestra actualizaciones.**
+✅ **Ejecutado el 2026-05-03.**
 
 ---
 

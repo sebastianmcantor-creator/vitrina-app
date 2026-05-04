@@ -159,7 +159,7 @@
   let rest = null
   let pedidos = {}
   let historial = {}
-  let pollInterval = null
+  let realtimeChannel = null
 
   // ── Auth ──────────────────────────────────────────────────────────────────────
   async function init() {
@@ -181,8 +181,8 @@
     }
     document.getElementById('rest-sub').textContent = rest.name + ' — Pedidos en tiempo real'
     show('main-view')
-    fetchPedidos()
-    pollInterval = setInterval(fetchPedidos, 10000)
+    await fetchPedidos()
+    suscribirRealtime()
   }
 
   window.loginGoogle = async function () {
@@ -194,6 +194,14 @@
 
   supabase.auth.onAuthStateChange((_event, session) => {
     if (session && !rest) startKitchen()
+    if (!session && realtimeChannel) {
+      supabase.removeChannel(realtimeChannel)
+      realtimeChannel = null
+    }
+  })
+
+  window.addEventListener('beforeunload', () => {
+    if (realtimeChannel) supabase.removeChannel(realtimeChannel)
   })
 
   // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -213,7 +221,7 @@
     document.getElementById('conn-label').textContent = online ? 'En línea' : 'Sin conexión'
   }
 
-  // ── Polling ───────────────────────────────────────────────────────────────────
+  // ── Carga inicial ─────────────────────────────────────────────────────────────
   async function fetchPedidos() {
     try {
       const lista = await orders.listActive(rest.id)
@@ -226,6 +234,55 @@
     } catch {
       setStatus(false)
     }
+  }
+
+  // ── Realtime ──────────────────────────────────────────────────────────────────
+  function suscribirRealtime() {
+    if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+
+    realtimeChannel = supabase
+      .channel('cocina-' + rest.id)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'orders',
+        filter: 'restaurant_id=eq.' + rest.id,
+      }, async payload => {
+        const order = payload.new
+        if (!order) return
+
+        if (payload.eventType === 'DELETE' || order.status === 'delivered' || order.status === 'cancelled') {
+          delete pedidos[order.id]
+          renderAll()
+          return
+        }
+
+        // Para INSERT necesitamos los order_items — hacemos fetch puntual
+        if (payload.eventType === 'INSERT') {
+          try {
+            const { data } = await supabase
+              .from('orders')
+              .select('*, order_items(*)')
+              .eq('id', order.id)
+              .single()
+            if (data) {
+              const esNuevo = !pedidos[data.id]
+              pedidos[data.id] = data
+              if (esNuevo) playSound()
+            }
+          } catch {}
+        } else {
+          // UPDATE: actualizar solo los campos del order, conservar order_items
+          if (pedidos[order.id]) {
+            pedidos[order.id] = { ...pedidos[order.id], ...order }
+          }
+        }
+        renderAll()
+        setStatus(true)
+      })
+      .subscribe(status => {
+        setStatus(status === 'SUBSCRIBED')
+      })
   }
 
   // ── Sound ─────────────────────────────────────────────────────────────────────
