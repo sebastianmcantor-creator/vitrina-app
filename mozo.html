@@ -3,290 +3,88 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Chikpi — Asistente</title>
+  <title>Asistente</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html, body {
-      height: 100%;
-      background: #1a1208;
-      font-family: 'DM Sans', sans-serif;
-      overflow: hidden;
-    }
+    html, body { height: 100%; background: #1a1208; font-family: 'DM Sans', sans-serif; overflow: hidden; }
 
     .screen {
-      display: flex;
-      flex-direction: column;
-      height: 100dvh;
-      max-width: 480px;
-      margin: 0 auto;
-      background: #1a1208;
+      display: flex; flex-direction: column;
+      height: 100dvh; max-width: 480px; margin: 0 auto; background: #1a1208;
     }
 
-    /* HEADER */
-    .header {
-      padding: 16px 20px 12px;
-      border-bottom: 0.5px solid #2e2410;
-      flex-shrink: 0;
-    }
+    .header { padding: 16px 20px 12px; border-bottom: 0.5px solid #2e2410; flex-shrink: 0; }
+    .restaurant-name { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 500; color: #e8c87a; letter-spacing: 0.02em; }
+    .table-badge { font-size: 11px; color: #8a7450; margin-top: 3px; letter-spacing: 0.05em; text-transform: uppercase; }
+    .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #5a9e6a; margin-right: 5px; vertical-align: middle; }
 
-    .restaurant-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 20px;
-      font-weight: 500;
-      color: #e8c87a;
-      letter-spacing: 0.02em;
-    }
-
-    .table-badge {
-      font-size: 11px;
-      color: #8a7450;
-      margin-top: 3px;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-    }
-
-    .status-dot {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #5a9e6a;
-      margin-right: 5px;
-      vertical-align: middle;
-    }
-
-    /* MESSAGES */
-    .messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      scrollbar-width: none;
-    }
-
+    .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
     .messages::-webkit-scrollbar { display: none; }
 
-    .msg {
-      max-width: 82%;
-      font-size: 14px;
-      line-height: 1.55;
-    }
-
+    .msg { max-width: 82%; font-size: 14px; line-height: 1.55; }
     .msg.bot { align-self: flex-start; }
     .msg.user { align-self: flex-end; }
+    .msg-bubble { padding: 10px 14px; border-radius: 18px; }
+    .msg.bot .msg-bubble { background: #2a2010; color: #d4b97a; border-bottom-left-radius: 4px; border: 0.5px solid #3a2e1a; }
+    .msg.user .msg-bubble { background: #c8a84a; color: #1a1208; border-bottom-right-radius: 4px; font-weight: 500; }
+    .msg-label { font-size: 10px; color: #5a4a2a; margin-bottom: 4px; padding-left: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
 
-    .msg-bubble {
-      padding: 10px 14px;
-      border-radius: 18px;
-    }
-
-    .msg.bot .msg-bubble {
-      background: #2a2010;
-      color: #d4b97a;
-      border-bottom-left-radius: 4px;
-      border: 0.5px solid #3a2e1a;
-    }
-
-    .msg.user .msg-bubble {
-      background: #c8a84a;
-      color: #1a1208;
-      border-bottom-right-radius: 4px;
-      font-weight: 500;
-    }
-
-    .msg-label {
-      font-size: 10px;
-      color: #5a4a2a;
-      margin-bottom: 4px;
-      padding-left: 4px;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
-
-    /* TYPING */
-    .typing {
-      align-self: flex-start;
-      display: none;
-    }
-
-    .typing .msg-bubble {
-      background: #2a2010;
-      border: 0.5px solid #3a2e1a;
-      padding: 12px 16px;
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      border-bottom-left-radius: 4px;
-    }
-
-    .dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #c8a84a;
-      opacity: 0.4;
-      animation: bounce 1.2s infinite;
-    }
-
+    .typing { align-self: flex-start; display: none; }
+    .typing .msg-bubble { background: #2a2010; border: 0.5px solid #3a2e1a; padding: 12px 16px; display: flex; gap: 4px; align-items: center; border-bottom-left-radius: 4px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #c8a84a; opacity: 0.4; animation: bounce 1.2s infinite; }
     .dot:nth-child(2) { animation-delay: 0.2s; }
     .dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%, 100% { opacity: 0.3; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-3px); } }
 
-    @keyframes bounce {
-      0%, 100% { opacity: 0.3; transform: translateY(0); }
-      50% { opacity: 1; transform: translateY(-3px); }
-    }
-
-    /* SUGGESTIONS */
-    .suggestions {
-      padding: 0 16px 8px;
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-      flex-shrink: 0;
-    }
-
-    .suggestion-btn {
-      background: #2a2010;
-      border: 0.5px solid #4a3820;
-      color: #c8a84a;
-      font-size: 12px;
-      font-family: 'DM Sans', sans-serif;
-      padding: 7px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: background 0.15s;
-      white-space: nowrap;
-    }
-
+    .suggestions { padding: 0 16px 8px; display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; }
+    .suggestion-btn { background: #2a2010; border: 0.5px solid #4a3820; color: #c8a84a; font-size: 12px; font-family: 'DM Sans', sans-serif; padding: 7px 12px; border-radius: 20px; cursor: pointer; transition: background 0.15s; white-space: nowrap; }
     .suggestion-btn:hover { background: #3a2e18; }
 
-    /* INPUT */
-    .input-area {
-      padding: 10px 14px 24px;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-      border-top: 0.5px solid #2e2410;
-      flex-shrink: 0;
-    }
+    .error-msg { font-size: 12px; color: #8a5a3a; text-align: center; padding: 4px 16px; display: none; flex-shrink: 0; }
 
-    .chat-input {
-      flex: 1;
-      background: #2a2010;
-      border: 0.5px solid #4a3820;
-      border-radius: 22px;
-      padding: 10px 16px;
-      color: #e8c87a;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      outline: none;
-      -webkit-appearance: none;
-    }
-
+    .input-area { padding: 10px 14px 24px; display: flex; gap: 8px; align-items: center; border-top: 0.5px solid #2e2410; flex-shrink: 0; }
+    .chat-input { flex: 1; background: #2a2010; border: 0.5px solid #4a3820; border-radius: 22px; padding: 10px 16px; color: #e8c87a; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; -webkit-appearance: none; }
     .chat-input::placeholder { color: #5a4a2a; }
-
-    .send-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: #c8a84a;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background 0.15s;
-    }
-
+    .send-btn { width: 40px; height: 40px; border-radius: 50%; background: #c8a84a; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
     .send-btn:hover { background: #e8c87a; }
     .send-btn:active { transform: scale(0.95); }
-
     .send-btn svg { width: 17px; height: 17px; }
 
-    /* ERROR */
-    .error-msg {
-      font-size: 12px;
-      color: #8a5a3a;
-      text-align: center;
-      padding: 4px 16px;
-      display: none;
-      flex-shrink: 0;
-    }
-
-    /* LOADING SPLASH */
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      background: #1a1208;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      z-index: 10;
-      transition: opacity 0.5s;
-    }
-
+    .loading-overlay { position: fixed; inset: 0; background: #1a1208; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; z-index: 10; transition: opacity 0.5s; }
     .loading-overlay.hidden { opacity: 0; pointer-events: none; }
-
-    .loading-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 32px;
-      color: #e8c87a;
-      letter-spacing: 0.05em;
-    }
-
-    .loading-sub {
-      font-size: 11px;
-      color: #5a4a2a;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .loading-bar {
-      width: 100px;
-      height: 1px;
-      background: #2a2010;
-      overflow: hidden;
-    }
-
-    .loading-bar-fill {
-      height: 100%;
-      background: #c8a84a;
-      width: 0%;
-      animation: load 1.4s ease forwards;
-    }
-
+    .loading-logo { font-family: 'Playfair Display', serif; font-size: 32px; color: #e8c87a; letter-spacing: 0.05em; }
+    .loading-sub { font-size: 11px; color: #5a4a2a; letter-spacing: 0.12em; text-transform: uppercase; }
+    .loading-bar { width: 100px; height: 1px; background: #2a2010; overflow: hidden; }
+    .loading-bar-fill { height: 100%; background: #c8a84a; width: 0%; animation: load 1.4s ease forwards; }
     @keyframes load { to { width: 100%; } }
+
+    #error-screen { position: fixed; inset: 0; background: #1a1208; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #8a7450; font-size: 14px; text-align: center; padding: 20px; }
   </style>
 </head>
 <body>
 
   <div class="loading-overlay" id="loader">
-    <div class="loading-logo">Chikpi</div>
-    <div class="loading-sub">Cargando menú</div>
+    <div class="loading-logo" id="loader-name">Cargando</div>
+    <div class="loading-sub">Asistente de menú</div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  </div>
+
+  <div id="error-screen">
+    <div style="font-size:36px">😕</div>
+    <div id="error-msg"></div>
   </div>
 
   <div class="screen">
     <div class="header">
-      <div class="restaurant-name">Chikpi</div>
+      <div class="restaurant-name" id="rest-name">—</div>
       <div class="table-badge" id="table-badge">
         <span class="status-dot"></span>Asistente activo
       </div>
     </div>
 
     <div class="messages" id="messages">
-      <div class="msg bot">
-        <div class="msg-label">Mozo</div>
-        <div class="msg-bubble">¡Hola! Bienvenido a La Panera Rosa 🥐 Soy Chikpi, tu asistente. Puedo ayudarte con el menú completo, ingredientes, opciones vegetarianas, veganas o aptas para celíacos, y hacerte recomendaciones. ¿En qué te puedo ayudar?</div>
-      </div>
       <div class="msg typing" id="typing">
         <div class="msg-bubble">
           <div class="dot"></div><div class="dot"></div><div class="dot"></div>
@@ -294,15 +92,8 @@
       </div>
     </div>
 
-    <div class="suggestions" id="suggestions">
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué opciones veganas tienen?')">Opciones veganas</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué platos son sin TACC?')">Sin TACC</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué waffles tienen?')">Waffles</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué me recomendás para desayunar?')">Desayuno</button>
-      <button class="suggestion-btn" onclick="sendSuggestion('¿Qué pastas caseras tienen?')">Pastas</button>
-    </div>
-
-    <div class="error-msg" id="error-msg"></div>
+    <div class="suggestions" id="suggestions"></div>
+    <div class="error-msg" id="api-error"></div>
 
     <div class="input-area">
       <input class="chat-input" id="chat-input" type="text" placeholder="Preguntame lo que quieras..." />
@@ -315,210 +106,209 @@
     </div>
   </div>
 
-  <script>
-    const BACKEND = 'https://proud-illumination-production-ed01.up.railway.app';
+  <script type="module">
+    import { restaurants } from './lib/db.js'
 
-    const MENU = `
-MENÚ DE LA PANERA ROSA — Restaurante en Recoleta, Buenos Aires. Abierto non stop (todo el día).
+    const BACKEND = 'https://proud-illumination-production-ed01.up.railway.app'
+    const TAG_LABELS = { veg: 'Vegetariano', vegan: 'Vegano', celiac: 'Sin TACC', popular: 'Muy pedido', spicy: 'Picante', new: 'Nuevo' }
 
-ENTRADAS / PICOTEO:
-- Burrata con rúcula ($9.800): burrata fresca, rúcula selvática, nueces, tomates cherry y remolachas, aceite de oliva extra virgen. Vegetariano. Muy pedida.
-- Papas cheddar & romero ($7.200): papas fritas bañadas en cheddar fundido, romero fresco y dip de salsa criolla. Vegetariano. Contiene lácteos.
-- Empanadas caseras x3 ($6.900): a elección carne cortada a cuchillo, pollo especiado, jamón y queso, o humita. Doradas al horno. Contienen gluten y lácteos.
+    const params = new URLSearchParams(location.search)
+    const slug = params.get('slug')
+    const mesa = params.get('mesa')
 
-TOSTAS:
-- Tosta palta & nuez ($8.500): pan de campo tostado, queso crema panera, palta slice, nueces y rúcula. Opcional: huevo poche. Vegetariano. Contiene gluten, lácteos y frutos secos.
+    let systemPrompt = ''
+    let conversationHistory = []
+    let isLoading = false
 
-ENSALADAS:
-- Ensalada Panera ($11.400): pollo salteado con sésamo, mix de lechugas, bocconcinos, tomates cherry, parmesano, almendras tostadas y aderezo aceto-miel. Con focaccia. Contiene gluten, lácteos y frutos secos. Muy pedida.
-- Ensalada veggie caesar ($9.200): mix de lechugas, croutons, garrapiñada de semillas, queso parmesano y aderezo caesar. Vegetariano. Contiene gluten y lácteos.
-- Ensalada de atún ($12.800): penne rigate al pesto, arroz yamaní, lomitos de atún, nueces, huevo duro, parmesano, mix de lechugas, tomates cherry y palta. Sin TACC. Contiene pescado, frutos secos y lácteos.
+    async function init() {
+      if (!slug) { showError('URL inválida — falta el parámetro slug.'); return }
 
-CARNES:
-- Consultar al mozo por las opciones de carne disponibles. La carta varía según temporada.
-
-PASTAS CASERAS:
-- Ñoquis de papa caseros ($10.500): salsa rosa cremosa. Opción: agregar pollo grillado o salsa blanca. Vegetariano. Contiene gluten, lácteos y huevo. Muy pedidos.
-- Raviolones de calabaza ($11.900): rellenos de calabaza con crema, tomate cubeteado fresco y verdeo rondelle. Masa casera. Vegetariano. Contiene gluten, lácteos y huevo.
-- Raviolones de salmón ($14.200): rellenos de salmón rosado con crema de eneldo, tomates cherry y alcaparras. Masa fresca. Contiene gluten, pescado, lácteos y huevo.
-- Sorrentinos de jamón y queso ($12.400): rellenos de jamón cocido y queso, trilogía de tomates. Masa artesanal. Contiene gluten, lácteos y huevo.
-
-SANDWICHES:
-Todos vienen con guarnición a elección: papas fritas, rústicas o boniatos.
-- Smoked Lomito ($13.800): baguetín con lomito vuelta y vuelta, cebolla caramelizada, queso fundido, lechuga, tomate y huevo a la plancha. Contiene gluten y lácteos. Muy pedido.
-- Sándwich jamón & brie ($13.200): jamón crudo, queso brie, rúcula, tomates cherry y manteca de Dijon en baguetín. Contiene gluten y lácteos.
-- Wrap Panera ($12.600): tortilla con guacamole, pollo, lechuga capuchina, queso, morrones asados y huevo duro. Con papas rústicas. Contiene gluten y lácteos.
-- Wrap Veggie ($11.400): tortilla con pesto de tomate, muzzalmendra, rúcula, cebolla caramelizada, tomates secos y frescos, aceitunas y pesto de albahaca. Vegano. Contiene gluten y frutos secos.
-
-WAFFLES SALADOS:
-- Waffle salado ($10.900): waffle relleno de jamón, huevo y queso cheddar, con papas rústicas. Clásico de la casa. Contiene gluten, lácteos y huevo. Muy pedido.
-
-WAFFLES DULCES:
-- Pink Tower ($12.800): torre de waffles con frutos rojos, crema chantilly, dulce de leche y azúcar impalpable. Postre signature de la casa. Vegetariano. Contiene gluten, lácteos y huevo. Muy pedido.
-
-CREPES SALADOS:
-- Consultar al mozo por las opciones del día.
-
-CREPES DULCES:
-- Consultar al mozo por las opciones del día.
-
-PANCAKES:
-- Consultar al mozo por las opciones del día.
-
-TORTAS:
-- Torta del día ($7.200): según disponibilidad — chocolate belga, lemon pie, carrot cake o cheesecake de frutos rojos. Consultar al mozo. Vegetariano. Contiene gluten, lácteos y huevo.
-- Flan casero con dulce de leche ($6.400): flan casero con dulce de leche artesanal y crema batida. Sin TACC. Vegetariano. Contiene lácteos y huevo.
-
-DESAYUNOS Y MERIENDAS:
-- Keto breakfast ($14.500): tostada sin gluten con palta slice, huevos revueltos, tomate concasse y dips de frutos secos. Con yogurt y frutas. Sin TACC. Vegetariano. Contiene lácteos, huevo y frutos secos.
-- (También disponibles tostadas, medialunas y opciones del día. Consultar al mozo.)
-
-CAFETERÍA:
-- Capuchino italiano ($5.900): café, leche vaporizada, crema, chocolate y canela, terminado con crema batida. Vegetariano. Contiene lácteos y cafeína.
-- (También disponibles: café, cortado, latte, té e infusiones. Consultar al mozo.)
-
-JUGOS Y BEBIDAS:
-- Jugo maracuyá & menta ($4.800): jugo natural de maracuyá, menta fresca, miel y limón. Sin azúcar agregada. Vegano. Sin TACC.
-- Limonada de menta & jengibre ($4.200): limón exprimido, menta fresca, jengibre, miel y soda. Vegano. Sin TACC.
-- (También disponibles: agua, gaseosas, jugos del día. Consultar al mozo.)
-
-TRAGOS CON ALCOHOL:
-- Consultar al mozo por la carta de tragos y vinos.
-
-INFORMACIÓN IMPORTANTE:
-- La Panera Rosa está en Recoleta, Buenos Aires. Abierto non stop todos los días.
-- Sin TACC confirmados en la carta: ensalada de atún, flan casero, keto breakfast, jugos y limonada. Para el resto, consultar por contaminación cruzada ya que la cocina es compartida.
-- Opciones veganas: Wrap Veggie, jugo maracuyá & menta, limonada de menta & jengibre.
-- Opciones vegetarianas: burrata, papas cheddar, tosta palta, ensalada veggie caesar, ñoquis, raviolones de calabaza, wrap veggie, pink tower, keto breakfast, tortas, flan, toda la cafetería y bebidas.
-- Precios en pesos argentinos, sujetos a cambios.
-`;
-
-    const SYSTEM_PROMPT = `Sos Chikpi, el asistente digital de La Panera Rosa, un restaurante de cocina casera y brunch en Recoleta, Buenos Aires. Tu rol es el de un mozo digital amable, cálido y conocedor del menú.
-
-REGLAS ESTRICTAS:
-1. Solo respondés preguntas relacionadas con el menú, los platos, ingredientes, alérgenos, recomendaciones o información del restaurante La Panera Rosa.
-2. Si te preguntan algo que no tiene que ver con el restaurante, respondés amablemente que solo podés ayudar con el menú.
-3. Nunca inventés platos, precios ni información que no esté en el menú. Si algo no está listado, decí que consulten al mozo.
-4. Usás un tono cálido, informal y porteño. Podés usar emojis con moderación.
-5. Cuando recomendés, basate en lo que el cliente necesita (vegano, vegetariano, sin TACC, desayuno, para compartir, postre, etc.).
-6. Respondés en español rioplatense (vos, che, etc.).
-7. Tus respuestas son concisas, máximo 3-4 líneas. Si hay lista, usá viñetas cortas.
-8. Para las categorías Carnes, Crepes, Pancakes y Tragos con Alcohol, siempre indicá que consulten al mozo por las opciones del día.
-
-MENÚ DISPONIBLE:
-${MENU}`;
-
-    let conversationHistory = [];
-    let isLoading = false;
-
-    // Leer número de mesa desde la URL: ?mesa=4
-    const params = new URLSearchParams(window.location.search);
-    const mesa = params.get('mesa');
-    if (mesa) {
-      document.getElementById('table-badge').innerHTML =
-        '<span class="status-dot"></span>Mesa ' + mesa + ' · Asistente activo';
-    }
-
-    setTimeout(() => {
-      document.getElementById('loader').classList.add('hidden');
-    }, 1600);
-
-    document.getElementById('chat-input').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') sendMessage();
-    });
-
-    function sendSuggestion(text) {
-      document.getElementById('chat-input').value = text;
-      sendMessage();
-    }
-
-    function addMessage(role, text) {
-      const messages = document.getElementById('messages');
-      const typing = document.getElementById('typing');
-      const div = document.createElement('div');
-      div.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
-      if (role === 'assistant') {
-        div.innerHTML = '<div class="msg-label">Mozo</div><div class="msg-bubble">' + text.replace(/\n/g, '<br>') + '</div>';
-      } else {
-        div.innerHTML = '<div class="msg-bubble">' + text + '</div>';
+      let rest
+      try {
+        rest = await restaurants.getBySlug(slug)
+      } catch {
+        showError('No se encontró el restaurante "' + slug + '".')
+        return
       }
-      messages.insertBefore(div, typing);
-      messages.scrollTop = messages.scrollHeight;
+
+      document.getElementById('loader-name').textContent = rest.name
+      document.getElementById('rest-name').textContent = rest.name
+      document.title = rest.name + ' — Asistente'
+
+      if (mesa) {
+        document.getElementById('table-badge').innerHTML =
+          '<span class="status-dot"></span>Mesa ' + mesa + ' · Asistente activo'
+      }
+
+      systemPrompt = buildSystemPrompt(rest)
+      buildSuggestions(rest)
+      addGreeting(rest)
+
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden')
+      }, 1400)
+
+      document.getElementById('chat-input').addEventListener('keydown', e => {
+        if (e.key === 'Enter') sendMessage()
+      })
+    }
+
+    function showError(msg) {
+      document.getElementById('loader').classList.add('hidden')
+      document.getElementById('error-msg').textContent = msg
+      document.getElementById('error-screen').style.display = 'flex'
+    }
+
+    // ─── Menu text builder ────────────────────────────────────────────────────
+    function buildMenuText(rest) {
+      const cats = (rest.menu_categories || [])
+        .filter(c => c.is_visible)
+        .sort((a, b) => a.sort_order - b.sort_order)
+
+      return cats.map(cat => {
+        const items = (cat.menu_items || [])
+          .filter(i => i.is_visible && i.is_available)
+          .sort((a, b) => a.sort_order - b.sort_order)
+        if (!items.length) return ''
+        const lines = items.map(item => {
+          const price = '$' + Number(item.price).toLocaleString('es-AR')
+          const tags = (item.tags || []).map(t => TAG_LABELS[t]).filter(Boolean).join(', ')
+          return '- ' + item.name + ' (' + price + ')'
+            + (item.description ? ': ' + item.description : '')
+            + (tags ? '. ' + tags + '.' : '')
+        }).join('\n')
+        return (cat.emoji ? cat.emoji + ' ' : '') + cat.name.toUpperCase() + ':\n' + lines
+      }).filter(Boolean).join('\n\n')
+    }
+
+    function buildSystemPrompt(rest) {
+      const menuText = buildMenuText(rest)
+      const location = [rest.address, rest.city].filter(Boolean).join(', ')
+      return 'Sos el asistente digital de ' + rest.name
+        + (location ? ', un restaurante en ' + location : '') + '.'
+        + ' Tu rol es el de un mozo digital amable y conocedor del menú.\n\n'
+        + 'REGLAS:\n'
+        + '1. Solo respondés preguntas sobre el menú, platos, ingredientes, alérgenos o el restaurante.\n'
+        + '2. Si te preguntan algo ajeno al restaurante, decís amablemente que solo podés ayudar con el menú.\n'
+        + '3. Nunca inventés platos ni precios. Si algo no figura, decí que consulten al mozo.\n'
+        + '4. Tono cálido, informal y porteño. Emojis con moderación.\n'
+        + '5. Español rioplatense (vos, che, etc.).\n'
+        + '6. Respuestas concisas, máximo 3-4 líneas. Si hay lista, viñetas cortas.\n\n'
+        + 'MENÚ DISPONIBLE:\n' + menuText
+    }
+
+    function buildSuggestions(rest) {
+      const cats = (rest.menu_categories || [])
+        .filter(c => c.is_visible)
+        .sort((a, b) => a.sort_order - b.sort_order)
+        .slice(0, 3)
+
+      const el = document.getElementById('suggestions')
+      el.innerHTML = cats.map(cat =>
+        '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué ' + cat.name.toLowerCase() + ' tienen?\')">'
+        + (cat.emoji ? cat.emoji + ' ' : '') + cat.name + '</button>'
+      ).join('')
+        + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué opciones veganas tienen?\')">Vegano</button>'
+        + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué platos son sin TACC?\')">Sin TACC</button>'
+        + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué me recomendás?\')">Recomendaciones</button>'
+    }
+
+    function addGreeting(rest) {
+      addMessage('assistant',
+        '¡Hola! Bienvenido a ' + rest.name + ' 👋 Soy tu asistente de menú. '
+        + 'Puedo ayudarte con los platos, ingredientes, opciones vegetarianas, veganas o aptas para celíacos, y hacerte recomendaciones. '
+        + '¿En qué te puedo ayudar?'
+      )
+    }
+
+    // ─── Chat ─────────────────────────────────────────────────────────────────
+    function addMessage(role, text) {
+      const messages = document.getElementById('messages')
+      const typing = document.getElementById('typing')
+      const div = document.createElement('div')
+      div.className = 'msg ' + (role === 'user' ? 'user' : 'bot')
+      if (role === 'assistant') {
+        div.innerHTML = '<div class="msg-label">Asistente</div><div class="msg-bubble">' + text.replace(/\n/g, '<br>') + '</div>'
+      } else {
+        div.innerHTML = '<div class="msg-bubble">' + text + '</div>'
+      }
+      messages.insertBefore(div, typing)
+      messages.scrollTop = messages.scrollHeight
     }
 
     function showTyping(show) {
-      document.getElementById('typing').style.display = show ? 'flex' : 'none';
+      document.getElementById('typing').style.display = show ? 'flex' : 'none'
       if (show) {
-        const messages = document.getElementById('messages');
-        messages.scrollTop = messages.scrollHeight;
+        const messages = document.getElementById('messages')
+        messages.scrollTop = messages.scrollHeight
       }
     }
 
     async function sendMessage() {
-      if (isLoading) return;
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
+      if (isLoading) return
+      const input = document.getElementById('chat-input')
+      const text = input.value.trim()
+      if (!text) return
 
-      input.value = '';
-      document.getElementById('suggestions').style.display = 'none';
-      addMessage('user', text);
-      conversationHistory.push({ role: 'user', content: text });
-      isLoading = true;
-      showTyping(true);
+      input.value = ''
+      document.getElementById('suggestions').style.display = 'none'
+      addMessage('user', text)
+      conversationHistory.push({ role: 'user', content: text })
+      isLoading = true
+      showTyping(true)
 
-      const errorEl = document.getElementById('error-msg');
-      errorEl.style.display = 'none';
+      const errorEl = document.getElementById('api-error')
+      errorEl.style.display = 'none'
 
-      let attempts = 0;
-      const maxAttempts = 3;
-
-      while (attempts < maxAttempts) {
+      let attempts = 0
+      while (attempts < 3) {
         try {
-          const response = await fetch(BACKEND + '/api/claude', {
+          const res = await fetch(BACKEND + '/api/claude', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              system: SYSTEM_PROMPT,
-              messages: conversationHistory,
-              max_tokens: 1000
-            })
-          });
+            body: JSON.stringify({ system: systemPrompt, messages: conversationHistory, max_tokens: 1000 })
+          })
 
-          if (response.status === 529) {
-            attempts++;
-            if (attempts < maxAttempts) {
-              errorEl.style.display = 'block';
-              errorEl.textContent = 'Servidor ocupado, reintentando (' + attempts + '/' + maxAttempts + ')...';
-              await new Promise(r => setTimeout(r, 3000));
-              continue;
+          if (res.status === 529) {
+            attempts++
+            if (attempts < 3) {
+              errorEl.style.display = 'block'
+              errorEl.textContent = 'Servidor ocupado, reintentando (' + attempts + '/3)...'
+              await new Promise(r => setTimeout(r, 3000))
+              continue
             }
           }
 
-          if (!response.ok) throw new Error('Error ' + response.status);
+          if (!res.ok) throw new Error('Error ' + res.status)
 
-          const data = await response.json();
-          const reply = data.content?.[0]?.text || 'No pude procesar tu consulta. ¿Podés repetirla?';
-
-          conversationHistory.push({ role: 'assistant', content: reply });
-          showTyping(false);
-          addMessage('assistant', reply);
-          errorEl.style.display = 'none';
-          break;
-
-        } catch (err) {
-          attempts++;
-          if (attempts >= maxAttempts) {
-            showTyping(false);
-            addMessage('assistant', 'Ups, tuve un problema técnico. ¿Podés intentarlo de nuevo?');
+          const data = await res.json()
+          const reply = data.content?.[0]?.text || 'No pude procesar tu consulta. ¿Podés repetirla?'
+          conversationHistory.push({ role: 'assistant', content: reply })
+          showTyping(false)
+          addMessage('assistant', reply)
+          errorEl.style.display = 'none'
+          break
+        } catch {
+          attempts++
+          if (attempts >= 3) {
+            showTyping(false)
+            addMessage('assistant', 'Ups, tuve un problema técnico. ¿Podés intentarlo de nuevo?')
           } else {
-            await new Promise(r => setTimeout(r, 3000));
+            await new Promise(r => setTimeout(r, 3000))
           }
         }
       }
 
-      isLoading = false;
+      isLoading = false
     }
+
+    window.sendMessage = sendMessage
+    window.sendSuggestion = function(text) {
+      document.getElementById('chat-input').value = text
+      sendMessage()
+    }
+
+    init()
   </script>
 </body>
 </html>
