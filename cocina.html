@@ -192,11 +192,18 @@
     })
   }
 
-  supabase.auth.onAuthStateChange((_event, session) => {
-    if (session && !rest) startKitchen()
-    if (!session && realtimeChannel) {
-      supabase.removeChannel(realtimeChannel)
-      realtimeChannel = null
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (session && !rest) {
+      startKitchen()
+      return
+    }
+    if (!session) {
+      if (realtimeChannel) { supabase.removeChannel(realtimeChannel); realtimeChannel = null }
+      if (rest) {
+        // Sesión expirada durante uso activo — resetear y mostrar login sin recargar
+        rest = null; pedidos = {}; historial = {}
+        show('login-screen')
+      }
     }
   })
 
