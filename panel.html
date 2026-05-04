@@ -674,6 +674,51 @@ html, body {
 }
 .btn-copy-url:hover { border-color: var(--terra); color: var(--terra); }
 
+/* ── Pedidos en panel ── */
+.pedidos-empty { text-align:center; padding:80px 24px; color:var(--muted); }
+.pedidos-empty-icon { font-size:40px; margin-bottom:10px; }
+.pedidos-empty-label { font-size:16px; font-weight:500; color:var(--ink2); }
+.pedidos-empty-desc { font-size:13.5px; margin-top:4px; }
+.pedidos-list { display:flex; flex-direction:column; gap:14px; }
+.pedido-card { background:var(--card); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+.pedido-card-header {
+  display:flex; align-items:center; gap:10px;
+  padding:14px 20px; background:var(--cream); border-bottom:1px solid var(--border);
+}
+.pedido-mesa { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--terra); }
+.pedido-hora { font-size:12px; color:var(--muted); }
+.pedido-status-badge {
+  margin-left:auto; padding:4px 12px; border-radius:20px; font-size:12px; font-weight:500;
+}
+.status-pending   { background:#FEF3C7; color:#92400E; }
+.status-confirmed { background:#DBEAFE; color:#1E40AF; }
+.status-preparing { background:#FEF9C3; color:#713F12; }
+.status-ready     { background:#DCFCE7; color:#14532D; }
+.status-delivered { background:var(--cream2); color:var(--muted); }
+.status-cancelled { background:var(--bad-pale); color:var(--bad); }
+.pedido-items-list { padding:12px 20px; display:flex; flex-direction:column; gap:4px; }
+.pedido-item-row { font-size:13.5px; display:flex; gap:6px; }
+.pedido-item-qty { font-weight:500; color:var(--terra); min-width:20px; }
+.pedido-item-name { flex:1; }
+.pedido-item-price { color:var(--muted); }
+.pedido-card-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:12px 20px; border-top:1px solid var(--border);
+}
+.pedido-total { font-size:15px; font-weight:500; }
+.pedido-actions { display:flex; gap:8px; }
+
+/* ── Links rápidos ── */
+.quick-links-grid { display:flex; flex-wrap:wrap; gap:10px; }
+.btn-quick-link {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--white); border:1.5px solid var(--border); border-radius:10px;
+  padding:10px 16px; font-family:'Outfit',sans-serif; font-size:13.5px;
+  color:var(--ink2); cursor:pointer; text-decoration:none;
+  transition:border-color .12s,color .12s;
+}
+.btn-quick-link:hover { border-color:var(--terra); color:var(--terra); }
+
 /* ── Coming soon ── */
 .coming-soon {
   display: flex;
@@ -761,6 +806,7 @@ html, body {
       </button>
       <button class="nav-item" data-section="pedidos" onclick="switchSection('pedidos', this)">
         <span class="nav-icon">🔔</span> Pedidos
+        <span class="nav-badge" id="pedidos-badge" style="display:none">0</span>
       </button>
 
       <div class="nav-section-label">Negocio</div>
@@ -951,6 +997,16 @@ html, body {
           </button>
           <button class="btn-secondary" onclick="loadRestaurant()">Descartar</button>
         </div>
+
+        <!-- Links rápidos -->
+        <div class="card" style="margin-top:20px">
+          <div class="card-title">🔗 Links rápidos</div>
+          <div class="quick-links-grid" id="quick-links-grid">
+            <a class="btn-quick-link" id="link-menu" href="#" target="_blank">🍽️ Ver menú público</a>
+            <a class="btn-quick-link" id="link-cocina" href="#" target="_blank">🧑‍🍳 Panel de cocina</a>
+            <a class="btn-quick-link" id="link-mozo" href="#" target="_blank">💬 Ver asistente</a>
+          </div>
+        </div>
       </div>
 
       <!-- ══ Secciones proximamente ══ -->
@@ -989,12 +1045,17 @@ html, body {
       </div>
 
       <div id="section-pedidos" class="panel-section">
-        <div class="page-header"><div class="page-title">Pedidos</div></div>
-        <div class="coming-soon">
-          <div class="coming-soon-icon">🔔</div>
-          <div class="coming-soon-label">Pedidos en tiempo real</div>
-          <div class="coming-soon-desc">Próximamente: seguimiento en vivo de todos los pedidos.</div>
+        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+          <div>
+            <div class="page-title">Pedidos</div>
+            <div class="page-subtitle">Pedidos activos en tiempo real</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;flex-shrink:0">
+            <span id="pedidos-rt-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s"></span>
+            <span id="pedidos-rt-label" style="font-size:12px;color:var(--muted)">Conectando...</span>
+          </div>
         </div>
+        <div id="pedidos-body"></div>
       </div>
 
       <div id="section-estadisticas" class="panel-section">
@@ -1123,7 +1184,8 @@ html, body {
 
 <script type="module">
 import { requireAuth, signOut } from './lib/auth.js'
-import { profiles, restaurants, menuCategories, menuItems, restaurantTables } from './lib/db.js'
+import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders } from './lib/db.js'
+import { supabase } from './lib/supabase.js'
 
 // ── Estado global ──
 let currentUser = null
@@ -1187,6 +1249,14 @@ function fillForm(rest) {
   document.getElementById('f-is-open').checked   = rest.is_open     ?? true
   document.getElementById('f-is-active').checked = rest.is_active   ?? true
   onColorChange(rest.primary_color || '#B85A30')
+  updateQuickLinks(rest.slug)
+}
+
+function updateQuickLinks(slug) {
+  const base = 'https://vitrinaapp.com.ar/'
+  document.getElementById('link-menu').href   = base + 'menu.html?slug=' + slug
+  document.getElementById('link-cocina').href = base + 'cocina.html?slug=' + slug
+  document.getElementById('link-mozo').href   = base + 'mozo.html?slug=' + slug + '&mesa=1'
 }
 
 function renderColorPresets() {
@@ -1399,8 +1469,10 @@ window.switchSection = function (name, btn) {
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'))
   if (btn) btn.classList.add('active')
   closeSidebar()
-  if (name === 'menu')  loadMenu()
-  if (name === 'mesas') loadMesas()
+  if (name === 'menu')    loadMenu()
+  if (name === 'mesas')   loadMesas()
+  if (name === 'pedidos') loadPedidos()
+  if (name !== 'pedidos') detachPedidosRealtime()
 }
 
 function showSection(name) {
@@ -1764,6 +1836,157 @@ window.deleteMesa = async function (tableId) {
     mesasList = mesasList.filter(t => t.id !== tableId)
     renderMesas()
     showToast('Mesa eliminada', 'success')
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+// ═══════════════════════════════════════════
+// PEDIDOS
+// ═══════════════════════════════════════════
+let pedidosMap = {}
+let pedidosChannel = null
+
+const STATUS_LABELS = {
+  pending:   'Pendiente',
+  confirmed: 'Confirmado',
+  preparing: 'Preparando',
+  ready:     'Listo ✓',
+  delivered: 'Entregado',
+  cancelled: 'Cancelado',
+}
+
+const STATUS_NEXT = {
+  pending:   { label: 'Confirmar',  next: 'confirmed' },
+  confirmed: { label: 'Preparando', next: 'preparing' },
+  preparing: { label: 'Listo',      next: 'ready' },
+  ready:     { label: 'Entregado',  next: 'delivered' },
+}
+
+window.loadPedidos = async function () {
+  if (!currentRestaurant) return
+  pedidosMap = {}
+  document.getElementById('pedidos-body').innerHTML =
+    '<div style="padding:40px;text-align:center;color:var(--muted)">Cargando pedidos...</div>'
+
+  try {
+    const list = await orders.listActive(currentRestaurant.id)
+    list.forEach(o => { pedidosMap[o.id] = o })
+    renderPedidos()
+    suscribirPedidosRealtime()
+  } catch (e) {
+    showToast('Error cargando pedidos: ' + e.message, 'error')
+  }
+}
+
+function suscribirPedidosRealtime() {
+  if (pedidosChannel) supabase.removeChannel(pedidosChannel)
+
+  pedidosChannel = supabase
+    .channel('panel-pedidos-' + currentRestaurant.id)
+    .on('postgres_changes', {
+      event: '*', schema: 'public', table: 'orders',
+      filter: 'restaurant_id=eq.' + currentRestaurant.id,
+    }, async payload => {
+      const o = payload.new
+      const oldId = payload.old?.id ?? o?.id
+      if (payload.eventType === 'DELETE' || o?.status === 'delivered' || o?.status === 'cancelled') {
+        delete pedidosMap[oldId]
+      } else if (payload.eventType === 'INSERT') {
+        const { data } = await supabase.from('orders').select('*, order_items(*)').eq('id', o.id).single()
+        if (data) pedidosMap[data.id] = data
+      } else {
+        if (pedidosMap[o.id]) pedidosMap[o.id] = { ...pedidosMap[o.id], ...o }
+      }
+      renderPedidos()
+    })
+    .subscribe(status => {
+      const dot = document.getElementById('pedidos-rt-dot')
+      const lbl = document.getElementById('pedidos-rt-label')
+      if (!dot) return
+      dot.style.background = status === 'SUBSCRIBED' ? 'var(--sage)' : 'var(--border)'
+      lbl.textContent      = status === 'SUBSCRIBED' ? 'En vivo' : 'Conectando...'
+    })
+}
+
+function detachPedidosRealtime() {
+  if (pedidosChannel) {
+    supabase.removeChannel(pedidosChannel)
+    pedidosChannel = null
+  }
+}
+
+function formatHora(iso) {
+  return new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+}
+
+function renderPedidos() {
+  const container = document.getElementById('pedidos-body')
+  if (!container) return
+  const list = Object.values(pedidosMap).sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+
+  const badge = document.getElementById('pedidos-badge')
+  if (badge) {
+    badge.textContent = list.length
+    badge.style.display = list.length ? '' : 'none'
+  }
+
+  if (!list.length) {
+    container.innerHTML = `
+      <div class="pedidos-empty">
+        <div class="pedidos-empty-icon">🔔</div>
+        <div class="pedidos-empty-label">Sin pedidos activos</div>
+        <div class="pedidos-empty-desc">Los nuevos pedidos aparecerán acá en tiempo real.</div>
+      </div>`
+    return
+  }
+
+  container.innerHTML = '<div class="pedidos-list">' + list.map(o => {
+    const items = o.order_items ?? []
+    const total = '$' + Number(o.total ?? 0).toLocaleString('es-AR')
+    const next  = STATUS_NEXT[o.status]
+    return `
+      <div class="pedido-card">
+        <div class="pedido-card-header">
+          <div class="pedido-mesa">Mesa ${o.table_number}</div>
+          <div class="pedido-hora">${formatHora(o.created_at)}</div>
+          <span class="pedido-status-badge status-${o.status ?? 'pending'}">${STATUS_LABELS[o.status] ?? o.status}</span>
+        </div>
+        <div class="pedido-items-list">
+          ${items.map(i => `
+            <div class="pedido-item-row">
+              <span class="pedido-item-qty">${i.quantity}×</span>
+              <span class="pedido-item-name">${escHtml(i.name)}</span>
+              <span class="pedido-item-price">$${Number(i.price * i.quantity).toLocaleString('es-AR')}</span>
+            </div>`).join('')}
+        </div>
+        <div class="pedido-card-footer">
+          <span class="pedido-total">${total}</span>
+          <div class="pedido-actions">
+            <button class="btn-secondary" style="padding:7px 14px;font-size:13px" onclick="cancelarPedido('${o.id}')">Cancelar</button>
+            ${next ? `<button class="btn-primary" style="padding:7px 14px;font-size:13px" onclick="avanzarEstado('${o.id}','${next.next}')">${next.label}</button>` : ''}
+          </div>
+        </div>
+      </div>`
+  }).join('') + '</div>'
+}
+
+window.avanzarEstado = async function (id, status) {
+  try {
+    await orders.updateStatus(id, status)
+    if (status === 'delivered') {
+      delete pedidosMap[id]
+    } else {
+      if (pedidosMap[id]) pedidosMap[id] = { ...pedidosMap[id], status }
+    }
+    renderPedidos()
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+window.cancelarPedido = async function (id) {
+  if (!confirm('¿Cancelar este pedido?')) return
+  try {
+    await orders.updateStatus(id, 'cancelled')
+    delete pedidosMap[id]
+    renderPedidos()
   } catch (e) { showToast('Error: ' + e.message, 'error') }
 }
 
