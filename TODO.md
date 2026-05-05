@@ -193,6 +193,8 @@ Dueño en panel
         └─> editor de menú + imagen   ✅
         └─> gestión de mesas + QR     ✅ (descarga QR 400px)
         └─> pedidos Realtime + badge global ✅
+        └─> notificación sonora + toast en nuevo pedido ✅
+        └─> historial (últimos 60, agrupado por día)    ✅
         └─> estadísticas (KPIs + gráfico + top platos) ✅
         └─> configuración / equipo    ✅ (agregar/editar/eliminar staff)
 ```
