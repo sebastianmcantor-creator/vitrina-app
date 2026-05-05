@@ -1480,6 +1480,18 @@ html, body {
           </div>
           <div id="plan-status-msg" style="font-size:13.5px;color:var(--muted);margin:8px 0 0"></div>
 
+          <!-- Uso de Tano (solo plan free) -->
+          <div id="tano-usage-block" style="display:none;margin-top:16px;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="font-size:13.5px;font-weight:500;color:var(--ink)">🤖 Tano este mes</span>
+              <span id="tano-usage-text" style="font-size:13px;color:var(--muted)">— / 75</span>
+            </div>
+            <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden">
+              <div id="tano-usage-bar" style="height:100%;border-radius:6px;background:var(--terra);transition:width .4s;width:0%"></div>
+            </div>
+            <div id="tano-usage-hint" style="font-size:12px;color:var(--muted);margin-top:6px">Se reinicia el 1° de cada mes.</div>
+          </div>
+
           <div class="plan-cards-grid" id="plan-cards-grid">
             <!-- Se renderiza con JS -->
           </div>
@@ -1612,6 +1624,11 @@ html, body {
       <div class="form-field">
         <label class="form-label">Etiquetas</label>
         <div class="tag-chips" id="item-tags-picker"></div>
+      </div>
+      <!-- Historial de precios (solo en edición) -->
+      <div id="price-history-block" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Historial de precios</div>
+        <div id="price-history-list" style="display:flex;flex-direction:column;gap:6px;max-height:120px;overflow-y:auto"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -2282,6 +2299,33 @@ window.openItemModal = function (catId, itemId = null) {
   ).join('')
   document.getElementById('modal-item').classList.add('open')
   setTimeout(() => document.getElementById('item-name').focus(), 80)
+
+  // Historial de precios
+  const histBlock = document.getElementById('price-history-block')
+  const histList = document.getElementById('price-history-list')
+  if (editingItem) {
+    histBlock.style.display = 'block'
+    histList.innerHTML = '<div style="font-size:12px;color:var(--muted)">Cargando...</div>'
+    menuItemPriceHistory.getByItem(editingItem.id, 8).then(rows => {
+      if (!rows.length) {
+        histList.innerHTML = '<div style="font-size:12px;color:var(--muted)">Sin cambios de precio registrados.</div>'
+        return
+      }
+      histList.innerHTML = rows.map(r => {
+        const date = new Date(r.changed_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'2-digit' })
+        const dir = r.new_price > r.old_price ? '↑' : '↓'
+        const color = r.new_price > r.old_price ? 'var(--terra)' : 'var(--sage)'
+        return `<div style="display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:3px 0">
+          <span style="color:var(--muted)">${date}</span>
+          <span>${formatPrice(r.old_price)} <span style="color:${color};font-weight:600">${dir}</span> ${formatPrice(r.new_price)}</span>
+        </div>`
+      }).join('')
+    }).catch(() => {
+      histList.innerHTML = '<div style="font-size:12px;color:var(--muted)">—</div>'
+    })
+  } else {
+    histBlock.style.display = 'none'
+  }
 }
 
 window.toggleTag = function (key, el) {
@@ -2702,6 +2746,29 @@ function renderPlanSection() {
     msg.textContent = `Plan activo · Se renueva automáticamente cada mes vía MercadoPago.`
   } else if (status === 'cancelled' || status === 'paused') {
     msg.innerHTML = `<span style="color:var(--terra)">⚠️ Tu plan está ${status === 'cancelled' ? 'cancelado' : 'pausado'}. Renovalo para restablecer las funciones.</span>`
+  }
+
+  // Bloque de uso de Tano (solo free)
+  const tanoBlock = document.getElementById('tano-usage-block')
+  if (plan === 'free' || !plan) {
+    const now = new Date()
+    const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
+    const count = currentRestaurant.tano_month === currentMonth ? (currentRestaurant.tano_month_count || 0) : 0
+    const pct = Math.min(100, Math.round(count / 75 * 100))
+    document.getElementById('tano-usage-text').textContent = `${count} / 75`
+    document.getElementById('tano-usage-bar').style.width = pct + '%'
+    document.getElementById('tano-usage-bar').style.background = pct >= 90 ? 'var(--terra)' : pct >= 60 ? 'var(--gold)' : 'var(--sage)'
+    const hint = document.getElementById('tano-usage-hint')
+    if (count >= 75) {
+      hint.innerHTML = '<span style="color:var(--terra)">Límite alcanzado. Tano no responde hasta el próximo mes o hasta que upgrades.</span>'
+    } else if (count >= 60) {
+      hint.innerHTML = `<span style="color:var(--gold)">Quedan ${75-count} respuestas este mes.</span>`
+    } else {
+      hint.textContent = 'Se reinicia el 1° de cada mes.'
+    }
+    tanoBlock.style.display = 'block'
+  } else {
+    tanoBlock.style.display = 'none'
   }
 
   // Tarjetas de planes
