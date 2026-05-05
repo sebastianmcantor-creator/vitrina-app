@@ -151,6 +151,33 @@ html, body {
   font-size: 12px !important;
 }
 
+/* ── Open/closed pill ── */
+.rest-open-pill {
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.7);
+  cursor: pointer;
+  display: flex; align-items: center; gap: 4px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.rest-open-pill:hover { background: rgba(255,255,255,.14); }
+.rest-open-pill.open #rest-open-dot  { color: #5db87a; }
+.rest-open-pill.closed #rest-open-dot { color: #e05555; }
+
+/* ── Reorder buttons ── */
+.btn-reorder {
+  background: none; border: none;
+  color: var(--muted); cursor: pointer;
+  font-size: 13px; padding: 2px 4px;
+  border-radius: 4px; line-height: 1;
+  opacity: 0.6;
+}
+.btn-reorder:hover { opacity: 1; background: var(--cream2); }
+
 .sidebar-nav {
   flex: 1;
   padding: 12px 10px;
@@ -946,7 +973,12 @@ html, body {
         <span class="sidebar-rest-chevron" id="rest-chevron" style="display:none">▾</span>
       </div>
       <div class="sidebar-rest-name" id="sidebar-rest-name">—</div>
-      <div class="sidebar-rest-plan" id="sidebar-rest-plan">Plan Free</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+        <div class="sidebar-rest-plan" id="sidebar-rest-plan">Plan Free</div>
+        <button class="rest-open-pill" id="rest-open-pill" onclick="event.stopPropagation();quickToggleOpen()" title="Cambiar estado">
+          <span id="rest-open-dot">●</span> <span id="rest-open-label">Abierto</span>
+        </button>
+      </div>
       <div class="rest-switcher" id="rest-switcher"></div>
     </div>
 
@@ -1439,6 +1471,27 @@ function renderSidebarRestaurant(rest) {
   document.getElementById('sidebar-rest-name').textContent = rest.name
   document.getElementById('sidebar-rest-plan').textContent =
     ({ free: 'Plan Free', starter: 'Plan Starter', pro: 'Plan Pro' })[rest.plan] ?? rest.plan
+  updateOpenPill(rest.is_open ?? true)
+}
+
+function updateOpenPill(isOpen) {
+  const pill = document.getElementById('rest-open-pill')
+  if (!pill) return
+  pill.className = 'rest-open-pill ' + (isOpen ? 'open' : 'closed')
+  document.getElementById('rest-open-label').textContent = isOpen ? 'Abierto' : 'Cerrado'
+}
+
+window.quickToggleOpen = async function () {
+  if (!currentRestaurant) return
+  const newVal = !(currentRestaurant.is_open ?? true)
+  try {
+    currentRestaurant = await restaurants.update(currentRestaurant.id, { is_open: newVal })
+    updateOpenPill(newVal)
+    document.getElementById('f-is-open').checked = newVal
+    showToast(newVal ? '🟢 Restaurante abierto' : '🔴 Restaurante cerrado', 'success')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
 }
 
 function fillForm(rest) {
@@ -1871,6 +1924,8 @@ function renderMenu() {
             <div class="toggle-track"></div>
           </label>
           <div class="item-actions">
+            <button class="btn-reorder" onclick="moveItem('${item.id}','${cat.id}',-1)" title="Subir">↑</button>
+            <button class="btn-reorder" onclick="moveItem('${item.id}','${cat.id}',1)"  title="Bajar">↓</button>
             <button class="btn-icon" onclick="openItemModal('${cat.id}','${item.id}')" title="Editar">✏️</button>
             <button class="btn-icon danger" onclick="deleteItem('${item.id}','${cat.id}')" title="Eliminar">🗑️</button>
           </div>
@@ -1882,6 +1937,8 @@ function renderMenu() {
           <div class="cat-emoji">${cat.emoji || '📂'}</div>
           <div class="cat-name">${escHtml(cat.name)}</div>
           <div class="cat-actions">
+            <button class="btn-reorder" onclick="moveCat('${cat.id}',-1)" title="Subir">↑</button>
+            <button class="btn-reorder" onclick="moveCat('${cat.id}',1)"  title="Bajar">↓</button>
             <button class="btn-icon" onclick="openCategoryModal('${cat.id}')" title="Editar">✏️</button>
             <button class="btn-icon danger" onclick="deleteCat('${cat.id}')" title="Eliminar">🗑️</button>
           </div>
@@ -1945,6 +2002,43 @@ window.deleteCat = async function (catId) {
     delete menuItemsMap[catId]
     renderMenu()
     showToast('Categoría eliminada', 'success')
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+window.moveCat = async function (catId, dir) {
+  const idx = menuCats.findIndex(c => c.id === catId)
+  const swapIdx = idx + dir
+  if (swapIdx < 0 || swapIdx >= menuCats.length) return
+  const a = menuCats[idx], b = menuCats[swapIdx]
+  const aOrder = a.sort_order ?? idx
+  const bOrder = b.sort_order ?? swapIdx
+  try {
+    await Promise.all([
+      menuCategories.update(a.id, { sort_order: bOrder }),
+      menuCategories.update(b.id, { sort_order: aOrder }),
+    ])
+    menuCats[idx] = { ...b, sort_order: aOrder }
+    menuCats[swapIdx] = { ...a, sort_order: bOrder }
+    renderMenu()
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+window.moveItem = async function (itemId, catId, dir) {
+  const items = menuItemsMap[catId]
+  const idx = items.findIndex(i => i.id === itemId)
+  const swapIdx = idx + dir
+  if (swapIdx < 0 || swapIdx >= items.length) return
+  const a = items[idx], b = items[swapIdx]
+  const aOrder = a.sort_order ?? idx
+  const bOrder = b.sort_order ?? swapIdx
+  try {
+    await Promise.all([
+      menuItems.update(a.id, { sort_order: bOrder }),
+      menuItems.update(b.id, { sort_order: aOrder }),
+    ])
+    items[idx] = { ...b, sort_order: aOrder }
+    items[swapIdx] = { ...a, sort_order: bOrder }
+    renderMenu()
   } catch (e) { showToast('Error: ' + e.message, 'error') }
 }
 
