@@ -913,6 +913,64 @@ html, body {
 .add-staff-form .form-input { flex: 1; min-width: 200px; }
 .add-staff-form .form-select { flex: 0 0 140px; }
 
+/* ── Plan / Suscripción ── */
+.plan-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+}
+.plan-badge.free   { background: var(--cream2); color: var(--muted); }
+.plan-badge.pro    { background: var(--gold-pale); color: var(--gold); }
+.plan-badge.full   { background: var(--terra-pale); color: var(--terra); }
+.plan-badge.active { background: var(--sage-pale); color: var(--sage); }
+
+.plan-cards-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px; margin-top: 20px;
+}
+.plan-card {
+  border: 2px solid var(--border); border-radius: 14px; padding: 22px 20px;
+  display: flex; flex-direction: column; gap: 10px; position: relative;
+  transition: border-color .2s;
+}
+.plan-card.current {
+  border-color: var(--terra); background: var(--terra-pale);
+}
+.plan-card.featured {
+  border-color: var(--gold);
+}
+.plan-card-tag {
+  font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--gold);
+}
+.plan-card-name {
+  font-size: 18px; font-weight: 600; font-family: 'Cormorant Garamond', serif;
+  color: var(--ink);
+}
+.plan-card-price {
+  font-size: 26px; font-weight: 600; color: var(--ink);
+}
+.plan-card-price span { font-size: 14px; font-weight: 300; color: var(--muted); }
+.plan-card-features {
+  list-style: none; margin: 0; padding: 0; font-size: 13px; color: var(--muted);
+  flex: 1;
+}
+.plan-card-features li { padding: 4px 0; display: flex; gap: 8px; align-items: flex-start; }
+.plan-card-features li::before { content: '✓'; color: var(--terra); flex-shrink: 0; }
+.plan-card-features li.no::before { content: '–'; color: var(--border); }
+.plan-card .btn-plan {
+  width: 100%; padding: 10px; border-radius: 10px; border: none; cursor: pointer;
+  font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500;
+  margin-top: 6px; transition: opacity .2s;
+}
+.plan-card.current .btn-plan {
+  background: var(--terra-pale); color: var(--terra); cursor: default;
+}
+.plan-card:not(.current) .btn-plan {
+  background: var(--terra); color: #fff;
+}
+.plan-card:not(.current) .btn-plan:hover { opacity: .85; }
+.plan-card:not(.current) .btn-plan:disabled { opacity: .5; cursor: not-allowed; }
+
 /* ── Loading skeleton ── */
 .skeleton-line {
   height: 14px;
@@ -1273,7 +1331,20 @@ html, body {
       <div id="section-config" class="panel-section">
         <div class="page-header">
           <div class="page-title">Configuración</div>
-          <div class="page-subtitle">Gestioná el equipo que tiene acceso al panel de cocina.</div>
+          <div class="page-subtitle">Gestioná tu plan y el equipo con acceso al panel.</div>
+        </div>
+
+        <!-- Plan actual -->
+        <div class="card" id="plan-card-section">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <span>💳 Tu plan</span>
+            <span id="plan-current-badge" class="plan-badge free">Free</span>
+          </div>
+          <div id="plan-status-msg" style="font-size:13.5px;color:var(--muted);margin:8px 0 0"></div>
+
+          <div class="plan-cards-grid" id="plan-cards-grid">
+            <!-- Se renderiza con JS -->
+          </div>
         </div>
 
         <div class="card">
@@ -1443,6 +1514,18 @@ window.addEventListener('DOMContentLoaded', async () => {
     }).catch(() => {})
     await loadRestaurant()
     renderColorPresets()
+
+    // Vuelta de MercadoPago
+    const qp = new URLSearchParams(window.location.search)
+    if (qp.get('mp') === 'ok') {
+      const planActivado = qp.get('plan')
+      const planNombre = PLAN_INFO[planActivado]?.nombre ?? planActivado
+      showToast(`🎉 ¡Suscripción activada! Bienvenido al plan ${planNombre}.`, 'success')
+      // Limpiar params de la URL sin recargar
+      history.replaceState({}, '', '/panel.html')
+      // Navegar a config para mostrar el plan
+      setTimeout(() => navigate('config'), 800)
+    }
   } catch (e) {
     // requireAuth ya redirigió; este catch es por errores reales
     showToast('Error al cargar el panel: ' + e.message, 'error')
@@ -1470,7 +1553,7 @@ function renderSidebarRestaurant(rest) {
   el.style.display = 'block'
   document.getElementById('sidebar-rest-name').textContent = rest.name
   document.getElementById('sidebar-rest-plan').textContent =
-    ({ free: 'Plan Free', starter: 'Plan Starter', pro: 'Plan Pro' })[rest.plan] ?? rest.plan
+    ({ free: 'Plan Free', starter: 'Plan Starter', pro: 'Plan Pro', full: 'Plan Full' })[rest.plan] ?? (rest.plan ?? 'Plan Free')
   updateOpenPill(rest.is_open ?? true)
 }
 
@@ -2443,8 +2526,117 @@ let staffList = []
 
 const ROLE_LABELS = { cook: 'Cocinero', waiter: 'Mozo', manager: 'Gerente', owner: 'Propietario' }
 
+// ── Plan / Suscripción ────────────────────────────────────────────────────────
+const WORKER_URL = 'https://vitrina-tano.vitrinaapp.workers.dev'
+
+const PLAN_INFO = {
+  free:  { nombre: 'Free',      precioUSD: 0,   precioARS: 0,     descripcion: 'Hasta 45 platos · 75 msgs Tano/mes · Sin pedidos' },
+  pro:   { nombre: 'Menú Pro',  precioUSD: 22,  precioARS: 9020,  descripcion: 'Pedidos · Cocina · Pagos MP · Analytics básico' },
+  full:  { nombre: 'Menú Full', precioUSD: 35,  precioARS: 14350, descripcion: 'Todo Pro + Fotos IA · Analytics completo · Viti 30 consultas' },
+}
+
+const PLAN_FEATURES = {
+  free:  ['75 mensajes Tano por mes', 'Hasta 45 platos', 'Menú en múltiples idiomas', { no: 'Pedidos online' }, { no: 'Pantalla de cocina' }, { no: 'Pagos integrados' }],
+  pro:   ['Tano ilimitado', 'Pedidos en tiempo real', 'Pantalla de cocina', 'Pagos con MercadoPago', 'Analytics básico', { no: 'Fotos IA del menú' }],
+  full:  ['Tano ilimitado', 'Pedidos en tiempo real', 'Pantalla de cocina', 'Pagos con MercadoPago', 'Analytics completo + Excel', '60 créditos fotos IA + 5/mes', 'Viti: 30 consultas/mes (pronto)'],
+}
+
+function renderPlanSection() {
+  if (!currentRestaurant) return
+  const plan = currentRestaurant.plan ?? 'free'
+  const status = currentRestaurant.plan_status ?? 'active'
+
+  // Badge del plan actual
+  const badge = document.getElementById('plan-current-badge')
+  const planLabel = PLAN_INFO[plan]?.nombre ?? plan
+  badge.textContent = planLabel
+  badge.className = 'plan-badge ' + plan
+
+  // Mensaje de estado
+  const msg = document.getElementById('plan-status-msg')
+  if (plan === 'free') {
+    msg.textContent = 'Estás en el plan gratuito. Upgradear desbloquea pedidos, cocina y pagos.'
+  } else if (status === 'active') {
+    msg.textContent = `Plan activo · Se renueva automáticamente cada mes vía MercadoPago.`
+  } else if (status === 'cancelled' || status === 'paused') {
+    msg.innerHTML = `<span style="color:var(--terra)">⚠️ Tu plan está ${status === 'cancelled' ? 'cancelado' : 'pausado'}. Renovalo para restablecer las funciones.</span>`
+  }
+
+  // Tarjetas de planes
+  const grid = document.getElementById('plan-cards-grid')
+  const planesAMostrar = ['free', 'pro', 'full']
+  grid.innerHTML = planesAMostrar.map(pid => {
+    const info = PLAN_INFO[pid]
+    const feats = PLAN_FEATURES[pid]
+    const isCurrent = plan === pid
+    const isFeatured = pid === 'pro'
+    const classes = ['plan-card', isCurrent ? 'current' : '', isFeatured && !isCurrent ? 'featured' : ''].filter(Boolean).join(' ')
+
+    const featHtml = feats.map(f => {
+      if (typeof f === 'object' && f.no) return `<li class="no">${f.no}</li>`
+      return `<li>${f}</li>`
+    }).join('')
+
+    const priceHtml = pid === 'free'
+      ? `<div class="plan-card-price">Gratis <span></span></div>`
+      : `<div class="plan-card-price">USD ${info.precioUSD}<span>/mes</span></div>
+         <div style="font-size:12px;color:var(--muted)">≈ $${info.precioARS.toLocaleString('es-AR')} ARS</div>`
+
+    const btnHtml = isCurrent
+      ? `<button class="btn-plan" disabled>✓ Plan actual</button>`
+      : pid === 'free'
+        ? `<button class="btn-plan" onclick="downgradePlan()" style="background:var(--cream2);color:var(--muted)">Volver a Free</button>`
+        : `<button class="btn-plan" id="btn-upgrade-${pid}" onclick="upgradePlan('${pid}')">Activar ${info.nombre}</button>`
+
+    return `
+      <div class="${classes}">
+        ${isFeatured && !isCurrent ? '<div class="plan-card-tag">⭐ Más popular</div>' : ''}
+        <div class="plan-card-name">${info.nombre}</div>
+        ${priceHtml}
+        <ul class="plan-card-features">${featHtml}</ul>
+        ${btnHtml}
+      </div>`
+  }).join('')
+}
+
+window.upgradePlan = async function (planId) {
+  if (!currentRestaurant || !currentUser) return
+  const btn = document.getElementById('btn-upgrade-' + planId)
+  if (btn) { btn.disabled = true; btn.textContent = 'Procesando...' }
+
+  try {
+    const res = await fetch(WORKER_URL + '/api/mp/crear-suscripcion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurantId:   currentRestaurant.id,
+        planId,
+        email:          currentUser.email,
+        restaurantName: currentRestaurant.name,
+      }),
+    })
+    const data = await res.json()
+    if (!res.ok || !data.init_point) {
+      showToast('Error al crear la suscripción: ' + (data.error || 'intente nuevamente'), 'error')
+      if (btn) { btn.disabled = false; btn.textContent = 'Activar ' + PLAN_INFO[planId]?.nombre }
+      return
+    }
+    // Redirigir a MercadoPago
+    window.location.href = data.init_point
+  } catch (e) {
+    showToast('Error de red: ' + e.message, 'error')
+    if (btn) { btn.disabled = false; btn.textContent = 'Activar ' + PLAN_INFO[planId]?.nombre }
+  }
+}
+
+window.downgradePlan = function () {
+  showToast('Para cancelar tu suscripción, escribinos a contacto@vitrinaapp.com.ar', 'info')
+}
+
+// ── loadConfig ────────────────────────────────────────────────────────────────
 window.loadConfig = async function () {
   if (!currentRestaurant) return
+  renderPlanSection()
   try {
     staffList = await restaurantStaff.listByRestaurant(currentRestaurant.id)
     renderStaff()
