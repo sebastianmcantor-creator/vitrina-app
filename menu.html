@@ -161,6 +161,10 @@
     <div class="cart-footer" id="cart-footer" style="display:none">
       <div class="cart-total"><span>Total</span><span id="cart-total">$0</span></div>
       <div class="mesa-warning" id="mesa-warning">⚠️ No se detectó número de mesa. Pedí al mozo que te escanee el QR correcto.</div>
+      <div style="margin-bottom:10px">
+        <input type="email" id="cliente-email" placeholder="Tu email (opcional) para recibir confirmación"
+          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--surface);outline:none">
+      </div>
       <button class="checkout-btn" id="checkout-btn" onclick="checkout()">Confirmar pedido →</button>
     </div>
   </div>
@@ -409,6 +413,31 @@
         })))
         pedidosSesion.push(order.id)
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(pedidosSesion))
+
+        // Email de confirmación (si el cliente lo ingresó)
+        const emailInput = document.getElementById('cliente-email')
+        const clienteEmail = emailInput?.value?.trim()
+        if (clienteEmail && clienteEmail.includes('@')) {
+          const itemsParaEmail = ids.map(id => ({
+            name: itemsById[id].name,
+            price: Number(itemsById[id].price),
+            quantity: cart[id] || 1,
+          }))
+          fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              to: clienteEmail,
+              restaurantName: rest.name,
+              tableNumber: mesa,
+              items: itemsParaEmail,
+              total,
+              currency: rest.currency || 'ARS',
+            }),
+          }).catch(() => {}) // silencioso — no bloquear el flujo del pedido
+          if (emailInput) emailInput.value = ''
+        }
+
         closeCart()
         cart = {}
         updateCartCount()
