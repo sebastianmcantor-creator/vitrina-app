@@ -30,6 +30,14 @@
 
     .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
     .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .lang-switcher { display: flex; gap: 4px; margin-top: 8px; }
+    .lang-btn { background: none; border: 1px solid var(--border); border-radius: 16px; padding: 3px 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all .15s; }
+    .lang-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+    .lang-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
+    .translating-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.7); z-index: 500; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--muted); backdrop-filter: blur(4px); }
+    .translating-overlay.show { display: flex; }
+    .translating-spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     .pedidos-bar { margin-top: 12px; background: var(--accent-light); border: 1px solid color-mix(in srgb, var(--accent) 25%, white); border-radius: 10px; padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
     .pedidos-bar-text { font-size: 13px; color: var(--accent); font-weight: 500; }
     .pedidos-bar-hint { font-size: 11px; color: var(--muted); }
@@ -138,6 +146,17 @@
           <span class="cart-count" id="cart-count">0</span>
         </button>
       </div>
+      <div class="lang-switcher" id="lang-switcher" style="display:none">
+        <button class="lang-btn active" id="lang-es" onclick="switchLang('es')">ES</button>
+        <button class="lang-btn" id="lang-en" onclick="switchLang('en')">EN</button>
+        <button class="lang-btn" id="lang-pt" onclick="switchLang('pt')">PT</button>
+      </div>
+    </div>
+
+    <!-- Overlay de traducción -->
+    <div class="translating-overlay" id="translating-overlay">
+      <div class="translating-spinner"></div>
+      <span id="translating-text">Traduciendo menú...</span>
     </div>
     <div class="cerrado-banner" id="cerrado-banner">🔒 El restaurante está cerrado temporalmente</div>
     <div class="pedidos-bar" id="pedidos-bar" style="display:none" onclick="abrirOverlayEstado()">
@@ -223,6 +242,9 @@
       document.getElementById('mozo-fab').href = 'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? '')
 
       buildMenu()
+
+      // Mostrar selector de idioma
+      document.getElementById('lang-switcher').style.display = 'flex'
 
       document.getElementById('loading').style.display = 'none'
       document.getElementById('app').style.display = 'block'
@@ -563,6 +585,145 @@
     window.cerrarOverlay = cerrarOverlay
     window.abrirOverlayEstado = abrirOverlayEstado
     window.navScroll = navScroll
+
+    // ─── Multi-idioma ──────────────────────────────────────────────────────────
+    const BACKEND = 'https://vitrina-tano.vitrinaapp.workers.dev'
+    const LANG_LABELS = { es: 'español', en: 'inglés', pt: 'portugués' }
+    const LANG_TRANSLATING = { es: 'Traduciendo al español...', en: 'Translating to English...', pt: 'Traduzindo para português...' }
+    let currentLang = 'es'
+    let translationCache = {} // { 'en': { itemId: { name, description }, ... }, ... }
+
+    function getLangCacheKey() { return 'vitrina_lang_' + slug }
+
+    function loadLangCache() {
+      try { return JSON.parse(sessionStorage.getItem(getLangCacheKey()) || '{}') } catch { return {} }
+    }
+
+    function saveLangCache() {
+      try { sessionStorage.setItem(getLangCacheKey(), JSON.stringify(translationCache)) } catch {}
+    }
+
+    translationCache = loadLangCache()
+
+    window.switchLang = async function(lang) {
+      if (lang === currentLang) return
+      currentLang = lang
+
+      // Actualizar botones activos
+      ;['es','en','pt'].forEach(l => {
+        document.getElementById('lang-' + l)?.classList.toggle('active', l === lang)
+      })
+
+      if (lang === 'es') {
+        // Volver al original — reconstruir el menú
+        buildMenu()
+        return
+      }
+
+      // Verificar caché
+      if (translationCache[lang]) {
+        applyTranslations(translationCache[lang])
+        return
+      }
+
+      // Traducir con Claude
+      const overlay = document.getElementById('translating-overlay')
+      document.getElementById('translating-text').textContent = LANG_TRANSLATING[lang] || 'Traduciendo...'
+      overlay.classList.add('show')
+
+      try {
+        const cats = (rest.menu_categories || []).filter(c => c.is_visible)
+        const items = cats.flatMap(c => c.menu_items || []).filter(i => i.is_visible)
+
+        const itemsToTranslate = items.map(i => ({
+          id: i.id,
+          name: i.name,
+          description: i.description || ''
+        }))
+
+        const catNames = cats.map(c => ({ id: c.id, name: c.name, description: c.description || '' }))
+
+        const prompt = `Translate the following restaurant menu items from Spanish to ${LANG_LABELS[lang]}.
+Return ONLY a valid JSON object with this exact structure:
+{
+  "items": { "<id>": { "name": "...", "description": "..." } },
+  "categories": { "<id>": { "name": "...", "description": "..." } }
+}
+Keep prices, emojis and special characters unchanged. If description is empty, keep it empty.
+
+ITEMS: ${JSON.stringify(itemsToTranslate)}
+CATEGORIES: ${JSON.stringify(catNames)}`
+
+        const res = await fetch(BACKEND + '/api/claude', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            system: 'You are a professional restaurant menu translator. Return only valid JSON, no explanation.',
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 4096,
+          })
+        })
+
+        if (!res.ok) throw new Error('Error de traducción')
+        const data = await res.json()
+        const text = data.content?.[0]?.text || ''
+
+        // Extraer JSON de la respuesta
+        const jsonMatch = text.match(/\{[\s\S]*\}/)
+        if (!jsonMatch) throw new Error('Respuesta inválida')
+        const translations = JSON.parse(jsonMatch[0])
+
+        translationCache[lang] = translations
+        saveLangCache()
+        applyTranslations(translations)
+      } catch (e) {
+        console.error('Error traduciendo:', e)
+        // Revertir a español si falla
+        currentLang = 'es'
+        ;['es','en','pt'].forEach(l => {
+          document.getElementById('lang-' + l)?.classList.toggle('active', l === 'es')
+        })
+      } finally {
+        overlay.classList.remove('show')
+      }
+    }
+
+    function applyTranslations(translations) {
+      const cats = (rest.menu_categories || []).filter(c => c.is_visible).sort((a,b) => a.sort_order - b.sort_order)
+      const catTrans = translations.categories || {}
+      const itemTrans = translations.items || {}
+
+      // Actualizar nav de categorías
+      document.getElementById('cat-nav').innerHTML = cats.map((cat, i) => {
+        const t = catTrans[cat.id]
+        const name = t?.name || cat.name
+        return '<button class="cat-btn' + (i === 0 ? ' active' : '') + '" data-id="' + cat.id + '" onclick="navScroll(\'cat-' + cat.id + '\')">'
+          + (cat.emoji ? cat.emoji + ' ' : '') + esc(name) + '</button>'
+      }).join('')
+
+      // Actualizar contenido
+      document.getElementById('content').innerHTML = cats.map((cat, i) => {
+        const catT = catTrans[cat.id]
+        const catName = catT?.name || cat.name
+        const catDesc = catT?.description || cat.description || ''
+        const items = (cat.menu_items || []).filter(item => item.is_visible).sort((a,b) => a.sort_order - b.sort_order)
+
+        const itemsHtml = items.map(item => {
+          const t = itemTrans[item.id]
+          const translatedItem = t ? { ...item, name: t.name || item.name, description: t.description || item.description } : item
+          return itemCardHtml(translatedItem)
+        }).join('')
+
+        return '<div class="category-section" id="cat-' + cat.id + '">'
+          + '<div class="category-title">' + (cat.emoji ? cat.emoji + ' ' : '') + esc(catName) + '</div>'
+          + (catDesc ? '<div class="category-desc">' + esc(catDesc) + '</div>' : '')
+          + itemsHtml
+          + '</div>'
+          + (i < cats.length - 1 ? '<div class="divider"></div>' : '')
+      }).join('')
+
+      Object.keys(itemsById).forEach(renderCtrl)
+    }
 
     init()
   </script>

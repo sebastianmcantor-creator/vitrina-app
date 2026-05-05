@@ -94,6 +94,7 @@
 
     <div class="suggestions" id="suggestions"></div>
     <div class="error-msg" id="api-error"></div>
+    <div id="tano-limit-alert" style="display:none;padding:8px 16px;background:#3a1f0a;color:#e8a06a;font-size:12px;text-align:center;border-top:1px solid #4a2f1a"></div>
 
     <div class="input-area">
       <input class="chat-input" id="chat-input" type="text" placeholder="Preguntame lo que quieras..." />
@@ -119,6 +120,8 @@
     let systemPrompt = ''
     let conversationHistory = []
     let isLoading = false
+    let currentRestaurantId = null
+    let tanoLimitReached = false
 
     async function init() {
       if (!slug) { showError('URL inválida — falta el parámetro slug.'); return }
@@ -131,6 +134,7 @@
         return
       }
 
+      currentRestaurantId = rest.id
       document.getElementById('loader-name').textContent = rest.name
       document.getElementById('rest-name').textContent = rest.name
       document.title = rest.name + ' — Asistente'
@@ -260,13 +264,27 @@
       const errorEl = document.getElementById('api-error')
       errorEl.style.display = 'none'
 
+      // Si ya llegó al límite, responder sin llamar a la API
+      if (tanoLimitReached) {
+        showTyping(false)
+        addMessage('assistant', 'Por ahora no puedo seguir respondiendo — llegué al límite de mensajes del mes. El equipo del restaurante te atiende con gusto 😊')
+        isLoading = false
+        return
+      }
+
       let attempts = 0
       while (attempts < 3) {
         try {
           const res = await fetch(BACKEND + '/api/claude', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ system: systemPrompt, messages: conversationHistory, max_tokens: 1000 })
+            body: JSON.stringify({
+              system: systemPrompt,
+              messages: conversationHistory,
+              max_tokens: 1000,
+              restaurantId: currentRestaurantId,
+              assistantType: 'tano',
+            })
           })
 
           if (res.status === 529) {
@@ -282,6 +300,23 @@
           if (!res.ok) throw new Error('Error ' + res.status)
 
           const data = await res.json()
+
+          // Manejar límite de Tano
+          if (data.tano_limit_reached) {
+            tanoLimitReached = true
+            document.getElementById('chat-input').disabled = true
+            document.querySelector('.send-btn').disabled = true
+          }
+
+          // Mostrar alerta si quedan pocos mensajes
+          if (data.tano_remaining !== undefined && data.tano_remaining <= 15 && data.tano_remaining > 0) {
+            const alertEl = document.getElementById('tano-limit-alert')
+            if (alertEl) {
+              alertEl.style.display = 'block'
+              alertEl.textContent = `⚠️ Quedan ${data.tano_remaining} respuestas disponibles este mes.`
+            }
+          }
+
           const reply = data.content?.[0]?.text || 'No pude procesar tu consulta. ¿Podés repetirla?'
           conversationHistory.push({ role: 'assistant', content: reply })
           showTyping(false)

@@ -267,6 +267,110 @@ html, body {
 }
 .btn-logout:hover { color: var(--bad); }
 
+/* ── Viti Chat ── */
+.btn-viti {
+  display: flex; align-items: center; gap: 10px;
+  width: calc(100% - 32px); margin: 0 16px 12px;
+  padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(200,150,60,.3);
+  background: rgba(200,150,60,.08); color: var(--gold);
+  font-family: 'Outfit', sans-serif; font-size: 13.5px; font-weight: 500;
+  cursor: pointer; text-align: left; transition: background .15s;
+}
+.btn-viti:hover { background: rgba(200,150,60,.16); }
+.btn-viti-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+  animation: pulse-gold 2s ease-in-out infinite; flex-shrink: 0;
+}
+@keyframes pulse-gold {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(.8); }
+}
+
+.viti-drawer {
+  position: fixed; top: 0; right: -480px; width: 440px; max-width: 96vw;
+  height: 100vh; background: var(--white); border-left: 1px solid var(--border);
+  display: flex; flex-direction: column; z-index: 200;
+  transition: right .3s cubic-bezier(.4,0,.2,1);
+  box-shadow: -4px 0 24px rgba(0,0,0,.12);
+}
+.viti-drawer.open { right: 0; }
+.viti-drawer-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.25); z-index: 199;
+  display: none; backdrop-filter: blur(2px);
+}
+.viti-drawer-overlay.open { display: block; }
+
+.viti-header {
+  padding: 20px 20px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
+}
+.viti-header-info { display: flex; align-items: center; gap: 10px; }
+.viti-avatar {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--gold-pale); display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.viti-title { font-size: 16px; font-weight: 500; color: var(--ink); }
+.viti-subtitle { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.viti-close {
+  background: none; border: none; cursor: pointer; color: var(--muted);
+  font-size: 20px; padding: 4px; border-radius: 6px; line-height: 1;
+}
+.viti-close:hover { background: var(--cream); color: var(--ink); }
+
+.viti-messages {
+  flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column;
+  gap: 14px; scroll-behavior: smooth;
+}
+.viti-msg { display: flex; flex-direction: column; max-width: 88%; }
+.viti-msg.user { align-self: flex-end; align-items: flex-end; }
+.viti-msg.viti { align-self: flex-start; align-items: flex-start; }
+.viti-msg-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+.viti-msg-bubble {
+  padding: 10px 14px; border-radius: 16px; font-size: 14px; line-height: 1.55;
+}
+.viti-msg.user .viti-msg-bubble {
+  background: var(--terra); color: #fff; border-bottom-right-radius: 4px;
+}
+.viti-msg.viti .viti-msg-bubble {
+  background: var(--cream); color: var(--ink); border-bottom-left-radius: 4px;
+  border: 1px solid var(--border);
+}
+.viti-typing {
+  align-self: flex-start; padding: 10px 16px; background: var(--cream);
+  border-radius: 16px; border-bottom-left-radius: 4px; border: 1px solid var(--border);
+  display: none; gap: 5px; align-items: center;
+}
+.viti-typing.show { display: flex; }
+.viti-typing span {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--muted);
+  animation: viti-bounce .9s ease-in-out infinite;
+}
+.viti-typing span:nth-child(2) { animation-delay: .15s; }
+.viti-typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes viti-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: .5; }
+  40% { transform: translateY(-5px); opacity: 1; }
+}
+
+.viti-input-area {
+  padding: 12px 16px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; flex-shrink: 0;
+}
+.viti-input {
+  flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 12px;
+  font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--ink);
+  background: var(--cream); outline: none; resize: none;
+}
+.viti-input:focus { border-color: var(--gold); }
+.viti-send {
+  padding: 10px 16px; border-radius: 12px; border: none; background: var(--gold);
+  color: #fff; font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500;
+  cursor: pointer; flex-shrink: 0; transition: opacity .2s;
+}
+.viti-send:hover { opacity: .85; }
+.viti-send:disabled { opacity: .4; cursor: not-allowed; }
+
 /* ── Main ── */
 .main {
   margin-left: var(--sidebar-w);
@@ -1068,6 +1172,12 @@ html, body {
       </button>
     </nav>
 
+    <!-- Viti -->
+    <button class="btn-viti" onclick="openViti()">
+      <div class="btn-viti-dot"></div>
+      <span>Consultá a Viti</span>
+    </button>
+
     <div class="sidebar-user">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info">
@@ -1078,6 +1188,34 @@ html, body {
     </div>
 
   </aside>
+
+  <!-- Viti Overlay -->
+  <div class="viti-drawer-overlay" id="viti-overlay" onclick="closeViti()"></div>
+
+  <!-- Viti Drawer -->
+  <div class="viti-drawer" id="viti-drawer">
+    <div class="viti-header">
+      <div class="viti-header-info">
+        <div class="viti-avatar">✨</div>
+        <div>
+          <div class="viti-title">Viti</div>
+          <div class="viti-subtitle">Asistente de marketing y estrategia</div>
+        </div>
+      </div>
+      <button class="viti-close" onclick="closeViti()">✕</button>
+    </div>
+
+    <div class="viti-messages" id="viti-messages">
+      <div class="viti-typing" id="viti-typing">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+
+    <div class="viti-input-area">
+      <input class="viti-input" id="viti-input" placeholder="Preguntale algo a Viti..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();vitiSend()}">
+      <button class="viti-send" id="viti-send-btn" onclick="vitiSend()">Enviar</button>
+    </div>
+  </div>
 
   <!-- ═══ MAIN ═══ -->
   <div class="main">
@@ -1485,7 +1623,7 @@ html, body {
 
 <script type="module">
 import { requireAuth, signOut } from './lib/auth.js'
-import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff } from './lib/db.js'
+import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff, menuItemPriceHistory } from './lib/db.js'
 import { supabase } from './lib/supabase.js'
 
 // ── Estado global ──
@@ -2169,6 +2307,10 @@ window.saveItemModal = async function () {
       category_id:   editingItemCatId,
     }
     if (editingItem) {
+      // Registrar historial de precio si cambió
+      if (editingItem.price !== price) {
+        menuItemPriceHistory.record(editingItem.id, currentRestaurant.id, editingItem.price, price).catch(() => {})
+      }
       const updated = await menuItems.update(editingItem.id, payload)
       menuItemsMap[editingItemCatId] = menuItemsMap[editingItemCatId].map(
         i => i.id === editingItem.id ? { ...i, ...updated } : i
@@ -2917,6 +3059,147 @@ window.cancelarPedido = async function (id) {
     delete pedidosMap[id]
     renderPedidos()
   } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+// ═══════════════════════════════════════════
+// VITI — Asistente IA del dueño
+// ═══════════════════════════════════════════
+let vitiHistory = []
+let vitiLoading = false
+
+function buildVitiSystemPrompt() {
+  if (!currentRestaurant) return ''
+  const r = currentRestaurant
+  const plan = r.plan ?? 'free'
+  const menuSummary = buildVitiMenuSummary()
+  return `Sos Viti, la asistente de marketing e inteligencia de negocios de Vitrina.
+Estás hablando con el dueño o administrador de "${r.name}"${r.city ? ', ubicado en ' + r.city : ''}.
+
+DATOS DEL RESTAURANTE:
+- Plan actual: ${plan}
+- Moneda: ${r.currency || 'ARS'}
+${r.address ? '- Dirección: ' + r.address : ''}
+${menuSummary}
+
+TU ROL:
+- Asesorás al dueño sobre estrategia de marketing, gestión del menú, precios, análisis competitivo y tendencias gastronómicas.
+- Respondés preguntas sobre cómo mejorar la presencia digital, qué platos destacar, cómo manejar las redes sociales.
+- Usás los datos del restaurante para dar consejos específicos y concretos.
+- Si no tenés datos suficientes para responder algo, lo decís claramente y sugerís cómo conseguirlos.
+- Solo respondés sobre temas relacionados con el restaurante y su negocio.
+- Tono profesional pero cercano. Sin jerga de marketing vacía.
+- Respuestas directas y accionables. Máximo 4-5 párrafos.`
+}
+
+function buildVitiMenuSummary() {
+  const cats = []
+  for (const catId in menuItemsMap) {
+    const cat = menuCats.find(c => c.id === catId)
+    const items = menuItemsMap[catId] || []
+    if (cat && items.length) {
+      const prices = items.map(i => i.price).filter(Boolean)
+      const avgPrice = prices.length ? Math.round(prices.reduce((a,b) => a+b, 0) / prices.length) : 0
+      cats.push(`  - ${cat.name}: ${items.length} platos${avgPrice ? ', precio promedio $' + avgPrice.toLocaleString('es-AR') : ''}`)
+    }
+  }
+  const totalItems = Object.values(menuItemsMap).flat().length
+  return cats.length
+    ? `- Menú: ${totalItems} platos en ${cats.length} categorías\n${cats.join('\n')}`
+    : '- Menú: sin datos cargados aún'
+}
+
+window.openViti = function () {
+  document.getElementById('viti-drawer').classList.add('open')
+  document.getElementById('viti-overlay').classList.add('open')
+  document.body.style.overflow = 'hidden'
+
+  // Saludo inicial solo la primera vez
+  if (vitiHistory.length === 0) {
+    const name = currentRestaurant?.name ?? 'tu restaurante'
+    vitiAddMessage('viti', `¡Hola! Soy Viti 👋\n\nEstoy acá para ayudarte con la estrategia de marketing y el negocio de **${name}**.\n\nPodés preguntarme sobre precios, qué platos destacar, cómo mejorar tu presencia digital, análisis de competidores o cualquier duda del negocio. ¿Por dónde querés arrancar?`)
+  }
+
+  setTimeout(() => document.getElementById('viti-input').focus(), 300)
+}
+
+window.closeViti = function () {
+  document.getElementById('viti-drawer').classList.remove('open')
+  document.getElementById('viti-overlay').classList.remove('open')
+  document.body.style.overflow = ''
+}
+
+function vitiAddMessage(role, text) {
+  const container = document.getElementById('viti-messages')
+  const typing = document.getElementById('viti-typing')
+  const div = document.createElement('div')
+  div.className = 'viti-msg ' + role
+  const formattedText = text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>')
+  if (role === 'viti') {
+    div.innerHTML = '<div class="viti-msg-label">Viti</div><div class="viti-msg-bubble">' + formattedText + '</div>'
+  } else {
+    div.innerHTML = '<div class="viti-msg-bubble">' + formattedText + '</div>'
+  }
+  container.insertBefore(div, typing)
+  container.scrollTop = container.scrollHeight
+}
+
+function vitiShowTyping(show) {
+  const t = document.getElementById('viti-typing')
+  t.classList.toggle('show', show)
+  if (show) {
+    const c = document.getElementById('viti-messages')
+    c.scrollTop = c.scrollHeight
+  }
+}
+
+window.vitiSend = async function () {
+  if (vitiLoading) return
+  const input = document.getElementById('viti-input')
+  const text = input.value.trim()
+  if (!text) return
+
+  input.value = ''
+  vitiAddMessage('user', text)
+  vitiHistory.push({ role: 'user', content: text })
+  vitiLoading = true
+  vitiShowTyping(true)
+  document.getElementById('viti-send-btn').disabled = true
+
+  try {
+    const system = buildVitiSystemPrompt()
+    const res = await fetch(WORKER_URL + '/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system,
+        messages: vitiHistory,
+        max_tokens: 1200,
+        assistantType: 'viti',
+      }),
+    })
+
+    if (res.status === 529) {
+      vitiShowTyping(false)
+      vitiAddMessage('viti', 'El servidor está un poco ocupado. Esperá unos segundos y volvé a intentarlo.')
+      return
+    }
+
+    if (!res.ok) throw new Error('Error ' + res.status)
+
+    const data = await res.json()
+    const reply = data.content?.[0]?.text || 'No pude procesar tu consulta. ¿Podés repetirla?'
+    vitiHistory.push({ role: 'assistant', content: reply })
+    vitiShowTyping(false)
+    vitiAddMessage('viti', reply)
+  } catch (e) {
+    vitiShowTyping(false)
+    vitiAddMessage('viti', 'Tuve un problema técnico. ¿Podés intentarlo de nuevo?')
+  } finally {
+    vitiLoading = false
+    document.getElementById('viti-send-btn').disabled = false
+  }
 }
 
 // ─────────────────────────────────────────────
