@@ -82,14 +82,26 @@ html, body {
 .sidebar-restaurant {
   padding: 14px 20px;
   border-bottom: 1px solid rgba(255,255,255,.08);
+  position: relative;
 }
+.sidebar-restaurant.clickable { cursor: pointer; }
+.sidebar-restaurant.clickable:hover { background: rgba(255,255,255,.04); }
 .sidebar-rest-label {
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: rgba(255,255,255,.35);
   margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
+.sidebar-rest-chevron {
+  font-size: 12px;
+  color: rgba(255,255,255,.35);
+  transition: transform 0.15s;
+}
+.sidebar-restaurant.open .sidebar-rest-chevron { transform: rotate(180deg); }
 .sidebar-rest-name {
   font-size: 14px;
   font-weight: 500;
@@ -102,6 +114,41 @@ html, body {
   font-size: 11px;
   color: var(--gold);
   margin-top: 2px;
+}
+
+/* ── Dropdown selector ── */
+.rest-switcher {
+  position: absolute;
+  left: 0; right: 0; top: 100%;
+  background: #1a1410;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  z-index: 200;
+  display: none;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.rest-switcher.open { display: block; }
+.rest-switcher-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: rgba(255,255,255,.65);
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.rest-switcher-item:hover { background: rgba(255,255,255,.06); color: var(--white); }
+.rest-switcher-item.current { color: var(--terra2); font-weight: 500; }
+.rest-switcher-item .sw-check { font-size: 12px; margin-left: auto; opacity: 0; }
+.rest-switcher-item.current .sw-check { opacity: 1; }
+.rest-switcher-add {
+  border-top: 1px solid rgba(255,255,255,.08);
+  color: var(--gold) !important;
+  font-size: 12px !important;
 }
 
 .sidebar-nav {
@@ -893,10 +940,14 @@ html, body {
       <div class="sidebar-logo-name">Vitrina</div>
     </div>
 
-    <div class="sidebar-restaurant" id="sidebar-restaurant" style="display:none">
-      <div class="sidebar-rest-label">Restaurante</div>
+    <div class="sidebar-restaurant" id="sidebar-restaurant" style="display:none" onclick="toggleRestSwitcher()">
+      <div class="sidebar-rest-label">
+        <span>Restaurante</span>
+        <span class="sidebar-rest-chevron" id="rest-chevron" style="display:none">▾</span>
+      </div>
       <div class="sidebar-rest-name" id="sidebar-rest-name">—</div>
       <div class="sidebar-rest-plan" id="sidebar-rest-plan">Plan Free</div>
+      <div class="rest-switcher" id="rest-switcher"></div>
     </div>
 
     <nav class="sidebar-nav">
@@ -1424,23 +1475,113 @@ function renderColorPresets() {
 // ─────────────────────────────────────────────
 // Cargar restaurante
 // ─────────────────────────────────────────────
+let restaurantList = []
+
 window.loadRestaurant = async function () {
   try {
-    const list = await restaurants.listByUser(currentUser.id)
+    restaurantList = await restaurants.listByUser(currentUser.id)
 
-    if (!list || list.length === 0) {
+    if (!restaurantList || restaurantList.length === 0) {
       showSection('setup')
       return
     }
 
-    currentRestaurant = list[0]
+    currentRestaurant = restaurantList[0]
     renderSidebarRestaurant(currentRestaurant)
+    renderRestSwitcher()
     fillForm(currentRestaurant)
     showSection('info')
     initPedidosBadge()
   } catch (e) {
     showToast('Error cargando restaurante: ' + e.message, 'error')
   }
+}
+
+// ─────────────────────────────────────────────
+// Selector multi-restaurante
+// ─────────────────────────────────────────────
+function renderRestSwitcher() {
+  const switcher = document.getElementById('rest-switcher')
+  const chevron  = document.getElementById('rest-chevron')
+  const wrap     = document.getElementById('sidebar-restaurant')
+
+  if (restaurantList.length <= 1) {
+    chevron.style.display = 'none'
+    wrap.classList.remove('clickable')
+    switcher.innerHTML = ''
+    return
+  }
+
+  chevron.style.display = ''
+  wrap.classList.add('clickable')
+
+  const items = restaurantList.map(r => `
+    <button class="rest-switcher-item ${r.id === currentRestaurant.id ? 'current' : ''}"
+      onclick="event.stopPropagation(); switchRestaurant('${r.id}')">
+      <span>🏪</span>
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.name}</span>
+      <span class="sw-check">✓</span>
+    </button>
+  `).join('')
+
+  switcher.innerHTML = items + `
+    <button class="rest-switcher-item rest-switcher-add"
+      onclick="event.stopPropagation(); showNewRestaurantSetup()">
+      <span>＋</span> Agregar restaurante
+    </button>
+  `
+}
+
+window.toggleRestSwitcher = function () {
+  if (!document.getElementById('sidebar-restaurant').classList.contains('clickable')) return
+  const wrap     = document.getElementById('sidebar-restaurant')
+  const switcher = document.getElementById('rest-switcher')
+  const isOpen   = switcher.classList.contains('open')
+  wrap.classList.toggle('open', !isOpen)
+  switcher.classList.toggle('open', !isOpen)
+}
+
+// Cerrar dropdown al hacer click fuera
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('sidebar-restaurant')
+  if (wrap && !wrap.contains(e.target)) {
+    wrap.classList.remove('open')
+    document.getElementById('rest-switcher')?.classList.remove('open')
+  }
+})
+
+window.switchRestaurant = async function (id) {
+  if (id === currentRestaurant?.id) {
+    window.toggleRestSwitcher()
+    return
+  }
+
+  // Cerrar dropdown
+  document.getElementById('rest-switcher')?.classList.remove('open')
+  document.getElementById('sidebar-restaurant')?.classList.remove('open')
+
+  // Limpiar canal badge anterior
+  if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
+  if (pedidosChannel) { supabase.removeChannel(pedidosChannel); pedidosChannel = null }
+  pedidosMap = {}
+
+  currentRestaurant = restaurantList.find(r => r.id === id)
+  renderSidebarRestaurant(currentRestaurant)
+  renderRestSwitcher()
+  fillForm(currentRestaurant)
+  showSection('info')
+  initPedidosBadge()
+  showToast('Cambiaste a ' + currentRestaurant.name, 'success')
+}
+
+window.showNewRestaurantSetup = function () {
+  document.getElementById('rest-switcher')?.classList.remove('open')
+  document.getElementById('sidebar-restaurant')?.classList.remove('open')
+  document.getElementById('setup-name').value = ''
+  document.getElementById('setup-slug').value = ''
+  document.getElementById('setup-city').value = ''
+  document.getElementById('setup-phone').value = ''
+  showSection('setup')
 }
 
 // ─────────────────────────────────────────────
@@ -1480,9 +1621,12 @@ window.createRestaurant = async function () {
       owner_id: currentUser.id,
     })
 
+    restaurantList.push(currentRestaurant)
     renderSidebarRestaurant(currentRestaurant)
+    renderRestSwitcher()
     fillForm(currentRestaurant)
     showSection('info')
+    if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
     initPedidosBadge()
     showToast('¡Restaurante creado! 🎉', 'success')
   } catch (e) {
