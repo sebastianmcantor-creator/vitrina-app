@@ -140,13 +140,33 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Idioma: español únicamente
 - Todo en un solo archivo para GitHub Pages
 
+**Bloque 8 — Agente de ventas + Twilio WhatsApp** (100%) ✅
+- Migración 014: tablas `sales_prospects`, `sales_contacts`, `sales_agent_config`, `sales_metrics`
+- Módulos en lib/db.js: salesProspects, salesContacts, salesAgentConfig, salesMetrics
+- Worker con endpoints completos: `/api/sales/search-restaurants`, `/generate-diagnosis`, `/create-prospect`, `/contact`, `/process-followups`, `/prospects`, `/config`, `/metrics`
+- Búsqueda automática de restaurantes con Google Places API (por ubicación y radio)
+- Generación de diagnóstico preliminar automático: análisis de presencia online, fit score, pain points
+- Envío de WhatsApp personalizado vía Twilio con templates configurables
+- Sistema de seguimiento automático a 3 días con endpoint cron `/process-followups`
+- Sección completa en panel.html: métricas del agente, lista de prospectos con filtros, configuración, búsqueda manual
+- Estados de prospectos: discovered → contacted → interested/not_interested → converted
+- Modales para detalle de prospecto y búsqueda manual de restaurantes
+- Métricas: prospectos encontrados, contactados, interesados, convertidos, costo total
+- Toggle para activar/desactivar el agente, configuración de templates y límites diarios
+- Worker deployado con todos los endpoints nuevos
+
+**Pendiente manual:**
+- Ejecutar migración 014 en Supabase Dashboard
+- Configurar cron job en Cloudflare Workers para `/api/sales/process-followups` (diario a las 10 AM)
+- Testing del flujo completo con prospectos reales
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 8 — Agente de ventas + Twilio WhatsApp** (0%)
-- Búsqueda automática de restaurantes con Google Places API
-- Generación de diagnóstico preliminar por restaurante
-- Envío de mensajes personalizados vía WhatsApp
-- Sistema de seguimiento a 3 días
-- Notificación a Sebastián cuando hay interés real
+**Bloque 9 — Panel maestro completo + sistema de productores** (0%)
+- Dashboard maestro para Sebastián con todos los clientes
+- Métricas globales: facturación, fees, costos, margen
+- Sistema de productores con comisiones
+- Alertas de churn y problemas
+- Exportación de reportes
 
 ---
 

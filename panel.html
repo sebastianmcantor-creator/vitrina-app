@@ -1346,6 +1346,108 @@ html, body {
   border-top: 1px solid var(--border);
 }
 
+/* ── Sales Agent ── */
+.metric-card {
+  background: var(--cream);
+  padding: 16px;
+  border-radius: 10px;
+  text-align: center;
+}
+.metric-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--terra);
+  margin-bottom: 6px;
+}
+.metric-label {
+  font-size: 13px;
+  color: var(--muted);
+}
+.prospect-card {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--white);
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: border-color .15s, box-shadow .15s;
+}
+.prospect-card:hover {
+  border-color: var(--terra);
+  box-shadow: 0 2px 8px rgba(184, 90, 48, 0.1);
+}
+.prospect-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.prospect-name {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.prospect-address {
+  font-size: 13px;
+  color: var(--muted);
+}
+.prospect-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  flex-shrink: 0;
+}
+.prospect-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 28px;
+}
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--border);
+  transition: .3s;
+  border-radius: 28px;
+}
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+}
+input:checked + .toggle-slider {
+  background-color: var(--terra);
+}
+input:checked + .toggle-slider:before {
+  transform: translateX(24px);
+}
+
 /* ── Mobile overlay ── */
 .sidebar-overlay {
   display: none;
@@ -1426,6 +1528,9 @@ html, body {
 
       <button class="nav-item" data-section="marketing" onclick="switchSection('marketing', this)">
         <span class="nav-icon">📱</span> Marketing
+      </button>
+      <button class="nav-item" data-section="sales-agent" onclick="switchSection('sales-agent', this)">
+        <span class="nav-icon">🤖</span> Agente de Ventas
       </button>
 
       <div class="nav-section-label">Negocio</div>
@@ -2110,6 +2215,123 @@ html, body {
 
       </div>
 
+      <!-- Sección Agente de Ventas -->
+      <div id="section-sales-agent" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">🤖 Agente de Ventas</div>
+          <div class="page-subtitle">Automatiza la prospección y contacto con restaurantes potenciales.</div>
+        </div>
+
+        <!-- Control del agente -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>Estado del agente</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="agent-active-toggle" onchange="toggleAgent(this.checked)">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div id="agent-status-text" style="margin-top:12px;font-size:13.5px;color:var(--muted)">
+            El agente está desactivado. Activalo para comenzar la prospección automática.
+          </div>
+        </div>
+
+        <!-- Métricas del agente -->
+        <div class="card">
+          <div class="card-title">📊 Métricas del agente (últimos 30 días)</div>
+          <div id="agent-metrics-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-top:20px">
+            <div class="metric-card">
+              <div class="metric-value" id="metric-found">-</div>
+              <div class="metric-label">Encontrados</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="metric-contacted">-</div>
+              <div class="metric-label">Contactados</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="metric-interested">-</div>
+              <div class="metric-label">Interesados</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="metric-converted">-</div>
+              <div class="metric-label">Convertidos</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" id="metric-cost">-</div>
+              <div class="metric-label">Costo total</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prospectos -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <span>🎯 Prospectos</span>
+            <button class="btn-primary" style="font-size:13px;padding:7px 14px" onclick="openSearchRestaurantsModal()">
+              🔍 Buscar restaurantes
+            </button>
+          </div>
+
+          <!-- Filtros -->
+          <div style="display:flex;gap:8px;margin:16px 0;flex-wrap:wrap">
+            <button class="filter-btn active" data-filter="all" onclick="filterProspects('all')">
+              Todos
+            </button>
+            <button class="filter-btn" data-filter="discovered" onclick="filterProspects('discovered')">
+              Descubiertos
+            </button>
+            <button class="filter-btn" data-filter="contacted" onclick="filterProspects('contacted')">
+              Contactados
+            </button>
+            <button class="filter-btn" data-filter="interested" onclick="filterProspects('interested')">
+              Interesados
+            </button>
+            <button class="filter-btn" data-filter="converted" onclick="filterProspects('converted')">
+              Convertidos
+            </button>
+          </div>
+
+          <!-- Lista de prospectos -->
+          <div id="prospects-list" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:40px 20px">
+              No hay prospectos todavía. Activá el agente o buscá manualmente.
+            </div>
+          </div>
+        </div>
+
+        <!-- Configuración del agente -->
+        <div class="card">
+          <div class="card-title">⚙️ Configuración</div>
+
+          <div class="form-field">
+            <label class="form-label">Contactos diarios máximos</label>
+            <input class="form-input" id="agent-max-contacts" type="number" min="1" max="50" value="10" style="width:120px">
+            <div class="form-hint">Cuántos restaurantes contactar por día como máximo.</div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Rating mínimo</label>
+            <input class="form-input" id="agent-min-rating" type="number" min="0" max="5" step="0.1" value="3.5" style="width:120px">
+            <div class="form-hint">Solo contactar restaurantes con este rating o superior.</div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Template de WhatsApp inicial</label>
+            <textarea class="form-textarea" id="agent-whatsapp-template" rows="4"></textarea>
+            <div class="form-hint">Usá {nombre} para el nombre del restaurante.</div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Template de seguimiento (3 días después)</label>
+            <textarea class="form-textarea" id="agent-followup-template" rows="3"></textarea>
+          </div>
+
+          <div style="margin-top:20px">
+            <button class="btn-primary" onclick="saveAgentConfig()">Guardar configuración</button>
+          </div>
+        </div>
+      </div>
+
       <!-- Sección Facturación -->
       <div id="section-facturacion" class="panel-section">
         <div class="page-header">
@@ -2455,9 +2677,61 @@ html, body {
   </div>
 </div>
 
+<!-- Modal: buscar restaurantes -->
+<div class="modal-overlay" id="modal-search-restaurants" onclick="if(event.target===this)closeModal('modal-search-restaurants')">
+  <div class="modal-box" style="max-width:700px">
+    <div class="modal-header">
+      <div class="modal-title">🔍 Buscar restaurantes</div>
+      <button class="modal-close" onclick="closeModal('modal-search-restaurants')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Ubicación *</label>
+        <input type="text" id="search-location" class="input-field" placeholder="Ej: Palermo, Buenos Aires">
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Ciudad, barrio o dirección específica</div>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Radio de búsqueda (km)</label>
+        <input type="number" id="search-radius" class="input-field" value="5" min="1" max="50" style="width:120px">
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:12px">
+        <button class="btn-primary" onclick="searchRestaurants()">Buscar</button>
+        <button class="btn-secondary" onclick="closeModal('modal-search-restaurants')">Cancelar</button>
+      </div>
+
+      <!-- Resultados -->
+      <div id="search-results" style="margin-top:24px;display:none">
+        <div style="padding:12px;background:var(--cream);border-radius:8px;margin-bottom:12px">
+          <strong id="search-results-count">0</strong> restaurantes encontrados
+        </div>
+        <div id="search-results-list" style="max-height:400px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: detalle de prospecto -->
+<div class="modal-overlay" id="modal-prospect-detail" onclick="if(event.target===this)closeModal('modal-prospect-detail')">
+  <div class="modal-box" style="max-width:600px">
+    <div class="modal-header">
+      <div class="modal-title" id="prospect-detail-name">Restaurante</div>
+      <button class="modal-close" onclick="closeModal('modal-prospect-detail')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="prospect-detail-content"></div>
+
+      <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap" id="prospect-detail-actions">
+        <!-- Botones dinámicos según el estado -->
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { requireAuth, signOut } from './lib/auth.js'
-import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff, menuItemPriceHistory, scheduledPosts, contentTemplates } from './lib/db.js'
+import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff, menuItemPriceHistory, scheduledPosts, contentTemplates, salesProspects, salesContacts, salesAgentConfig, salesMetrics } from './lib/db.js'
 import { supabase } from './lib/supabase.js'
 
 // ── Estado global ──
@@ -3075,6 +3349,7 @@ window.switchSection = function (name, btn) {
   if (name === 'estadisticas') loadEstadisticas()
   if (name === 'analisis')     loadAnalisis()
   if (name === 'marketing')    loadMarketing()
+  if (name === 'sales-agent')  loadSalesAgent()
   if (name === 'config')       loadConfig()
   if (name === 'facturacion')  loadFacturacion()
   if (name !== 'pedidos')      detachPedidosRealtime()
@@ -4924,6 +5199,500 @@ window.deleteTemplate = async function (templateId) {
     await contentTemplates.delete(templateId)
     showToast('Template eliminado', 'success')
     loadTemplates()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+// SALES AGENT
+// ═════════════════════════════════════════════════════════════════════════════
+
+let agentConfig = null
+let prospectsList = []
+let currentProspectFilter = 'all'
+
+window.loadSalesAgent = async function () {
+  showSection('sales-agent')
+
+  try {
+    // Cargar configuración
+    const configRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config')
+    const configData = await configRes.json()
+    agentConfig = configData.config
+
+    if (agentConfig) {
+      // Actualizar UI con la configuración
+      document.getElementById('agent-active-toggle').checked = agentConfig.is_active || false
+      document.getElementById('agent-max-contacts').value = agentConfig.max_daily_contacts || 10
+      document.getElementById('agent-min-rating').value = agentConfig.min_rating || 3.5
+      document.getElementById('agent-whatsapp-template').value = agentConfig.whatsapp_template || ''
+      document.getElementById('agent-followup-template').value = agentConfig.followup_template || ''
+
+      updateAgentStatusText()
+    }
+
+    // Cargar métricas
+    await loadAgentMetrics()
+
+    // Cargar prospectos
+    await loadProspects()
+  } catch (e) {
+    console.error('Error cargando agente de ventas:', e)
+    showToast('Error cargando agente: ' + e.message, 'error')
+  }
+}
+
+function updateAgentStatusText() {
+  const statusEl = document.getElementById('agent-status-text')
+  if (agentConfig.is_active) {
+    statusEl.textContent = `✅ El agente está activo y buscando restaurantes automáticamente. Máximo ${agentConfig.max_daily_contacts} contactos diarios.`
+    statusEl.style.color = 'var(--good)'
+  } else {
+    statusEl.textContent = 'El agente está desactivado. Activalo para comenzar la prospección automática.'
+    statusEl.style.color = 'var(--muted)'
+  }
+}
+
+async function loadAgentMetrics() {
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/metrics?days=30')
+    const data = await res.json()
+
+    if (data.totals) {
+      document.getElementById('metric-found').textContent = data.totals.prospects_found || 0
+      document.getElementById('metric-contacted').textContent = data.totals.prospects_contacted || 0
+      document.getElementById('metric-interested').textContent = data.totals.interested_count || 0
+      document.getElementById('metric-converted').textContent = data.totals.converted_count || 0
+
+      const totalCost = (data.totals.whatsapp_cost || 0) + (data.totals.api_cost || 0)
+      document.getElementById('metric-cost').textContent = '$' + totalCost.toFixed(2) + ' USD'
+    }
+  } catch (e) {
+    console.error('Error cargando métricas:', e)
+  }
+}
+
+async function loadProspects() {
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/prospects')
+    const data = await res.json()
+    prospectsList = data.prospects || []
+    renderProspects()
+  } catch (e) {
+    console.error('Error cargando prospectos:', e)
+  }
+}
+
+window.filterProspects = function (filter) {
+  currentProspectFilter = filter
+
+  // Update active button
+  document.querySelectorAll('#section-sales-agent .filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter)
+  })
+
+  renderProspects()
+}
+
+function renderProspects() {
+  const container = document.getElementById('prospects-list')
+
+  let filtered = prospectsList
+  if (currentProspectFilter !== 'all') {
+    filtered = prospectsList.filter(p => p.status === currentProspectFilter)
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:40px 20px">
+        No hay prospectos ${currentProspectFilter === 'all' ? 'todavía' : 'con estado "' + currentProspectFilter + '"'}.
+      </div>`
+    return
+  }
+
+  container.innerHTML = filtered.map(p => {
+    const statusMap = {
+      discovered: { label: 'Descubierto', color: '#6B7280' },
+      contacted: { label: 'Contactado', color: '#3B82F6' },
+      interested: { label: 'Interesado', color: '#10B981' },
+      not_interested: { label: 'No interesado', color: '#EF4444' },
+      converted: { label: 'Convertido', color: '#8B5CF6' },
+      invalid: { label: 'Inválido', color: '#9CA3AF' },
+    }
+
+    const status = statusMap[p.status] || { label: p.status, color: '#6B7280' }
+    const rating = p.google_rating || 0
+    const fitScore = p.fit_score || 0
+
+    return `
+      <div class="prospect-card" onclick="openProspectDetail('${p.id}')">
+        <div class="prospect-header">
+          <div style="flex:1">
+            <div class="prospect-name">${p.name}</div>
+            <div class="prospect-address">${p.address || 'Sin dirección'}</div>
+          </div>
+          <div class="prospect-status" style="background:${status.color}1A;color:${status.color}">
+            ${status.label}
+          </div>
+        </div>
+        <div class="prospect-meta">
+          <span>⭐ ${rating.toFixed(1)} (${p.google_reviews_count || 0} reseñas)</span>
+          <span>📊 Fit: ${fitScore}/100</span>
+          ${p.phone ? '<span>📱 ' + p.phone + '</span>' : '<span style="color:var(--muted)">Sin teléfono</span>'}
+        </div>
+      </div>`
+  }).join('')
+}
+
+window.openProspectDetail = async function (prospectId) {
+  const prospect = prospectsList.find(p => p.id === prospectId)
+  if (!prospect) return
+
+  const modal = document.getElementById('modal-prospect-detail')
+  const nameEl = document.getElementById('prospect-detail-name')
+  const contentEl = document.getElementById('prospect-detail-content')
+  const actionsEl = document.getElementById('prospect-detail-actions')
+
+  nameEl.textContent = prospect.name
+
+  // Render content
+  const diagnosis = prospect.diagnosis || {}
+  const painPoints = diagnosis.pain_points || []
+
+  contentEl.innerHTML = `
+    <div style="display:grid;gap:16px">
+      <div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Dirección</div>
+        <div>${prospect.address || 'Sin dirección'}</div>
+      </div>
+      ${prospect.phone ? `
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Teléfono</div>
+          <div>${prospect.phone}</div>
+        </div>
+      ` : ''}
+      ${prospect.website ? `
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Website</div>
+          <div><a href="${prospect.website}" target="_blank" style="color:var(--terra)">${prospect.website}</a></div>
+        </div>
+      ` : ''}
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Rating</div>
+          <div>⭐ ${(prospect.google_rating || 0).toFixed(1)}</div>
+        </div>
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Reseñas</div>
+          <div>${prospect.google_reviews_count || 0}</div>
+        </div>
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Fit Score</div>
+          <div>${prospect.fit_score || 0}/100</div>
+        </div>
+      </div>
+      ${painPoints.length > 0 ? `
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Pain Points</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            ${painPoints.map(pp => `<span style="padding:4px 10px;background:var(--cream);border-radius:6px;font-size:12px">${pp}</span>`).join('')}
+          </div>
+        </div>
+      ` : ''}
+      ${prospect.notes ? `
+        <div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:4px">Notas</div>
+          <div>${prospect.notes}</div>
+        </div>
+      ` : ''}
+    </div>
+  `
+
+  // Render actions based on status
+  if (prospect.status === 'discovered') {
+    actionsEl.innerHTML = `
+      <button class="btn-primary" onclick="contactProspect('${prospect.id}')">
+        📱 Enviar WhatsApp
+      </button>
+      <button class="btn-secondary" onclick="markProspectInvalid('${prospect.id}')">
+        Marcar como inválido
+      </button>
+    `
+  } else if (prospect.status === 'contacted') {
+    actionsEl.innerHTML = `
+      <button class="btn-primary" onclick="markProspectInterested('${prospect.id}')">
+        ✅ Marcar como interesado
+      </button>
+      <button class="btn-secondary" onclick="markProspectNotInterested('${prospect.id}')">
+        ❌ No está interesado
+      </button>
+    `
+  } else if (prospect.status === 'interested') {
+    actionsEl.innerHTML = `
+      <button class="btn-primary" onclick="markProspectConverted('${prospect.id}')">
+        🎉 Marcar como convertido
+      </button>
+    `
+  } else {
+    actionsEl.innerHTML = ''
+  }
+
+  openModal('modal-prospect-detail')
+}
+
+window.contactProspect = async function (prospectId) {
+  const prospect = prospectsList.find(p => p.id === prospectId)
+  if (!prospect) return
+
+  if (!prospect.phone) {
+    showToast('Este prospecto no tiene teléfono registrado', 'error')
+    return
+  }
+
+  if (!confirm(`¿Enviar WhatsApp a ${prospect.name}?`)) return
+
+  try {
+    // Preparar mensaje personalizado
+    const message = agentConfig.whatsapp_template.replace('{nombre}', prospect.name)
+
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prospectId,
+        message,
+        contactType: 'whatsapp',
+        templateUsed: 'whatsapp_template',
+      }),
+    })
+
+    if (!res.ok) {
+      const errorData = await res.json()
+      throw new Error(errorData.error || 'Error enviando WhatsApp')
+    }
+
+    showToast('✅ WhatsApp enviado correctamente', 'success')
+    closeModal('modal-prospect-detail')
+    await loadProspects()
+    await loadAgentMetrics()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.markProspectInterested = async function (prospectId) {
+  const notes = prompt('¿Alguna nota sobre el interés del prospecto?')
+
+  try {
+    const { salesProspects } = await import('./lib/db.js')
+    await salesProspects.markInterested(prospectId, notes)
+
+    showToast('✅ Prospecto marcado como interesado', 'success')
+    closeModal('modal-prospect-detail')
+    await loadProspects()
+    await loadAgentMetrics()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.markProspectNotInterested = async function (prospectId) {
+  if (!confirm('¿Marcar este prospecto como "no interesado"?')) return
+
+  try {
+    const { salesProspects } = await import('./lib/db.js')
+    await salesProspects.update(prospectId, { status: 'not_interested' })
+
+    showToast('Prospecto actualizado', 'success')
+    closeModal('modal-prospect-detail')
+    await loadProspects()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.markProspectConverted = async function (prospectId) {
+  if (!confirm('🎉 ¿Confirmar que este prospecto se convirtió en cliente?')) return
+
+  try {
+    const { salesProspects } = await import('./lib/db.js')
+    await salesProspects.markConverted(prospectId)
+
+    showToast('🎉 ¡Excelente! Prospecto convertido a cliente', 'success')
+    closeModal('modal-prospect-detail')
+    await loadProspects()
+    await loadAgentMetrics()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.markProspectInvalid = async function (prospectId) {
+  if (!confirm('¿Marcar este prospecto como inválido?')) return
+
+  try {
+    const { salesProspects } = await import('./lib/db.js')
+    await salesProspects.update(prospectId, { status: 'invalid' })
+
+    showToast('Prospecto marcado como inválido', 'success')
+    closeModal('modal-prospect-detail')
+    await loadProspects()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.toggleAgent = async function (isActive) {
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_active: isActive }),
+    })
+
+    if (!res.ok) throw new Error('Error actualizando configuración')
+
+    const data = await res.json()
+    agentConfig = data.config
+
+    updateAgentStatusText()
+    showToast(isActive ? '✅ Agente activado' : 'Agente desactivado', 'success')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+    // Revertir el toggle
+    document.getElementById('agent-active-toggle').checked = !isActive
+  }
+}
+
+window.saveAgentConfig = async function () {
+  const maxContacts = parseInt(document.getElementById('agent-max-contacts').value)
+  const minRating = parseFloat(document.getElementById('agent-min-rating').value)
+  const whatsappTemplate = document.getElementById('agent-whatsapp-template').value.trim()
+  const followupTemplate = document.getElementById('agent-followup-template').value.trim()
+
+  if (!whatsappTemplate || !followupTemplate) {
+    showToast('Completá ambos templates', 'error')
+    return
+  }
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        max_daily_contacts: maxContacts,
+        min_rating: minRating,
+        whatsapp_template: whatsappTemplate,
+        followup_template: followupTemplate,
+      }),
+    })
+
+    if (!res.ok) throw new Error('Error guardando configuración')
+
+    const data = await res.json()
+    agentConfig = data.config
+
+    showToast('✅ Configuración guardada', 'success')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.openSearchRestaurantsModal = function () {
+  document.getElementById('search-location').value = ''
+  document.getElementById('search-radius').value = '5'
+  document.getElementById('search-results').style.display = 'none'
+  document.getElementById('search-results-list').innerHTML = ''
+  openModal('modal-search-restaurants')
+}
+
+window.searchRestaurants = async function () {
+  const location = document.getElementById('search-location').value.trim()
+  const radius = parseInt(document.getElementById('search-radius').value) * 1000 // Convert to meters
+
+  if (!location) {
+    showToast('Ingresá una ubicación', 'error')
+    return
+  }
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/search-restaurants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ location, radius }),
+    })
+
+    if (!res.ok) {
+      const errorData = await res.json()
+      throw new Error(errorData.error || 'Error buscando restaurantes')
+    }
+
+    const data = await res.json()
+    const restaurants = data.restaurants || []
+
+    document.getElementById('search-results-count').textContent = restaurants.length
+    document.getElementById('search-results').style.display = 'block'
+
+    if (restaurants.length === 0) {
+      document.getElementById('search-results-list').innerHTML = `
+        <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+          No se encontraron restaurantes en esta ubicación.
+        </div>`
+      return
+    }
+
+    // Para cada restaurante, generar diagnóstico y agregarlo como prospecto
+    document.getElementById('search-results-list').innerHTML = `
+      <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+        Analizando restaurantes...
+      </div>`
+
+    let added = 0
+    for (const r of restaurants) {
+      try {
+        // Generar diagnóstico
+        const diagnosisRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/generate-diagnosis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ placeId: r.place_id }),
+        })
+
+        const diagnosisData = await diagnosisRes.json()
+
+        // Crear prospecto
+        const createRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/create-prospect', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            placeId: r.place_id,
+            name: r.name,
+            address: r.address,
+            phone: null, // Will be filled by diagnosis if available
+            rating: r.rating,
+            reviewsCount: r.reviews_count,
+            priceLevel: r.price_level,
+            types: r.types,
+            lat: r.lat,
+            lng: r.lng,
+            city: location.split(',')[0].trim(),
+            province: location.split(',')[1]?.trim() || null,
+            diagnosis: diagnosisData.diagnosis,
+            fitScore: diagnosisData.fit_score,
+          }),
+        })
+
+        const createData = await createRes.json()
+        if (createData.created) added++
+      } catch (e) {
+        console.error('Error procesando restaurante:', e)
+      }
+    }
+
+    showToast(`✅ ${added} restaurantes agregados como prospectos`, 'success')
+    closeModal('modal-search-restaurants')
+    await loadProspects()
+    await loadAgentMetrics()
   } catch (e) {
     showToast('Error: ' + e.message, 'error')
   }
