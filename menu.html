@@ -264,6 +264,15 @@
       document.getElementById('rest-sub').textContent = sub || rest.city || ''
       document.getElementById('mozo-fab').href = 'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? '')
 
+      // Mostrar horario de apertura en el sub-header
+      if (rest.opening_hours) {
+        const hoursText = getOpeningStatus(rest.opening_hours)
+        if (hoursText) {
+          const el = document.getElementById('rest-sub')
+          el.textContent = (el.textContent ? el.textContent + ' · ' : '') + hoursText
+        }
+      }
+
       buildMenu()
 
       // Mostrar selector de idioma
@@ -294,6 +303,30 @@
     }
 
     // ─── Menu rendering ────────────────────────────────────────────────────────
+    function getOpeningStatus(hours) {
+      if (!hours) return null
+      const now   = new Date()
+      const day   = now.getDay()    // 0=Dom ... 6=Sab
+      const hm    = now.getHours() * 100 + now.getMinutes() // e.g. 1430 = 14:30
+      const h     = hours[day]
+
+      if (!h) return '🔴 Cerrado hoy'
+
+      const toNum = str => { const [hh, mm] = str.split(':').map(Number); return hh * 100 + mm }
+      const openN = toNum(h.o)
+      const closeN= toNum(h.c)
+
+      if (hm < openN) {
+        return '🕐 Abre a las ' + h.o + ' hs'
+      } else if (hm >= closeN) {
+        // Ver si abre mañana
+        const tomorrow = hours[(day + 1) % 7]
+        return tomorrow ? '🔴 Cerrado · Abre mañana a las ' + tomorrow.o : '🔴 Cerrado'
+      } else {
+        return '🟢 Abierto · Cierra a las ' + h.c + ' hs'
+      }
+    }
+
     function buildMenu() {
       const cats = (rest.menu_categories || [])
         .filter(c => c.is_visible)
