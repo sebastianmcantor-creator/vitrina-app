@@ -80,12 +80,28 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Configurar webhook en MercadoPago Dashboard
 - Testing con credenciales sandbox de MP
 
+**Bloque 4 — Google Business API + Instagram básica + análisis + Viti** (100%) ✅
+- Migración 012: tablas `integrations`, `analytics_cache`, `competitors`
+- OAuth Google Business Profile: endpoints `/api/google/auth`, `/api/google/callback`, `/api/google/business-data`
+- OAuth Instagram Basic Display: endpoints `/api/instagram/auth`, `/api/instagram/callback`, `/api/instagram/metrics`
+- Endpoint `/api/places/nearby-competitors` para búsqueda automática de competidores
+- Dashboard de análisis en panel.html: cards de Google Business, Instagram y Competidores
+- Viti: drawer lateral con chat, contexto enriquecido (menú, precios, pedidos, stats), endpoint `/api/claude`
+- Funciones `loadAnalisis()`, `renderGoogleBusinessData()`, `renderInstagramData()`, `loadCompetitors()`
+- Manejo de callbacks OAuth con navegación automática y toasts
+- Worker deployado con todos los endpoints nuevos
+
+**Pendiente manual (ver migración 012_integrations.sql):**
+- Ejecutar migración SQL en Supabase Dashboard
+- Configurar secrets en Cloudflare: `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_PLACES_API_KEY`
+- Crear app de Instagram en Meta Developers
+- Crear proyecto OAuth en Google Cloud Console
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 4 — Google Business API + Instagram básica + análisis + Viti** (0%)
-- Integración Google Business Profile API para análisis
-- Instagram Basic Display API para métricas básicas
-- Dashboard de análisis en panel
-- Viti (asistente IA del dueño) con acceso a datos
+**Bloque 5 — Publicación automática vía Metricool + calendario de contenido** (0%)
+- Integración Metricool API para publicación cruzada
+- Calendario de contenido en panel
+- Programación de posts automáticos
 
 ---
 
