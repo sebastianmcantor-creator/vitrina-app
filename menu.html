@@ -536,6 +536,13 @@
     async function checkout() {
       const ids = Object.keys(cart).filter(id => cart[id] > 0)
       if (!ids.length) return
+
+      // Validar que el restaurante pueda recibir pedidos
+      if (rest.can_take_orders === false) {
+        alert('Este restaurante no puede recibir pedidos online en este momento. Por favor, llamá al mozo.')
+        return
+      }
+
       const btn = document.getElementById('checkout-btn')
       btn.textContent = 'Enviando...'
       btn.disabled = true
