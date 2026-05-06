@@ -160,13 +160,32 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Configurar cron job en Cloudflare Workers para `/api/sales/process-followups` (diario a las 10 AM)
 - Testing del flujo completo con prospectos reales
 
+**Bloque 9 — Panel maestro completo + sistema de productores** (100%) ✅
+- Migración 015: tablas `producers`, `producer_commissions`, `master_dashboard_cache`, columna `producer_id` en restaurants
+- Trigger automático para actualizar comisiones de productores top (10+ clientes activos → 25%/15% en lugar de 20%/10%)
+- Módulos en lib/db.js: producers, producerCommissions, masterDashboardCache
+- maestro.html: panel completo con 6 pestañas (Vista General, Clientes, Facturación, Productores, Agentes IA, Costos)
+- Vista General: clientes activos, facturación, margen, prospectos, distribución por plan, alertas de churn (7+ días inactivos)
+- Clientes: tabla completa con plan, estado, productor, uso de Tano, última actividad
+- Facturación: suscripciones, fees transacciones, fees publicidad, proyección mensual
+- Productores: tabla con clientes activos, comisiones pendientes/pagadas, botón "Marcar pagado"
+- Agentes IA: métricas de Tano, Viti y Sales Agent con costos en USD
+- Costos: fijos vs variables, costo total, costo por cliente, desglose detallado
+- Cache de métricas con TTL de 1 hora para evitar recalculo constante
+- Acceso restringido solo a sebastianmcantor@gmail.com
+- Link desde panel.html (solo visible para Sebastián)
+
+**Pendiente manual:**
+- Ejecutar migración 015 en Supabase Dashboard
+- Implementar cálculo real de facturación (actualmente en $0 — requiere integración con historial de pagos MP)
+- Agregar exportación CSV de reportes
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 9 — Panel maestro completo + sistema de productores** (0%)
-- Dashboard maestro para Sebastián con todos los clientes
-- Métricas globales: facturación, fees, costos, margen
-- Sistema de productores con comisiones
-- Alertas de churn y problemas
-- Exportación de reportes
+**Bloque 10 — Informe ejecutivo PDF + medición de éxito del plan** (0%)
+- Generación de PDF ejecutivo mensual para clientes
+- Comparativa métricas reales vs proyecciones iniciales
+- Recomendaciones automáticas de Viti
+- Envío automático por email cada mes
 
 ---
 

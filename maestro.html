@@ -3,583 +3,931 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vitrina — Panel Maestro</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>Panel Maestro — Vitrina</title>
 <style>
 :root {
-  --ink: #1C1612; --ink2: #2E2620;
-  --terra: #B85A30; --terra2: #D4724E; --terra-pale: #F2E6DF;
-  --gold: #C8963C; --gold-pale: #FAF3E4;
-  --sage: #5A7A5E; --sage-pale: #E8F0E4;
-  --cream: #F7F2EA; --cream2: #EDE5D8;
-  --white: #FDFAF6; --muted: #8A7E74; --border: #DDD5C8;
-  --bad: #C0392B; --bad-pale: #FDECEA;
-  --card: #FDFAF6;
+  --ink:        #1C1612;
+  --terra:      #B85A30;
+  --terra2:     #D4724E;
+  --terra-pale: #F9EDE6;
+  --gold:       #C8963C;
+  --gold-pale:  #FEF8EC;
+  --sage:       #5A7A5E;
+  --cream:      #F7F2EA;
+  --cream2:     #EDE5D8;
+  --white:      #FDFAF6;
+  --muted:      #8A7E74;
+  --border:     #DDD5C8;
+  --good:       #10B981;
+  --bad:        #EF4444;
+  --warning:    #F59E0B;
 }
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Outfit',sans-serif; font-weight:300; background:var(--cream); color:var(--ink); min-height:100vh; }
 
-/* Nav */
-.nav {
-  background: var(--ink); color: var(--white);
-  padding: 14px 28px; display: flex; align-items: center; justify-content: space-between;
-  position: sticky; top:0; z-index:100;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--white);
+  color: var(--ink);
+  line-height: 1.6;
 }
-.nav-logo { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#e8c87a; }
-.nav-title { font-size:13px; color:rgba(255,255,255,.5); margin-top:2px; }
-.nav-user { font-size:13px; color:rgba(255,255,255,.6); display:flex;align-items:center;gap:12px; }
-.btn-logout-nav { background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:5px 12px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer; }
-.btn-logout-nav:hover { border-color:rgba(255,255,255,.4);color:#fff; }
 
-/* Layout */
-.container { max-width:1200px; margin:0 auto; padding:32px 24px 80px; }
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 24px;
+}
 
-/* KPI strip */
-.kpi-strip { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:28px; }
-.kpi-card { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:18px 20px; }
-.kpi-label { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:6px; }
-.kpi-value { font-size:26px; font-weight:600; color:var(--ink); font-family:'Cormorant Garamond',serif; }
-.kpi-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
 
-/* Filtros */
-.filters { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
-.filter-btn { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:var(--white); font-family:'Outfit',sans-serif; font-size:13px; color:var(--muted); cursor:pointer; transition:all .15s; }
-.filter-btn.active { background:var(--terra); border-color:var(--terra); color:#fff; }
-.search-input { padding:7px 14px; border:1px solid var(--border); border-radius:20px; font-family:'Outfit',sans-serif; font-size:13px; color:var(--ink); background:var(--white); outline:none; width:200px; }
-.search-input:focus { border-color:var(--terra); }
+.header-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ink);
+}
 
-/* Tabla de restaurantes */
-.rest-table-wrap { background:var(--white); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
-.rest-table { width:100%; border-collapse:collapse; }
-.rest-table th { padding:10px 16px; text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); background:var(--cream); border-bottom:1px solid var(--border); }
-.rest-table td { padding:14px 16px; border-bottom:1px solid var(--border); font-size:14px; vertical-align:middle; }
-.rest-table tr:last-child td { border-bottom:none; }
-.rest-table tr:hover td { background:var(--cream); }
+.header-subtitle {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 4px;
+}
 
-.plan-pill { display:inline-flex; align-items:center; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:500; }
-.plan-pill.free   { background:var(--cream2); color:var(--muted); }
-.plan-pill.pro    { background:var(--gold-pale); color:var(--gold); }
-.plan-pill.full   { background:var(--terra-pale); color:var(--terra); }
-.plan-pill.cortesia { background:var(--sage-pale); color:var(--sage); }
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
 
-.status-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:500; }
-.status-pill.active   { background:var(--sage-pale); color:var(--sage); }
-.status-pill.inactive { background:var(--cream2); color:var(--muted); }
-.status-pill::before  { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.btn {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .15s;
+}
 
-.rest-name-cell { font-weight:500; color:var(--ink); }
-.rest-name-cell small { display:block; font-size:12px; color:var(--muted); font-weight:300; margin-top:2px; }
+.btn-primary {
+  background: var(--terra);
+  color: var(--white);
+}
 
-.action-btns { display:flex; gap:6px; }
-.btn-sm { padding:5px 10px; border-radius:7px; border:1px solid var(--border); background:var(--white); font-family:'Outfit',sans-serif; font-size:12px; color:var(--ink); cursor:pointer; transition:all .15s; white-space:nowrap; }
-.btn-sm:hover { border-color:var(--terra); color:var(--terra); }
-.btn-sm.danger:hover { border-color:var(--bad); color:var(--bad); }
-.btn-sm.primary { background:var(--terra); border-color:var(--terra); color:#fff; }
-.btn-sm.primary:hover { opacity:.85; }
+.btn-primary:hover {
+  background: var(--terra2);
+}
 
-/* Costos */
-.cost-chip { font-size:12px; color:var(--muted); }
-.cost-chip.warn { color:var(--gold); }
+.btn-secondary {
+  background: var(--cream);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
 
-/* Modal de restaurante */
-.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px); }
-.modal-overlay.open { display:flex; }
-.modal-box { background:var(--white); border-radius:18px; width:100%; max-width:500px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15); }
-.modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
-.modal-title { font-size:18px; font-weight:500; }
-.modal-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
-.modal-body { padding:24px; display:flex; flex-direction:column; gap:14px; }
-.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
-.form-label { font-size:12px; font-weight:500; color:var(--muted); margin-bottom:5px; display:block; text-transform:uppercase; letter-spacing:.05em; }
-.form-input { width:100%; padding:9px 13px; border:1px solid var(--border); border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; color:var(--ink); background:var(--cream); outline:none; }
-.form-input:focus { border-color:var(--terra); background:var(--white); }
-.form-select { width:100%; padding:9px 13px; border:1px solid var(--border); border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; color:var(--ink); background:var(--cream); outline:none; cursor:pointer; }
-.btn-primary { padding:10px 20px; background:var(--terra); color:#fff; border:none; border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; font-weight:500; cursor:pointer; }
-.btn-primary:hover { opacity:.85; }
-.btn-secondary { padding:10px 20px; background:var(--cream2); color:var(--ink2); border:none; border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; cursor:pointer; }
+.btn-secondary:hover {
+  background: var(--cream2);
+}
 
-/* Toast */
-.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 20px; border-radius:10px; font-size:14px; opacity:0; transition:all .25s; z-index:999; pointer-events:none; }
-.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
 
-/* Empty state */
-.empty-state { padding:60px 24px; text-align:center; color:var(--muted); }
-.empty-icon { font-size:40px; margin-bottom:12px; }
+.tab {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
 
-/* Loading */
-.spinner { display:inline-block; width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--terra); border-radius:50%; animation:spin .7s linear infinite; }
-@keyframes spin { to { transform:rotate(360deg); } }
+.tab.active {
+  color: var(--terra);
+  border-bottom-color: var(--terra);
+}
 
-.section-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--ink); margin-bottom:14px; }
+.tab:hover {
+  color: var(--ink);
+}
 
-/* Costos mensuales */
-.cost-table { width:100%; border-collapse:collapse; margin-top:8px; }
-.cost-table td { padding:8px 0; border-bottom:1px solid var(--border); font-size:13.5px; }
-.cost-table td:last-child { text-align:right; font-weight:500; }
-.cost-table tr:last-child td { border-bottom:none; font-weight:600; font-size:15px; }
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.metric-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  transition: box-shadow .15s;
+}
+
+.metric-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+}
+
+.metric-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+
+.metric-change {
+  font-size: 12px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.metric-change.positive { color: var(--good); }
+.metric-change.negative { color: var(--bad); }
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: var(--ink);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+thead {
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  text-align: left;
+  padding: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+tbody tr:hover {
+  background: var(--cream);
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge-free { background: var(--cream2); color: var(--muted); }
+.badge-basic { background: #DBEAFE; color: #1E40AF; }
+.badge-pro { background: #D1FAE5; color: #065F46; }
+.badge-full { background: #DDD6FE; color: #5B21B6; }
+.badge-active { background: #D1FAE5; color: #065F46); }
+.badge-inactive { background: #FEE2E2; color: #991B1B; }
+.badge-trial { background: #FEF3C7; color: #92400E; }
+.badge-pending { background: #FEF3C7; color: #92400E; }
+.badge-paid { background: #D1FAE5; color: #065F46; }
+
+.alert {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid;
+}
+
+.alert-warning {
+  background: #FEF3C7;
+  border-color: var(--warning);
+  color: #92400E;
+}
+
+.alert-danger {
+  background: #FEE2E2;
+  border-color: var(--bad);
+  color: #991B1B;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--muted);
+}
+
+.action-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.action-btn:hover {
+  background: var(--cream);
+}
+
+.action-btn.primary {
+  background: var(--terra);
+  color: var(--white);
+  border-color: var(--terra);
+}
+
+.action-btn.primary:hover {
+  background: var(--terra2);
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .metric-value {
+    font-size: 24px;
+  }
+
+  .table-wrapper {
+    margin: 0 -24px;
+    padding: 0 24px;
+  }
+}
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <div>
-    <div class="nav-logo">🪟 Vitrina</div>
-    <div class="nav-title">Panel Maestro</div>
-  </div>
-  <div class="nav-user">
-    <span id="nav-email"></span>
-    <button class="btn-logout-nav" onclick="handleLogout()">Salir</button>
-  </div>
-</nav>
-
 <div class="container">
-
-  <!-- KPIs globales -->
-  <div class="kpi-strip" id="kpi-strip">
-    <div class="kpi-card">
-      <div class="kpi-label">Restaurantes</div>
-      <div class="kpi-value" id="kpi-total">—</div>
-      <div class="kpi-sub">registrados</div>
+  <div class="header">
+    <div>
+      <div class="header-title">🎯 Panel Maestro</div>
+      <div class="header-subtitle">Visión completa de Vitrina · <span id="last-updated">Cargando...</span></div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Planes pagos</div>
-      <div class="kpi-value" id="kpi-pagos">—</div>
-      <div class="kpi-sub">pro + full</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Plan Free</div>
-      <div class="kpi-value" id="kpi-free">—</div>
-      <div class="kpi-sub">sin pago</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">MRR estimado</div>
-      <div class="kpi-value" id="kpi-mrr">—</div>
-      <div class="kpi-sub">USD/mes</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Costo Supabase</div>
-      <div class="kpi-value" id="kpi-supabase">$0</div>
-      <div class="kpi-sub">hasta 100 rests = gratis</div>
+    <div class="header-actions">
+      <button class="btn btn-secondary" onclick="window.open('/panel.html', '_self')">← Volver al panel</button>
+      <button class="btn btn-primary" onclick="refreshData()">🔄 Actualizar</button>
     </div>
   </div>
 
-  <!-- Filtros y búsqueda -->
-  <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('all')">Todos</button>
-    <button class="filter-btn" onclick="setFilter('free')">Free</button>
-    <button class="filter-btn" onclick="setFilter('pro')">Pro</button>
-    <button class="filter-btn" onclick="setFilter('full')">Full</button>
-    <button class="filter-btn" onclick="setFilter('cortesia')">Cortesía</button>
-    <input class="search-input" id="search-input" placeholder="Buscar restaurante..." oninput="renderTable()">
-    <button class="btn-sm primary" onclick="openNewRestModal()" style="margin-left:auto">+ Nuevo restaurante</button>
+  <div class="tabs">
+    <button class="tab active" data-tab="overview" onclick="switchTab('overview')">📊 Vista General</button>
+    <button class="tab" data-tab="clients" onclick="switchTab('clients')">👥 Clientes</button>
+    <button class="tab" data-tab="revenue" onclick="switchTab('revenue')">💰 Facturación</button>
+    <button class="tab" data-tab="producers" onclick="switchTab('producers')">🤝 Productores</button>
+    <button class="tab" data-tab="agents" onclick="switchTab('agents')">🤖 Agentes IA</button>
+    <button class="tab" data-tab="costs" onclick="switchTab('costs')">📉 Costos</button>
   </div>
 
-  <!-- Tabla -->
-  <div class="rest-table-wrap">
-    <table class="rest-table">
-      <thead>
-        <tr>
-          <th>Restaurante</th>
-          <th>Plan</th>
-          <th>Estado</th>
-          <th>Tano este mes</th>
-          <th>Creado</th>
-          <th>Costo API</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="rest-tbody">
-        <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)"><div class="spinner"></div></td></tr>
-      </tbody>
-    </table>
-  </div>
+  <!-- Vista General -->
+  <div id="tab-overview" class="tab-content active">
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Clientes activos</div>
+        <div class="metric-value" id="metric-active-clients">-</div>
+        <div class="metric-change" id="metric-active-change"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Facturación este mes</div>
+        <div class="metric-value" id="metric-revenue">-</div>
+        <div class="metric-change" id="metric-revenue-change"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Margen bruto</div>
+        <div class="metric-value" id="metric-margin">-</div>
+        <div class="metric-change" id="metric-margin-pct"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Prospectos (agente)</div>
+        <div class="metric-value" id="metric-prospects">-</div>
+        <div class="metric-change" id="metric-prospects-contacted"></div>
+      </div>
+    </div>
 
-  <!-- Costos mensuales estimados -->
-  <div style="margin-top:32px">
-    <div class="section-title">💸 Costos operativos estimados</div>
-    <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:480px">
-      <table class="cost-table" id="cost-table">
-        <tr><td>Anthropic (Claude Haiku)</td><td id="cost-anthropic">$0.00</td></tr>
-        <tr><td>Resend (emails)</td><td id="cost-resend">$0.00</td></tr>
-        <tr><td>Cloudflare Workers</td><td>$0.00 <small style="color:var(--muted)">(free tier)</small></td></tr>
-        <tr><td>Supabase</td><td>$0.00 <small style="color:var(--muted)">(free tier)</small></td></tr>
-        <tr><td><strong>Total estimado / mes</strong></td><td id="cost-total" style="color:var(--terra)">$0.00</td></tr>
-      </table>
-      <div style="font-size:12px;color:var(--muted);margin-top:12px">Estimación basada en uso promedio de Tano. Actualizado en tiempo real.</div>
+    <div id="churn-alerts"></div>
+
+    <div class="card">
+      <div class="card-title">Distribución por plan</div>
+      <div id="plan-distribution"></div>
     </div>
   </div>
 
+  <!-- Clientes -->
+  <div id="tab-clients" class="tab-content">
+    <div class="card">
+      <div class="card-title">Todos los clientes</div>
+      <div class="table-wrapper">
+        <table id="clients-table">
+          <thead>
+            <tr>
+              <th>Restaurante</th>
+              <th>Plan</th>
+              <th>Estado</th>
+              <th>Productor</th>
+              <th>Tano usado</th>
+              <th>Última actividad</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="clients-tbody">
+            <tr><td colspan="7" class="loading">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Facturación -->
+  <div id="tab-revenue" class="tab-content">
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Suscripciones</div>
+        <div class="metric-value" id="revenue-subscriptions">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Fees transacciones</div>
+        <div class="metric-value" id="revenue-fees">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Fees publicidad</div>
+        <div class="metric-value" id="revenue-ads">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Proyección mes</div>
+        <div class="metric-value" id="revenue-projected">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Detalle de facturación</div>
+      <div id="revenue-details">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- Productores -->
+  <div id="tab-producers" class="tab-content">
+    <div class="card">
+      <div class="card-title">Productores activos</div>
+      <div class="table-wrapper">
+        <table id="producers-table">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Clientes activos</th>
+              <th>Comisión pendiente</th>
+              <th>Comisión pagada</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="producers-tbody">
+            <tr><td colspan="6" class="loading">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Agentes IA -->
+  <div id="tab-agents" class="tab-content">
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Tano (mensajes)</div>
+        <div class="metric-value" id="agent-tano-messages">-</div>
+        <div class="metric-change" id="agent-tano-cost"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Viti (mensajes)</div>
+        <div class="metric-value" id="agent-viti-messages">-</div>
+        <div class="metric-change" id="agent-viti-cost"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Sales (prospectos)</div>
+        <div class="metric-value" id="agent-sales-prospects">-</div>
+        <div class="metric-change" id="agent-sales-cost"></div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Costo total IA</div>
+        <div class="metric-value" id="agent-total-cost">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Rendimiento de agentes</div>
+      <div id="agents-performance">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- Costos -->
+  <div id="tab-costs" class="tab-content">
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Costos fijos</div>
+        <div class="metric-value" id="costs-fixed">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Costos variables</div>
+        <div class="metric-value" id="costs-variable">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Costo total</div>
+        <div class="metric-value" id="costs-total">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Costo por cliente</div>
+        <div class="metric-value" id="costs-per-client">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Desglose de costos</div>
+      <div id="costs-breakdown">Cargando...</div>
+    </div>
+  </div>
 </div>
-
-<!-- Modal: gestionar restaurante -->
-<div class="modal-overlay" id="modal-rest" onclick="if(event.target===this)closeModal()">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-rest-title">Gestionar restaurante</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div>
-        <label class="form-label">Nombre</label>
-        <input class="form-input" id="m-name" placeholder="Nombre del restaurante">
-      </div>
-      <div>
-        <label class="form-label">Slug (URL)</label>
-        <input class="form-input" id="m-slug" placeholder="la-panera-rosa">
-      </div>
-      <div>
-        <label class="form-label">Email del dueño</label>
-        <input class="form-input" id="m-email" type="email" placeholder="dueno@restaurante.com">
-      </div>
-      <div>
-        <label class="form-label">Plan</label>
-        <select class="form-select" id="m-plan">
-          <option value="free">Free</option>
-          <option value="pro">Menú Pro</option>
-          <option value="full">Menú Full</option>
-          <option value="cortesia">Cortesía (gratis 1 mes)</option>
-        </select>
-      </div>
-      <div>
-        <label class="form-label">Ciudad</label>
-        <input class="form-input" id="m-city" placeholder="Buenos Aires">
-      </div>
-      <div id="m-tano-info" style="background:var(--cream);border-radius:10px;padding:12px 14px;font-size:13px;display:none">
-        <strong>Tano este mes:</strong> <span id="m-tano-count">—</span> / 75 mensajes
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
-      <button class="btn-primary" id="btn-save-modal" onclick="saveRestModal()">Guardar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: nuevo restaurante -->
-<div class="modal-overlay" id="modal-new" onclick="if(event.target===this)closeNewModal()">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div class="modal-title">Nuevo restaurante</div>
-      <button class="modal-close" onclick="closeNewModal()">✕</button>
-    </div>
-    <div class="modal-body">
-      <div>
-        <label class="form-label">Nombre del restaurante <span style="color:var(--terra)">*</span></label>
-        <input class="form-input" id="n-name" placeholder="La Panera Rosa">
-      </div>
-      <div>
-        <label class="form-label">Slug (URL pública) <span style="color:var(--terra)">*</span></label>
-        <input class="form-input" id="n-slug" placeholder="la-panera-rosa">
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">vitrinaapp.com.ar/menu.html?slug=<span id="n-slug-preview">...</span></div>
-      </div>
-      <div>
-        <label class="form-label">Email del dueño <span style="color:var(--terra)">*</span></label>
-        <input class="form-input" id="n-email" type="email" placeholder="dueno@restaurante.com">
-      </div>
-      <div>
-        <label class="form-label">Ciudad</label>
-        <input class="form-input" id="n-city" placeholder="Buenos Aires">
-      </div>
-      <div>
-        <label class="form-label">Plan inicial</label>
-        <select class="form-select" id="n-plan">
-          <option value="free">Free</option>
-          <option value="cortesia">Cortesía (1 mes gratis sin límites)</option>
-          <option value="pro">Menú Pro</option>
-          <option value="full">Menú Full</option>
-        </select>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeNewModal()">Cancelar</button>
-      <button class="btn-primary" id="btn-create" onclick="createRestaurant()">Crear restaurante</button>
-    </div>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
 
 <script type="module">
-import { requireAuth, signOut } from './lib/auth.js'
-import { supabase } from './lib/supabase.js'
-
-// ─── Solo Sebastián tiene acceso ───────────────────────────────────────────
-const OWNER_EMAIL = 'sebastianmcantor@gmail.com'
+import { requireAuth } from './lib/auth.js'
+import { restaurants, producers, producerCommissions, masterDashboardCache, salesProspects } from './lib/db.js'
 
 let currentUser = null
-let allRestaurants = []
-let activeFilter = 'all'
-let editingRestId = null
+let dashboardData = null
+let currentTab = 'overview'
 
-const PLAN_MRR = { free: 0, cortesia: 0, pro: 22, full: 35 }
-// Costo estimado por mensaje Tano: $0.000375 (Haiku input+output promedio 500 tokens)
-const COST_PER_TANO_MSG = 0.000375
-
-async function init() {
-  currentUser = await requireAuth('/login.html')
-  if (currentUser.email !== OWNER_EMAIL) {
-    document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:Outfit,sans-serif;color:#8A7E74">Acceso no autorizado.</div>'
-    return
-  }
-  document.getElementById('nav-email').textContent = currentUser.email
-  await loadRestaurants()
-}
-
-async function loadRestaurants() {
-  const { data, error } = await supabase
-    .from('restaurants')
-    .select('id,name,slug,plan,plan_status,is_open,city,created_at,tano_month_count,tano_month,mp_preapproval_id')
-    .order('created_at', { ascending: false })
-
-  if (error) { showToast('Error: ' + error.message, 'error'); return }
-  allRestaurants = data ?? []
-  updateKPIs()
-  renderTable()
-  updateCosts()
-}
-
-function updateKPIs() {
-  const total = allRestaurants.length
-  const pagos = allRestaurants.filter(r => r.plan === 'pro' || r.plan === 'full').length
-  const free  = allRestaurants.filter(r => !r.plan || r.plan === 'free').length
-  const mrr   = allRestaurants.reduce((s, r) => s + (PLAN_MRR[r.plan] || 0), 0)
-
-  document.getElementById('kpi-total').textContent = total
-  document.getElementById('kpi-pagos').textContent = pagos
-  document.getElementById('kpi-free').textContent  = free
-  document.getElementById('kpi-mrr').textContent   = 'USD ' + mrr
-}
-
-function updateCosts() {
-  const now = new Date()
-  const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
-
-  const totalTanoMsgs = allRestaurants.reduce((s, r) => {
-    return s + (r.tano_month === currentMonth ? (r.tano_month_count || 0) : 0)
-  }, 0)
-
-  const costAnthropic = totalTanoMsgs * COST_PER_TANO_MSG
-  // Resend: ~1 email por pedido, estimamos 10 pedidos/rest/día en promedio para rests activos
-  const restsActivos = allRestaurants.filter(r => r.plan === 'pro' || r.plan === 'full').length
-  const costResend = restsActivos * 0.0001 * 300 // ~300 emails/mes por rest activo @ $0.0001
-  const total = costAnthropic + costResend
-
-  const fmt = n => '$' + n.toFixed(2)
-  document.getElementById('cost-anthropic').textContent = fmt(costAnthropic)
-  document.getElementById('cost-resend').textContent    = fmt(costResend)
-  document.getElementById('cost-total').textContent     = fmt(total)
-}
-
-window.setFilter = function(f) {
-  activeFilter = f
-  document.querySelectorAll('.filter-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.toLowerCase().trim() === f || (f === 'all' && b.textContent.trim() === 'Todos'))
-  })
-  renderTable()
-}
-
-window.renderTable = function() {
-  const q = document.getElementById('search-input').value.toLowerCase()
-  const now = new Date()
-  const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
-
-  let rows = allRestaurants.filter(r => {
-    if (activeFilter !== 'all' && (r.plan || 'free') !== activeFilter) return false
-    if (q && !r.name?.toLowerCase().includes(q) && !r.city?.toLowerCase().includes(q) && !r.slug?.toLowerCase().includes(q)) return false
-    return true
-  })
-
-  if (!rows.length) {
-    document.getElementById('rest-tbody').innerHTML = `
-      <tr><td colspan="7"><div class="empty-state">
-        <div class="empty-icon">🍽️</div>
-        <div>No hay restaurantes que coincidan</div>
-      </div></td></tr>`
-    return
-  }
-
-  const plan_label = { free:'Free', pro:'Pro', full:'Full', cortesia:'Cortesía' }
-
-  document.getElementById('rest-tbody').innerHTML = rows.map(r => {
-    const plan = r.plan || 'free'
-    const tanoCount = r.tano_month === currentMonth ? (r.tano_month_count || 0) : 0
-    const tanoBar = plan === 'free' ? `
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="width:50px;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
-          <div style="height:100%;background:${tanoCount>=60?'var(--terra)':tanoCount>=30?'var(--gold)':'var(--sage)'};width:${Math.min(100,Math.round(tanoCount/75*100))}%"></div>
-        </div>
-        <span style="font-size:12px;color:var(--muted)">${tanoCount}/75</span>
-      </div>` : `<span style="font-size:12px;color:var(--muted)">Ilimitado</span>`
-
-    const statusActive = r.is_open !== false
-    const created = new Date(r.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'2-digit' })
-    const costMes = (r.tano_month === currentMonth ? tanoCount : 0) * COST_PER_TANO_MSG
-
-    return `<tr>
-      <td>
-        <div class="rest-name-cell">
-          ${escHtml(r.name)}
-          <small>${escHtml(r.slug || '')}${r.city ? ' · ' + escHtml(r.city) : ''}</small>
-        </div>
-      </td>
-      <td><span class="plan-pill ${plan}">${plan_label[plan] || plan}</span></td>
-      <td><span class="status-pill ${statusActive?'active':'inactive'}">${statusActive?'Abierto':'Cerrado'}</span></td>
-      <td>${tanoBar}</td>
-      <td style="font-size:13px;color:var(--muted)">${created}</td>
-      <td><span class="cost-chip ${costMes>0.05?'warn':''}">$${costMes.toFixed(3)}</span></td>
-      <td>
-        <div class="action-btns">
-          <button class="btn-sm" onclick="openRestModal('${r.id}')">Editar</button>
-          <a href="/panel.html" class="btn-sm" style="text-decoration:none" target="_blank">Panel →</a>
-          <a href="/menu.html?slug=${r.slug}&mesa=1" class="btn-sm" style="text-decoration:none" target="_blank">Menú</a>
-        </div>
-      </td>
-    </tr>`
-  }).join('')
-}
-
-function escHtml(s) {
-  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
-}
-
-// ── Modal edición ────────────────────────────────────────────────────────────
-window.openRestModal = function(id) {
-  const r = allRestaurants.find(x => x.id === id)
-  if (!r) return
-  editingRestId = id
-  document.getElementById('modal-rest-title').textContent = r.name
-  document.getElementById('m-name').value  = r.name || ''
-  document.getElementById('m-slug').value  = r.slug || ''
-  document.getElementById('m-email').value = ''
-  document.getElementById('m-plan').value  = r.plan || 'free'
-  document.getElementById('m-city').value  = r.city || ''
-
-  const now = new Date()
-  const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
-  const tanoCount = r.tano_month === currentMonth ? (r.tano_month_count || 0) : 0
-  if (r.plan === 'free' || !r.plan) {
-    document.getElementById('m-tano-count').textContent = tanoCount
-    document.getElementById('m-tano-info').style.display = 'block'
-  } else {
-    document.getElementById('m-tano-info').style.display = 'none'
-  }
-
-  document.getElementById('modal-rest').classList.add('open')
-}
-
-window.saveRestModal = async function() {
-  const btn = document.getElementById('btn-save-modal')
-  btn.disabled = true; btn.textContent = 'Guardando...'
+// ─────────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
   try {
-    const updates = {
-      name: document.getElementById('m-name').value.trim(),
-      slug: document.getElementById('m-slug').value.trim().toLowerCase().replace(/\s+/g,'-'),
-      plan: document.getElementById('m-plan').value,
-      city: document.getElementById('m-city').value.trim() || null,
-      updated_at: new Date().toISOString(),
+    currentUser = await requireAuth('/login.html')
+
+    // Solo Sebastián puede acceder
+    if (currentUser.email !== 'sebastianmcantor@gmail.com') {
+      alert('No tenés acceso a este panel.')
+      window.location.href = '/panel.html'
+      return
     }
-    const { error } = await supabase.from('restaurants').update(updates).eq('id', editingRestId)
-    if (error) throw error
-    closeModal()
-    await loadRestaurants()
-    showToast('Restaurante actualizado ✓', 'success')
-  } catch(e) {
-    showToast('Error: ' + e.message, 'error')
-  } finally {
-    btn.disabled = false; btn.textContent = 'Guardar'
+
+    await loadDashboardData()
+  } catch (e) {
+    console.error('Error inicializando:', e)
+    alert('Error cargando panel: ' + e.message)
   }
-}
+})
 
-window.closeModal = function() {
-  document.getElementById('modal-rest').classList.remove('open')
-  editingRestId = null
-}
-
-// ── Modal nuevo restaurante ──────────────────────────────────────────────────
-window.openNewRestModal = function() {
-  document.getElementById('n-name').value = ''
-  document.getElementById('n-slug').value = ''
-  document.getElementById('n-email').value = ''
-  document.getElementById('n-city').value = ''
-  document.getElementById('n-plan').value = 'free'
-  document.getElementById('n-slug-preview').textContent = '...'
-  document.getElementById('modal-new').classList.add('open')
-  setTimeout(() => document.getElementById('n-name').focus(), 80)
-
-  document.getElementById('n-name').oninput = function() {
-    const slug = this.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')
-    document.getElementById('n-slug').value = slug
-    document.getElementById('n-slug-preview').textContent = slug || '...'
-  }
-  document.getElementById('n-slug').oninput = function() {
-    document.getElementById('n-slug-preview').textContent = this.value || '...'
-  }
-}
-
-window.closeNewModal = function() {
-  document.getElementById('modal-new').classList.remove('open')
-}
-
-window.createRestaurant = async function() {
-  const name  = document.getElementById('n-name').value.trim()
-  const slug  = document.getElementById('n-slug').value.trim().toLowerCase()
-  const email = document.getElementById('n-email').value.trim()
-  const city  = document.getElementById('n-city').value.trim() || null
-  const plan  = document.getElementById('n-plan').value
-
-  if (!name || !slug || !email) { showToast('Nombre, slug y email son obligatorios', 'error'); return }
-
-  const btn = document.getElementById('btn-create')
-  btn.disabled = true; btn.textContent = 'Creando...'
-
+async function loadDashboardData() {
   try {
-    // Buscar el perfil del dueño por email
-    const { data: profile } = await supabase.from('profiles').select('id').eq('email', email).maybeSingle()
+    document.getElementById('last-updated').textContent = 'Cargando...'
 
-    const payload = { name, slug, plan, city, is_open: true, created_at: new Date().toISOString() }
-    const { data: rest, error } = await supabase.from('restaurants').insert(payload).select().single()
-    if (error) throw error
+    // Intentar obtener del cache
+    const currentMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
+    let cache = await masterDashboardCache.get('monthly_' + currentMonth)
 
-    // Si existe el perfil, agregarlo como owner
-    if (profile) {
-      await supabase.from('restaurant_staff').insert({
-        restaurant_id: rest.id,
-        user_id: profile.id,
-        role: 'owner',
+    // Si no está en cache o no está fresco, recalcular
+    if (!cache || !(await masterDashboardCache.isFresh('monthly_' + currentMonth))) {
+      cache = await calculateDashboardMetrics(currentMonth)
+      await masterDashboardCache.upsert('monthly_' + currentMonth, cache)
+    }
+
+    dashboardData = cache
+    renderCurrentTab()
+
+    const cachedAt = new Date(cache.cached_at)
+    document.getElementById('last-updated').textContent =
+      'Actualizado ' + cachedAt.toLocaleString('es-AR', {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit'
       })
-    }
-
-    closeNewModal()
-    await loadRestaurants()
-    showToast(`Restaurante "${name}" creado ✓${!profile ? ' — el dueño debe registrarse primero en Vitrina' : ''}`, 'success')
-  } catch(e) {
-    showToast('Error: ' + e.message, 'error')
-  } finally {
-    btn.disabled = false; btn.textContent = 'Crear restaurante'
+  } catch (e) {
+    console.error('Error cargando dashboard:', e)
+    document.getElementById('last-updated').textContent = 'Error cargando datos'
   }
 }
 
-// ── Auth ─────────────────────────────────────────────────────────────────────
-window.handleLogout = async function() {
-  await signOut()
-  location.href = '/login.html'
+async function calculateDashboardMetrics(periodMonth) {
+  // Esta función calcula todas las métricas desde cero
+  const allRestaurants = await restaurants.list()
+  const activeRestaurants = allRestaurants.filter(r => r.subscription_status === 'active')
+
+  const clientsByPlan = {
+    free: 0,
+    basic: 0,
+    pro: 0,
+    full: 0,
+  }
+
+  allRestaurants.forEach(r => {
+    const plan = r.subscription_tier || 'free'
+    if (clientsByPlan[plan] !== undefined) {
+      clientsByPlan[plan]++
+    }
+  })
+
+  // Alertas de churn (sin actividad en 7+ días)
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  const churnAlerts = allRestaurants
+    .filter(r => {
+      const lastActivity = r.updated_at ? new Date(r.updated_at) : new Date(r.created_at)
+      return lastActivity < sevenDaysAgo && r.subscription_status === 'active'
+    })
+    .map(r => ({
+      restaurant_id: r.id,
+      name: r.name,
+      days_inactive: Math.floor((Date.now() - new Date(r.updated_at || r.created_at)) / (24 * 60 * 60 * 1000))
+    }))
+
+  // Calcular costos de agentes
+  const tanoTotal = allRestaurants.reduce((sum, r) => sum + (r.tano_month_count || 0), 0)
+  const tanoCostUsd = (tanoTotal * 0.005) // Estimado: $0.005 por mensaje
+
+  // Prospectos del agente de ventas
+  const allProspects = await salesProspects.list()
+  const salesCost = allProspects.length * 0.01 // Estimado: $0.01 por prospecto
+
+  // Costos fijos mensuales
+  const fixedCosts = {
+    cloudflare: 10,
+    google_workspace: 6,
+    domain: 1.25,
+  }
+  const totalFixedCosts = Object.values(fixedCosts).reduce((a, b) => a + b, 0)
+
+  // Costos variables
+  const totalVariableCosts = tanoCostUsd + salesCost
+
+  return {
+    total_clients: allRestaurants.length,
+    active_clients: activeRestaurants.length,
+    new_this_month: 0,
+    churned_this_month: 0,
+    clients_by_plan: clientsByPlan,
+    churn_alerts: churnAlerts,
+
+    total_revenue: 0,
+    subscription_revenue: 0,
+    transaction_fees: 0,
+    ad_fees: 0,
+    previous_month_revenue: 0,
+    projected_revenue: 0,
+
+    tano_messages_count: tanoTotal,
+    tano_cost_usd: tanoCostUsd,
+    viti_messages_count: 0,
+    viti_cost_usd: 0,
+    sales_prospects: allProspects.length,
+    sales_cost_usd: salesCost,
+
+    cloudflare_cost: fixedCosts.cloudflare,
+    anthropic_cost: tanoCostUsd,
+    replicate_cost: 0,
+    twilio_cost: 0,
+    google_workspace: fixedCosts.google_workspace,
+    domain_cost: fixedCosts.domain,
+    total_fixed_costs: totalFixedCosts,
+    total_variable_costs: totalVariableCosts,
+    gross_margin: 0 - totalFixedCosts - totalVariableCosts,
+
+    total_producers: 0,
+    total_commissions_pending: 0,
+    total_commissions_paid: 0,
+  }
 }
 
-// ── Toast ────────────────────────────────────────────────────────────────────
-let toastTimer = null
-function showToast(msg, type = 'default') {
-  const el = document.getElementById('toast')
-  el.textContent = msg
-  el.className = 'toast show'
-  if (type === 'error') el.style.background = '#C0392B'
-  else if (type === 'success') el.style.background = '#2E7D4F'
-  else el.style.background = '#1C1612'
-  clearTimeout(toastTimer)
-  toastTimer = setTimeout(() => el.classList.remove('show'), 3500)
+function renderCurrentTab() {
+  if (!dashboardData) return
+
+  switch (currentTab) {
+    case 'overview':
+      renderOverview()
+      break
+    case 'clients':
+      renderClients()
+      break
+    case 'revenue':
+      renderRevenue()
+      break
+    case 'producers':
+      renderProducers()
+      break
+    case 'agents':
+      renderAgents()
+      break
+    case 'costs':
+      renderCosts()
+      break
+  }
 }
 
-init()
+function renderOverview() {
+  // Métricas principales
+  document.getElementById('metric-active-clients').textContent = dashboardData.active_clients || 0
+  document.getElementById('metric-revenue').textContent = '$' + (dashboardData.total_revenue || 0).toLocaleString('es-AR')
+  document.getElementById('metric-margin').textContent = '$' + (dashboardData.gross_margin || 0).toLocaleString('es-AR')
+  document.getElementById('metric-prospects').textContent = dashboardData.sales_prospects || 0
+
+  // Cambios
+  const revenueChange = dashboardData.total_revenue - (dashboardData.previous_month_revenue || 0)
+  if (revenueChange !== 0) {
+    const changeEl = document.getElementById('metric-revenue-change')
+    changeEl.textContent = (revenueChange > 0 ? '+' : '') + '$' + Math.abs(revenueChange).toLocaleString('es-AR')
+    changeEl.className = 'metric-change ' + (revenueChange > 0 ? 'positive' : 'negative')
+  }
+
+  // Distribución por plan
+  const planDist = dashboardData.clients_by_plan || {}
+  document.getElementById('plan-distribution').innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px">
+      <div style="text-align:center;padding:16px;background:var(--cream);border-radius:8px">
+        <div style="font-size:32px;font-weight:700;color:var(--muted)">${planDist.free || 0}</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:4px">Free</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--cream);border-radius:8px">
+        <div style="font-size:32px;font-weight:700;color:#1E40AF">${planDist.basic || 0}</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:4px">Básico</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--cream);border-radius:8px">
+        <div style="font-size:32px;font-weight:700;color:#065F46">${planDist.pro || 0}</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:4px">Pro</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--cream);border-radius:8px">
+        <div style="font-size:32px;font-weight:700;color:#5B21B6">${planDist.full || 0}</div>
+        <div style="font-size:14px;color:var(--muted);margin-top:4px">Full</div>
+      </div>
+    </div>
+  `
+
+  // Alertas de churn
+  const alerts = dashboardData.churn_alerts || []
+  const alertsEl = document.getElementById('churn-alerts')
+  if (alerts.length > 0) {
+    alertsEl.innerHTML = `
+      <div class="alert alert-warning">
+        <strong>⚠️ ${alerts.length} cliente${alerts.length > 1 ? 's' : ''} sin actividad reciente</strong>
+        <ul style="margin-top:8px;padding-left:20px">
+          ${alerts.slice(0, 5).map(a => `<li>${a.name} (${a.days_inactive} días)</li>`).join('')}
+        </ul>
+      </div>
+    `
+  } else {
+    alertsEl.innerHTML = ''
+  }
+}
+
+async function renderClients() {
+  const tbody = document.getElementById('clients-tbody')
+  tbody.innerHTML = '<tr><td colspan="7" class="loading">Cargando clientes...</td></tr>'
+
+  try {
+    const allRestaurants = await restaurants.list()
+
+    if (allRestaurants.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay clientes todavía</td></tr>'
+      return
+    }
+
+    tbody.innerHTML = allRestaurants.map(r => {
+      const plan = r.subscription_tier || 'free'
+      const status = r.subscription_status || 'inactive'
+      const tanoUsed = r.tano_month_count || 0
+      const lastActivity = r.updated_at ? new Date(r.updated_at).toLocaleDateString('es-AR') : 'Nunca'
+
+      return `
+        <tr>
+          <td><strong>${r.name}</strong></td>
+          <td><span class="badge badge-${plan}">${plan.toUpperCase()}</span></td>
+          <td><span class="badge badge-${status}">${status}</span></td>
+          <td>${r.producer_id ? 'Asignado' : '-'}</td>
+          <td>${tanoUsed}</td>
+          <td>${lastActivity}</td>
+          <td>
+            <button class="action-btn" onclick="window.open('/panel.html?restaurant=${r.id}', '_blank')">Ver</button>
+          </td>
+        </tr>
+      `
+    }).join('')
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="7" style="color:var(--bad)">Error: ${e.message}</td></tr>`
+  }
+}
+
+function renderRevenue() {
+  document.getElementById('revenue-subscriptions').textContent =
+    '$' + (dashboardData.subscription_revenue || 0).toLocaleString('es-AR')
+  document.getElementById('revenue-fees').textContent =
+    '$' + (dashboardData.transaction_fees || 0).toLocaleString('es-AR')
+  document.getElementById('revenue-ads').textContent =
+    '$' + (dashboardData.ad_fees || 0).toLocaleString('es-AR')
+  document.getElementById('revenue-projected').textContent =
+    '$' + (dashboardData.projected_revenue || 0).toLocaleString('es-AR')
+
+  document.getElementById('revenue-details').innerHTML =
+    '<p style="color:var(--muted)">Detalles de facturación próximamente...</p>'
+}
+
+async function renderProducers() {
+  const tbody = document.getElementById('producers-tbody')
+  tbody.innerHTML = '<tr><td colspan="6" class="loading">Cargando productores...</td></tr>'
+
+  try {
+    const allProducers = await producers.list(true)
+
+    if (allProducers.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No hay productores todavía</td></tr>'
+      return
+    }
+
+    // Obtener stats para cada productor
+    const producersWithStats = await Promise.all(
+      allProducers.map(async p => {
+        const stats = await producers.getStats(p.id)
+        const pendingTotal = await producerCommissions.getTotalPending(p.id)
+        return { ...p, ...stats, pendingTotal }
+      })
+    )
+
+    tbody.innerHTML = producersWithStats.map(p => `
+      <tr>
+        <td><strong>${p.name}</strong></td>
+        <td>${p.email}</td>
+        <td>${p.active_clients || 0}</td>
+        <td>$${(p.pendingTotal || 0).toLocaleString('es-AR')}</td>
+        <td>$0</td>
+        <td>
+          <button class="action-btn primary" onclick="markProducerCommissionsPaid('${p.id}')">Marcar pagado</button>
+        </td>
+      </tr>
+    `).join('')
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="color:var(--bad)">Error: ${e.message}</td></tr>`
+  }
+}
+
+function renderAgents() {
+  document.getElementById('agent-tano-messages').textContent = dashboardData.tano_messages_count || 0
+  document.getElementById('agent-tano-cost').textContent = '$' + (dashboardData.tano_cost_usd || 0).toFixed(2) + ' USD'
+
+  document.getElementById('agent-viti-messages').textContent = dashboardData.viti_messages_count || 0
+  document.getElementById('agent-viti-cost').textContent = '$' + (dashboardData.viti_cost_usd || 0).toFixed(2) + ' USD'
+
+  document.getElementById('agent-sales-prospects').textContent = dashboardData.sales_prospects || 0
+  document.getElementById('agent-sales-cost').textContent = '$' + (dashboardData.sales_cost_usd || 0).toFixed(2) + ' USD'
+
+  const totalAiCost = (dashboardData.tano_cost_usd || 0) + (dashboardData.viti_cost_usd || 0) + (dashboardData.sales_cost_usd || 0)
+  document.getElementById('agent-total-cost').textContent = '$' + totalAiCost.toFixed(2) + ' USD'
+
+  document.getElementById('agents-performance').innerHTML =
+    '<p style="color:var(--muted)">Métricas de rendimiento próximamente...</p>'
+}
+
+function renderCosts() {
+  const fixedCosts = dashboardData.total_fixed_costs || 0
+  const variableCosts = dashboardData.total_variable_costs || 0
+  const totalCosts = fixedCosts + variableCosts
+  const activeClients = dashboardData.active_clients || 1
+
+  document.getElementById('costs-fixed').textContent = '$' + fixedCosts.toFixed(2) + ' USD'
+  document.getElementById('costs-variable').textContent = '$' + variableCosts.toFixed(2) + ' USD'
+  document.getElementById('costs-total').textContent = '$' + totalCosts.toFixed(2) + ' USD'
+  document.getElementById('costs-per-client').textContent = '$' + (totalCosts / activeClients).toFixed(2) + ' USD'
+
+  document.getElementById('costs-breakdown').innerHTML = `
+    <div style="display:grid;gap:12px">
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--cream);border-radius:8px">
+        <span>Cloudflare Workers</span>
+        <strong>$${(dashboardData.cloudflare_cost || 0).toFixed(2)} USD</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--cream);border-radius:8px">
+        <span>Anthropic API (Tano + Viti)</span>
+        <strong>$${(dashboardData.anthropic_cost || 0).toFixed(2)} USD</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--cream);border-radius:8px">
+        <span>Google Workspace</span>
+        <strong>$${(dashboardData.google_workspace || 0).toFixed(2)} USD</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--cream);border-radius:8px">
+        <span>Dominio</span>
+        <strong>$${(dashboardData.domain_cost || 0).toFixed(2)} USD</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:12px;background:var(--terra-pale);border-radius:8px;border:2px solid var(--terra)">
+        <span><strong>Total</strong></span>
+        <strong style="color:var(--terra)">$${totalCosts.toFixed(2)} USD</strong>
+      </div>
+    </div>
+  `
+}
+
+window.switchTab = function(tabName) {
+  currentTab = tabName
+
+  // Actualizar tabs activos
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.toggle('active', tab.dataset.tab === tabName)
+  })
+
+  // Actualizar contenido activo
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.toggle('active', content.id === 'tab-' + tabName)
+  })
+
+  renderCurrentTab()
+}
+
+window.refreshData = async function() {
+  // Forzar recalculo eliminando el cache
+  await loadDashboardData()
+}
+
+window.markProducerCommissionsPaid = async function(producerId) {
+  const currentMonth = new Date().toISOString().slice(0, 7)
+  const pending = await producerCommissions.getPendingByProducerAndPeriod(producerId, currentMonth)
+
+  if (pending.length === 0) {
+    alert('No hay comisiones pendientes para este productor este mes.')
+    return
+  }
+
+  const total = pending.reduce((sum, c) => sum + parseFloat(c.commission_amount || 0), 0)
+
+  if (!confirm(`¿Marcar como pagadas ${pending.length} comisión(es) por un total de $${total.toLocaleString('es-AR')}?`)) {
+    return
+  }
+
+  try {
+    const ids = pending.map(c => c.id)
+    await producerCommissions.markMultipleAsPaid(ids, 'transferencia')
+    alert('✅ Comisiones marcadas como pagadas')
+    renderProducers()
+  } catch (e) {
+    alert('Error: ' + e.message)
+  }
+}
 </script>
+
 </body>
 </html>
