@@ -3275,11 +3275,43 @@ window.cancelarPedido = async function (id) {
 let vitiHistory = []
 let vitiLoading = false
 
+let vitiContext = null // se carga async en openViti()
+
 function buildVitiSystemPrompt() {
   if (!currentRestaurant) return ''
   const r = currentRestaurant
   const plan = r.plan ?? 'free'
   const menuSummary = buildVitiMenuSummary()
+
+  // Historial de precios
+  let priceHistorySection = ''
+  if (vitiContext?.priceChanges?.length) {
+    const lines = vitiContext.priceChanges.slice(0, 10).map(h => {
+      const date = new Date(h.changed_at).toLocaleDateString('es-AR')
+      return `  - ${h.menu_items?.name || 'Plato'}: $${Number(h.old_price).toLocaleString('es-AR')} → $${Number(h.new_price).toLocaleString('es-AR')} (${date})`
+    })
+    priceHistorySection = '\n\nHISTORIAL DE PRECIOS RECIENTE (últimos cambios):\n' + lines.join('\n')
+  }
+
+  // Top platos
+  let topItemsSection = ''
+  if (vitiContext?.topItems?.length) {
+    const lines = vitiContext.topItems.slice(0, 8).map(i =>
+      `  - ${i.name}: ${i.total_qty} pedidos, $${Number(i.total_revenue).toLocaleString('es-AR')} facturado`
+    )
+    topItemsSection = '\n\nPLATOS MÁS VENDIDOS (últimos 30 días):\n' + lines.join('\n')
+  }
+
+  // Stats del mes
+  let statsSection = ''
+  if (vitiContext?.stats) {
+    const s = vitiContext.stats
+    statsSection = `\n\nSTATS DEL RESTAURANTE (últimos 30 días):\n`
+      + `  - Pedidos totales: ${s.totalOrders}\n`
+      + `  - Facturación total: $${Number(s.totalRevenue).toLocaleString('es-AR')} ARS\n`
+      + (s.avgOrderValue ? `  - Ticket promedio: $${Number(s.avgOrderValue).toLocaleString('es-AR')} ARS` : '')
+  }
+
   return `Sos Viti, la asistente de marketing e inteligencia de negocios de Vitrina.
 Estás hablando con el dueño o administrador de "${r.name}"${r.city ? ', ubicado en ' + r.city : ''}.
 
@@ -3287,13 +3319,13 @@ DATOS DEL RESTAURANTE:
 - Plan actual: ${plan}
 - Moneda: ${r.currency || 'ARS'}
 ${r.address ? '- Dirección: ' + r.address : ''}
-${menuSummary}
+${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}
 
 TU ROL:
 - Asesorás al dueño sobre estrategia de marketing, gestión del menú, precios, análisis competitivo y tendencias gastronómicas.
 - Respondés preguntas sobre cómo mejorar la presencia digital, qué platos destacar, cómo manejar las redes sociales.
-- Usás los datos del restaurante para dar consejos específicos y concretos.
-- Si no tenés datos suficientes para responder algo, lo decís claramente y sugerís cómo conseguirlos.
+- Usás todos los datos disponibles del restaurante para dar consejos específicos y concretos.
+- Si los datos muestran tendencias claras (precios que subieron y bajaron ventas, platos estrellas, etc.) los mencionás proactivamente.
 - Solo respondés sobre temas relacionados con el restaurante y su negocio.
 - Tono profesional pero cercano. Sin jerga de marketing vacía.
 - Respuestas directas y accionables. Máximo 4-5 párrafos.`
@@ -3316,7 +3348,7 @@ function buildVitiMenuSummary() {
     : '- Menú: sin datos cargados aún'
 }
 
-window.openViti = function () {
+window.openViti = async function () {
   document.getElementById('viti-drawer').classList.add('open')
   document.getElementById('viti-overlay').classList.add('open')
   document.body.style.overflow = 'hidden'
@@ -3327,7 +3359,64 @@ window.openViti = function () {
     vitiAddMessage('viti', `¡Hola! Soy Viti 👋\n\nEstoy acá para ayudarte con la estrategia de marketing y el negocio de **${name}**.\n\nPodés preguntarme sobre precios, qué platos destacar, cómo mejorar tu presencia digital, análisis de competidores o cualquier duda del negocio. ¿Por dónde querés arrancar?`)
   }
 
+  // Cargar contexto enriquecido en segundo plano (solo una vez por sesión de panel)
+  if (!vitiContext && currentRestaurant) {
+    loadVitiContext().catch(() => {})
+  }
+
   setTimeout(() => document.getElementById('viti-input').focus(), 300)
+}
+
+async function loadVitiContext() {
+  if (!currentRestaurant) return
+  const restId = currentRestaurant.id
+  const since30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  const ctx = {}
+
+  try {
+    // Historial de precios
+    const ph = await menuItemPriceHistory.getByRestaurant(restId, 15)
+    ctx.priceChanges = ph || []
+  } catch { ctx.priceChanges = [] }
+
+  try {
+    // Top platos (agrega por name en order_items del último mes)
+    const { data } = await supabase
+      .from('order_items')
+      .select('name, quantity, price, orders!inner(restaurant_id, created_at, status)')
+      .eq('orders.restaurant_id', restId)
+      .gte('orders.created_at', since30)
+      .neq('orders.status', 'cancelled')
+    if (data?.length) {
+      const map = {}
+      for (const item of data) {
+        if (!map[item.name]) map[item.name] = { name: item.name, total_qty: 0, total_revenue: 0 }
+        map[item.name].total_qty     += item.quantity
+        map[item.name].total_revenue += item.quantity * Number(item.price)
+      }
+      ctx.topItems = Object.values(map).sort((a, b) => b.total_qty - a.total_qty)
+    } else { ctx.topItems = [] }
+  } catch { ctx.topItems = [] }
+
+  try {
+    // Stats generales
+    const { data } = await supabase
+      .from('orders')
+      .select('total, status')
+      .eq('restaurant_id', restId)
+      .gte('created_at', since30)
+      .neq('status', 'cancelled')
+    if (data?.length) {
+      const totalRevenue = data.reduce((s, o) => s + Number(o.total || 0), 0)
+      ctx.stats = {
+        totalOrders: data.length,
+        totalRevenue,
+        avgOrderValue: Math.round(totalRevenue / data.length),
+      }
+    }
+  } catch {}
+
+  vitiContext = ctx
 }
 
 window.closeViti = function () {
