@@ -97,11 +97,27 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Crear app de Instagram en Meta Developers
 - Crear proyecto OAuth en Google Cloud Console
 
+**Bloque 5 — Publicación automática vía Metricool + calendario de contenido** (100%) ✅
+- Migración 013: tablas `scheduled_posts`, `content_templates`, `content_calendar_suggestions`
+- Módulos en lib/db.js: scheduledPosts, contentTemplates, contentCalendarSuggestions
+- OAuth Metricool: endpoints `/api/metricool/auth`, `/callback`, `/schedule-post`, `/posts`
+- Sección Marketing en panel: calendario de contenido con filtros por estado
+- Modales para crear posts programados y guardar templates
+- Sistema de templates reutilizables con categorías
+- Integración completa con Metricool API para publicación en Instagram, Facebook, Google Business
+- Renderizado de posts con estados (programadas, publicadas, fallidas, canceladas)
+- Worker deployado con todos los endpoints
+
+**Pendiente manual:**
+- Ejecutar migración 013 en Supabase Dashboard
+- Configurar secrets en Cloudflare: `METRICOOL_CLIENT_ID`, `METRICOOL_CLIENT_SECRET`
+- Crear cuenta en Metricool y obtener credenciales de API
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 5 — Publicación automática vía Metricool + calendario de contenido** (0%)
-- Integración Metricool API para publicación cruzada
-- Calendario de contenido en panel
-- Programación de posts automáticos
+**Bloque 6 — Replicate fotos + historial precios + competidores automático** (0%)
+- Integración Replicate API para mejorar fotos de platos
+- Historial de cambios de precios con análisis
+- Actualización automática de métricas de competidores
 
 ---
 
