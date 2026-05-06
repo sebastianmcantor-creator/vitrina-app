@@ -226,6 +226,7 @@
     const SESSION_TS_KEY = SESSION_KEY + '_ts'
     let pedidosSesion = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '[]')
     let statusInterval = null
+    let pedidosStatusCache = {} // { id: status } para evitar flasheo de estado
 
     // Auto-reset si la sesión tiene más de 3 horas (nuevo comensal en la misma mesa)
     const sesionTs = Number(sessionStorage.getItem(SESSION_TS_KEY) || 0)
@@ -536,6 +537,11 @@
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(pedidosSesion))
         sessionStorage.setItem(SESSION_TS_KEY, Date.now())
 
+        // Pedir permiso de notificaciones al primer pedido
+        if ('Notification' in window && Notification.permission === 'default') {
+          Notification.requestPermission().catch(() => {})
+        }
+
         // Email de confirmación (si el cliente lo ingresó)
         const emailInput = document.getElementById('cliente-email')
         const clienteEmail = emailInput?.value?.trim()
@@ -620,6 +626,36 @@
       }).filter(Boolean).join('')
     }
 
+    function notifyOrderReady(orderId) {
+      // Toast visible siempre
+      showToast('🎉 ¡Tu pedido #' + orderId.slice(-6).toUpperCase() + ' está listo!')
+      // Abrir overlay si no está abierto
+      if (!document.getElementById('confirm-overlay').classList.contains('open')) {
+        abrirOverlayEstado()
+      }
+      // Notificación del sistema (si tiene permiso)
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('¡Tu pedido está listo! 🎉', {
+          body: 'Pedido #' + orderId.slice(-6).toUpperCase() + ' — podés pasar a retirarlo.',
+          icon: '/favicon.ico'
+        })
+      }
+      // Sonido suave con Web Audio API
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)()
+        const osc = ctx.createOscillator()
+        const gain = ctx.createGain()
+        osc.connect(gain); gain.connect(ctx.destination)
+        osc.frequency.setValueAtTime(523, ctx.currentTime)       // Do5
+        osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1) // Mi5
+        osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2) // Sol5
+        gain.gain.setValueAtTime(0.15, ctx.currentTime)
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6)
+        osc.start(ctx.currentTime)
+        osc.stop(ctx.currentTime + 0.6)
+      } catch {}
+    }
+
     function abrirOverlayEstado() {
       document.getElementById('confirm-mesa-label').textContent = mesa != null ? 'Mesa ' + mesa : 'Pedido a retirar'
       document.getElementById('confirm-overlay').classList.add('open')
@@ -633,7 +669,10 @@
             .from('orders')
             .select('id, status')
             .in('id', pedidosSesion)
-          if (data) renderConfirmList(data)
+          if (data) {
+            data.forEach(r => { pedidosStatusCache[r.id] = r.status })
+            renderConfirmList(data)
+          }
         } catch {}
       }
       fetchEstados()
@@ -647,11 +686,17 @@
           table: 'orders',
         }, payload => {
           if (!pedidosSesion.includes(payload.new.id)) return
-          renderConfirmList(pedidosSesion.map(id =>
-            id === payload.new.id ? payload.new : { id, status: 'pending' }
-          ))
-          // Re-fetch todos para tener el estado completo
-          fetchEstados()
+          const prevStatus = pedidosStatusCache[payload.new.id]
+          // Actualizar cache y re-renderizar sin flasheo
+          pedidosStatusCache[payload.new.id] = payload.new.status
+          renderConfirmList(pedidosSesion.map(id => ({
+            id,
+            status: pedidosStatusCache[id] || 'pending'
+          })))
+          // Notificar al cliente si su pedido está listo
+          if (payload.new.status === 'ready' && prevStatus !== 'ready') {
+            notifyOrderReady(payload.new.id)
+          }
         })
         .subscribe()
     }
@@ -681,14 +726,19 @@
     }
 
     window.addEventListener('scroll', () => {
-      let current = catIds[0]
-      catIds.forEach(id => {
+      // Include 'featured' section if present
+      const allIds = document.getElementById('cat-featured') ? ['featured', ...catIds] : catIds
+      let current = allIds[0]
+      allIds.forEach(id => {
         const el = document.getElementById('cat-' + id)
         if (el && el.getBoundingClientRect().top < 110) current = id
       })
       document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.id === current)
       })
+      // Auto-scroll active nav button into view
+      const activeBtn = document.querySelector('.cat-btn.active')
+      if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
     })
 
     window.addItem = addItem
