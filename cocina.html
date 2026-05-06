@@ -109,6 +109,31 @@
       font-size: 15px; grid-column: 1 / -1;
     }
     .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* Agrupación por mesa */
+    .mesa-group {
+      background: #141414; border: 1px solid #2a2a2a;
+      border-radius: 16px; overflow: hidden;
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .mesa-group-header {
+      background: #1e1e1e; padding: 12px 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #2a2a2a;
+    }
+    .mesa-group-title { font-size: 18px; font-weight: 700; color: #f0f0f0; }
+    .mesa-group-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #888; }
+    .mesa-order-count {
+      background: #c8a84a20; color: #c8a84a;
+      padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600;
+    }
+    .mesa-group .pedido-card {
+      border-radius: 0; border: none; border-top: 1px solid #222;
+      animation: none;
+    }
+    .mesa-group .pedido-card:first-of-type { border-top: none; }
+    .mesa-group .pedido-header { background: #1a1a1a; }
+    .pedido-num { font-size: 12px; color: #888; font-weight: 400; }
   </style>
 </head>
 <body>
@@ -372,48 +397,88 @@
 
   function renderAll() {
     const boards = document.getElementById('boards')
-    const lista = Object.values(pedidos).sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    const lista = Object.values(pedidos).sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
 
     if (lista.length === 0) {
       boards.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div>Esperando pedidos…<br>Los pedidos aparecen acá en tiempo real.</div>'
       return
     }
 
-    boards.innerHTML = lista.map(p => {
-      const esNuevo = (p.status === 'pending' || p.status === 'confirmed')
-        && (Date.now() - new Date(p.created_at).getTime()) < 30000
-      const cardId = 'card-' + p.id.replace(/-/g, '_')
-      const isDone = p.status === 'ready' || p.status === 'delivered'
-      const canAct = !isDone
-      const canUndo = !!historial[p.id]
-      const items = p.order_items || []
+    // Agrupar por mesa
+    const mesaMap = {}
+    const mesaOrder = []
+    for (const p of lista) {
+      const key = p.table_number != null ? String(p.table_number) : 'sin-mesa'
+      if (!mesaMap[key]) { mesaMap[key] = []; mesaOrder.push(key) }
+      mesaMap[key].push(p)
+    }
 
-      return '<div class="pedido-card' + (p.status === 'ready' ? ' status-ready' : '') + '" id="' + cardId + '">'
-        + '<div class="pedido-header">'
-        +   '<div>'
-        +     '<div class="mesa-label">' + (p.table_number != null ? 'Mesa ' + p.table_number : 'Sin mesa')
-        +       (esNuevo ? '<span class="nuevo-badge">NUEVO</span>' : '') + '</div>'
-        +     '<div class="pedido-id">Pedido #' + p.id.slice(-6).toUpperCase() + '</div>'
-        +   '</div>'
-        +   '<div style="text-align:right">'
-        +     '<span class="estado-badge ' + (BADGE_CLASS[p.status] || '') + '">' + (BADGE_LABEL[p.status] || p.status) + '</span>'
-        +     '<div class="pedido-hora" style="margin-top:4px">' + formatHora(p.created_at) + '</div>'
+    // Mesas con pedidos activos primero
+    mesaOrder.sort((a, b) => {
+      const prioA = mesaMap[a].some(p => p.status === 'pending' || p.status === 'confirmed' || p.status === 'preparing') ? 0 : 1
+      const prioB = mesaMap[b].some(p => p.status === 'pending' || p.status === 'confirmed' || p.status === 'preparing') ? 0 : 1
+      return prioA - prioB
+    })
+
+    boards.innerHTML = mesaOrder.map(key => {
+      const pedidosMesa = mesaMap[key]
+      const mesaLabel = key === 'sin-mesa' ? 'Sin mesa' : 'Mesa ' + key
+      const hayNuevo = pedidosMesa.some(p =>
+        (p.status === 'pending' || p.status === 'confirmed') &&
+        (Date.now() - new Date(p.created_at).getTime()) < 30000
+      )
+      const totalItems = pedidosMesa.reduce((s, p) => s + (p.order_items || []).reduce((si, i) => si + i.quantity, 0), 0)
+      const nPedidos = pedidosMesa.length
+
+      const cardsHtml = pedidosMesa.map((p, idx) => {
+        const esNuevo = (p.status === 'pending' || p.status === 'confirmed')
+          && (Date.now() - new Date(p.created_at).getTime()) < 30000
+        const cardId = 'card-' + p.id.replace(/-/g, '_')
+        const isDone = p.status === 'ready' || p.status === 'delivered'
+        const canAct = !isDone
+        const canUndo = !!historial[p.id]
+        const items = p.order_items || []
+
+        return '<div class="pedido-card' + (p.status === 'ready' ? ' status-ready' : '') + '" id="' + cardId + '">'
+          + '<div class="pedido-header">'
+          +   '<div>'
+          +     (nPedidos > 1
+                  ? '<div class="pedido-num">Pedido ' + (idx + 1) + ' de ' + nPedidos
+                    + (esNuevo ? ' <span class="nuevo-badge">NUEVO</span>' : '') + '</div>'
+                  : (esNuevo ? '<div class="pedido-num"><span class="nuevo-badge">NUEVO</span></div>' : ''))
+          +     '<div class="pedido-id">#' + p.id.slice(-6).toUpperCase() + '</div>'
+          +   '</div>'
+          +   '<div style="text-align:right">'
+          +     '<span class="estado-badge ' + (BADGE_CLASS[p.status] || '') + '">' + (BADGE_LABEL[p.status] || p.status) + '</span>'
+          +     '<div class="pedido-hora" style="margin-top:4px">' + formatHora(p.created_at) + '</div>'
+          +   '</div>'
+          + '</div>'
+          + '<div class="pedido-items">'
+          + items.map(item =>
+              '<div class="pedido-item">'
+              + '<span class="item-qty">x' + item.quantity + '</span>'
+              + '<span class="item-name-cocina">' + esc(item.name) + '</span>'
+              + '</div>'
+            ).join('')
+          + '</div>'
+          + (canAct || canUndo
+            ? '<div class="pedido-footer">'
+              + (canAct ? '<button class="estado-btn ' + p.status + '" onclick="cambiarEstado('' + p.id + '')">'' + labelBtn(p.status) + '</button>' : '')
+              + (canUndo ? '<button class="card-undo-btn" onclick="deshacerEnCard('' + p.id + '')" title="Deshacer">↩</button>' : '')
+              + '</div>'
+            : '')
+          + '</div>'
+      }).join('')
+
+      return '<div class="mesa-group">'
+        + '<div class="mesa-group-header">'
+        +   '<div class="mesa-group-title">' + mesaLabel + (hayNuevo ? ' <span class="nuevo-badge">NUEVO</span>' : '') + '</div>'
+        +   '<div class="mesa-group-meta">'
+        +     (nPedidos > 1 ? '<span class="mesa-order-count">' + nPedidos + ' pedidos</span>' : '')
+        +     '<span>' + totalItems + ' ítem' + (totalItems !== 1 ? 's' : '') + '</span>'
         +   '</div>'
         + '</div>'
-        + '<div class="pedido-items">'
-        + items.map(item =>
-            '<div class="pedido-item">'
-            + '<span class="item-qty">x' + item.quantity + '</span>'
-            + '<span class="item-name-cocina">' + esc(item.name) + '</span>'
-            + '</div>'
-          ).join('')
-        + '</div>'
-        + (canAct || canUndo
-          ? '<div class="pedido-footer">'
-            + (canAct ? '<button class="estado-btn ' + p.status + '" onclick="cambiarEstado(\'' + p.id + '\')">' + labelBtn(p.status) + '</button>' : '')
-            + (canUndo ? '<button class="card-undo-btn" onclick="deshacerEnCard(\'' + p.id + '\')" title="Deshacer">↩</button>' : '')
-            + '</div>'
-          : '')
+        + cardsHtml
         + '</div>'
     }).join('')
   }
