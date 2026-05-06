@@ -194,6 +194,7 @@
       <div class="confirm-mesa-label" id="confirm-mesa-label">Mesa —</div>
       <div class="confirm-list" id="confirm-list"></div>
       <button class="confirm-close" onclick="cerrarOverlay()">Cerrar</button>
+      <button onclick="resetSesion()" style="margin-top:8px;width:100%;padding:8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:#8a7a6a;cursor:pointer;text-decoration:underline">No son mis pedidos — empezar de cero</button>
     </div>
   </div>
 
@@ -221,8 +222,30 @@
     let catIds = []
     let cart = {}
     const SESSION_KEY = 'vitrina_orders_' + slug + '_' + (mesa ?? 'x')
+    const SESSION_TS_KEY = SESSION_KEY + '_ts'
     let pedidosSesion = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '[]')
     let statusInterval = null
+
+    // Auto-reset si la sesión tiene más de 3 horas (nuevo comensal en la misma mesa)
+    const sesionTs = Number(sessionStorage.getItem(SESSION_TS_KEY) || 0)
+    if (sesionTs && Date.now() - sesionTs > 3 * 60 * 60 * 1000) {
+      sessionStorage.removeItem(SESSION_KEY)
+      sessionStorage.removeItem(SESSION_TS_KEY)
+      pedidosSesion = []
+    }
+    if (!sesionTs) sessionStorage.setItem(SESSION_TS_KEY, Date.now())
+
+    window.resetSesion = function() {
+      if (!confirm('¿Empezar una sesión nueva? Tus pedidos anteriores no desaparecen de cocina.')) return
+      sessionStorage.removeItem(SESSION_KEY)
+      sessionStorage.removeItem(SESSION_TS_KEY)
+      pedidosSesion = []
+      cart = {}
+      cerrarOverlay()
+      updatePedidosBar()
+      renderCtrlAll()
+      showToast('Sesión reiniciada ✓')
+    }
 
     // ─── Init ──────────────────────────────────────────────────────────────────
     async function init() {
@@ -331,6 +354,24 @@
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
     }
 
+    function renderCtrlAll() { Object.keys(itemsById).forEach(renderCtrl) }
+
+    let toastTimer = null
+    function showToast(msg) {
+      let el = document.getElementById('menu-toast')
+      if (!el) {
+        el = document.createElement('div')
+        el.id = 'menu-toast'
+        el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1208;color:#e8c87a;padding:10px 20px;border-radius:20px;font-family:DM Sans,sans-serif;font-size:13px;opacity:0;transition:all .25s;z-index:999;pointer-events:none;white-space:nowrap'
+        document.body.appendChild(el)
+      }
+      el.textContent = msg
+      el.style.opacity = '1'
+      el.style.transform = 'translateX(-50%) translateY(0)'
+      clearTimeout(toastTimer)
+      toastTimer = setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translateX(-50%) translateY(10px)' }, 2500)
+    }
+
     function renderCtrl(id) {
       const key = id.replace(/-/g, '_')
       const el = document.getElementById('ctrl-' + key)
@@ -435,6 +476,7 @@
         })))
         pedidosSesion.push(order.id)
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(pedidosSesion))
+        sessionStorage.setItem(SESSION_TS_KEY, Date.now())
 
         // Email de confirmación (si el cliente lo ingresó)
         const emailInput = document.getElementById('cliente-email')
@@ -459,6 +501,19 @@
           }).catch(() => {}) // silencioso — no bloquear el flujo del pedido
           if (emailInput) emailInput.value = ''
         }
+
+        // Notificación WhatsApp al operativo (fire-and-forget)
+        fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notificar-pedido', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            restaurantId: rest.id,
+            tableNumber: mesa,
+            items: ids.map(id => ({ name: itemsById[id].name, quantity: cart[id] })),
+            total,
+            currency: rest.currency || 'ARS',
+          }),
+        }).catch(() => {})
 
         closeCart()
         cart = {}
