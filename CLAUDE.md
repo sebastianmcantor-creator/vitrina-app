@@ -64,13 +64,28 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Tipo de cambio dinámico (BCRA API) para precios en ARS
 - Panel maestro con stats y exportación CSV
 
+**Bloque 3 — MercadoPago suscripciones + lógica de planes + prueba gratis** (100%) ✅
+- Migración 011: tablas `subscriptions`, `subscription_payments` + columnas en `restaurants`
+- Worker actualizado con endpoints `/api/mp/crear-suscripcion` y webhook `/api/mp/webhook`
+- Lógica de planes: Free (45 platos, 75 Tano/mes) | Básico (ilimitado, sin pedidos) | Pro (pedidos + cocina) | Full (3 sucursales)
+- `lib/plans.js`: funciones para validar límites por plan
+- Panel de facturación: plan actual, estado trial, uso de Tano, historial de pagos
+- Modal de upgrade con tarjetas de planes y checkout MercadoPago
+- Trial de 14 días automático
+- Worker deployado: `https://vitrina-tano.vitrinaapp.workers.dev`
+- Validación `can_take_orders` en menu.html antes de confirmar pedidos
+
+**Pendiente manual (ver SETUP_SUBSCRIPTIONS.md):**
+- Ejecutar migración SQL en Supabase Dashboard
+- Configurar webhook en MercadoPago Dashboard
+- Testing con credenciales sandbox de MP
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 3 — MercadoPago suscripciones + lógica de planes + prueba gratis** (0%)
-- Integración MercadoPago Checkout Pro para suscripciones
-- Lógica de planes (free/starter/pro) con límites
-- Trial gratuito de 14 días
-- Webhook de MercadoPago para actualizar estado de suscripción
-- Panel de facturación para el dueño
+**Bloque 4 — Google Business API + Instagram básica + análisis + Viti** (0%)
+- Integración Google Business Profile API para análisis
+- Instagram Basic Display API para métricas básicas
+- Dashboard de análisis en panel
+- Viti (asistente IA del dueño) con acceso a datos
 
 ---
 
