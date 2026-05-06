@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitrina — Panel Maestro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #1C1612; --ink2: #2E2620;
+  --terra: #B85A30; --terra2: #D4724E; --terra-pale: #F2E6DF;
+  --gold: #C8963C; --gold-pale: #FAF3E4;
+  --sage: #5A7A5E; --sage-pale: #E8F0E4;
+  --cream: #F7F2EA; --cream2: #EDE5D8;
+  --white: #FDFAF6; --muted: #8A7E74; --border: #DDD5C8;
+  --bad: #C0392B; --bad-pale: #FDECEA;
+  --card: #FDFAF6;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Outfit',sans-serif; font-weight:300; background:var(--cream); color:var(--ink); min-height:100vh; }
+
+/* Nav */
+.nav {
+  background: var(--ink); color: var(--white);
+  padding: 14px 28px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top:0; z-index:100;
+}
+.nav-logo { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#e8c87a; }
+.nav-title { font-size:13px; color:rgba(255,255,255,.5); margin-top:2px; }
+.nav-user { font-size:13px; color:rgba(255,255,255,.6); display:flex;align-items:center;gap:12px; }
+.btn-logout-nav { background:none;border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);padding:5px 12px;border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;cursor:pointer; }
+.btn-logout-nav:hover { border-color:rgba(255,255,255,.4);color:#fff; }
+
+/* Layout */
+.container { max-width:1200px; margin:0 auto; padding:32px 24px 80px; }
+
+/* KPI strip */
+.kpi-strip { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:28px; }
+.kpi-card { background:var(--white); border:1px solid var(--border); border-radius:14px; padding:18px 20px; }
+.kpi-label { font-size:11px; font-weight:500; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:6px; }
+.kpi-value { font-size:26px; font-weight:600; color:var(--ink); font-family:'Cormorant Garamond',serif; }
+.kpi-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+
+/* Filtros */
+.filters { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; align-items:center; }
+.filter-btn { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:var(--white); font-family:'Outfit',sans-serif; font-size:13px; color:var(--muted); cursor:pointer; transition:all .15s; }
+.filter-btn.active { background:var(--terra); border-color:var(--terra); color:#fff; }
+.search-input { padding:7px 14px; border:1px solid var(--border); border-radius:20px; font-family:'Outfit',sans-serif; font-size:13px; color:var(--ink); background:var(--white); outline:none; width:200px; }
+.search-input:focus { border-color:var(--terra); }
+
+/* Tabla de restaurantes */
+.rest-table-wrap { background:var(--white); border:1px solid var(--border); border-radius:16px; overflow:hidden; }
+.rest-table { width:100%; border-collapse:collapse; }
+.rest-table th { padding:10px 16px; text-align:left; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); background:var(--cream); border-bottom:1px solid var(--border); }
+.rest-table td { padding:14px 16px; border-bottom:1px solid var(--border); font-size:14px; vertical-align:middle; }
+.rest-table tr:last-child td { border-bottom:none; }
+.rest-table tr:hover td { background:var(--cream); }
+
+.plan-pill { display:inline-flex; align-items:center; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:500; }
+.plan-pill.free   { background:var(--cream2); color:var(--muted); }
+.plan-pill.pro    { background:var(--gold-pale); color:var(--gold); }
+.plan-pill.full   { background:var(--terra-pale); color:var(--terra); }
+.plan-pill.cortesia { background:var(--sage-pale); color:var(--sage); }
+
+.status-pill { display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:500; }
+.status-pill.active   { background:var(--sage-pale); color:var(--sage); }
+.status-pill.inactive { background:var(--cream2); color:var(--muted); }
+.status-pill::before  { content:''; width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+.rest-name-cell { font-weight:500; color:var(--ink); }
+.rest-name-cell small { display:block; font-size:12px; color:var(--muted); font-weight:300; margin-top:2px; }
+
+.action-btns { display:flex; gap:6px; }
+.btn-sm { padding:5px 10px; border-radius:7px; border:1px solid var(--border); background:var(--white); font-family:'Outfit',sans-serif; font-size:12px; color:var(--ink); cursor:pointer; transition:all .15s; white-space:nowrap; }
+.btn-sm:hover { border-color:var(--terra); color:var(--terra); }
+.btn-sm.danger:hover { border-color:var(--bad); color:var(--bad); }
+.btn-sm.primary { background:var(--terra); border-color:var(--terra); color:#fff; }
+.btn-sm.primary:hover { opacity:.85; }
+
+/* Costos */
+.cost-chip { font-size:12px; color:var(--muted); }
+.cost-chip.warn { color:var(--gold); }
+
+/* Modal de restaurante */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:200; display:none; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px); }
+.modal-overlay.open { display:flex; }
+.modal-box { background:var(--white); border-radius:18px; width:100%; max-width:500px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.15); }
+.modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; }
+.modal-title { font-size:18px; font-weight:500; }
+.modal-close { background:none; border:none; font-size:22px; cursor:pointer; color:var(--muted); line-height:1; }
+.modal-body { padding:24px; display:flex; flex-direction:column; gap:14px; }
+.modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; }
+.form-label { font-size:12px; font-weight:500; color:var(--muted); margin-bottom:5px; display:block; text-transform:uppercase; letter-spacing:.05em; }
+.form-input { width:100%; padding:9px 13px; border:1px solid var(--border); border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; color:var(--ink); background:var(--cream); outline:none; }
+.form-input:focus { border-color:var(--terra); background:var(--white); }
+.form-select { width:100%; padding:9px 13px; border:1px solid var(--border); border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; color:var(--ink); background:var(--cream); outline:none; cursor:pointer; }
+.btn-primary { padding:10px 20px; background:var(--terra); color:#fff; border:none; border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; font-weight:500; cursor:pointer; }
+.btn-primary:hover { opacity:.85; }
+.btn-secondary { padding:10px 20px; background:var(--cream2); color:var(--ink2); border:none; border-radius:10px; font-family:'Outfit',sans-serif; font-size:14px; cursor:pointer; }
+
+/* Toast */
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:var(--ink); color:#fff; padding:10px 20px; border-radius:10px; font-size:14px; opacity:0; transition:all .25s; z-index:999; pointer-events:none; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* Empty state */
+.empty-state { padding:60px 24px; text-align:center; color:var(--muted); }
+.empty-icon { font-size:40px; margin-bottom:12px; }
+
+/* Loading */
+.spinner { display:inline-block; width:20px; height:20px; border:2px solid var(--border); border-top-color:var(--terra); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+.section-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--ink); margin-bottom:14px; }
+
+/* Costos mensuales */
+.cost-table { width:100%; border-collapse:collapse; margin-top:8px; }
+.cost-table td { padding:8px 0; border-bottom:1px solid var(--border); font-size:13.5px; }
+.cost-table td:last-child { text-align:right; font-weight:500; }
+.cost-table tr:last-child td { border-bottom:none; font-weight:600; font-size:15px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div>
+    <div class="nav-logo">🪟 Vitrina</div>
+    <div class="nav-title">Panel Maestro</div>
+  </div>
+  <div class="nav-user">
+    <span id="nav-email"></span>
+    <button class="btn-logout-nav" onclick="handleLogout()">Salir</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- KPIs globales -->
+  <div class="kpi-strip" id="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">Restaurantes</div>
+      <div class="kpi-value" id="kpi-total">—</div>
+      <div class="kpi-sub">registrados</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Planes pagos</div>
+      <div class="kpi-value" id="kpi-pagos">—</div>
+      <div class="kpi-sub">pro + full</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Plan Free</div>
+      <div class="kpi-value" id="kpi-free">—</div>
+      <div class="kpi-sub">sin pago</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">MRR estimado</div>
+      <div class="kpi-value" id="kpi-mrr">—</div>
+      <div class="kpi-sub">USD/mes</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Costo Supabase</div>
+      <div class="kpi-value" id="kpi-supabase">$0</div>
+      <div class="kpi-sub">hasta 100 rests = gratis</div>
+    </div>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all')">Todos</button>
+    <button class="filter-btn" onclick="setFilter('free')">Free</button>
+    <button class="filter-btn" onclick="setFilter('pro')">Pro</button>
+    <button class="filter-btn" onclick="setFilter('full')">Full</button>
+    <button class="filter-btn" onclick="setFilter('cortesia')">Cortesía</button>
+    <input class="search-input" id="search-input" placeholder="Buscar restaurante..." oninput="renderTable()">
+    <button class="btn-sm primary" onclick="openNewRestModal()" style="margin-left:auto">+ Nuevo restaurante</button>
+  </div>
+
+  <!-- Tabla -->
+  <div class="rest-table-wrap">
+    <table class="rest-table">
+      <thead>
+        <tr>
+          <th>Restaurante</th>
+          <th>Plan</th>
+          <th>Estado</th>
+          <th>Tano este mes</th>
+          <th>Creado</th>
+          <th>Costo API</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="rest-tbody">
+        <tr><td colspan="7" style="text-align:center;padding:40px;color:var(--muted)"><div class="spinner"></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Costos mensuales estimados -->
+  <div style="margin-top:32px">
+    <div class="section-title">💸 Costos operativos estimados</div>
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:480px">
+      <table class="cost-table" id="cost-table">
+        <tr><td>Anthropic (Claude Haiku)</td><td id="cost-anthropic">$0.00</td></tr>
+        <tr><td>Resend (emails)</td><td id="cost-resend">$0.00</td></tr>
+        <tr><td>Cloudflare Workers</td><td>$0.00 <small style="color:var(--muted)">(free tier)</small></td></tr>
+        <tr><td>Supabase</td><td>$0.00 <small style="color:var(--muted)">(free tier)</small></td></tr>
+        <tr><td><strong>Total estimado / mes</strong></td><td id="cost-total" style="color:var(--terra)">$0.00</td></tr>
+      </table>
+      <div style="font-size:12px;color:var(--muted);margin-top:12px">Estimación basada en uso promedio de Tano. Actualizado en tiempo real.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: gestionar restaurante -->
+<div class="modal-overlay" id="modal-rest" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-rest-title">Gestionar restaurante</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label class="form-label">Nombre</label>
+        <input class="form-input" id="m-name" placeholder="Nombre del restaurante">
+      </div>
+      <div>
+        <label class="form-label">Slug (URL)</label>
+        <input class="form-input" id="m-slug" placeholder="la-panera-rosa">
+      </div>
+      <div>
+        <label class="form-label">Email del dueño</label>
+        <input class="form-input" id="m-email" type="email" placeholder="dueno@restaurante.com">
+      </div>
+      <div>
+        <label class="form-label">Plan</label>
+        <select class="form-select" id="m-plan">
+          <option value="free">Free</option>
+          <option value="pro">Menú Pro</option>
+          <option value="full">Menú Full</option>
+          <option value="cortesia">Cortesía (gratis 1 mes)</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Ciudad</label>
+        <input class="form-input" id="m-city" placeholder="Buenos Aires">
+      </div>
+      <div id="m-tano-info" style="background:var(--cream);border-radius:10px;padding:12px 14px;font-size:13px;display:none">
+        <strong>Tano este mes:</strong> <span id="m-tano-count">—</span> / 75 mensajes
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal()">Cancelar</button>
+      <button class="btn-primary" id="btn-save-modal" onclick="saveRestModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: nuevo restaurante -->
+<div class="modal-overlay" id="modal-new" onclick="if(event.target===this)closeNewModal()">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Nuevo restaurante</div>
+      <button class="modal-close" onclick="closeNewModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <label class="form-label">Nombre del restaurante <span style="color:var(--terra)">*</span></label>
+        <input class="form-input" id="n-name" placeholder="La Panera Rosa">
+      </div>
+      <div>
+        <label class="form-label">Slug (URL pública) <span style="color:var(--terra)">*</span></label>
+        <input class="form-input" id="n-slug" placeholder="la-panera-rosa">
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">vitrinaapp.com.ar/menu.html?slug=<span id="n-slug-preview">...</span></div>
+      </div>
+      <div>
+        <label class="form-label">Email del dueño <span style="color:var(--terra)">*</span></label>
+        <input class="form-input" id="n-email" type="email" placeholder="dueno@restaurante.com">
+      </div>
+      <div>
+        <label class="form-label">Ciudad</label>
+        <input class="form-input" id="n-city" placeholder="Buenos Aires">
+      </div>
+      <div>
+        <label class="form-label">Plan inicial</label>
+        <select class="form-select" id="n-plan">
+          <option value="free">Free</option>
+          <option value="cortesia">Cortesía (1 mes gratis sin límites)</option>
+          <option value="pro">Menú Pro</option>
+          <option value="full">Menú Full</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeNewModal()">Cancelar</button>
+      <button class="btn-primary" id="btn-create" onclick="createRestaurant()">Crear restaurante</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { requireAuth, signOut } from './lib/auth.js'
+import { supabase } from './lib/supabase.js'
+
+// ─── Solo Sebastián tiene acceso ───────────────────────────────────────────
+const OWNER_EMAIL = 'sebastianmcantor@gmail.com'
+
+let currentUser = null
+let allRestaurants = []
+let activeFilter = 'all'
+let editingRestId = null
+
+const PLAN_MRR = { free: 0, cortesia: 0, pro: 22, full: 35 }
+// Costo estimado por mensaje Tano: $0.000375 (Haiku input+output promedio 500 tokens)
+const COST_PER_TANO_MSG = 0.000375
+
+async function init() {
+  currentUser = await requireAuth('/login.html')
+  if (currentUser.email !== OWNER_EMAIL) {
+    document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:Outfit,sans-serif;color:#8A7E74">Acceso no autorizado.</div>'
+    return
+  }
+  document.getElementById('nav-email').textContent = currentUser.email
+  await loadRestaurants()
+}
+
+async function loadRestaurants() {
+  const { data, error } = await supabase
+    .from('restaurants')
+    .select('id,name,slug,plan,plan_status,is_open,city,created_at,tano_month_count,tano_month,mp_preapproval_id')
+    .order('created_at', { ascending: false })
+
+  if (error) { showToast('Error: ' + error.message, 'error'); return }
+  allRestaurants = data ?? []
+  updateKPIs()
+  renderTable()
+  updateCosts()
+}
+
+function updateKPIs() {
+  const total = allRestaurants.length
+  const pagos = allRestaurants.filter(r => r.plan === 'pro' || r.plan === 'full').length
+  const free  = allRestaurants.filter(r => !r.plan || r.plan === 'free').length
+  const mrr   = allRestaurants.reduce((s, r) => s + (PLAN_MRR[r.plan] || 0), 0)
+
+  document.getElementById('kpi-total').textContent = total
+  document.getElementById('kpi-pagos').textContent = pagos
+  document.getElementById('kpi-free').textContent  = free
+  document.getElementById('kpi-mrr').textContent   = 'USD ' + mrr
+}
+
+function updateCosts() {
+  const now = new Date()
+  const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
+
+  const totalTanoMsgs = allRestaurants.reduce((s, r) => {
+    return s + (r.tano_month === currentMonth ? (r.tano_month_count || 0) : 0)
+  }, 0)
+
+  const costAnthropic = totalTanoMsgs * COST_PER_TANO_MSG
+  // Resend: ~1 email por pedido, estimamos 10 pedidos/rest/día en promedio para rests activos
+  const restsActivos = allRestaurants.filter(r => r.plan === 'pro' || r.plan === 'full').length
+  const costResend = restsActivos * 0.0001 * 300 // ~300 emails/mes por rest activo @ $0.0001
+  const total = costAnthropic + costResend
+
+  const fmt = n => '$' + n.toFixed(2)
+  document.getElementById('cost-anthropic').textContent = fmt(costAnthropic)
+  document.getElementById('cost-resend').textContent    = fmt(costResend)
+  document.getElementById('cost-total').textContent     = fmt(total)
+}
+
+window.setFilter = function(f) {
+  activeFilter = f
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().trim() === f || (f === 'all' && b.textContent.trim() === 'Todos'))
+  })
+  renderTable()
+}
+
+window.renderTable = function() {
+  const q = document.getElementById('search-input').value.toLowerCase()
+  const now = new Date()
+  const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
+
+  let rows = allRestaurants.filter(r => {
+    if (activeFilter !== 'all' && (r.plan || 'free') !== activeFilter) return false
+    if (q && !r.name?.toLowerCase().includes(q) && !r.city?.toLowerCase().includes(q) && !r.slug?.toLowerCase().includes(q)) return false
+    return true
+  })
+
+  if (!rows.length) {
+    document.getElementById('rest-tbody').innerHTML = `
+      <tr><td colspan="7"><div class="empty-state">
+        <div class="empty-icon">🍽️</div>
+        <div>No hay restaurantes que coincidan</div>
+      </div></td></tr>`
+    return
+  }
+
+  const plan_label = { free:'Free', pro:'Pro', full:'Full', cortesia:'Cortesía' }
+
+  document.getElementById('rest-tbody').innerHTML = rows.map(r => {
+    const plan = r.plan || 'free'
+    const tanoCount = r.tano_month === currentMonth ? (r.tano_month_count || 0) : 0
+    const tanoBar = plan === 'free' ? `
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:50px;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+          <div style="height:100%;background:${tanoCount>=60?'var(--terra)':tanoCount>=30?'var(--gold)':'var(--sage)'};width:${Math.min(100,Math.round(tanoCount/75*100))}%"></div>
+        </div>
+        <span style="font-size:12px;color:var(--muted)">${tanoCount}/75</span>
+      </div>` : `<span style="font-size:12px;color:var(--muted)">Ilimitado</span>`
+
+    const statusActive = r.is_open !== false
+    const created = new Date(r.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'2-digit' })
+    const costMes = (r.tano_month === currentMonth ? tanoCount : 0) * COST_PER_TANO_MSG
+
+    return `<tr>
+      <td>
+        <div class="rest-name-cell">
+          ${escHtml(r.name)}
+          <small>${escHtml(r.slug || '')}${r.city ? ' · ' + escHtml(r.city) : ''}</small>
+        </div>
+      </td>
+      <td><span class="plan-pill ${plan}">${plan_label[plan] || plan}</span></td>
+      <td><span class="status-pill ${statusActive?'active':'inactive'}">${statusActive?'Abierto':'Cerrado'}</span></td>
+      <td>${tanoBar}</td>
+      <td style="font-size:13px;color:var(--muted)">${created}</td>
+      <td><span class="cost-chip ${costMes>0.05?'warn':''}">$${costMes.toFixed(3)}</span></td>
+      <td>
+        <div class="action-btns">
+          <button class="btn-sm" onclick="openRestModal('${r.id}')">Editar</button>
+          <a href="/panel.html" class="btn-sm" style="text-decoration:none" target="_blank">Panel →</a>
+          <a href="/menu.html?slug=${r.slug}&mesa=1" class="btn-sm" style="text-decoration:none" target="_blank">Menú</a>
+        </div>
+      </td>
+    </tr>`
+  }).join('')
+}
+
+function escHtml(s) {
+  return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+// ── Modal edición ────────────────────────────────────────────────────────────
+window.openRestModal = function(id) {
+  const r = allRestaurants.find(x => x.id === id)
+  if (!r) return
+  editingRestId = id
+  document.getElementById('modal-rest-title').textContent = r.name
+  document.getElementById('m-name').value  = r.name || ''
+  document.getElementById('m-slug').value  = r.slug || ''
+  document.getElementById('m-email').value = ''
+  document.getElementById('m-plan').value  = r.plan || 'free'
+  document.getElementById('m-city').value  = r.city || ''
+
+  const now = new Date()
+  const currentMonth = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0')
+  const tanoCount = r.tano_month === currentMonth ? (r.tano_month_count || 0) : 0
+  if (r.plan === 'free' || !r.plan) {
+    document.getElementById('m-tano-count').textContent = tanoCount
+    document.getElementById('m-tano-info').style.display = 'block'
+  } else {
+    document.getElementById('m-tano-info').style.display = 'none'
+  }
+
+  document.getElementById('modal-rest').classList.add('open')
+}
+
+window.saveRestModal = async function() {
+  const btn = document.getElementById('btn-save-modal')
+  btn.disabled = true; btn.textContent = 'Guardando...'
+  try {
+    const updates = {
+      name: document.getElementById('m-name').value.trim(),
+      slug: document.getElementById('m-slug').value.trim().toLowerCase().replace(/\s+/g,'-'),
+      plan: document.getElementById('m-plan').value,
+      city: document.getElementById('m-city').value.trim() || null,
+      updated_at: new Date().toISOString(),
+    }
+    const { error } = await supabase.from('restaurants').update(updates).eq('id', editingRestId)
+    if (error) throw error
+    closeModal()
+    await loadRestaurants()
+    showToast('Restaurante actualizado ✓', 'success')
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar'
+  }
+}
+
+window.closeModal = function() {
+  document.getElementById('modal-rest').classList.remove('open')
+  editingRestId = null
+}
+
+// ── Modal nuevo restaurante ──────────────────────────────────────────────────
+window.openNewRestModal = function() {
+  document.getElementById('n-name').value = ''
+  document.getElementById('n-slug').value = ''
+  document.getElementById('n-email').value = ''
+  document.getElementById('n-city').value = ''
+  document.getElementById('n-plan').value = 'free'
+  document.getElementById('n-slug-preview').textContent = '...'
+  document.getElementById('modal-new').classList.add('open')
+  setTimeout(() => document.getElementById('n-name').focus(), 80)
+
+  document.getElementById('n-name').oninput = function() {
+    const slug = this.value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')
+    document.getElementById('n-slug').value = slug
+    document.getElementById('n-slug-preview').textContent = slug || '...'
+  }
+  document.getElementById('n-slug').oninput = function() {
+    document.getElementById('n-slug-preview').textContent = this.value || '...'
+  }
+}
+
+window.closeNewModal = function() {
+  document.getElementById('modal-new').classList.remove('open')
+}
+
+window.createRestaurant = async function() {
+  const name  = document.getElementById('n-name').value.trim()
+  const slug  = document.getElementById('n-slug').value.trim().toLowerCase()
+  const email = document.getElementById('n-email').value.trim()
+  const city  = document.getElementById('n-city').value.trim() || null
+  const plan  = document.getElementById('n-plan').value
+
+  if (!name || !slug || !email) { showToast('Nombre, slug y email son obligatorios', 'error'); return }
+
+  const btn = document.getElementById('btn-create')
+  btn.disabled = true; btn.textContent = 'Creando...'
+
+  try {
+    // Buscar el perfil del dueño por email
+    const { data: profile } = await supabase.from('profiles').select('id').eq('email', email).maybeSingle()
+
+    const payload = { name, slug, plan, city, is_open: true, created_at: new Date().toISOString() }
+    const { data: rest, error } = await supabase.from('restaurants').insert(payload).select().single()
+    if (error) throw error
+
+    // Si existe el perfil, agregarlo como owner
+    if (profile) {
+      await supabase.from('restaurant_staff').insert({
+        restaurant_id: rest.id,
+        user_id: profile.id,
+        role: 'owner',
+      })
+    }
+
+    closeNewModal()
+    await loadRestaurants()
+    showToast(`Restaurante "${name}" creado ✓${!profile ? ' — el dueño debe registrarse primero en Vitrina' : ''}`, 'success')
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Crear restaurante'
+  }
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+window.handleLogout = async function() {
+  await signOut()
+  location.href = '/login.html'
+}
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+let toastTimer = null
+function showToast(msg, type = 'default') {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.className = 'toast show'
+  if (type === 'error') el.style.background = '#C0392B'
+  else if (type === 'success') el.style.background = '#2E7D4F'
+  else el.style.background = '#1C1612'
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3500)
+}
+
+init()
+</script>
+</body>
+</html>
