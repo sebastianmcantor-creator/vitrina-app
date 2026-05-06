@@ -110,6 +110,38 @@
     }
     .empty-icon { font-size: 48px; margin-bottom: 12px; }
 
+    /* Filter bar */
+    .filter-bar {
+      display: flex; gap: 8px; padding: 12px 24px 0;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-tab {
+      flex-shrink: 0; background: #1a1a1a; border: 1px solid #2a2a2a;
+      border-radius: 20px; padding: 6px 16px; font-family: 'DM Sans', sans-serif;
+      font-size: 13px; color: #888; cursor: pointer; transition: all .15s;
+    }
+    .filter-tab.active { background: #c8a84a20; border-color: #c8a84a; color: #c8a84a; font-weight: 600; }
+    .filter-tab:hover:not(.active) { border-color: #444; color: #ccc; }
+    .filter-count {
+      display: inline-block; background: #c8553d; color: #fff;
+      border-radius: 10px; font-size: 10px; padding: 1px 6px; margin-left: 4px;
+    }
+
+    /* Elapsed time */
+    .elapsed { font-size: 11px; margin-top:2px; }
+    .elapsed.ok { color: #888; }
+    .elapsed.warn { color: #e8a844; }
+    .elapsed.danger { color: #e84444; font-weight: 600; }
+
+    /* Mesa action */
+    .mesa-listo-btn {
+      background: #22aa4420; border: 1px solid #22aa4440; color: #44cc66;
+      border-radius: 8px; padding: 3px 10px; font-size: 11px; font-weight: 600;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background .15s;
+    }
+    .mesa-listo-btn:hover { background: #22aa4440; }
+
     /* Agrupación por mesa */
     .mesa-group {
       background: #141414; border: 1px solid #2a2a2a;
@@ -166,6 +198,23 @@
       <span id="conn-label">Conectando...</span>
     </div>
   </div>
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-tab active" data-filter="active" onclick="setFilter('active')">
+      🔥 Activos <span class="filter-count" id="fc-active" style="display:none">0</span>
+    </button>
+    <button class="filter-tab" data-filter="pending" onclick="setFilter('pending')">
+      ⏳ Pendientes <span class="filter-count" id="fc-pending" style="display:none">0</span>
+    </button>
+    <button class="filter-tab" data-filter="preparing" onclick="setFilter('preparing')">
+      🔥 Preparando <span class="filter-count" id="fc-preparing" style="display:none">0</span>
+    </button>
+    <button class="filter-tab" data-filter="ready" onclick="setFilter('ready')">
+      ✅ Listos <span class="filter-count" id="fc-ready" style="display:none">0</span>
+    </button>
+    <button class="filter-tab" data-filter="all" onclick="setFilter('all')">
+      📋 Todos
+    </button>
+  </div>
   <div class="boards" id="boards">
     <div class="empty-state">
       <div class="empty-icon">🍽️</div>
@@ -185,6 +234,8 @@
   let pedidos = {}
   let historial = {}
   let realtimeChannel = null
+  let currentFilter = 'active' // all | active | pending | preparing | ready
+  let elapsedTimer = null
 
   // ── Auth ──────────────────────────────────────────────────────────────────────
   async function init() {
@@ -380,6 +431,65 @@
     renderAll()
   }
 
+  // ── Filter ────────────────────────────────────────────────────────────────────
+  window.setFilter = function (f) {
+    currentFilter = f
+    document.querySelectorAll('.filter-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.filter === f)
+    })
+    renderAll()
+  }
+
+  function matchesFilter(pedido) {
+    if (currentFilter === 'all') return true
+    if (currentFilter === 'active') return pedido.status === 'pending' || pedido.status === 'confirmed' || pedido.status === 'preparing'
+    return pedido.status === currentFilter
+  }
+
+  function updateFilterCounts() {
+    const all = Object.values(pedidos)
+    const counts = {
+      active:    all.filter(p => p.status === 'pending' || p.status === 'confirmed' || p.status === 'preparing').length,
+      pending:   all.filter(p => p.status === 'pending' || p.status === 'confirmed').length,
+      preparing: all.filter(p => p.status === 'preparing').length,
+      ready:     all.filter(p => p.status === 'ready').length,
+    }
+    Object.entries(counts).forEach(([key, n]) => {
+      const el = document.getElementById('fc-' + key)
+      if (!el) return
+      el.textContent = n
+      el.style.display = n > 0 ? 'inline-block' : 'none'
+    })
+  }
+
+  // ── Elapsed time ─────────────────────────────────────────────────────────────
+  function formatElapsed(iso) {
+    const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
+    if (mins < 1) return 'hace un momento'
+    if (mins === 1) return 'hace 1 min'
+    return 'hace ' + mins + ' min'
+  }
+
+  function elapsedClass(iso, status) {
+    if (status === 'ready' || status === 'delivered') return 'ok'
+    const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
+    if (mins >= 20) return 'danger'
+    if (mins >= 10) return 'warn'
+    return 'ok'
+  }
+
+  function startElapsedTimer() {
+    if (elapsedTimer) clearInterval(elapsedTimer)
+    elapsedTimer = setInterval(() => {
+      document.querySelectorAll('.elapsed[data-ts]').forEach(el => {
+        const iso = el.dataset.ts
+        const status = el.dataset.status || 'pending'
+        el.textContent = formatElapsed(iso)
+        el.className = 'elapsed ' + elapsedClass(iso, status)
+      })
+    }, 30000) // actualizar cada 30s
+  }
+
   // ── Render ────────────────────────────────────────────────────────────────────
   const BADGE_LABEL = {
     pending: '⏳ Pendiente', confirmed: '⏳ Pendiente',
@@ -396,11 +506,21 @@
   }
 
   function renderAll() {
+    updateFilterCounts()
     const boards = document.getElementById('boards')
-    const lista = Object.values(pedidos).sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+    const listaAll = Object.values(pedidos).sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+
+    if (listaAll.length === 0) {
+      boards.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div>Esperando pedidos…<br>Los pedidos aparecen acá en tiempo real.</div>'
+      return
+    }
+
+    // Filtrar según tab activo
+    const lista = listaAll.filter(matchesFilter)
 
     if (lista.length === 0) {
-      boards.innerHTML = '<div class="empty-state"><div class="empty-icon">🍽️</div>Esperando pedidos…<br>Los pedidos aparecen acá en tiempo real.</div>'
+      const labels = { active: 'activos', pending: 'pendientes', preparing: 'en preparación', ready: 'listos', all: '' }
+      boards.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div>Sin pedidos ' + (labels[currentFilter] || '') + ' en este momento.</div>'
       return
     }
 
@@ -429,6 +549,7 @@
       )
       const totalItems = pedidosMesa.reduce((s, p) => s + (p.order_items || []).reduce((si, i) => si + i.quantity, 0), 0)
       const nPedidos = pedidosMesa.length
+      const hayPreparando = pedidosMesa.some(p => p.status === 'preparing')
 
       const cardsHtml = pedidosMesa.map((p, idx) => {
         const esNuevo = (p.status === 'pending' || p.status === 'confirmed')
@@ -450,7 +571,7 @@
           +   '</div>'
           +   '<div style="text-align:right">'
           +     '<span class="estado-badge ' + (BADGE_CLASS[p.status] || '') + '">' + (BADGE_LABEL[p.status] || p.status) + '</span>'
-          +     '<div class="pedido-hora" style="margin-top:4px">' + formatHora(p.created_at) + '</div>'
+          +     '<div class="elapsed ' + elapsedClass(p.created_at, p.status) + '" data-ts="' + p.created_at + '" data-status="' + p.status + '">' + formatElapsed(p.created_at) + '</div>'
           +   '</div>'
           + '</div>'
           + '<div class="pedido-items">'
@@ -463,8 +584,8 @@
           + '</div>'
           + (canAct || canUndo
             ? '<div class="pedido-footer">'
-              + (canAct ? '<button class="estado-btn ' + p.status + '" onclick="cambiarEstado('' + p.id + '')">'' + labelBtn(p.status) + '</button>' : '')
-              + (canUndo ? '<button class="card-undo-btn" onclick="deshacerEnCard('' + p.id + '')" title="Deshacer">↩</button>' : '')
+              + (canAct ? '<button class="estado-btn ' + p.status + '" data-id="' + p.id + '" onclick="cambiarEstado(this.dataset.id)">' + labelBtn(p.status) + '</button>' : '')
+              + (canUndo ? '<button class="card-undo-btn" data-id="' + p.id + '" onclick="deshacerEnCard(this.dataset.id)" title="Deshacer">&#8617;</button>' : '')
               + '</div>'
             : '')
           + '</div>'
@@ -476,19 +597,39 @@
         +   '<div class="mesa-group-meta">'
         +     (nPedidos > 1 ? '<span class="mesa-order-count">' + nPedidos + ' pedidos</span>' : '')
         +     '<span>' + totalItems + ' ítem' + (totalItems !== 1 ? 's' : '') + '</span>'
+        +     (hayPreparando ? '<button class="mesa-listo-btn" data-key="' + key + '" onclick="marcarMesaListos(this.dataset.key)">✓ Todo listo</button>' : '')
         +   '</div>'
         + '</div>'
         + cardsHtml
         + '</div>'
     }).join('')
+
+    startElapsedTimer()
   }
 
   function esc(s) {
     return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
   }
 
+  async function marcarMesaListos(key) {
+    const pedidosMesa = Object.values(pedidos).filter(p => {
+      const k = p.table_number != null ? String(p.table_number) : 'sin-mesa'
+      return k === key && p.status === 'preparing'
+    })
+    for (const p of pedidosMesa) {
+      try {
+        const updated = await orders.updateStatus(p.id, 'ready')
+        pedidos[p.id] = { ...pedidos[p.id], ...updated }
+        historial[p.id] = 'preparing'
+      } catch {}
+    }
+    renderAll()
+  }
+
   window.cambiarEstado = cambiarEstado
   window.deshacerEnCard = deshacerEnCard
+  window.marcarMesaListos = marcarMesaListos
+  window.setFilter = window.setFilter // already set above
 
   init()
 </script>
