@@ -855,19 +855,16 @@ document.querySelectorAll('.feature-card, .step, .testimonial-card, .plan-card')
 <script>
 // Tipo de cambio dinámico — actualiza precios ARS con valor oficial del Banco Nación
 ;(async function updateArsPrice() {
-  const USD_PRO = 22
-  const USD_FULL = 35
   try {
-    const res = await fetch('https://api.bluelytics.com.ar/v2/latest', { cache: 'no-cache' })
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio')
     if (!res.ok) return
     const data = await res.json()
-    const tc = data?.oficial?.value_sell
-    if (!tc || isNaN(tc)) return
+    if (!data?.oficial) return
     const fmt = n => '≈ $' + Math.round(n).toLocaleString('es-AR') + ' ARS / mes'
     const elPro  = document.getElementById('ars-pro')
     const elFull = document.getElementById('ars-full')
-    if (elPro)  elPro.textContent  = fmt(tc * USD_PRO)
-    if (elFull) elFull.textContent = fmt(tc * USD_FULL)
+    if (elPro  && data.ars_pro)  elPro.textContent  = fmt(data.ars_pro)
+    if (elFull && data.ars_full) elFull.textContent = fmt(data.ars_full)
   } catch (_) {
     // silencioso — fallback a los valores estáticos hardcodeados
   }
