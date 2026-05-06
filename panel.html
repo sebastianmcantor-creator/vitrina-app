@@ -409,6 +409,86 @@ html, body {
   max-width: 900px;
 }
 
+/* ── Getting Started card ── */
+.gs-card {
+  background: linear-gradient(135deg, #1c1612 0%, #2a1f14 100%);
+  border: 1px solid #3a2e1e;
+  border-radius: 16px;
+  padding: 24px 28px;
+  margin-bottom: 24px;
+}
+.gs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 12px;
+}
+.gs-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: #f0e8dd;
+}
+.gs-progress-text {
+  font-size: 13px;
+  color: #c8a84a;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.gs-bar-wrap {
+  background: rgba(255,255,255,.08);
+  border-radius: 6px;
+  height: 5px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.gs-bar {
+  height: 100%;
+  border-radius: 6px;
+  background: #c8a84a;
+  transition: width .6s ease;
+}
+.gs-items {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+.gs-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.05);
+  cursor: pointer;
+  transition: background .15s;
+  text-decoration: none;
+  border: none;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13.5px;
+  text-align: left;
+  width: 100%;
+}
+.gs-item:hover { background: rgba(255,255,255,.1); }
+.gs-item.done { cursor: default; }
+.gs-item.done:hover { background: rgba(255,255,255,.05); }
+.gs-check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+.gs-item.done .gs-check { background: #1a6b3a; color: #44cc88; }
+.gs-item:not(.done) .gs-check { background: rgba(200,168,74,.15); color: #c8a84a; border: 1px solid #c8a84a40; }
+.gs-item-label { color: #e0d8cc; line-height: 1.3; }
+.gs-item.done .gs-item-label { color: #888; }
+.gs-dismiss { float: right; background: none; border: none; color: #666; cursor: pointer; font-size: 12px; padding: 0; margin-top: 16px; }
+
 .page-header {
   margin-bottom: 28px;
 }
@@ -1282,6 +1362,10 @@ html, body {
 
       <!-- ══ SECCIÓN: Información ══ -->
       <div id="section-info" class="panel-section">
+
+        <!-- Getting Started -->
+        <div id="getting-started-card" style="display:none"></div>
+
         <div class="page-header">
           <div class="page-title">Información del restaurante</div>
           <div class="page-subtitle">Datos que aparecen en tu menú público y en Vitrina.</div>
@@ -1845,6 +1929,7 @@ window.loadRestaurant = async function () {
     renderRestSwitcher()
     fillForm(currentRestaurant)
     showSection('info')
+    renderGettingStarted()
     initPedidosBadge()
   } catch (e) {
     showToast('Error cargando restaurante: ' + e.message, 'error')
@@ -2039,6 +2124,7 @@ window.saveRestaurant = async function () {
 
     currentRestaurant = await restaurants.update(currentRestaurant.id, updates)
     renderSidebarRestaurant(currentRestaurant)
+    renderGettingStarted()
     showToast('Cambios guardados ✓', 'success')
   } catch (e) {
     showToast('Error al guardar: ' + e.message, 'error')
@@ -2185,6 +2271,7 @@ window.loadMenu = async function () {
       if (i.category_id && menuItemsMap[i.category_id]) menuItemsMap[i.category_id].push(i)
     })
     renderMenu()
+    renderGettingStarted() // re-evaluar checklist con datos frescos del menú
   } catch (e) {
     showToast('Error cargando menú: ' + e.message, 'error')
   }
@@ -2467,6 +2554,7 @@ window.loadMesas = async function () {
   try {
     mesasList = await restaurantTables.listByRestaurant(currentRestaurant.id)
     renderMesas()
+    renderGettingStarted()
   } catch (e) {
     showToast('Error cargando mesas: ' + e.message, 'error')
   }
@@ -2945,6 +3033,74 @@ window.saveWhatsappConfig = async function () {
     if (status) { status.textContent = 'Error: ' + e.message; status.style.color = 'var(--error)' }
     showToast('Error guardando: ' + e.message, 'error')
   }
+}
+
+// ── Getting Started checklist ─────────────────────────────────────────────────
+function renderGettingStarted() {
+  const card = document.getElementById('getting-started-card')
+  if (!card || !currentRestaurant) return
+
+  // Evitar mostrar si fue descartado en esta sesión
+  if (sessionStorage.getItem('gs-dismissed-' + currentRestaurant.id)) {
+    card.style.display = 'none'
+    return
+  }
+
+  const r = currentRestaurant
+  const totalMenuItems = Object.values(menuItemsMap || {}).flat().length
+
+  const steps = [
+    { label: 'Restaurante creado',                  done: true },
+    { label: 'Descripción o tagline cargados',      done: !!(r.tagline || r.description), action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
+    { label: 'Logo o foto de portada subidos',      done: !!(r.logo_url || r.cover_url),  action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
+    { label: 'Primer plato del menú agregado',      done: totalMenuItems > 0,             action: () => switchSection('menu',  document.querySelector('[data-section="menu"]'))  },
+    { label: 'Mesa con QR creada',                  done: mesasList.length > 0,           action: () => switchSection('mesas', document.querySelector('[data-section="mesas"]')) },
+    { label: 'WhatsApp de notificaciones guardado', done: !!(r.whatsapp_operativo),       action: () => switchSection('config',document.querySelector('[data-section="config"]'))},
+  ]
+
+  const doneCount  = steps.filter(s => s.done).length
+  const totalCount = steps.length
+  const pct        = Math.round((doneCount / totalCount) * 100)
+
+  // Si todo está completo, ocultar la card
+  if (doneCount === totalCount) {
+    card.style.display = 'none'
+    return
+  }
+
+  // Guardar acciones para gsStepClick (inline onclick no puede tener closures)
+  _gsStepActions.length = 0
+  steps.forEach(s => _gsStepActions.push(!s.done && s.action ? s.action : null))
+
+  card.style.display = 'block'
+  card.innerHTML = `
+    <div class="gs-card">
+      <div class="gs-header">
+        <div class="gs-title">🚀 Primeros pasos</div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span class="gs-progress-text">${doneCount}/${totalCount} completados</span>
+          <button onclick="dismissGettingStarted()" title="Ocultar" style="background:transparent;border:none;color:#888;cursor:pointer;font-size:20px;padding:0;line-height:1">×</button>
+        </div>
+      </div>
+      <div class="gs-bar-wrap"><div class="gs-bar" style="width:${pct}%"></div></div>
+      <div class="gs-items">
+        ${steps.map((s, i) => `
+          <button class="gs-item ${s.done ? 'done' : ''}" onclick="gsStepClick(${i})">
+            <div class="gs-check">${s.done ? '✓' : '→'}</div>
+            <div class="gs-item-label">${s.label}</div>
+          </button>`).join('')}
+      </div>
+    </div>`
+}
+
+const _gsStepActions = []
+window.gsStepClick = function (i) {
+  if (_gsStepActions[i]) _gsStepActions[i]()
+}
+window.dismissGettingStarted = function () {
+  if (currentRestaurant) sessionStorage.setItem('gs-dismissed-' + currentRestaurant.id, '1')
+  const card = document.getElementById('getting-started-card')
+  if (card) card.style.display = 'none'
 }
 
 function renderStaff() {
