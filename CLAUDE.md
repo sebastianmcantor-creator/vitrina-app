@@ -113,11 +113,26 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Configurar secrets en Cloudflare: `METRICOOL_CLIENT_ID`, `METRICOOL_CLIENT_SECRET`
 - Crear cuenta en Metricool y obtener credenciales de API
 
+**Bloque 6 — Replicate fotos + historial precios + competidores automático** (100%) ✅
+- Integración Replicate API (modelo real-esrgan) para mejorar fotos de platos con upscaling 2x
+- Botón "✨ Mejorar" en modal de platos con polling automático de resultados
+- Endpoints `/api/replicate/enhance-image` y `/api/replicate/prediction/:id`
+- Historial de precios ya estaba implementado: se muestra al editar plato, registra cambios automáticamente
+- Endpoint `/api/competitors/update-metrics` para actualizar ratings y reviews desde Google Places
+- Botón "🔄 Actualizar métricas" en sección de competidores (se muestra cuando hay competidores)
+- Muestra fecha de última actualización en cada competidor
+- Worker deployado con todos los endpoints nuevos
+
+**Pendiente manual:**
+- Configurar secret en Cloudflare: `REPLICATE_API_TOKEN`
+- Crear cuenta en Replicate (https://replicate.com) y generar API token
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 6 — Replicate fotos + historial precios + competidores automático** (0%)
-- Integración Replicate API para mejorar fotos de platos
-- Historial de cambios de precios con análisis
-- Actualización automática de métricas de competidores
+**Bloque 7 — Landing page con animaciones + videos IA** (0%)
+- Landing page responsive con hero animado
+- Secciones de features, pricing, testimonios
+- Video demos generados con Runway ML
+- Animaciones con CSS/JS
 
 ---
 
