@@ -1212,6 +1212,140 @@ html, body {
 }
 @keyframes shimmer { to { background-position: -200% 0; } }
 
+/* ── Filter buttons ── */
+.filter-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+}
+.filter-btn:hover { background: var(--cream); }
+.filter-btn.active {
+  background: var(--terra);
+  color: var(--white);
+  border-color: var(--terra);
+}
+
+/* ── Post card ── */
+.post-card {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--cream);
+  margin-bottom: 12px;
+  transition: border-color .15s;
+}
+.post-card:hover { border-color: var(--terra-pale); }
+.post-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.post-status {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  flex-shrink: 0;
+}
+.post-status.scheduled { background: var(--gold-pale); color: var(--gold); }
+.post-status.published { background: #d4edda; color: #155724; }
+.post-status.failed { background: #f8d7da; color: #721c24; }
+.post-status.cancelled { background: var(--border); color: var(--muted); }
+.post-caption {
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+}
+.post-networks {
+  display: flex;
+  gap: 6px;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+.post-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.post-actions {
+  display: flex;
+  gap: 8px;
+}
+.post-action-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.post-action-btn:hover { background: var(--cream); }
+.post-action-btn.danger { color: var(--bad); }
+.post-action-btn.danger:hover { background: var(--bad); color: var(--white); border-color: var(--bad); }
+
+/* ── Template card ── */
+.template-card {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--white);
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.template-card:hover { border-color: var(--terra); }
+.template-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.template-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.template-category {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--cream2);
+  color: var(--muted);
+}
+.template-caption {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.template-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
 /* ── Mobile overlay ── */
 .sidebar-overlay {
   display: none;
@@ -1288,6 +1422,10 @@ html, body {
       </button>
       <button class="nav-item" data-section="historial" onclick="switchSection('historial', this)">
         <span class="nav-icon">📋</span> Historial
+      </button>
+
+      <button class="nav-item" data-section="marketing" onclick="switchSection('marketing', this)">
+        <span class="nav-icon">📱</span> Marketing
       </button>
 
       <div class="nav-section-label">Negocio</div>
@@ -1771,6 +1909,75 @@ html, body {
         </div>
       </div>
 
+      <!-- Sección Marketing -->
+      <div id="section-marketing" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">Marketing y contenido</div>
+          <div class="page-subtitle">Programa publicaciones automáticas en tus redes sociales.</div>
+        </div>
+
+        <!-- Conexión Metricool -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>🚀 Metricool</span>
+            <button id="btn-connect-metricool" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectMetricool()">
+              Conectar cuenta
+            </button>
+          </div>
+          <div id="metricool-status" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+              Conectá Metricool para publicar automáticamente en Instagram, Facebook y otras redes.
+            </div>
+          </div>
+        </div>
+
+        <!-- Calendario de contenido -->
+        <div class="card" id="content-calendar-card" style="display:none">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <span>📅 Calendario de contenido</span>
+            <button class="btn-primary" style="font-size:13px;padding:7px 14px" onclick="openCreatePostModal()">
+              + Nueva publicación
+            </button>
+          </div>
+
+          <!-- Filtro de estado -->
+          <div style="display:flex;gap:8px;margin:16px 0;flex-wrap:wrap">
+            <button class="filter-btn active" data-filter="all" onclick="filterPosts('all')">
+              Todas
+            </button>
+            <button class="filter-btn" data-filter="scheduled" onclick="filterPosts('scheduled')">
+              Programadas
+            </button>
+            <button class="filter-btn" data-filter="published" onclick="filterPosts('published')">
+              Publicadas
+            </button>
+            <button class="filter-btn" data-filter="failed" onclick="filterPosts('failed')">
+              Fallidas
+            </button>
+          </div>
+
+          <!-- Lista de posts -->
+          <div id="posts-list" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:40px">
+              No hay publicaciones programadas todavía.
+            </div>
+          </div>
+        </div>
+
+        <!-- Templates de contenido -->
+        <div class="card" id="content-templates-card" style="display:none">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>📝 Templates guardados</span>
+            <button class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="openCreateTemplateModal()">
+              + Guardar template
+            </button>
+          </div>
+          <div id="templates-list" style="margin-top:16px">
+            <!-- Se llena con JS -->
+          </div>
+        </div>
+      </div>
+
       <div id="section-config" class="panel-section">
         <div class="page-header">
           <div class="page-title">Configuración</div>
@@ -2142,9 +2349,105 @@ html, body {
   </div>
 </div>
 
+<!-- Modal: crear post -->
+<div class="modal-overlay" id="modal-create-post" onclick="if(event.target===this)closeModal('modal-create-post')">
+  <div class="modal-box" style="max-width:600px">
+    <div class="modal-header">
+      <div class="modal-title">📱 Nueva publicación</div>
+      <button class="modal-close" onclick="closeModal('modal-create-post')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Caption -->
+      <div class="form-row">
+        <label class="form-label">Texto del post *</label>
+        <textarea id="post-caption" class="input-field" rows="4" placeholder="Escribí el texto de tu publicación..." maxlength="2200"></textarea>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;text-align:right">
+          <span id="caption-char-count">0</span>/2200
+        </div>
+      </div>
+
+      <!-- Fecha y hora -->
+      <div class="form-row">
+        <label class="form-label">Fecha y hora de publicación *</label>
+        <input type="datetime-local" id="post-scheduled-for" class="input-field">
+      </div>
+
+      <!-- Redes sociales -->
+      <div class="form-row">
+        <label class="form-label">Publicar en:</label>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="post-instagram" checked>
+            <span style="font-size:14px">📸 Instagram</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="post-facebook" checked>
+            <span style="font-size:14px">👥 Facebook</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="post-google">
+            <span style="font-size:14px">🏢 Google Business</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- URLs de medios (opcional) -->
+      <div class="form-row">
+        <label class="form-label">URLs de imágenes/videos (opcional)</label>
+        <input type="text" id="post-media-url-1" class="input-field" placeholder="https://...">
+        <input type="text" id="post-media-url-2" class="input-field" placeholder="https://..." style="margin-top:8px">
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:12px">
+        <button class="btn-primary" onclick="saveScheduledPost()">Programar publicación</button>
+        <button class="btn-secondary" onclick="closeModal('modal-create-post')">Cancelar</button>
+        <span id="post-save-status" style="font-size:13px;color:var(--muted);display:flex;align-items:center"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: crear template -->
+<div class="modal-overlay" id="modal-create-template" onclick="if(event.target===this)closeModal('modal-create-template')">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-header">
+      <div class="modal-title">📝 Guardar template</div>
+      <button class="modal-close" onclick="closeModal('modal-create-template')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label class="form-label">Nombre del template *</label>
+        <input type="text" id="template-name" class="input-field" placeholder="Ej: Menú del día">
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Texto del template *</label>
+        <textarea id="template-caption" class="input-field" rows="4" placeholder="Escribí el texto... Podés usar variables como {plato}, {precio}, etc."></textarea>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Categoría</label>
+        <select id="template-category" class="input-field">
+          <option value="">Sin categoría</option>
+          <option value="promocion">Promoción</option>
+          <option value="menu_del_dia">Menú del día</option>
+          <option value="evento">Evento</option>
+          <option value="tips">Tips y consejos</option>
+          <option value="historia">Historia del restaurante</option>
+        </select>
+      </div>
+
+      <div style="margin-top:20px;display:flex;gap:12px">
+        <button class="btn-primary" onclick="saveTemplate()">Guardar template</button>
+        <button class="btn-secondary" onclick="closeModal('modal-create-template')">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { requireAuth, signOut } from './lib/auth.js'
-import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff, menuItemPriceHistory } from './lib/db.js'
+import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff, menuItemPriceHistory, scheduledPosts, contentTemplates } from './lib/db.js'
 import { supabase } from './lib/supabase.js'
 
 // ── Estado global ──
@@ -2761,6 +3064,7 @@ window.switchSection = function (name, btn) {
   if (name === 'historial')    loadHistorial()
   if (name === 'estadisticas') loadEstadisticas()
   if (name === 'analisis')     loadAnalisis()
+  if (name === 'marketing')    loadMarketing()
   if (name === 'config')       loadConfig()
   if (name === 'facturacion')  loadFacturacion()
   if (name !== 'pedidos')      detachPedidosRealtime()
@@ -4141,6 +4445,357 @@ async function disconnectIntegration(provider) {
   }
 }
 
+// ─────────────────────────────────────────────
+// Marketing y contenido
+// ─────────────────────────────────────────────
+let currentPostFilter = 'all'
+let scheduledPostsList = []
+
+window.loadMarketing = async function () {
+  if (!currentRestaurant) return
+
+  try {
+    const { integrations, scheduledPosts } = await import('./lib/db.js')
+
+    // Verificar si hay integración con Metricool
+    const metricoolIntegration = await integrations.getByProvider(currentRestaurant.id, 'metricool')
+
+    if (metricoolIntegration && metricoolIntegration.is_active) {
+      document.getElementById('btn-connect-metricool').textContent = 'Desconectar'
+      document.getElementById('btn-connect-metricool').onclick = () => disconnectIntegration('metricool')
+      document.getElementById('metricool-status').innerHTML = `
+        <div style="padding:12px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+          <div style="font-size:13px;color:var(--muted)">✅ Metricool conectado</div>
+          <div style="font-size:13px;color:var(--ink);margin-top:4px">Podés programar publicaciones en tus redes.</div>
+        </div>`
+
+      // Mostrar secciones de contenido
+      document.getElementById('content-calendar-card').style.display = 'block'
+      document.getElementById('content-templates-card').style.display = 'block'
+
+      // Cargar posts programados
+      scheduledPostsList = await scheduledPosts.listByRestaurant(currentRestaurant.id)
+      renderPosts()
+
+      // Cargar templates
+      loadTemplates()
+    }
+  } catch (e) {
+    console.error('Error cargando marketing:', e)
+    showToast('Error cargando sección de marketing', 'error')
+  }
+}
+
+window.connectMetricool = function () {
+  if (!currentRestaurant) return
+  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/metricool/auth?restaurant_id=${currentRestaurant.id}`
+}
+
+window.openCreatePostModal = function () {
+  // Set default date to tomorrow at 12:00
+  const tomorrow = new Date()
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  tomorrow.setHours(12, 0, 0, 0)
+  const dateString = tomorrow.toISOString().slice(0, 16)
+  document.getElementById('post-scheduled-for').value = dateString
+
+  // Reset form
+  document.getElementById('post-caption').value = ''
+  document.getElementById('post-instagram').checked = true
+  document.getElementById('post-facebook').checked = true
+  document.getElementById('post-google').checked = false
+  document.getElementById('post-media-url-1').value = ''
+  document.getElementById('post-media-url-2').value = ''
+  document.getElementById('caption-char-count').textContent = '0'
+
+  openModal('modal-create-post')
+}
+
+// Character counter para caption
+document.addEventListener('DOMContentLoaded', () => {
+  const captionInput = document.getElementById('post-caption')
+  if (captionInput) {
+    captionInput.addEventListener('input', (e) => {
+      document.getElementById('caption-char-count').textContent = e.target.value.length
+    })
+  }
+})
+
+window.saveScheduledPost = async function () {
+  const caption = document.getElementById('post-caption').value.trim()
+  const scheduledFor = document.getElementById('post-scheduled-for').value
+  const instagram = document.getElementById('post-instagram').checked
+  const facebook = document.getElementById('post-facebook').checked
+  const google = document.getElementById('post-google').checked
+  const mediaUrl1 = document.getElementById('post-media-url-1').value.trim()
+  const mediaUrl2 = document.getElementById('post-media-url-2').value.trim()
+
+  if (!caption) {
+    showToast('El texto del post es obligatorio', 'error')
+    return
+  }
+
+  if (!scheduledFor) {
+    showToast('La fecha de publicación es obligatoria', 'error')
+    return
+  }
+
+  const selectedDate = new Date(scheduledFor)
+  if (selectedDate <= new Date()) {
+    showToast('La fecha debe ser futura', 'error')
+    return
+  }
+
+  if (!instagram && !facebook && !google) {
+    showToast('Seleccioná al menos una red social', 'error')
+    return
+  }
+
+  const statusEl = document.getElementById('post-save-status')
+  statusEl.textContent = 'Programando...'
+
+  try {
+    const { scheduledPosts } = await import('./lib/db.js')
+
+    const mediaUrls = []
+    if (mediaUrl1) mediaUrls.push(mediaUrl1)
+    if (mediaUrl2) mediaUrls.push(mediaUrl2)
+
+    const payload = {
+      restaurant_id: currentRestaurant.id,
+      caption,
+      scheduled_for: new Date(scheduledFor).toISOString(),
+      publish_instagram: instagram,
+      publish_facebook: facebook,
+      publish_google: google,
+      media_urls: mediaUrls.length > 0 ? mediaUrls : null,
+      status: 'scheduled',
+      created_by: currentUser.id,
+    }
+
+    const newPost = await scheduledPosts.create(payload)
+
+    // Programar en Metricool
+    const networks = []
+    if (instagram) networks.push('instagram')
+    if (facebook) networks.push('facebook')
+    if (google) networks.push('google')
+
+    const metricoolRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/metricool/schedule-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurantId: currentRestaurant.id,
+        caption,
+        mediaUrls: mediaUrls.length > 0 ? mediaUrls : null,
+        scheduledFor: new Date(scheduledFor).toISOString(),
+        networks,
+      }),
+    })
+
+    if (metricoolRes.ok) {
+      const data = await metricoolRes.json()
+      // Actualizar con ID de Metricool
+      if (data.metricoolPostId) {
+        await scheduledPosts.update(newPost.id, {
+          metricool_post_id: data.metricoolPostId,
+        })
+      }
+    }
+
+    showToast('✅ Publicación programada correctamente', 'success')
+    closeModal('modal-create-post')
+    loadMarketing()
+  } catch (e) {
+    console.error('Error programando post:', e)
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    statusEl.textContent = ''
+  }
+}
+
+window.filterPosts = function (filter) {
+  currentPostFilter = filter
+
+  // Update active button
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filter === filter)
+  })
+
+  renderPosts()
+}
+
+function renderPosts() {
+  const container = document.getElementById('posts-list')
+
+  let filtered = scheduledPostsList
+  if (currentPostFilter !== 'all') {
+    filtered = scheduledPostsList.filter(p => p.status === currentPostFilter)
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:40px">
+        No hay publicaciones ${currentPostFilter === 'all' ? '' : currentPostFilter === 'scheduled' ? 'programadas' : currentPostFilter === 'published' ? 'publicadas' : 'fallidas'}.
+      </div>`
+    return
+  }
+
+  container.innerHTML = filtered.map(post => {
+    const networks = []
+    if (post.publish_instagram) networks.push('📸 Instagram')
+    if (post.publish_facebook) networks.push('👥 Facebook')
+    if (post.publish_google) networks.push('🏢 Google')
+
+    const scheduledDate = new Date(post.scheduled_for)
+    const dateStr = scheduledDate.toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })
+    const timeStr = scheduledDate.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+
+    const statusMap = {
+      scheduled: 'Programada',
+      publishing: 'Publicando...',
+      published: 'Publicada',
+      failed: 'Fallida',
+      cancelled: 'Cancelada',
+    }
+
+    const canEdit = post.status === 'scheduled'
+    const canCancel = post.status === 'scheduled'
+
+    return `
+      <div class="post-card">
+        <div class="post-header">
+          <div style="flex:1">
+            <div class="post-networks">${networks.join(' • ')}</div>
+            <div class="post-caption">${post.caption}</div>
+          </div>
+          <div class="post-status ${post.status}">${statusMap[post.status] || post.status}</div>
+        </div>
+        ${post.error_message ? `<div style="font-size:12px;color:var(--bad);margin-top:8px">❌ ${post.error_message}</div>` : ''}
+        <div class="post-footer">
+          <div>🗓 ${dateStr} a las ${timeStr}</div>
+          <div class="post-actions">
+            ${canEdit ? `<button class="post-action-btn" onclick="editPost('${post.id}')">Editar</button>` : ''}
+            ${canCancel ? `<button class="post-action-btn danger" onclick="cancelPost('${post.id}')">Cancelar</button>` : ''}
+          </div>
+        </div>
+      </div>`
+  }).join('')
+}
+
+window.cancelPost = async function (postId) {
+  if (!confirm('¿Cancelar esta publicación programada?')) return
+
+  try {
+    const { scheduledPosts } = await import('./lib/db.js')
+    await scheduledPosts.cancel(postId)
+    showToast('Publicación cancelada', 'success')
+    loadMarketing()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.editPost = async function (postId) {
+  // TODO: Implementar edición de post
+  showToast('Edición próximamente', 'info')
+}
+
+async function loadTemplates() {
+  try {
+    const { contentTemplates } = await import('./lib/db.js')
+    const templates = await contentTemplates.listByRestaurant(currentRestaurant.id)
+
+    const container = document.getElementById('templates-list')
+
+    if (templates.length === 0) {
+      container.innerHTML = `
+        <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+          No hay templates guardados todavía.
+        </div>`
+      return
+    }
+
+    container.innerHTML = templates.map(t => {
+      const categoryMap = {
+        promocion: 'Promoción',
+        menu_del_dia: 'Menú del día',
+        evento: 'Evento',
+        tips: 'Tips',
+        historia: 'Historia',
+      }
+
+      return `
+        <div class="template-card" onclick="useTemplate('${t.id}')">
+          <div class="template-header">
+            <div class="template-name">${t.name}</div>
+            ${t.category ? `<div class="template-category">${categoryMap[t.category] || t.category}</div>` : ''}
+          </div>
+          <div class="template-caption">${t.caption_template.slice(0, 120)}${t.caption_template.length > 120 ? '...' : ''}</div>
+          <div class="template-footer">
+            <span>Usado ${t.times_used || 0} veces</span>
+            <button class="post-action-btn danger" onclick="event.stopPropagation();deleteTemplate('${t.id}')">Eliminar</button>
+          </div>
+        </div>`
+    }).join('')
+  } catch (e) {
+    console.error('Error cargando templates:', e)
+  }
+}
+
+window.openCreateTemplateModal = function () {
+  document.getElementById('template-name').value = ''
+  document.getElementById('template-caption').value = ''
+  document.getElementById('template-category').value = ''
+  openModal('modal-create-template')
+}
+
+window.saveTemplate = async function () {
+  const name = document.getElementById('template-name').value.trim()
+  const caption = document.getElementById('template-caption').value.trim()
+  const category = document.getElementById('template-category').value
+
+  if (!name || !caption) {
+    showToast('Completá nombre y texto del template', 'error')
+    return
+  }
+
+  try {
+    const { contentTemplates } = await import('./lib/db.js')
+    await contentTemplates.create({
+      restaurant_id: currentRestaurant.id,
+      name,
+      caption_template: caption,
+      category: category || null,
+      created_by: currentUser.id,
+    })
+
+    showToast('Template guardado', 'success')
+    closeModal('modal-create-template')
+    loadTemplates()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.useTemplate = function (templateId) {
+  // TODO: Abrir modal de crear post con el template pre-cargado
+  showToast('Función próximamente', 'info')
+}
+
+window.deleteTemplate = async function (templateId) {
+  if (!confirm('¿Eliminar este template?')) return
+
+  try {
+    const { contentTemplates } = await import('./lib/db.js')
+    await contentTemplates.delete(templateId)
+    showToast('Template eliminado', 'success')
+    loadTemplates()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
 window.confirmCancelPlan = async function () {
   if (!currentRestaurant) return
 
@@ -4932,6 +5587,16 @@ window.showToast = function (msg, type = 'default') {
     }, 500)
   } else if (params.has('instagram_error')) {
     showToast('Error conectando Instagram', 'error')
+    window.history.replaceState({}, '', 'panel.html')
+  } else if (params.has('metricool_connected')) {
+    showToast('✅ Metricool conectado correctamente', 'success')
+    // Ir a la sección de marketing
+    setTimeout(() => {
+      switchSection('marketing', document.querySelector('[data-section="marketing"]'))
+      window.history.replaceState({}, '', 'panel.html')
+    }, 500)
+  } else if (params.has('metricool_error')) {
+    showToast('Error conectando Metricool', 'error')
     window.history.replaceState({}, '', 'panel.html')
   }
 })()
