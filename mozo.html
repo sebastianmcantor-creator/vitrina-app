@@ -61,6 +61,11 @@
     @keyframes load { to { width: 100%; } }
 
     #error-screen { position: fixed; inset: 0; background: #1a1208; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #8a7450; font-size: 14px; text-align: center; padding: 20px; }
+
+    .lang-switcher { display: flex; gap: 4px; margin-top: 6px; }
+    .lang-btn { background: transparent; border: 0.5px solid #3a2e1a; color: #5a4a2a; font-size: 11px; font-family: 'DM Sans', sans-serif; padding: 3px 8px; border-radius: 6px; cursor: pointer; transition: all .15s; letter-spacing: .03em; }
+    .lang-btn.active { background: #2a2010; border-color: #c8a84a; color: #c8a84a; }
+    .lang-btn:hover:not(.active) { border-color: #5a4a2a; color: #8a7450; }
   </style>
 </head>
 <body>
@@ -77,10 +82,17 @@
   </div>
 
   <div class="screen">
-    <div class="header">
-      <div class="restaurant-name" id="rest-name">—</div>
-      <div class="table-badge" id="table-badge">
-        <span class="status-dot"></span>Asistente activo
+    <div class="header" style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div class="restaurant-name" id="rest-name">—</div>
+        <div class="table-badge" id="table-badge">
+          <span class="status-dot"></span>Asistente activo
+        </div>
+      </div>
+      <div class="lang-switcher" id="lang-switcher">
+        <button class="lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" data-lang="pt" onclick="setLang('pt')">PT</button>
       </div>
     </div>
 
@@ -122,6 +134,19 @@
     let isLoading = false
     let currentRestaurantId = null
     let tanoLimitReached = false
+    let currentRestData = null
+    let currentLang = 'es'
+
+    // Auto-detectar idioma del navegador
+    ;(function detectLang() {
+      const nav = (navigator.language || 'es').toLowerCase().slice(0, 2)
+      if (nav === 'en') currentLang = 'en'
+      else if (nav === 'pt') currentLang = 'pt'
+      else currentLang = 'es'
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === currentLang)
+      })
+    })()
 
     async function init() {
       if (!slug) { showError('URL inválida — falta el parámetro slug.'); return }
@@ -135,6 +160,7 @@
       }
 
       currentRestaurantId = rest.id
+      currentRestData = rest
       document.getElementById('loader-name').textContent = rest.name
       document.getElementById('rest-name').textContent = rest.name
       document.title = rest.name + ' — Asistente'
@@ -200,6 +226,7 @@
         + (location ? ', un restaurante en ' + location : '') + '.'
         + ' Tu nombre es Tano. Sonas humano, nunca como un bot genérico.\n\n'
         + toneDesc + '\n\n'
+        + (LANG_INSTRUCTION[currentLang] ? LANG_INSTRUCTION[currentLang] + '\n\n' : '')
         + 'REGLAS:\n'
         + '1. Solo respondés sobre el menú, platos, ingredientes, alérgenos, opciones dietarias y el restaurante.\n'
         + '2. Si te preguntan algo ajeno: "Eso no te lo puedo contestar yo, pero el equipo del restaurante te ayuda con gusto."\n'
@@ -224,12 +251,52 @@
         + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué me recomendás?\')">Recomendaciones</button>'
     }
 
-    function addGreeting(rest) {
-      const msg = rest.tano_welcome?.trim()
-        || '¡Hola! Bienvenido a ' + rest.name + ' 👋 Soy Tano, tu asistente de menú. '
-          + 'Puedo ayudarte con los platos, ingredientes, opciones vegetarianas, veganas o sin TACC, y hacerte recomendaciones. '
-          + '¿En qué te puedo ayudar?'
+    const LANG_GREETINGS = {
+      en: name => `Hello! Welcome to ${name} 👋 I'm Tano, your menu assistant. I can help you with dishes, ingredients, vegetarian, vegan or gluten-free options, and recommendations. What can I help you with?`,
+      pt: name => `Olá! Bem-vindo ao ${name} 👋 Sou o Tano, seu assistente de cardápio. Posso ajudar com pratos, ingredientes, opções vegetarianas, veganas ou sem glúten, e recomendações. Em que posso ajudar?`,
+      es: name => null, // usa tano_welcome o default en español
+    }
+
+    const LANG_INSTRUCTION = {
+      en: 'IMPORTANT: The customer is writing in English. Always respond in English regardless of what language the menu items are written in.',
+      pt: 'IMPORTANTE: O cliente está escrevendo em português. Sempre responda em português, independentemente do idioma dos itens do menu.',
+      es: '',
+    }
+
+    function addGreeting(rest, lang = currentLang) {
+      let msg
+      if (lang !== 'es') {
+        msg = LANG_GREETINGS[lang](rest.name)
+      } else {
+        msg = rest.tano_welcome?.trim()
+          || '¡Hola! Bienvenido a ' + rest.name + ' 👋 Soy Tano, tu asistente de menú. '
+            + 'Puedo ayudarte con los platos, ingredientes, opciones vegetarianas, veganas o sin TACC, y hacerte recomendaciones. '
+            + '¿En qué te puedo ayudar?'
+      }
       addMessage('assistant', msg)
+    }
+
+    window.setLang = function (lang) {
+      if (lang === currentLang || !currentRestData) return
+      currentLang = lang
+
+      // Actualizar botones
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang)
+      })
+
+      // Regenerar system prompt con nuevo idioma
+      systemPrompt = buildSystemPrompt(currentRestData)
+
+      // Limpiar conversación y saludar de nuevo
+      conversationHistory = []
+      const messagesEl = document.getElementById('messages')
+      const typing = document.getElementById('typing')
+      // Mantener solo el typing indicator
+      Array.from(messagesEl.children).forEach(el => {
+        if (el !== typing) el.remove()
+      })
+      addGreeting(currentRestData, lang)
     }
 
     // ─── Chat ─────────────────────────────────────────────────────────────────
