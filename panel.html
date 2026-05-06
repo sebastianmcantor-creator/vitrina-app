@@ -1294,6 +1294,9 @@ html, body {
       <button class="nav-item" data-section="estadisticas" onclick="switchSection('estadisticas', this)">
         <span class="nav-icon">📊</span> Estadísticas
       </button>
+      <button class="nav-item" data-section="analisis" onclick="switchSection('analisis', this)">
+        <span class="nav-icon">📈</span> Análisis
+      </button>
       <button class="nav-item" data-section="config" onclick="switchSection('config', this)">
         <span class="nav-icon">⚙️</span> Configuración
       </button>
@@ -1713,6 +1716,58 @@ html, body {
         </div>
         <div id="stats-body">
           <div style="padding:40px;text-align:center;color:var(--muted)">Cargando estadísticas...</div>
+        </div>
+      </div>
+
+      <div id="section-analisis" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">Análisis de presencia digital</div>
+          <div class="page-subtitle">Métricas de Google Business, redes sociales y competidores.</div>
+        </div>
+
+        <!-- Google Business -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>🏢 Google Business Profile</span>
+            <button id="btn-connect-google" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectGoogleBusiness()">
+              Conectar cuenta
+            </button>
+          </div>
+          <div id="google-business-content" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+              Conectá tu cuenta de Google Business para ver análisis de búsquedas, vistas y reseñas.
+            </div>
+          </div>
+        </div>
+
+        <!-- Instagram -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>📸 Instagram</span>
+            <button id="btn-connect-instagram" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectInstagram()">
+              Conectar cuenta
+            </button>
+          </div>
+          <div id="instagram-content" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+              Conectá tu cuenta de Instagram para ver métricas de seguidores y engagement.
+            </div>
+          </div>
+        </div>
+
+        <!-- Competidores -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>🏆 Competidores cercanos</span>
+            <button id="btn-find-competitors" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="findCompetitors()">
+              Buscar automáticamente
+            </button>
+          </div>
+          <div id="competitors-content" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+              Identificá competidores cercanos automáticamente con Google Places.
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2705,6 +2760,7 @@ window.switchSection = function (name, btn) {
   if (name === 'pedidos')      loadPedidos()
   if (name === 'historial')    loadHistorial()
   if (name === 'estadisticas') loadEstadisticas()
+  if (name === 'analisis')     loadAnalisis()
   if (name === 'config')       loadConfig()
   if (name === 'facturacion')  loadFacturacion()
   if (name !== 'pedidos')      detachPedidosRealtime()
@@ -3851,6 +3907,240 @@ window.selectPlan = async function (planId, planNombre, precioUSD) {
   }
 }
 
+// ── loadAnalisis ───────────────────────────────────────────────────────────
+window.loadAnalisis = async function () {
+  if (!currentRestaurant) return
+
+  // Cargar integraciones
+  try {
+    const { integrations } = await import('./lib/db.js')
+    const integracionesLista = await integrations.listByRestaurant(currentRestaurant.id)
+
+    // Google Business
+    const googleIntegration = integracionesLista.find(i => i.provider === 'google_business')
+    if (googleIntegration && googleIntegration.is_active) {
+      document.getElementById('btn-connect-google').textContent = 'Desconectar'
+      document.getElementById('btn-connect-google').onclick = () => disconnectIntegration('google_business')
+
+      // Cargar datos de Google Business
+      try {
+        const res = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/google/business-data?restaurant_id=${currentRestaurant.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          renderGoogleBusinessData(data)
+        }
+      } catch (e) {
+        console.error('Error cargando datos de Google Business:', e)
+      }
+    }
+
+    // Instagram
+    const instagramIntegration = integracionesLista.find(i => i.provider === 'instagram')
+    if (instagramIntegration && instagramIntegration.is_active) {
+      document.getElementById('btn-connect-instagram').textContent = 'Desconectar'
+      document.getElementById('btn-connect-instagram').onclick = () => disconnectIntegration('instagram')
+
+      // Cargar datos de Instagram
+      try {
+        const res = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/instagram/metrics?restaurant_id=${currentRestaurant.id}`)
+        if (res.ok) {
+          const data = await res.json()
+          renderInstagramData(data)
+        }
+      } catch (e) {
+        console.error('Error cargando datos de Instagram:', e)
+      }
+    }
+
+    // Cargar competidores
+    loadCompetitors()
+  } catch (e) {
+    showToast('Error cargando análisis: ' + e.message, 'error')
+  }
+}
+
+function renderGoogleBusinessData(data) {
+  const content = document.getElementById('google-business-content')
+  if (!data || !data.profile) return
+
+  content.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+      <div style="padding:14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Rating</div>
+        <div style="font-size:22px;font-weight:600;color:var(--terra)">⭐ ${data.profile.rating || 'N/A'}</div>
+      </div>
+      <div style="padding:14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Reseñas</div>
+        <div style="font-size:22px;font-weight:600;color:var(--ink)">${data.profile.reviews_count || 0}</div>
+      </div>
+      <div style="padding:14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Búsquedas</div>
+        <div style="font-size:22px;font-weight:600;color:var(--ink)">${data.metrics?.searches || 0}</div>
+      </div>
+      <div style="padding:14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Vistas</div>
+        <div style="font-size:22px;font-weight:600;color:var(--ink)">${data.metrics?.views || 0}</div>
+      </div>
+    </div>`
+}
+
+function renderInstagramData(data) {
+  const content = document.getElementById('instagram-content')
+  if (!data || !data.user) return
+
+  const recentMedia = data.recent_media || []
+  const totalLikes = recentMedia.reduce((sum, m) => sum + (m.like_count || 0), 0)
+  const totalComments = recentMedia.reduce((sum, m) => sum + (m.comments_count || 0), 0)
+  const avgEngagement = recentMedia.length > 0
+    ? Math.round((totalLikes + totalComments) / recentMedia.length)
+    : 0
+
+  content.innerHTML = `
+    <div style="margin-bottom:16px;padding:12px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+      <div style="font-size:13px;color:var(--muted)">Cuenta conectada</div>
+      <div style="font-size:15px;font-weight:500;color:var(--ink);margin-top:2px">@${data.user.username}</div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px">
+      <div style="padding:14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Publicaciones</div>
+        <div style="font-size:22px;font-weight:600;color:var(--terra)">${data.user.media_count || 0}</div>
+      </div>
+      <div style="padding:14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:4px">Engagement prom.</div>
+        <div style="font-size:22px;font-weight:600;color:var(--ink)">${avgEngagement}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">últimas 10 publis</div>
+      </div>
+    </div>`
+}
+
+async function loadCompetitors() {
+  if (!currentRestaurant) return
+
+  try {
+    const { competitors } = await import('./lib/db.js')
+    const lista = await competitors.listByRestaurant(currentRestaurant.id)
+
+    if (!lista || lista.length === 0) {
+      document.getElementById('competitors-content').innerHTML = `
+        <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+          Todavía no identificaste competidores. Usá el botón para buscar automáticamente.
+        </div>`
+      return
+    }
+
+    document.getElementById('competitors-content').innerHTML = `
+      <div style="display:grid;gap:12px">
+        ${lista.map(c => `
+          <div style="padding:14px;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:space-between">
+            <div>
+              <div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:3px">${c.name}</div>
+              <div style="font-size:12px;color:var(--muted)">${c.address || 'Sin dirección'}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">
+                ⭐ ${c.rating || 'N/A'} • ${c.reviews_count || 0} reseñas
+              </div>
+            </div>
+            <button onclick="deleteCompetitor('${c.id}')" style="background:none;border:none;color:var(--bad);cursor:pointer;font-size:18px;padding:4px 8px" title="Eliminar">
+              ✕
+            </button>
+          </div>
+        `).join('')}
+      </div>`
+  } catch (e) {
+    console.error('Error cargando competidores:', e)
+  }
+}
+
+window.connectGoogleBusiness = function () {
+  if (!currentRestaurant) return
+  // Abrir ventana de OAuth
+  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/google/auth?restaurant_id=${currentRestaurant.id}`
+}
+
+window.connectInstagram = function () {
+  if (!currentRestaurant) return
+  // Abrir ventana de OAuth
+  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/instagram/auth?restaurant_id=${currentRestaurant.id}`
+}
+
+window.findCompetitors = async function () {
+  if (!currentRestaurant || !currentRestaurant.address) {
+    showToast('Necesitás tener una dirección cargada en Info del restaurante', 'error')
+    return
+  }
+
+  const btn = document.getElementById('btn-find-competitors')
+  const originalText = btn.textContent
+  btn.textContent = 'Buscando...'
+  btn.disabled = true
+
+  try {
+    // Geocodificar la dirección (simplificado - en producción usar Google Geocoding API)
+    // Por ahora usar coordenadas mock de Buenos Aires
+    const lat = -34.6037
+    const lng = -58.3816
+
+    const res = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/places/nearby-competitors?lat=${lat}&lng=${lng}`)
+    if (!res.ok) throw new Error('Error buscando competidores')
+
+    const data = await res.json()
+    if (!data.competitors || data.competitors.length === 0) {
+      showToast('No se encontraron competidores cercanos', 'info')
+      return
+    }
+
+    // Guardar competidores en BD
+    const { competitors } = await import('./lib/db.js')
+    for (const comp of data.competitors) {
+      await competitors.create({
+        restaurant_id: currentRestaurant.id,
+        name: comp.name,
+        address: comp.address,
+        place_id: comp.place_id,
+        rating: comp.rating,
+        reviews_count: comp.reviews_count,
+        source: 'auto',
+      })
+    }
+
+    showToast(`Se encontraron ${data.competitors.length} competidores`, 'success')
+    loadCompetitors()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.textContent = originalText
+    btn.disabled = false
+  }
+}
+
+window.deleteCompetitor = async function (id) {
+  if (!confirm('¿Eliminar este competidor?')) return
+
+  try {
+    const { competitors } = await import('./lib/db.js')
+    await competitors.delete(id)
+    showToast('Competidor eliminado', 'success')
+    loadCompetitors()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+async function disconnectIntegration(provider) {
+  if (!confirm('¿Desconectar esta integración?')) return
+
+  try {
+    const { integrations } = await import('./lib/db.js')
+    const integration = await integrations.getByProvider(currentRestaurant.id, provider)
+    if (integration) {
+      await integrations.disconnect(integration.id)
+      showToast('Integración desconectada', 'success')
+      loadAnalisis()
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
 window.confirmCancelPlan = async function () {
   if (!currentRestaurant) return
 
@@ -4616,6 +4906,35 @@ window.showToast = function (msg, type = 'default') {
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => el.classList.remove('show'), 3200)
 }
+
+// ─────────────────────────────────────────────
+// Manejo de callbacks OAuth
+// ─────────────────────────────────────────────
+;(function () {
+  const params = new URLSearchParams(window.location.search)
+
+  if (params.has('google_connected')) {
+    showToast('✅ Google Business conectado correctamente', 'success')
+    // Ir a la sección de análisis
+    setTimeout(() => {
+      switchSection('analisis', document.querySelector('[data-section="analisis"]'))
+      window.history.replaceState({}, '', 'panel.html')
+    }, 500)
+  } else if (params.has('google_error')) {
+    showToast('Error conectando Google Business', 'error')
+    window.history.replaceState({}, '', 'panel.html')
+  } else if (params.has('instagram_connected')) {
+    showToast('✅ Instagram conectado correctamente', 'success')
+    // Ir a la sección de análisis
+    setTimeout(() => {
+      switchSection('analisis', document.querySelector('[data-section="analisis"]'))
+      window.history.replaceState({}, '', 'panel.html')
+    }, 500)
+  } else if (params.has('instagram_error')) {
+    showToast('Error conectando Instagram', 'error')
+    window.history.replaceState({}, '', 'panel.html')
+  }
+})()
 </script>
 </body>
 </html>
