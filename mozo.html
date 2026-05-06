@@ -289,12 +289,23 @@
         const lines = items.map(item => {
           const price = '$' + Number(item.price).toLocaleString('es-AR')
           const tags = (item.tags || []).map(t => TAG_LABELS[t]).filter(Boolean).join(', ')
-          return '- ' + item.name + ' (' + price + ')'
+          const star = item.is_featured ? '⭐ ' : ''
+          return '- ' + star + item.name + ' (' + price + ')'
             + (item.description ? ': ' + item.description : '')
             + (tags ? '. ' + tags + '.' : '')
+            + (item.is_featured ? ' [DESTACADO]' : '')
         }).join('\n')
         return (cat.emoji ? cat.emoji + ' ' : '') + cat.name.toUpperCase() + ':\n' + lines
       }).filter(Boolean).join('\n\n')
+    }
+
+    function buildFeaturedLine(rest) {
+      const featured = (rest.menu_categories || []).flatMap(cat =>
+        (cat.menu_items || []).filter(i => i.is_visible && i.is_available && i.is_featured)
+      )
+      if (!featured.length) return ''
+      const names = featured.map(i => i.name).join(', ')
+      return '\nPLATOS DESTACADOS (recomendá estos primero cuando te pregunten qué pedir): ' + names
     }
 
     function buildHoursText(hours) {
@@ -309,6 +320,7 @@
 
     function buildSystemPrompt(rest) {
       const menuText = buildMenuText(rest)
+      const featuredLine = buildFeaturedLine(rest)
       const location = [rest.address, rest.city].filter(Boolean).join(', ')
       const tone = rest.tano_tone || 'calido'
       const hoursLine = rest.opening_hours ? '\nHorarios: ' + buildHoursText(rest.opening_hours) : ''
@@ -330,6 +342,7 @@
         + '2. Si te preguntan algo ajeno: "Eso no te lo puedo contestar yo, pero el equipo del restaurante te ayuda con gusto."\n'
         + '3. Nunca inventés platos ni precios. Si algo no figura, decí que consulten al personal.\n'
         + '4. Respuestas concisas, máximo 3-4 líneas. Si hay lista, viñetas cortas.\n\n'
+        + featuredLine + '\n\n'
         + 'MENÚ DISPONIBLE:\n' + menuText
     }
 
@@ -339,13 +352,20 @@
         .sort((a, b) => a.sort_order - b.sort_order)
         .slice(0, 3)
 
+      const hasFeatured = (rest.menu_categories || []).some(cat =>
+        (cat.menu_items || []).some(i => i.is_visible && i.is_available && i.is_featured)
+      )
+
       const menuLink = 'menu.html?slug=' + encodeURIComponent(rest.slug) + (mesa ? '&mesa=' + mesa : '')
 
       const el = document.getElementById('suggestions')
-      el.innerHTML = cats.map(cat =>
-        '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué ' + cat.name.toLowerCase() + ' tienen?\')">'
-        + (cat.emoji ? cat.emoji + ' ' : '') + cat.name + '</button>'
-      ).join('')
+      el.innerHTML = (hasFeatured
+        ? '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Cuáles son los platos destacados?\')">⭐ Destacados</button>'
+        : '')
+        + cats.map(cat =>
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué ' + cat.name.toLowerCase() + ' tienen?\')">'
+          + (cat.emoji ? cat.emoji + ' ' : '') + cat.name + '</button>'
+        ).join('')
         + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué opciones veganas tienen?\')">Vegano</button>'
         + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué platos son sin TACC?\')">Sin TACC</button>'
         + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué me recomendás?\')">Recomendaciones</button>'

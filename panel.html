@@ -1555,6 +1555,43 @@ html, body {
             <a class="btn-quick-link" id="link-mozo" href="#" target="_blank">💬 Ver asistente</a>
           </div>
         </div>
+
+        <!-- QR del menú -->
+        <div class="card" style="margin-top:20px" id="menu-qr-card">
+          <div class="card-title">📲 QR del menú</div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+            <div id="menu-qr-wrap" style="text-align:center">
+              <img id="menu-qr-img" src="" alt="QR menú"
+                style="width:140px;height:140px;border:1px solid var(--border);border-radius:10px;display:block">
+              <div style="font-size:11px;color:var(--muted);margin-top:6px">Menú público</div>
+              <button class="btn-secondary" onclick="downloadMenuQr('menu')"
+                style="font-size:12px;padding:5px 14px;margin-top:8px">⬇️ Descargar</button>
+            </div>
+            <div id="mozo-qr-wrap" style="text-align:center">
+              <img id="mozo-qr-img" src="" alt="QR asistente"
+                style="width:140px;height:140px;border:1px solid var(--border);border-radius:10px;display:block">
+              <div style="font-size:11px;color:var(--muted);margin-top:6px">Asistente Tano</div>
+              <button class="btn-secondary" onclick="downloadMenuQr('mozo')"
+                style="font-size:12px;padding:5px 14px;margin-top:8px">⬇️ Descargar</button>
+            </div>
+            <div style="flex:1;min-width:180px">
+              <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px">Mesa específica</div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="number" id="qr-mesa-num" placeholder="Nº mesa" min="1"
+                  style="width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--cream2)"
+                  oninput="updateMesaQr(this.value)">
+                <span style="font-size:12px;color:var(--muted)">↓</span>
+              </div>
+              <div id="mesa-qr-preview" style="margin-top:10px;display:none;text-align:center">
+                <img id="mesa-qr-preview-img" src="" alt=""
+                  style="width:100px;height:100px;border:1px solid var(--border);border-radius:8px">
+                <div style="font-size:11px;color:var(--muted);margin-top:4px" id="mesa-qr-label"></div>
+                <button class="btn-secondary" onclick="downloadMenuQr('mesa')"
+                  style="font-size:12px;padding:4px 12px;margin-top:6px">⬇️ Descargar</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ══ Secciones proximamente ══ -->
@@ -2072,6 +2109,61 @@ function updateQuickLinks(slug) {
   document.getElementById('link-menu').href   = base + 'menu.html?slug=' + slug
   document.getElementById('link-cocina').href = base + 'cocina.html?slug=' + slug
   document.getElementById('link-mozo').href   = base + 'mozo.html?slug=' + slug + '&mesa=1'
+  updateMenuQr(slug)
+}
+
+function qrUrl(data, size = 140) {
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size
+    + '&data=' + encodeURIComponent(data)
+    + '&margin=8&color=1c1612&bgcolor=fdfaf6'
+}
+
+function updateMenuQr(slug) {
+  const base = 'https://vitrinaapp.com.ar/'
+  const menuLink  = base + 'menu.html?slug=' + slug
+  const mozoLink  = base + 'mozo.html?slug=' + slug
+
+  const menuImg = document.getElementById('menu-qr-img')
+  const mozoImg = document.getElementById('mozo-qr-img')
+  if (menuImg) { menuImg.src = qrUrl(menuLink); menuImg.dataset.url = menuLink }
+  if (mozoImg) { mozoImg.src = qrUrl(mozoLink); mozoImg.dataset.url = mozoLink }
+}
+
+window.updateMesaQr = function (num) {
+  if (!num || !currentRestaurant) return
+  const base = 'https://vitrinaapp.com.ar/'
+  const url = base + 'menu.html?slug=' + currentRestaurant.slug + '&mesa=' + num
+  const previewWrap = document.getElementById('mesa-qr-preview')
+  const previewImg  = document.getElementById('mesa-qr-preview-img')
+  const label       = document.getElementById('mesa-qr-label')
+  if (!previewWrap || !previewImg) return
+  previewImg.src = qrUrl(url, 100)
+  previewImg.dataset.url = url
+  if (label) label.textContent = 'Mesa ' + num
+  previewWrap.style.display = 'block'
+}
+
+window.downloadMenuQr = function (type) {
+  let img, filename
+  if (type === 'menu') {
+    img = document.getElementById('menu-qr-img'); filename = 'qr-menu.png'
+  } else if (type === 'mozo') {
+    img = document.getElementById('mozo-qr-img'); filename = 'qr-tano.png'
+  } else {
+    img = document.getElementById('mesa-qr-preview-img')
+    const num = document.getElementById('qr-mesa-num').value
+    filename = 'qr-mesa-' + num + '.png'
+  }
+  if (!img || !img.dataset.url) return
+  // Download hi-res version
+  const hiResUrl = img.dataset.url.replace(/size=\d+x\d+/, 'size=400x400')
+    || qrUrl(img.dataset.url, 400)
+  const a = document.createElement('a')
+  a.href = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data='
+    + encodeURIComponent(img.dataset.url) + '&margin=8&color=1c1612&bgcolor=fdfaf6'
+  a.download = filename
+  a.target = '_blank'
+  a.click()
 }
 
 function renderColorPresets() {
