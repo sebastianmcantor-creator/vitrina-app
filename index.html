@@ -653,7 +653,7 @@ footer {
         <div class="plan-badge">Más popular</div>
         <div class="plan-name">Pro</div>
         <div><span class="plan-price-num">USD 22</span></div>
-        <div class="plan-price-ars">≈ $9.020 ARS / mes</div>
+        <div class="plan-price-ars" id="ars-pro">≈ $9.020 ARS / mes</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li><span class="plan-check">✓</span> Todo lo del plan Free</li>
@@ -669,7 +669,7 @@ footer {
       <div class="plan-card">
         <div class="plan-name">Full</div>
         <div><span class="plan-price-num">USD 35</span></div>
-        <div class="plan-price-ars">≈ $14.350 ARS / mes</div>
+        <div class="plan-price-ars" id="ars-full">≈ $14.350 ARS / mes</div>
         <div class="plan-divider"></div>
         <ul class="plan-features">
           <li><span class="plan-check">✓</span> Todo lo del plan Pro</li>
@@ -850,6 +850,28 @@ document.querySelectorAll('.feature-card, .step, .testimonial-card, .plan-card')
   el.style.transition = 'opacity 0.5s ease, transform 0.5s ease'
   observer.observe(el)
 })
+</script>
+
+<script>
+// Tipo de cambio dinámico — actualiza precios ARS con valor oficial del Banco Nación
+;(async function updateArsPrice() {
+  const USD_PRO = 22
+  const USD_FULL = 35
+  try {
+    const res = await fetch('https://api.bluelytics.com.ar/v2/latest', { cache: 'no-cache' })
+    if (!res.ok) return
+    const data = await res.json()
+    const tc = data?.oficial?.value_sell
+    if (!tc || isNaN(tc)) return
+    const fmt = n => '≈ $' + Math.round(n).toLocaleString('es-AR') + ' ARS / mes'
+    const elPro  = document.getElementById('ars-pro')
+    const elFull = document.getElementById('ars-full')
+    if (elPro)  elPro.textContent  = fmt(tc * USD_PRO)
+    if (elFull) elFull.textContent = fmt(tc * USD_FULL)
+  } catch (_) {
+    // silencioso — fallback a los valores estáticos hardcodeados
+  }
+})()
 </script>
 </body>
 </html>
