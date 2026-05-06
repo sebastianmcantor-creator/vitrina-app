@@ -1278,6 +1278,9 @@ html, body {
       <button class="nav-item" data-section="config" onclick="switchSection('config', this)">
         <span class="nav-icon">⚙️</span> Configuración
       </button>
+      <button class="nav-item" data-section="facturacion" onclick="switchSection('facturacion', this)">
+        <span class="nav-icon">💳</span> Facturación
+      </button>
     </nav>
 
     <!-- Viti -->
@@ -1819,6 +1822,66 @@ html, body {
           </div>
         </div>
 
+      </div>
+
+      <!-- Sección Facturación -->
+      <div id="section-facturacion" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">Facturación y plan</div>
+          <div class="page-subtitle">Gestioná tu suscripción, historial de pagos y plan actual.</div>
+        </div>
+
+        <!-- Plan actual -->
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px">
+            <div>
+              <div class="card-title" style="margin-bottom:8px">
+                💳 Plan actual — <span id="fact-plan-name">Free</span>
+              </div>
+              <div id="fact-status" style="font-size:13.5px;color:var(--muted)"></div>
+            </div>
+            <div id="fact-badge-wrap"></div>
+          </div>
+
+          <!-- Uso de Tano (solo plan free o si hay límite) -->
+          <div id="fact-tano-usage" style="display:none;margin-bottom:20px;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <span style="font-size:13.5px;font-weight:500;color:var(--ink)">🤖 Tano este mes</span>
+              <span id="fact-tano-text">— / 75</span>
+            </div>
+            <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden">
+              <div id="fact-tano-bar" style="height:100%;border-radius:6px;background:var(--terra);transition:width .4s;width:0%"></div>
+            </div>
+            <div style="font-size:12px;color:var(--muted);margin-top:6px">Se reinicia el 1° de cada mes.</div>
+          </div>
+
+          <!-- Trial info -->
+          <div id="fact-trial-alert" style="display:none;margin-bottom:20px;padding:14px 16px;background:#fff8e1;border:1px solid #ffd54f;border-radius:10px">
+            <div style="font-size:14px;font-weight:500;color:#f57f17;margin-bottom:4px">🎉 Período de prueba activo</div>
+            <div id="fact-trial-text" style="font-size:13px;color:#856404"></div>
+          </div>
+
+          <!-- Features del plan -->
+          <div id="fact-features" style="margin-top:20px"></div>
+
+          <!-- Botones de acción -->
+          <div id="fact-actions" style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn-primary" id="btn-upgrade-plan" onclick="openUpgradeModal()" style="display:none">
+              ✨ Actualizar plan
+            </button>
+            <button class="btn-secondary" id="btn-cancel-plan" onclick="confirmCancelPlan()" style="display:none">
+              Cancelar suscripción
+            </button>
+          </div>
+        </div>
+
+        <!-- Historial de pagos -->
+        <div class="card">
+          <div class="card-title">📋 Historial de pagos</div>
+          <div id="fact-payments-list" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px">Cargando historial…</div>
+          </div>
+        </div>
       </div>
 
     </div><!-- /content -->
@@ -2597,6 +2660,7 @@ window.switchSection = function (name, btn) {
   if (name === 'historial')    loadHistorial()
   if (name === 'estadisticas') loadEstadisticas()
   if (name === 'config')       loadConfig()
+  if (name === 'facturacion')  loadFacturacion()
   if (name !== 'pedidos')      detachPedidosRealtime()
 }
 
@@ -3464,6 +3528,173 @@ window.loadConfig = async function () {
     renderStaff()
   } catch (e) {
     showToast('Error cargando equipo: ' + e.message, 'error')
+  }
+}
+
+// ── loadFacturacion ────────────────────────────────────────────────────────────
+window.loadFacturacion = async function () {
+  if (!currentRestaurant) return
+
+  // Importar módulo de planes
+  const { getPlanLimits, getTanoStatus, getPlanName, isTrialing, trialDaysRemaining } = await import('./lib/plans.js')
+
+  const limits = getPlanLimits(currentRestaurant)
+  const tanoStatus = getTanoStatus(currentRestaurant)
+  const planName = getPlanName(currentRestaurant)
+  const isTrial = isTrialing(currentRestaurant)
+  const trialDays = trialDaysRemaining(currentRestaurant)
+
+  // Renderizar nombre del plan
+  const planNameEl = document.getElementById('fact-plan-name')
+  if (planNameEl) planNameEl.textContent = planName
+
+  // Renderizar badge del plan
+  const badgeWrap = document.getElementById('fact-badge-wrap')
+  const tier = currentRestaurant.subscription_tier || 'free'
+  const badgeClass = tier === 'free' ? 'free' : tier === 'basico' ? 'basico' : tier === 'pro' ? 'pro' : 'full'
+  if (badgeWrap) {
+    badgeWrap.innerHTML = `<span class="plan-badge ${badgeClass}">${planName}</span>`
+  }
+
+  // Renderizar estado
+  const statusEl = document.getElementById('fact-status')
+  let statusText = ''
+  if (isTrial) {
+    statusText = `Período de prueba — ${trialDays} día${trialDays !== 1 ? 's' : ''} restante${trialDays !== 1 ? 's' : ''}`
+  } else if (currentRestaurant.subscription_status === 'active') {
+    statusText = 'Suscripción activa'
+  } else if (currentRestaurant.subscription_status === 'past_due') {
+    statusText = '⚠️ Pago pendiente — actualizá tu forma de pago'
+  } else if (currentRestaurant.subscription_status === 'cancelled') {
+    statusText = 'Suscripción cancelada'
+  } else {
+    statusText = 'Plan gratuito'
+  }
+  if (statusEl) statusEl.textContent = statusText
+
+  // Renderizar uso de Tano si aplica
+  const tanoBlock = document.getElementById('fact-tano-usage')
+  if (tanoStatus.unlimited) {
+    tanoBlock.style.display = 'none'
+  } else {
+    tanoBlock.style.display = 'block'
+    document.getElementById('fact-tano-text').textContent = `${tanoStatus.used} / ${tanoStatus.limit}`
+    document.getElementById('fact-tano-bar').style.width = tanoStatus.percentage + '%'
+    if (tanoStatus.exceeded) {
+      document.getElementById('fact-tano-bar').style.background = 'var(--bad)'
+    } else if (tanoStatus.warning) {
+      document.getElementById('fact-tano-bar').style.background = '#f57f17'
+    } else {
+      document.getElementById('fact-tano-bar').style.background = 'var(--terra)'
+    }
+  }
+
+  // Renderizar alerta de trial
+  const trialAlert = document.getElementById('fact-trial-alert')
+  if (isTrial) {
+    trialAlert.style.display = 'block'
+    document.getElementById('fact-trial-text').textContent =
+      `Tenés ${trialDays} día${trialDays !== 1 ? 's' : ''} restante${trialDays !== 1 ? 's' : ''} de prueba gratuita. Después se cobrará automáticamente.`
+  } else {
+    trialAlert.style.display = 'none'
+  }
+
+  // Renderizar features del plan
+  const featuresEl = document.getElementById('fact-features')
+  const features = [
+    { label: 'Platos en el menú', value: limits.maxPlatos === -1 ? 'Ilimitados' : `Hasta ${limits.maxPlatos}` },
+    { label: 'Mensajes de Tano', value: limits.tanoLimit === -1 ? 'Ilimitados' : `${limits.tanoLimit}/mes` },
+    { label: 'Pedidos online', value: limits.pedidos ? '✓ Incluido' : '✗ No incluido' },
+    { label: 'Pantalla de cocina', value: limits.cocina ? '✓ Incluido' : '✗ No incluido' },
+    { label: 'Pagos online', value: limits.pagos ? '✓ Incluido' : '✗ No incluido' },
+    { label: 'Sucursales', value: limits.maxSucursales },
+  ]
+  featuresEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px">
+      ${features.map(f => `
+        <div style="padding:10px 14px;background:var(--cream);border-radius:8px;border:1px solid var(--border)">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:3px">${f.label}</div>
+          <div style="font-size:14px;font-weight:500;color:var(--ink)">${f.value}</div>
+        </div>
+      `).join('')}
+    </div>`
+
+  // Renderizar botones de acción
+  const btnUpgrade = document.getElementById('btn-upgrade-plan')
+  const btnCancel = document.getElementById('btn-cancel-plan')
+
+  if (tier === 'free') {
+    btnUpgrade.style.display = 'inline-flex'
+    btnCancel.style.display = 'none'
+  } else {
+    btnUpgrade.style.display = 'none'
+    btnCancel.style.display = 'inline-flex'
+  }
+
+  // Cargar historial de pagos
+  loadPaymentsHistory()
+}
+
+async function loadPaymentsHistory() {
+  const container = document.getElementById('fact-payments-list')
+  if (!currentRestaurant) return
+
+  try {
+    const { subscriptionPayments } = await import('./lib/db.js')
+    const payments = await subscriptionPayments.listByRestaurant(currentRestaurant.id)
+
+    if (!payments || payments.length === 0) {
+      container.innerHTML = '<div style="color:var(--muted);font-size:13.5px">No hay pagos registrados todavía.</div>'
+      return
+    }
+
+    container.innerHTML = `
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="border-bottom:1px solid var(--border);text-align:left">
+              <th style="padding:10px 0;font-size:12px;color:var(--muted);font-weight:500">Fecha</th>
+              <th style="padding:10px 0;font-size:12px;color:var(--muted);font-weight:500">Monto</th>
+              <th style="padding:10px 0;font-size:12px;color:var(--muted);font-weight:500">Estado</th>
+              <th style="padding:10px 0;font-size:12px;color:var(--muted);font-weight:500">Método</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${payments.map(p => {
+              const date = new Date(p.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })
+              const amount = (p.currency || 'ARS') + ' ' + Number(p.amount).toLocaleString('es-AR')
+              let statusBadge = ''
+              if (p.status === 'approved') {
+                statusBadge = '<span style="color:var(--sage);font-size:13px">✓ Aprobado</span>'
+              } else if (p.status === 'rejected') {
+                statusBadge = '<span style="color:var(--bad);font-size:13px">✗ Rechazado</span>'
+              } else {
+                statusBadge = '<span style="color:var(--muted);font-size:13px">⏳ Pendiente</span>'
+              }
+              const method = p.payment_method || '—'
+              return `
+                <tr style="border-bottom:1px solid var(--cream)">
+                  <td style="padding:12px 0;font-size:13.5px">${date}</td>
+                  <td style="padding:12px 0;font-size:13.5px;font-weight:500">${amount}</td>
+                  <td style="padding:12px 0">${statusBadge}</td>
+                  <td style="padding:12px 0;font-size:13.5px;color:var(--muted)">${method}</td>
+                </tr>`
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`
+  } catch (e) {
+    container.innerHTML = '<div style="color:var(--bad);font-size:13.5px">Error cargando historial: ' + e.message + '</div>'
+  }
+}
+
+window.openUpgradeModal = function () {
+  alert('Próximamente: selector de planes y checkout con MercadoPago')
+}
+
+window.confirmCancelPlan = function () {
+  if (confirm('¿Estás seguro que querés cancelar tu suscripción? Perderás acceso a las funciones premium.')) {
+    alert('Próximamente: cancelación de suscripción')
   }
 }
 
