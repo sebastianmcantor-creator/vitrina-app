@@ -175,10 +175,34 @@
       document.getElementById('rest-name').textContent = rest.name
       document.title = rest.name + ' — Asistente'
 
-      if (mesa) {
+      // Badge: mesa + estado del restaurante
+      ;(function updateBadge() {
+        const parts = []
+        if (mesa) parts.push('Mesa ' + mesa)
+
+        // Estado según horarios
+        if (rest.opening_hours) {
+          const now  = new Date()
+          const day  = now.getDay()
+          const hm   = now.getHours() * 100 + now.getMinutes()
+          const h    = rest.opening_hours[day]
+          const toN  = s => { const [hh, mm] = s.split(':').map(Number); return hh*100+mm }
+          if (!h) {
+            parts.push('🔴 Cerrado hoy')
+          } else if (hm < toN(h.o)) {
+            parts.push('🕐 Abre a las ' + h.o)
+          } else if (hm >= toN(h.c)) {
+            parts.push('🔴 Cerrado')
+          } else {
+            parts.push('🟢 Abierto')
+          }
+        } else {
+          parts.push('Asistente activo')
+        }
+
         document.getElementById('table-badge').innerHTML =
-          '<span class="status-dot"></span>Mesa ' + mesa + ' · Asistente activo'
-      }
+          '<span class="status-dot"></span>' + parts.join(' · ')
+      })()
 
       systemPrompt = buildSystemPrompt(rest)
       buildSuggestions(rest)

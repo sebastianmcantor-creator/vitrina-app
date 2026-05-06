@@ -1544,7 +1544,10 @@ html, body {
             <div class="page-title">Mesas</div>
             <div class="page-subtitle">Cada mesa tiene una URL única para que los clientes pidan desde su lugar.</div>
           </div>
-          <button class="btn-primary" onclick="openMesaModal()" style="flex-shrink:0;margin-top:4px">+ Agregar mesa</button>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+            <button class="btn-primary" onclick="openMesaModal()">+ Agregar mesa</button>
+            <button class="btn-secondary" onclick="openBulkMesasModal()">+ Crear varias mesas</button>
+          </div>
         </div>
         <div id="mesas-body">
           <div class="coming-soon">
@@ -1778,6 +1781,40 @@ html, body {
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-mesa')">Cancelar</button>
       <button class="btn-primary" id="btn-save-mesa" onclick="saveMesaModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: crear varias mesas -->
+<div class="modal-overlay" id="modal-bulk-mesas" onclick="if(event.target===this)closeModal('modal-bulk-mesas')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Crear varias mesas</div>
+      <button class="modal-close" onclick="closeModal('modal-bulk-mesas')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Creá mesas numeradas automáticamente. Si ya tenés la mesa 1, se empieza desde la siguiente disponible.
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="form-field">
+          <label class="form-label">Desde</label>
+          <input class="form-input" id="bulk-desde" type="number" min="1" value="1" style="text-align:center">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Hasta</label>
+          <input class="form-input" id="bulk-hasta" type="number" min="1" value="10" style="text-align:center">
+        </div>
+      </div>
+      <div class="form-field" style="margin-top:14px">
+        <label class="form-label">Capacidad por mesa (opcional)</label>
+        <input class="form-input" id="bulk-capacity" type="number" min="1" placeholder="4" style="max-width:120px">
+      </div>
+      <div id="bulk-preview" style="font-size:13px;color:var(--muted);margin-top:12px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-bulk-mesas')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-bulk" onclick="saveBulkMesas()">Crear mesas</button>
     </div>
   </div>
 </div>
@@ -2819,6 +2856,69 @@ window.deleteMesa = async function (tableId) {
     renderMesas()
     showToast('Mesa eliminada', 'success')
   } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+window.openBulkMesasModal = function () {
+  const nextNum = mesasList.length ? Math.max(...mesasList.map(t => t.number)) + 1 : 1
+  document.getElementById('bulk-desde').value = nextNum
+  document.getElementById('bulk-hasta').value = nextNum + 9
+  document.getElementById('bulk-capacity').value = ''
+  updateBulkPreview()
+  document.getElementById('modal-bulk-mesas').classList.add('open')
+  document.getElementById('bulk-desde').addEventListener('input', updateBulkPreview, { once: false })
+  document.getElementById('bulk-hasta').addEventListener('input', updateBulkPreview, { once: false })
+}
+
+function updateBulkPreview() {
+  const desde = parseInt(document.getElementById('bulk-desde')?.value) || 1
+  const hasta  = parseInt(document.getElementById('bulk-hasta')?.value) || 1
+  const existing = new Set(mesasList.map(t => t.number))
+  const toCreate = []
+  for (let i = desde; i <= Math.min(hasta, desde + 49); i++) {
+    if (!existing.has(i)) toCreate.push(i)
+  }
+  const preview = document.getElementById('bulk-preview')
+  if (!preview) return
+  if (toCreate.length === 0) {
+    preview.textContent = 'Todas esas mesas ya existen.'
+  } else {
+    preview.textContent = 'Se crearán ' + toCreate.length + ' mesa' + (toCreate.length !== 1 ? 's' : '') + ': ' + toCreate.slice(0, 10).join(', ') + (toCreate.length > 10 ? '...' : '')
+  }
+}
+
+window.saveBulkMesas = async function () {
+  const desde    = parseInt(document.getElementById('bulk-desde').value) || 1
+  const hasta    = parseInt(document.getElementById('bulk-hasta').value) || 1
+  const capacity = parseInt(document.getElementById('bulk-capacity').value) || 4
+  const existing = new Set(mesasList.map(t => t.number))
+  const toCreate = []
+  for (let i = desde; i <= Math.min(hasta, desde + 49); i++) {
+    if (!existing.has(i)) toCreate.push(i)
+  }
+  if (!toCreate.length) { showToast('Nada que crear.', 'error'); return }
+
+  const btn = document.getElementById('btn-save-bulk')
+  btn.disabled = true; btn.textContent = 'Creando...'
+
+  try {
+    for (const num of toCreate) {
+      const t = await restaurantTables.create({
+        restaurant_id: currentRestaurant.id,
+        number: num,
+        capacity,
+      })
+      mesasList.push(t)
+    }
+    mesasList.sort((a, b) => a.number - b.number)
+    renderMesas()
+    renderGettingStarted()
+    closeModal('modal-bulk-mesas')
+    showToast(toCreate.length + ' mesas creadas ✓', 'success')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Crear mesas'
+  }
 }
 
 // ═══════════════════════════════════════════
