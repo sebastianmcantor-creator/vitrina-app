@@ -180,12 +180,33 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Implementar cálculo real de facturación (actualmente en $0 — requiere integración con historial de pagos MP)
 - Agregar exportación CSV de reportes
 
+**Bloque 10 — Informe ejecutivo + medición de éxito del plan** (100%) ✅
+- Migración 017: tablas `marketing_projections`, `executive_reports`, `monthly_metrics_snapshots`
+- Sistema de proyecciones en 3 escenarios (optimista, moderado, pesimista) con estrategia mensual
+- Snapshots automáticos de métricas al inicio y fin de cada mes para comparación
+- Endpoint `/api/reports/generate-executive`: genera informe con análisis de Viti (Claude Haiku)
+- Comparación automática resultados reales vs proyecciones, determina escenario alcanzado
+- Análisis estructurado por Viti: resumen ejecutivo, factores de éxito, áreas de mejora, recomendaciones
+- Endpoint `/api/reports/send-monthly`: envía informes pendientes por email (cron mensual)
+- Módulos en lib/db.js: marketingProjections, executiveReports, monthlyMetricsSnapshots
+- Worker deployado con endpoints completos
+
+**Pendiente manual adicional Bloques 8-10:**
+- Ejecutar migraciones 014, 015, 016 y 017 en Supabase Dashboard
+- Configurar cron jobs en Cloudflare Workers:
+  - `/api/exchange-rate/update` cada lunes a las 10 AM
+  - `/api/reports/send-monthly` día 1 de cada mes a las 9 AM
+  - `/api/sales/process-followups` diario a las 10 AM
+- Implementar generación de PDF para informes (actualmente solo JSON/HTML)
+- Completar integración envío de email HTML via Resend en informes ejecutivos
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 10 — Informe ejecutivo PDF + medición de éxito del plan** (0%)
-- Generación de PDF ejecutivo mensual para clientes
-- Comparativa métricas reales vs proyecciones iniciales
-- Recomendaciones automáticas de Viti
-- Envío automático por email cada mes
+**Bloque 11 — Testing final + pulido + documentación** (0%)
+- Testing completo de todos los flujos principales
+- Corrección de bugs encontrados
+- Onboarding mejorado para nuevos restaurantes
+- Documentación técnica y de usuario
+- Preparación para primeros clientes reales
 
 ---
 
