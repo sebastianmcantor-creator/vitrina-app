@@ -188,16 +188,23 @@
     function buildSystemPrompt(rest) {
       const menuText = buildMenuText(rest)
       const location = [rest.address, rest.city].filter(Boolean).join(', ')
-      return 'Sos el asistente digital de ' + rest.name
+      const tone = rest.tano_tone || 'calido'
+
+      const toneDesc = tone === 'sofisticado'
+        ? 'Tu tono es elegante y sofisticado. Vocabulario cuidado, sin contracciones informales ni emojis excesivos. Transmitís exclusividad.'
+        : tone === 'neutro'
+          ? 'Tu tono es amable y profesional. Ni muy formal ni muy informal. Emojis con moderación.'
+          : /* calido */ 'Tu tono es cálido, informal y porteño. Tratás al cliente de vos, usás expresiones del Río de la Plata (che, dale, etc.). Emojis con moderación.'
+
+      return 'Sos Tano, el asistente digital de ' + rest.name
         + (location ? ', un restaurante en ' + location : '') + '.'
-        + ' Tu rol es el de un mozo digital amable y conocedor del menú.\n\n'
+        + ' Tu nombre es Tano. Sonas humano, nunca como un bot genérico.\n\n'
+        + toneDesc + '\n\n'
         + 'REGLAS:\n'
-        + '1. Solo respondés preguntas sobre el menú, platos, ingredientes, alérgenos o el restaurante.\n'
-        + '2. Si te preguntan algo ajeno al restaurante, decís amablemente que solo podés ayudar con el menú.\n'
-        + '3. Nunca inventés platos ni precios. Si algo no figura, decí que consulten al mozo.\n'
-        + '4. Tono cálido, informal y porteño. Emojis con moderación.\n'
-        + '5. Español rioplatense (vos, che, etc.).\n'
-        + '6. Respuestas concisas, máximo 3-4 líneas. Si hay lista, viñetas cortas.\n\n'
+        + '1. Solo respondés sobre el menú, platos, ingredientes, alérgenos, opciones dietarias y el restaurante.\n'
+        + '2. Si te preguntan algo ajeno: "Eso no te lo puedo contestar yo, pero el equipo del restaurante te ayuda con gusto."\n'
+        + '3. Nunca inventés platos ni precios. Si algo no figura, decí que consulten al personal.\n'
+        + '4. Respuestas concisas, máximo 3-4 líneas. Si hay lista, viñetas cortas.\n\n'
         + 'MENÚ DISPONIBLE:\n' + menuText
     }
 
@@ -218,11 +225,11 @@
     }
 
     function addGreeting(rest) {
-      addMessage('assistant',
-        '¡Hola! Bienvenido a ' + rest.name + ' 👋 Soy tu asistente de menú. '
-        + 'Puedo ayudarte con los platos, ingredientes, opciones vegetarianas, veganas o aptas para celíacos, y hacerte recomendaciones. '
-        + '¿En qué te puedo ayudar?'
-      )
+      const msg = rest.tano_welcome?.trim()
+        || '¡Hola! Bienvenido a ' + rest.name + ' 👋 Soy Tano, tu asistente de menú. '
+          + 'Puedo ayudarte con los platos, ingredientes, opciones vegetarianas, veganas o sin TACC, y hacerte recomendaciones. '
+          + '¿En qué te puedo ayudar?'
+      addMessage('assistant', msg)
     }
 
     // ─── Chat ─────────────────────────────────────────────────────────────────
