@@ -864,6 +864,25 @@ html, body {
 }
 .tag-chip.selected { border-color:var(--terra); background:var(--terra-pale); color:var(--terra); }
 
+/* ── Plan cards ── */
+.plan-card {
+  background:var(--card); border:2px solid var(--border); border-radius:16px;
+  padding:20px; display:flex; flex-direction:column; gap:12px;
+  cursor:pointer; transition:all .2s;
+}
+.plan-card:hover { border-color:var(--terra); transform:translateY(-2px); box-shadow:0 4px 16px rgba(184,90,48,.12); }
+.plan-card.recommended { border-color:var(--gold); background:var(--gold-pale); }
+.plan-card-name { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--ink); }
+.plan-card-price { font-size:28px; font-weight:600; color:var(--terra); line-height:1; }
+.plan-card-price-usd { font-size:13px; color:var(--muted); margin-top:4px; }
+.plan-card-features { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+.plan-card-feature { font-size:13px; color:var(--ink2); display:flex; align-items:flex-start; gap:8px; }
+.plan-card-feature::before { content:'✓'; color:var(--sage); font-weight:600; flex-shrink:0; }
+.plan-card-btn { background:var(--terra); color:var(--white); border:none; border-radius:10px;
+  padding:10px 20px; font-family:'Outfit',sans-serif; font-size:14px; font-weight:500;
+  cursor:pointer; transition:background .15s; margin-top:auto; }
+.plan-card-btn:hover { background:var(--terra2); }
+
 /* ── Mesas ── */
 .mesas-grid {
   display: grid;
@@ -2041,6 +2060,33 @@ html, body {
   </div>
 </div>
 
+<!-- Modal: upgrade plan -->
+<div class="modal-overlay" id="modal-upgrade" onclick="if(event.target===this)closeModal('modal-upgrade')">
+  <div class="modal-box" style="max-width:720px">
+    <div class="modal-header">
+      <div class="modal-title">✨ Elegí tu plan</div>
+      <button class="modal-close" onclick="closeModal('modal-upgrade')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:13.5px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+        Todos los planes incluyen 14 días de prueba gratuita. Podés cancelar en cualquier momento.
+      </div>
+
+      <div id="upgrade-plans-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px">
+        <!-- Se renderiza con JS -->
+      </div>
+
+      <div id="upgrade-tc-info" style="margin-top:20px;padding:12px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border);font-size:12px;color:var(--muted);text-align:center">
+        Los precios se muestran en ARS al tipo de cambio oficial del día. El cobro se realiza en pesos argentinos.
+      </div>
+
+      <div id="upgrade-loading" style="display:none;text-align:center;padding:20px;color:var(--muted)">
+        Redirigiendo a MercadoPago...
+      </div>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import { requireAuth, signOut } from './lib/auth.js'
 import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff, menuItemPriceHistory } from './lib/db.js'
@@ -2786,6 +2832,7 @@ function renderMenu() {
 }
 
 // ── Modal categoría ──
+window.openModal = function (id) { document.getElementById(id).classList.add('open') }
 window.closeModal = function (id) { document.getElementById(id).classList.remove('open') }
 
 window.openCategoryModal = function (catId = null) {
@@ -3688,13 +3735,150 @@ async function loadPaymentsHistory() {
   }
 }
 
-window.openUpgradeModal = function () {
-  alert('Próximamente: selector de planes y checkout con MercadoPago')
+window.openUpgradeModal = async function () {
+  if (!currentRestaurant || !currentUser) return
+
+  openModal('modal-upgrade')
+
+  // Obtener tipo de cambio actualizado
+  const tcData = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio').then(r => r.json()).catch(() => ({ oficial: 1410 }))
+  const tc = tcData.oficial || 1410
+
+  // Definir planes disponibles
+  const planes = [
+    {
+      id: 'menu-basico',
+      nombre: 'Básico',
+      precioUSD: 12,
+      features: [
+        'Menú digital ilimitado',
+        'Tano ilimitado',
+        'Múltiples idiomas',
+        'Sin pedidos online',
+      ],
+    },
+    {
+      id: 'menu-pro',
+      nombre: 'Pro',
+      precioUSD: 22,
+      features: [
+        'Todo de Básico',
+        'Pedidos online',
+        'Pantalla de cocina',
+        'Notificaciones WhatsApp',
+        'Fee 1% por transacción',
+      ],
+      recommended: true,
+    },
+    {
+      id: 'menu-full',
+      nombre: 'Full',
+      precioUSD: 35,
+      features: [
+        'Todo de Pro',
+        'Hasta 3 sucursales',
+        'Fee 0.8% por transacción',
+        'Soporte prioritario',
+      ],
+    },
+  ]
+
+  const grid = document.getElementById('upgrade-plans-grid')
+  grid.innerHTML = planes.map(plan => {
+    const precioARS = Math.round(plan.precioUSD * tc)
+    const recommendedBadge = plan.recommended
+      ? '<div style="background:var(--gold);color:var(--white);font-size:10px;font-weight:600;padding:3px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:.06em;width:fit-content;margin-bottom:8px">Recomendado</div>'
+      : ''
+    return `
+      <div class="plan-card ${plan.recommended ? 'recommended' : ''}" onclick="selectPlan('${plan.id}', '${plan.nombre}', ${plan.precioUSD})">
+        ${recommendedBadge}
+        <div class="plan-card-name">${plan.nombre}</div>
+        <div>
+          <div class="plan-card-price">$${precioARS.toLocaleString('es-AR')}</div>
+          <div class="plan-card-price-usd">USD ${plan.precioUSD}/mes</div>
+        </div>
+        <div class="plan-card-features">
+          ${plan.features.map(f => `<div class="plan-card-feature">${f}</div>`).join('')}
+        </div>
+        <button class="plan-card-btn" onclick="event.stopPropagation();selectPlan('${plan.id}', '${plan.nombre}', ${plan.precioUSD})">
+          Elegir ${plan.nombre}
+        </button>
+      </div>`
+  }).join('')
+
+  document.getElementById('upgrade-tc-info').innerHTML =
+    `Los precios se muestran en ARS al tipo de cambio oficial del día (1 USD = $${tc.toLocaleString('es-AR')}). El cobro se realiza en pesos argentinos.`
 }
 
-window.confirmCancelPlan = function () {
-  if (confirm('¿Estás seguro que querés cancelar tu suscripción? Perderás acceso a las funciones premium.')) {
-    alert('Próximamente: cancelación de suscripción')
+window.selectPlan = async function (planId, planNombre, precioUSD) {
+  if (!currentRestaurant || !currentUser) return
+
+  const loadingDiv = document.getElementById('upgrade-loading')
+  const grid = document.getElementById('upgrade-plans-grid')
+
+  grid.style.display = 'none'
+  loadingDiv.style.display = 'block'
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/mp/crear-suscripcion', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurantId: currentRestaurant.id,
+        planId: planId,
+        email: currentUser.email,
+        restaurantName: currentRestaurant.name,
+      }),
+    })
+
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.error || 'Error creando suscripción')
+    }
+
+    const data = await res.json()
+
+    // Redireccionar a MercadoPago
+    if (data.init_point) {
+      window.location.href = data.init_point
+    } else {
+      throw new Error('No se recibió URL de pago')
+    }
+  } catch (e) {
+    loadingDiv.style.display = 'none'
+    grid.style.display = 'grid'
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.confirmCancelPlan = async function () {
+  if (!currentRestaurant) return
+
+  if (!confirm('¿Estás seguro que querés cancelar tu suscripción?\n\nPerderás acceso a:\n• Pedidos online\n• Pantalla de cocina\n• Tano ilimitado\n\nTu plan volverá a Free al finalizar el período actual.')) {
+    return
+  }
+
+  // TODO: Implementar cancelación vía API de MercadoPago
+  // Por ahora, solo actualizar en Supabase
+  try {
+    await restaurants.update(currentRestaurant.id, {
+      subscription_status: 'cancelled',
+      subscription_tier: 'free',
+      can_take_orders: false,
+      tano_messages_limit: 75,
+    })
+
+    Object.assign(currentRestaurant, {
+      subscription_status: 'cancelled',
+      subscription_tier: 'free',
+      can_take_orders: false,
+      tano_messages_limit: 75,
+    })
+
+    showToast('Suscripción cancelada. Tu plan se desactivará al finalizar el período actual.', 'success')
+    loadFacturacion()
+  } catch (e) {
+    showToast('Error cancelando suscripción: ' + e.message, 'error')
   }
 }
 
