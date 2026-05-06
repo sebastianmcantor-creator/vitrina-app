@@ -221,10 +221,21 @@
       }).filter(Boolean).join('\n\n')
     }
 
+    function buildHoursText(hours) {
+      if (!hours) return ''
+      const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
+      const lines = DAYS.map((d, i) => {
+        const h = hours[i]
+        return h ? d + ': ' + h.o + ' – ' + h.c : d + ': Cerrado'
+      })
+      return lines.join(' | ')
+    }
+
     function buildSystemPrompt(rest) {
       const menuText = buildMenuText(rest)
       const location = [rest.address, rest.city].filter(Boolean).join(', ')
       const tone = rest.tano_tone || 'calido'
+      const hoursLine = rest.opening_hours ? '\nHorarios: ' + buildHoursText(rest.opening_hours) : ''
 
       const toneDesc = tone === 'sofisticado'
         ? 'Tu tono es elegante y sofisticado. Vocabulario cuidado, sin contracciones informales ni emojis excesivos. Transmitís exclusividad.'
@@ -234,6 +245,7 @@
 
       return 'Sos Tano, el asistente digital de ' + rest.name
         + (location ? ', un restaurante en ' + location : '') + '.'
+        + hoursLine
         + ' Tu nombre es Tano. Sonas humano, nunca como un bot genérico.\n\n'
         + toneDesc + '\n\n'
         + (LANG_INSTRUCTION[currentLang] ? LANG_INSTRUCTION[currentLang] + '\n\n' : '')
