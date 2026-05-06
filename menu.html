@@ -55,6 +55,7 @@
     .category-section { padding: 24px 16px 8px; }
     .category-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 400; margin-bottom: 4px; }
     .category-desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+    .featured-section { background: linear-gradient(180deg, rgba(232,200,122,0.08) 0%, transparent 100%); border-radius: 0 0 12px 12px; }
 
     .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; }
     .item-card.item-unavailable { opacity: 0.5; }
@@ -337,12 +338,33 @@
         ;(cat.menu_items || []).forEach(item => { itemsById[item.id] = item })
       })
 
-      document.getElementById('cat-nav').innerHTML = cats.map((cat, i) =>
-        '<button class="cat-btn' + (i === 0 ? ' active' : '') + '" data-id="' + cat.id + '" onclick="navScroll(\'cat-' + cat.id + '\')">'
-        + (cat.emoji ? cat.emoji + ' ' : '') + esc(cat.name) + '</button>'
-      ).join('')
+      // Collect featured items across all categories
+      const featuredItems = cats.flatMap(cat =>
+        (cat.menu_items || []).filter(item => item.is_visible && item.is_available && item.is_featured)
+      )
 
-      document.getElementById('content').innerHTML = cats.map((cat, i) => {
+      const navButtons = []
+      if (featuredItems.length) {
+        navButtons.push('<button class="cat-btn active" data-id="featured" onclick="navScroll(\'cat-featured\')">⭐ Destacados</button>')
+      }
+      navButtons.push(...cats.map((cat, i) =>
+        '<button class="cat-btn' + (!featuredItems.length && i === 0 ? ' active' : '') + '" data-id="' + cat.id + '" onclick="navScroll(\'cat-' + cat.id + '\')">'
+        + (cat.emoji ? cat.emoji + ' ' : '') + esc(cat.name) + '</button>'
+      ))
+      document.getElementById('cat-nav').innerHTML = navButtons.join('')
+
+      const sectionsHtml = []
+      if (featuredItems.length) {
+        sectionsHtml.push(
+          '<div class="category-section featured-section" id="cat-featured">'
+          + '<div class="category-title" style="color:var(--gold)">⭐ Destacados</div>'
+          + '<div class="category-desc">Los favoritos de la casa</div>'
+          + featuredItems.map(itemCardHtml).join('')
+          + '</div>'
+          + '<div class="divider"></div>'
+        )
+      }
+      sectionsHtml.push(...cats.map((cat, i) => {
         const items = (cat.menu_items || [])
           .filter(item => item.is_visible)
           .sort((a, b) => a.sort_order - b.sort_order)
@@ -352,7 +374,8 @@
           + items.map(itemCardHtml).join('')
           + '</div>'
           + (i < cats.length - 1 ? '<div class="divider"></div>' : '')
-      }).join('')
+      }))
+      document.getElementById('content').innerHTML = sectionsHtml.join('')
 
       Object.keys(itemsById).forEach(renderCtrl)
     }
@@ -370,7 +393,9 @@
       return '<div class="item-card' + (!item.is_available ? ' item-unavailable' : '') + '">'
         + img
         + '<div class="item-info">'
-        + '<div class="item-name">' + esc(item.name)
+        + '<div class="item-name">'
+        + (item.is_featured ? '<span style="font-size:12px;margin-right:3px" title="Plato destacado">⭐</span>' : '')
+        + esc(item.name)
         + (!item.is_available ? ' <span style="font-size:11px;color:#aaa;font-weight:400">(no disponible)</span>' : '')
         + '</div>'
         + (item.description ? '<div class="item-desc">' + esc(item.description) + '</div>' : '')
@@ -781,16 +806,40 @@ CATEGORIES: ${JSON.stringify(catNames)}`
       const catTrans = translations.categories || {}
       const itemTrans = translations.items || {}
 
+      // Collect featured items (translated)
+      const featuredItemsTr = cats.flatMap(cat =>
+        (cat.menu_items || []).filter(item => item.is_visible && item.is_available && item.is_featured).map(item => {
+          const t = itemTrans[item.id]
+          return t ? { ...item, name: t.name || item.name, description: t.description || item.description } : item
+        })
+      )
+
       // Actualizar nav de categorías
-      document.getElementById('cat-nav').innerHTML = cats.map((cat, i) => {
+      const navBtns = []
+      if (featuredItemsTr.length) {
+        navBtns.push('<button class="cat-btn active" data-id="featured" onclick="navScroll(\'cat-featured\')">⭐ Destacados</button>')
+      }
+      navBtns.push(...cats.map((cat, i) => {
         const t = catTrans[cat.id]
         const name = t?.name || cat.name
-        return '<button class="cat-btn' + (i === 0 ? ' active' : '') + '" data-id="' + cat.id + '" onclick="navScroll(\'cat-' + cat.id + '\')">'
+        return '<button class="cat-btn' + (!featuredItemsTr.length && i === 0 ? ' active' : '') + '" data-id="' + cat.id + '" onclick="navScroll(\'cat-' + cat.id + '\')">'
           + (cat.emoji ? cat.emoji + ' ' : '') + esc(name) + '</button>'
-      }).join('')
+      }))
+      document.getElementById('cat-nav').innerHTML = navBtns.join('')
 
       // Actualizar contenido
-      document.getElementById('content').innerHTML = cats.map((cat, i) => {
+      const sectionsHtml = []
+      if (featuredItemsTr.length) {
+        sectionsHtml.push(
+          '<div class="category-section featured-section" id="cat-featured">'
+          + '<div class="category-title" style="color:var(--gold)">⭐ Destacados</div>'
+          + '<div class="category-desc">Los favoritos de la casa</div>'
+          + featuredItemsTr.map(itemCardHtml).join('')
+          + '</div>'
+          + '<div class="divider"></div>'
+        )
+      }
+      sectionsHtml.push(...cats.map((cat, i) => {
         const catT = catTrans[cat.id]
         const catName = catT?.name || cat.name
         const catDesc = catT?.description || cat.description || ''
@@ -808,7 +857,8 @@ CATEGORIES: ${JSON.stringify(catNames)}`
           + itemsHtml
           + '</div>'
           + (i < cats.length - 1 ? '<div class="divider"></div>' : '')
-      }).join('')
+      }))
+      document.getElementById('content').innerHTML = sectionsHtml.join('')
 
       Object.keys(itemsById).forEach(renderCtrl)
     }

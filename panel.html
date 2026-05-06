@@ -1884,6 +1884,13 @@ html, body {
         <label class="form-label">Etiquetas</label>
         <div class="tag-chips" id="item-tags-picker"></div>
       </div>
+      <div style="margin-top:14px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
+          <input type="checkbox" id="item-featured" style="accent-color:var(--gold);width:16px;height:16px;cursor:pointer">
+          <span style="font-size:13.5px;font-weight:500;color:var(--ink)">⭐ Plato destacado</span>
+        </label>
+        <div class="form-hint" style="margin-left:26px">Aparece en la sección "Destacados" al tope del menú público.</div>
+      </div>
       <!-- Historial de precios (solo en edición) -->
       <div id="price-history-block" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Historial de precios</div>
@@ -2492,7 +2499,7 @@ function renderMenu() {
         <div class="item-row ${item.is_available ? '' : 'unavailable'}" id="item-row-${item.id}">
           <div class="item-emoji">${item.emoji || '🍽️'}</div>
           <div class="item-info">
-            <div class="item-name-text">${escHtml(item.name)}</div>
+            <div class="item-name-text">${item.is_featured ? '<span title="Plato destacado" style="margin-right:4px">⭐</span>' : ''}${escHtml(item.name)}</div>
             ${item.tags?.length ? `<div class="item-tags-row">${item.tags.map(t=>`<span class="item-tag">${TAGS.find(x=>x.key===t)?.label||t}</span>`).join('')}</div>` : ''}
           </div>
           <div class="item-price-text">${formatPrice(item.price)}</div>
@@ -2636,6 +2643,7 @@ window.openItemModal = function (catId, itemId = null) {
   document.getElementById('item-tags-picker').innerHTML = TAGS.map(t =>
     `<div class="tag-chip ${SELECTED_TAGS.has(t.key)?'selected':''}" onclick="toggleTag('${t.key}',this)">${t.label}</div>`
   ).join('')
+  document.getElementById('item-featured').checked = editingItem?.is_featured ?? false
   document.getElementById('modal-item').classList.add('open')
   setTimeout(() => document.getElementById('item-name').focus(), 80)
 
@@ -2686,6 +2694,7 @@ window.saveItemModal = async function () {
       description:  document.getElementById('item-desc').value.trim()      || null,
       image_url:    document.getElementById('item-image-url').value.trim() || null,
       tags:         [...SELECTED_TAGS],
+      is_featured:  document.getElementById('item-featured').checked,
       restaurant_id: currentRestaurant.id,
       category_id:   editingItemCatId,
     }
