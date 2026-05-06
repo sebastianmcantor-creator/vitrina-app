@@ -108,6 +108,16 @@
     <div class="error-msg" id="api-error"></div>
     <div id="tano-limit-alert" style="display:none;padding:8px 16px;background:#3a1f0a;color:#e8a06a;font-size:12px;text-align:center;border-top:1px solid #4a2f1a"></div>
 
+    <!-- Botón llamar al mozo (se muestra después de ciertos mensajes) -->
+    <div id="call-waiter-bar" style="display:none;padding:8px 16px 4px;border-top:0.5px solid #2e2410">
+      <button id="call-waiter-btn" onclick="callWaiter()"
+        style="width:100%;background:#2a2010;border:0.5px solid #4a3820;color:#c8a84a;
+               font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 16px;
+               border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        🙋 Llamar al mozo
+      </button>
+    </div>
+
     <div class="input-area">
       <input class="chat-input" id="chat-input" type="text" placeholder="Preguntame lo que quieras..." />
       <button class="send-btn" onclick="sendMessage()">
@@ -322,6 +332,16 @@
       }
     }
 
+    // Llamar al mozo — counter (definido antes de sendMessage que lo usa)
+    const CALL_WAITER_AFTER_MSGS = 3
+    let userMsgCount = 0
+    function maybeShowCallWaiter() {
+      userMsgCount++
+      if (userMsgCount >= CALL_WAITER_AFTER_MSGS) {
+        document.getElementById('call-waiter-bar').style.display = 'block'
+      }
+    }
+
     async function sendMessage() {
       if (isLoading) return
       const input = document.getElementById('chat-input')
@@ -332,6 +352,7 @@
       document.getElementById('suggestions').style.display = 'none'
       addMessage('user', text)
       conversationHistory.push({ role: 'user', content: text })
+      maybeShowCallWaiter()
       isLoading = true
       showTyping(true)
 
@@ -415,6 +436,22 @@
     window.sendSuggestion = function(text) {
       document.getElementById('chat-input').value = text
       sendMessage()
+    }
+
+    window.callWaiter = function () {
+      // Si el restaurante tiene teléfono, abrir WhatsApp; si no, solo mostrar mensaje
+      const btn = document.getElementById('call-waiter-btn')
+      const phone = currentRestData?.phone?.replace(/\D/g, '')
+      if (phone) {
+        const waUrl = 'https://wa.me/' + phone + '?text=' + encodeURIComponent(
+          (mesa ? 'Mesa ' + mesa + ': ' : '') + 'Hola, necesito ayuda con mi pedido.'
+        )
+        window.open(waUrl, '_blank')
+      } else {
+        // Sin teléfono: mostrar mensaje en el chat y ocultar el botón
+        addMessage('assistant', '🙋 ¡Perfecto! Levantá la mano y un mozo se acerca enseguida.')
+        document.getElementById('call-waiter-bar').style.display = 'none'
+      }
     }
 
     init()
