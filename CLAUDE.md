@@ -127,12 +127,26 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Configurar secret en Cloudflare: `REPLICATE_API_TOKEN`
 - Crear cuenta en Replicate (https://replicate.com) y generar API token
 
+**Bloque 7 — Landing page con estética gastronómica** (100%) ✅
+- Landing page completa en index.html con paleta de colores tierra (terracota, beige, crema, marrón)
+- Hero con animación de partículas flotantes en fondo (CSS keyframes)
+- Secciones: Hero + demo visual, Servicios (Menú Digital y Marketing), Cómo funciona, Pricing, Diferenciadores, FAQ, CTA
+- Tabla de precios con toggle mensual/anual y descuento del 20% en plan anual
+- FAQ accordion con 6 preguntas frecuentes
+- Animaciones de scroll con Intersection Observer API
+- Diseño mobile-first responsive (breakpoint 768px)
+- Botón de WhatsApp flotante
+- Tipografía: Cormorant Garamond para títulos, Outfit para cuerpo
+- Idioma: español únicamente
+- Todo en un solo archivo para GitHub Pages
+
 ### 🔧 Próximo bloque sugerido
-**Bloque 7 — Landing page con animaciones + videos IA** (0%)
-- Landing page responsive con hero animado
-- Secciones de features, pricing, testimonios
-- Video demos generados con Runway ML
-- Animaciones con CSS/JS
+**Bloque 8 — Agente de ventas + Twilio WhatsApp** (0%)
+- Búsqueda automática de restaurantes con Google Places API
+- Generación de diagnóstico preliminar por restaurante
+- Envío de mensajes personalizados vía WhatsApp
+- Sistema de seguimiento a 3 días
+- Notificación a Sebastián cuando hay interés real
 
 ---
 
