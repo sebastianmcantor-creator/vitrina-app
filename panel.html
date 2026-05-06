@@ -1416,6 +1416,43 @@ html, body {
           </div>
         </div>
 
+        <!-- Imágenes -->
+        <div class="card">
+          <div class="card-title">🖼️ Imágenes</div>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">Logo</label>
+              <div id="logo-preview-wrap" style="margin-bottom:10px;display:none">
+                <img id="logo-preview" src="" alt="Logo"
+                  style="height:60px;border-radius:8px;border:1px solid var(--border);object-fit:contain;background:var(--cream2);padding:4px">
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <label class="btn-secondary" style="cursor:pointer;font-size:13px;padding:7px 14px">
+                  📤 Subir imagen
+                  <input type="file" id="logo-file" accept="image/*" onchange="uploadRestaurantImage('logo',this)" style="display:none">
+                </label>
+                <input class="form-input" id="f-logo-url" placeholder="o pegá una URL directa" oninput="previewImgFromUrl('logo',this.value)" style="flex:1">
+              </div>
+              <span class="form-hint">Recomendado: cuadrado, mínimo 200×200px.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Imagen de portada</label>
+              <div id="cover-preview-wrap" style="margin-bottom:10px;display:none">
+                <img id="cover-preview" src="" alt="Portada"
+                  style="width:100%;height:100px;border-radius:8px;border:1px solid var(--border);object-fit:cover">
+              </div>
+              <div style="display:flex;gap:8px;align-items:center">
+                <label class="btn-secondary" style="cursor:pointer;font-size:13px;padding:7px 14px">
+                  📤 Subir imagen
+                  <input type="file" id="cover-file" accept="image/*" onchange="uploadRestaurantImage('cover',this)" style="display:none">
+                </label>
+                <input class="form-input" id="f-cover-url" placeholder="o pegá una URL directa" oninput="previewImgFromUrl('cover',this.value)" style="flex:1">
+              </div>
+              <span class="form-hint">Recomendado: apaisada, mínimo 1200×400px.</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Contacto -->
         <div class="card">
           <div class="card-title">📍 Contacto y ubicación</div>
@@ -2023,6 +2060,11 @@ function fillForm(rest) {
   onColorChange(rest.primary_color || '#B85A30')
   updateQuickLinks(rest.slug)
   renderOpeningHours(rest.opening_hours)
+  // Imágenes
+  document.getElementById('f-logo-url').value  = rest.logo_url  || ''
+  document.getElementById('f-cover-url').value = rest.cover_url || ''
+  previewImgFromUrl('logo',  rest.logo_url  || '')
+  previewImgFromUrl('cover', rest.cover_url || '')
 }
 
 function updateQuickLinks(slug) {
@@ -2316,6 +2358,8 @@ window.saveRestaurant = async function () {
       primary_color: document.getElementById('f-color').value,
       is_open:       document.getElementById('f-is-open').checked,
       is_active:     document.getElementById('f-is-active').checked,
+      logo_url:      document.getElementById('f-logo-url').value.trim() || null,
+      cover_url:     document.getElementById('f-cover-url').value.trim() || null,
     }
 
     currentRestaurant = await restaurants.update(currentRestaurant.id, updates)
@@ -2327,6 +2371,56 @@ window.saveRestaurant = async function () {
   } finally {
     btn.disabled = false
     btn.textContent = 'Guardar cambios'
+  }
+}
+
+// ─────────────────────────────────────────────
+// Imágenes — upload y preview
+// ─────────────────────────────────────────────
+window.previewImgFromUrl = function (type, url) {
+  const preview = document.getElementById(type + '-preview')
+  const wrap = document.getElementById(type + '-preview-wrap')
+  if (!preview || !wrap) return
+  if (url && url.startsWith('http')) {
+    preview.src = url
+    wrap.style.display = 'block'
+    preview.onerror = () => { wrap.style.display = 'none' }
+  } else {
+    wrap.style.display = 'none'
+  }
+}
+
+window.uploadRestaurantImage = async function (type, input) {
+  if (!input.files || !input.files[0]) return
+  if (!currentRestaurant) { showToast('No hay restaurante activo.', 'error'); return }
+  const file = input.files[0]
+  if (file.size > 5 * 1024 * 1024) { showToast('La imagen debe ser menor a 5MB.', 'error'); return }
+  const ext = file.name.split('.').pop().toLowerCase()
+  const allowed = ['jpg', 'jpeg', 'png', 'webp', 'gif']
+  if (!allowed.includes(ext)) { showToast('Formato no soportado. Usá JPG, PNG o WebP.', 'error'); return }
+
+  const path = currentRestaurant.id + '/' + type + '-' + Date.now() + '.' + ext
+  showToast('Subiendo imagen...', 'success')
+
+  try {
+    const { error: upErr } = await supabase.storage
+      .from('restaurant-images')
+      .upload(path, file, { upsert: true, contentType: file.type })
+    if (upErr) throw upErr
+
+    const { data: urlData } = supabase.storage
+      .from('restaurant-images')
+      .getPublicUrl(path)
+    const publicUrl = urlData?.publicUrl
+    if (!publicUrl) throw new Error('No se pudo obtener la URL pública.')
+
+    document.getElementById('f-' + type + '-url').value = publicUrl
+    previewImgFromUrl(type, publicUrl)
+    showToast('Imagen subida ✓ Guardá los cambios para confirmar.', 'success')
+  } catch (e) {
+    showToast('Error al subir: ' + e.message, 'error')
+  } finally {
+    input.value = ''
   }
 }
 

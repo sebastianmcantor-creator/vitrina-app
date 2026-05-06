@@ -136,11 +136,21 @@
   </div>
 
   <div id="app" style="display:none">
+    <!-- Portada del restaurante (visible cuando hay cover_url) -->
+    <div id="rest-cover-wrap" style="display:none;position:relative;height:140px;overflow:hidden">
+      <img id="rest-cover-img" src="" alt="" style="width:100%;height:100%;object-fit:cover">
+      <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0) 40%,rgba(0,0,0,0.55) 100%)"></div>
+    </div>
+
     <div class="header">
       <div class="header-top">
-        <div>
-          <div class="restaurant-name" id="rest-name"></div>
-          <div class="restaurant-sub" id="rest-sub"></div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <img id="rest-logo-img" src="" alt="Logo"
+            style="display:none;width:44px;height:44px;border-radius:8px;object-fit:contain;border:1px solid var(--border);background:var(--cream2);padding:2px;flex-shrink:0">
+          <div>
+            <div class="restaurant-name" id="rest-name"></div>
+            <div class="restaurant-sub" id="rest-sub"></div>
+          </div>
         </div>
         <button class="cart-btn" onclick="toggleCart()">
           🛒 Mi pedido
@@ -265,6 +275,18 @@
       const sub = [rest.tagline, rest.address].filter(Boolean).join(' · ')
       document.getElementById('rest-sub').textContent = sub || rest.city || ''
       document.getElementById('mozo-fab').href = 'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? '')
+
+      // Portada y logo
+      if (rest.cover_url) {
+        const coverImg = document.getElementById('rest-cover-img')
+        coverImg.src = rest.cover_url
+        document.getElementById('rest-cover-wrap').style.display = 'block'
+      }
+      if (rest.logo_url) {
+        const logoImg = document.getElementById('rest-logo-img')
+        logoImg.src = rest.logo_url
+        logoImg.style.display = 'block'
+      }
 
       // Mostrar horario de apertura en el sub-header
       if (rest.opening_hours) {
