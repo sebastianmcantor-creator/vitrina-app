@@ -1895,11 +1895,16 @@ html, body {
 
         <!-- Competidores -->
         <div class="card">
-          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
             <span>🏆 Competidores cercanos</span>
-            <button id="btn-find-competitors" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="findCompetitors()">
-              Buscar automáticamente
-            </button>
+            <div style="display:flex;gap:8px">
+              <button id="btn-update-competitors" class="btn-secondary" style="font-size:13px;padding:7px 14px;display:none" onclick="updateCompetitorsMetrics()">
+                🔄 Actualizar métricas
+              </button>
+              <button id="btn-find-competitors" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="findCompetitors()">
+                Buscar automáticamente
+              </button>
+            </div>
           </div>
           <div id="competitors-content" style="margin-top:16px">
             <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
@@ -2295,8 +2300,13 @@ html, body {
       </div>
       <div class="form-field" style="margin-bottom:14px">
         <label class="form-label">URL de imagen</label>
-        <input class="form-input" id="item-image-url" placeholder="https://... (opcional)">
-        <span class="form-hint">Imagen que se muestra en el menú público.</span>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <input class="form-input" id="item-image-url" placeholder="https://... (opcional)" style="flex:1">
+          <button class="btn-secondary" onclick="enhanceImage()" id="btn-enhance-image" style="padding:8px 12px;font-size:12px;white-space:nowrap">
+            ✨ Mejorar
+          </button>
+        </div>
+        <span class="form-hint">Imagen que se muestra en el menú público. Usá el botón "Mejorar" para aumentar la calidad con IA.</span>
       </div>
       <div class="form-field">
         <label class="form-label">Etiquetas</label>
@@ -4324,7 +4334,10 @@ async function loadCompetitors() {
     const { competitors } = await import('./lib/db.js')
     const lista = await competitors.listByRestaurant(currentRestaurant.id)
 
+    const updateBtn = document.getElementById('btn-update-competitors')
+
     if (!lista || lista.length === 0) {
+      updateBtn.style.display = 'none'
       document.getElementById('competitors-content').innerHTML = `
         <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
           Todavía no identificaste competidores. Usá el botón para buscar automáticamente.
@@ -4332,22 +4345,32 @@ async function loadCompetitors() {
       return
     }
 
+    // Mostrar botón de actualizar cuando hay competidores
+    updateBtn.style.display = 'inline-block'
+
     document.getElementById('competitors-content').innerHTML = `
       <div style="display:grid;gap:12px">
-        ${lista.map(c => `
+        ${lista.map(c => {
+          const lastChecked = c.last_checked_at
+            ? new Date(c.last_checked_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })
+            : 'Nunca'
+          return `
           <div style="padding:14px;border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:space-between">
-            <div>
+            <div style="flex:1">
               <div style="font-size:14px;font-weight:500;color:var(--ink);margin-bottom:3px">${c.name}</div>
               <div style="font-size:12px;color:var(--muted)">${c.address || 'Sin dirección'}</div>
               <div style="font-size:12px;color:var(--muted);margin-top:4px">
                 ⭐ ${c.rating || 'N/A'} • ${c.reviews_count || 0} reseñas
               </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">
+                Última actualización: ${lastChecked}
+              </div>
             </div>
             <button onclick="deleteCompetitor('${c.id}')" style="background:none;border:none;color:var(--bad);cursor:pointer;font-size:18px;padding:4px 8px" title="Eliminar">
               ✕
             </button>
-          </div>
-        `).join('')}
+          </div>`
+        }).join('')}
       </div>`
   } catch (e) {
     console.error('Error cargando competidores:', e)
@@ -4442,6 +4465,116 @@ async function disconnectIntegration(provider) {
     }
   } catch (e) {
     showToast('Error: ' + e.message, 'error')
+  }
+}
+
+window.updateCompetitorsMetrics = async function () {
+  if (!currentRestaurant) return
+
+  const btn = document.getElementById('btn-update-competitors')
+  const originalText = btn.textContent
+  btn.textContent = 'Actualizando...'
+  btn.disabled = true
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/competitors/update-metrics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id }),
+    })
+
+    if (!res.ok) throw new Error('Error actualizando métricas')
+
+    const data = await res.json()
+    showToast(`✅ ${data.message}`, 'success')
+    loadCompetitors()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.textContent = originalText
+    btn.disabled = false
+  }
+}
+
+window.enhanceImage = async function () {
+  const imageUrlInput = document.getElementById('item-image-url')
+  const imageUrl = imageUrlInput.value.trim()
+
+  if (!imageUrl) {
+    showToast('Ingresá una URL de imagen primero', 'error')
+    return
+  }
+
+  if (!imageUrl.startsWith('http')) {
+    showToast('La URL debe empezar con http:// o https://', 'error')
+    return
+  }
+
+  const btn = document.getElementById('btn-enhance-image')
+  const originalText = btn.textContent
+  btn.textContent = 'Procesando...'
+  btn.disabled = true
+
+  try {
+    // Iniciar procesamiento en Replicate
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/replicate/enhance-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl }),
+    })
+
+    if (!res.ok) throw new Error('Error iniciando mejora de imagen')
+
+    const prediction = await res.json()
+
+    if (prediction.status === 'succeeded' && prediction.output) {
+      // Si ya está procesada (poco común)
+      imageUrlInput.value = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output
+      showToast('✨ Imagen mejorada correctamente', 'success')
+    } else {
+      // Polling para obtener resultado
+      showToast('Procesando imagen... esto puede tomar 10-30 segundos', 'info')
+      btn.textContent = 'Esperando...'
+
+      let attempts = 0
+      const maxAttempts = 20
+
+      const checkStatus = async () => {
+        if (attempts >= maxAttempts) {
+          throw new Error('Tiempo de espera agotado')
+        }
+
+        attempts++
+        const statusRes = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/replicate/prediction/${prediction.id}`)
+
+        if (!statusRes.ok) throw new Error('Error obteniendo estado')
+
+        const statusData = await statusRes.json()
+
+        if (statusData.status === 'succeeded') {
+          const enhancedUrl = Array.isArray(statusData.output) ? statusData.output[0] : statusData.output
+          imageUrlInput.value = enhancedUrl
+          showToast('✨ Imagen mejorada correctamente', 'success')
+          btn.textContent = originalText
+          btn.disabled = false
+        } else if (statusData.status === 'failed') {
+          throw new Error('Error procesando imagen')
+        } else {
+          // Seguir esperando
+          setTimeout(checkStatus, 2000)
+        }
+      }
+
+      setTimeout(checkStatus, 2000)
+      return // No resetear botón aún
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    if (btn.textContent !== 'Esperando...') {
+      btn.textContent = originalText
+      btn.disabled = false
+    }
   }
 }
 
