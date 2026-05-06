@@ -251,6 +251,8 @@
         .sort((a, b) => a.sort_order - b.sort_order)
         .slice(0, 3)
 
+      const menuLink = 'menu.html?slug=' + encodeURIComponent(rest.slug) + (mesa ? '&mesa=' + mesa : '')
+
       const el = document.getElementById('suggestions')
       el.innerHTML = cats.map(cat =>
         '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué ' + cat.name.toLowerCase() + ' tienen?\')">'
@@ -259,6 +261,7 @@
         + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué opciones veganas tienen?\')">Vegano</button>'
         + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué platos son sin TACC?\')">Sin TACC</button>'
         + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué me recomendás?\')">Recomendaciones</button>'
+        + '<a class="suggestion-btn" href="' + menuLink + '" style="text-decoration:none;display:inline-block">📋 Ver menú completo</a>'
     }
 
     const LANG_GREETINGS = {
