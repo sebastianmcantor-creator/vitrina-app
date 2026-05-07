@@ -410,6 +410,11 @@
       const updated = await orders.updateStatus(id, siguiente)
       pedidos[id] = { ...pedido, ...updated }
       historial[id] = anterior
+
+      // Si el pedido está listo, notificar al cliente por WhatsApp
+      if (siguiente === 'ready') {
+        notificarPedidoListo(id, restaurantId).catch(() => {})
+      }
     } catch {
       if (btn) { btn.disabled = false }
       return
@@ -429,6 +434,19 @@
       return
     }
     renderAll()
+  }
+
+  // ── Notificación WhatsApp al cliente ──────────────────────────────────────────
+  async function notificarPedidoListo(orderId, restaurantId) {
+    try {
+      await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notificar-pedido-listo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, restaurantId }),
+      })
+    } catch (e) {
+      console.error('Error al notificar pedido listo:', e)
+    }
   }
 
   // ── Filter ────────────────────────────────────────────────────────────────────
@@ -621,6 +639,9 @@
         const updated = await orders.updateStatus(p.id, 'ready')
         pedidos[p.id] = { ...pedidos[p.id], ...updated }
         historial[p.id] = 'preparing'
+
+        // Notificar al cliente por WhatsApp
+        notificarPedidoListo(p.id, restaurantId).catch(() => {})
       } catch {}
     }
     renderAll()

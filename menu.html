@@ -193,7 +193,10 @@
       <div class="mesa-warning" id="mesa-warning">⚠️ No se detectó número de mesa. Pedí al mozo que te escanee el QR correcto.</div>
       <div style="margin-bottom:10px">
         <input type="email" id="cliente-email" placeholder="Tu email (opcional) para recibir confirmación"
+          style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--surface);outline:none;margin-bottom:8px">
+        <input type="tel" id="cliente-telefono" placeholder="Tu teléfono (opcional) para avisarte cuando esté listo"
           style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--surface);outline:none">
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;padding:0 4px">📱 Te avisamos por WhatsApp cuando tu pedido esté listo</div>
       </div>
       <button class="checkout-btn" id="checkout-btn" onclick="checkout()">Confirmar pedido →</button>
     </div>
@@ -549,11 +552,27 @@
       try {
         const session = mesa != null ? await orderSessions.getOrCreate(rest.id, mesa) : null
         const total = ids.reduce((s, id) => s + Number(itemsById[id].price) * cart[id], 0)
+
+        // Capturar teléfono del cliente (opcional)
+        const telefonoInput = document.getElementById('cliente-telefono')
+        let customerPhone = telefonoInput?.value?.trim()
+
+        // Formatear teléfono para WhatsApp (agregar +54 si no tiene código de país)
+        if (customerPhone) {
+          // Limpiar espacios y guiones
+          customerPhone = customerPhone.replace(/[\s\-]/g, '')
+          // Si empieza con 0, sacar el 0
+          if (customerPhone.startsWith('0')) customerPhone = customerPhone.substring(1)
+          // Si no empieza con +, agregar +54 (Argentina)
+          if (!customerPhone.startsWith('+')) customerPhone = '+54' + customerPhone
+        }
+
         const order = await orders.create({
           restaurant_id: rest.id,
           session_id: session?.id ?? null,
           table_number: mesa ?? null,
           total,
+          customer_phone: customerPhone || null,
         })
         await orderItems.createBatch(ids.map(id => ({
           order_id: order.id,
