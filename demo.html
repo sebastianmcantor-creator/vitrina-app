@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Menú — El Origen Restaurante</title>
+  <meta name="description" content="Demo interactiva del menú digital de Vitrina">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --terra: #C86640;
+      --beige: #F5E6D3;
+      --cream: #FAF7F2;
+      --brown: #6B4423;
+      --sand: #D4A574;
+      --white: #FFFFFF;
+      --black: #1A1A1A;
+      --grey: #7A7A7A;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--cream);
+      color: var(--black);
+      line-height: 1.6;
+    }
+
+    .demo-banner {
+      background: linear-gradient(135deg, var(--terra), var(--sand));
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .demo-banner a {
+      color: white;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+
+    .header {
+      background: var(--white);
+      padding: 1.5rem 1rem;
+      text-align: center;
+      border-bottom: 1px solid var(--beige);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .logo-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 0.5rem;
+      display: block;
+    }
+
+    .restaurant-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--terra);
+      margin-bottom: 0.3rem;
+    }
+
+    .restaurant-description {
+      font-size: 0.9rem;
+      color: var(--grey);
+    }
+
+    .featured-section {
+      background: linear-gradient(135deg, rgba(200,102,64,0.1), rgba(212,165,116,0.1));
+      padding: 2rem 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .featured-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--terra);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .featured-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .menu-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .category {
+      margin-bottom: 3rem;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 2px solid var(--terra);
+    }
+
+    .category-icon {
+      font-size: 2rem;
+    }
+
+    .category-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--terra);
+    }
+
+    .dishes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .dish-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: pointer;
+    }
+
+    .dish-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .dish-card.featured {
+      border: 2px solid var(--terra);
+    }
+
+    .dish-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .dish-content {
+      padding: 1.2rem;
+    }
+
+    .dish-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.5rem;
+    }
+
+    .dish-name {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--brown);
+      flex: 1;
+    }
+
+    .dish-price {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: var(--terra);
+      white-space: nowrap;
+      margin-left: 0.5rem;
+    }
+
+    .dish-description {
+      font-size: 0.9rem;
+      color: var(--grey);
+      margin-bottom: 0.8rem;
+      line-height: 1.5;
+    }
+
+    .dish-tags {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .dish-tag {
+      background: var(--beige);
+      color: var(--brown);
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 12px;
+      font-weight: 500;
+    }
+
+    .featured-badge {
+      background: var(--terra);
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 12px;
+      font-weight: 600;
+    }
+
+    .cart-button {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: linear-gradient(135deg, var(--terra), var(--sand));
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 50px;
+      border: none;
+      font-weight: 600;
+      font-size: 1rem;
+      box-shadow: 0 4px 20px rgba(200,102,64,0.4);
+      cursor: pointer;
+      z-index: 99;
+      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cart-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 25px rgba(200,102,64,0.6);
+    }
+
+    .cart-count {
+      background: white;
+      color: var(--terra);
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .footer {
+      background: var(--brown);
+      color: rgba(255,255,255,0.8);
+      text-align: center;
+      padding: 2rem 1rem;
+      margin-top: 3rem;
+    }
+
+    .footer-text {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .footer-link {
+      color: white;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .dishes-grid, .featured-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cart-button {
+        bottom: 1rem;
+        right: 1rem;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
+      }
+
+      .restaurant-name {
+        font-size: 1.5rem;
+      }
+
+      .category-name {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-banner">
+    🎭 Modo Demo — Este es un restaurante ficticio para mostrar cómo funciona Vitrina ·
+    <a href="/panel.html">Creá tu propio menú gratis</a>
+  </div>
+
+  <div class="header">
+    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=200&fit=crop" alt="El Origen" class="logo-img">
+    <h1 class="restaurant-name">El Origen</h1>
+    <p class="restaurant-description">Cocina de autor con raíces argentinas</p>
+  </div>
+
+  <!-- Sección de destacados -->
+  <div class="featured-section">
+    <h2 class="featured-title">⭐ Nuestros Destacados</h2>
+    <div class="featured-grid" id="featured-dishes"></div>
+  </div>
+
+  <div class="menu-container" id="menu-container">
+    <!-- Las categorías se generan con JavaScript -->
+  </div>
+
+  <button class="cart-button" onclick="showCartDemo()">
+    🛒 Ver carrito
+    <span class="cart-count">0</span>
+  </button>
+
+  <div class="footer">
+    <p class="footer-text">Menú digital creado con <a href="/" class="footer-link">Vitrina</a></p>
+    <p class="footer-text" style="font-size: 0.8rem; opacity: 0.7;">
+      ¿Querés un menú como este para tu restaurante?
+      <a href="/panel.html" class="footer-link">Empezá gratis</a>
+    </p>
+  </div>
+
+  <script>
+    // Datos del menú demo
+    const menuData = {
+      categories: [
+        {
+          id: 1,
+          name: 'Entradas',
+          icon: '🥗',
+          dishes: [
+            {
+              id: 101,
+              name: 'Provoleta al Romero',
+              description: 'Queso provolone gratinado con romero fresco, tomates cherry confitados y reducción de aceto balsámico',
+              price: 8500,
+              image: 'https://images.unsplash.com/photo-1486297678162-eb2a19b0a32d?w=400&h=300&fit=crop',
+              tags: ['Vegetariano'],
+              featured: true
+            },
+            {
+              id: 102,
+              name: 'Empanadas de Cordero Patagónico',
+              description: 'Cordero cocido lentamente con especias, cebolla caramelizada y pasas de uva',
+              price: 3500,
+              image: 'https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=400&h=300&fit=crop',
+              tags: []
+            },
+            {
+              id: 103,
+              name: 'Tabla de Quesos Artesanales',
+              description: 'Selección de 4 quesos argentinos con mermeladas caseras, frutas secas y pan de campo',
+              price: 12000,
+              image: 'https://images.unsplash.com/photo-1452195100486-9cc805987862?w=400&h=300&fit=crop',
+              tags: ['Vegetariano', 'Para compartir']
+            }
+          ]
+        },
+        {
+          id: 2,
+          name: 'Platos Principales',
+          icon: '🍽️',
+          dishes: [
+            {
+              id: 201,
+              name: 'Bife de Chorizo Premium',
+              description: '400g de corte premium madurado 21 días, con papas rústicas al romero y chimichurri de autor',
+              price: 24000,
+              image: 'https://images.unsplash.com/photo-1600891964092-4316c288032e?w=400&h=300&fit=crop',
+              tags: [],
+              featured: true
+            },
+            {
+              id: 202,
+              name: 'Trucha de Río con Risotto',
+              description: 'Trucha patagónica a la plancha sobre risotto cremoso de hongos portobello y espárragos',
+              price: 18500,
+              image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop',
+              tags: []
+            },
+            {
+              id: 203,
+              name: 'Ravioles de Calabaza y Ricota',
+              description: 'Pasta fresca rellena con calabaza asada y ricota, salsa de manteca y salvia, nueces tostadas',
+              price: 14500,
+              image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=400&h=300&fit=crop',
+              tags: ['Vegetariano'],
+              featured: false
+            },
+            {
+              id: 204,
+              name: 'Cordero Patagónico Braseado',
+              description: 'Paletilla de cordero cocida 8 horas con vino tinto y hierbas, puré de batatas y vegetales de estación',
+              price: 26500,
+              image: 'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&h=300&fit=crop',
+              tags: [],
+              featured: true
+            }
+          ]
+        },
+        {
+          id: 3,
+          name: 'Postres',
+          icon: '🍰',
+          dishes: [
+            {
+              id: 301,
+              name: 'Flan Casero con Dulce de Leche',
+              description: 'Flan artesanal con dulce de leche repostero y crema chantilly',
+              price: 5500,
+              image: 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400&h=300&fit=crop',
+              tags: []
+            },
+            {
+              id: 302,
+              name: 'Volcán de Chocolate',
+              description: 'Bizcochuelo tibio con centro de chocolate fundido, helado de vainilla y frutos rojos',
+              price: 7000,
+              image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&h=300&fit=crop',
+              tags: [],
+              featured: true
+            },
+            {
+              id: 303,
+              name: 'Cheesecake de Frutos del Bosque',
+              description: 'Queso crema sobre base de galletas, coulis de frutos rojos y menta fresca',
+              price: 6500,
+              image: 'https://images.unsplash.com/photo-1533134242-deb6806b89b7?w=400&h=300&fit=crop',
+              tags: []
+            }
+          ]
+        },
+        {
+          id: 4,
+          name: 'Bebidas',
+          icon: '🍷',
+          dishes: [
+            {
+              id: 401,
+              name: 'Malbec Reserva',
+              description: 'Copa de Malbec de bodega boutique mendocina, crianza 12 meses en roble francés',
+              price: 4500,
+              image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
+              tags: []
+            },
+            {
+              id: 402,
+              name: 'Limonada de Autor',
+              description: 'Limón, jengibre, menta y un toque de cardamomo',
+              price: 2500,
+              image: 'https://images.unsplash.com/photo-1523677011781-c91d1bbe2f0a?w=400&h=300&fit=crop',
+              tags: ['Sin alcohol']
+            },
+            {
+              id: 403,
+              name: 'Café Espresso Doble',
+              description: 'Blend de cafés de especialidad tostado artesanalmente',
+              price: 2000,
+              image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=300&fit=crop',
+              tags: []
+            }
+          ]
+        }
+      ]
+    };
+
+    // Renderizar menú
+    function renderMenu() {
+      const container = document.getElementById('menu-container');
+      const featuredContainer = document.getElementById('featured-dishes');
+
+      // Renderizar destacados
+      const featuredDishes = [];
+      menuData.categories.forEach(category => {
+        category.dishes.forEach(dish => {
+          if (dish.featured) {
+            featuredDishes.push(dish);
+          }
+        });
+      });
+
+      featuredContainer.innerHTML = featuredDishes.map(dish => createDishCard(dish, true)).join('');
+
+      // Renderizar categorías
+      container.innerHTML = menuData.categories.map(category => `
+        <div class="category">
+          <div class="category-header">
+            <span class="category-icon">${category.icon}</span>
+            <h2 class="category-name">${category.name}</h2>
+          </div>
+          <div class="dishes-grid">
+            ${category.dishes.map(dish => createDishCard(dish)).join('')}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function createDishCard(dish, isInFeatured = false) {
+      const tagsHTML = dish.tags.length > 0
+        ? dish.tags.map(tag => `<span class="dish-tag">${tag}</span>`).join('')
+        : '';
+
+      const featuredBadge = dish.featured && !isInFeatured
+        ? '<span class="featured-badge">⭐ Destacado</span>'
+        : '';
+
+      return `
+        <div class="dish-card ${dish.featured ? 'featured' : ''}" onclick="showDishDetail(${dish.id})">
+          <img src="${dish.image}" alt="${dish.name}" class="dish-image">
+          <div class="dish-content">
+            <div class="dish-header">
+              <h3 class="dish-name">${dish.name}</h3>
+              <span class="dish-price">$${dish.price.toLocaleString('es-AR')}</span>
+            </div>
+            <p class="dish-description">${dish.description}</p>
+            <div class="dish-tags">
+              ${featuredBadge}
+              ${tagsHTML}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function showDishDetail(dishId) {
+      alert('En el menú real, acá se abriría un modal para agregar este plato al carrito con opciones de personalización.');
+    }
+
+    function showCartDemo() {
+      alert('En el menú real, acá se abriría el carrito con los platos seleccionados y la opción de confirmar el pedido.');
+    }
+
+    // Inicializar
+    renderMenu();
+  </script>
+
+</body>
+</html>
