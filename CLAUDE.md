@@ -208,11 +208,50 @@ SaaS para restaurantes con dos servicios contratables juntos o por separado:
 - Verificación de flujos principales completos
 - Sistema listo para primeros clientes
 
+**Mejoras Landing Page — 07/05/2026** (100%) ✅
+- Logo SVG con ventana y paleta cálida (terracota/beige/marrón) — reemplaza emoji
+- Hero con foto de restaurante lleno (Unsplash) — más atractivo que comida
+- Menú hamburguesa mobile funcional con JS + overlay CSS
+- Sección Marketing convertida a "Próximamente" con formulario waitlist
+- Chat IA flotante (Claude Haiku) — reemplaza WhatsApp:
+  - System prompt completo con info de Vitrina
+  - Detección automática de interés (palabras clave)
+  - Captura de leads con validación de email
+  - Notificaciones automáticas a contacto@vitrinaapp.com.ar
+- Demo interactiva `demo.html` — restaurante ficticio "El Origen" (13 platos, 4 categorías)
+- Link a demo desde hero CTAs
+- Migración 018: tablas `waitlist` y `leads`
+- Endpoints backend: `/api/waitlist`, `/api/lead`, `/api/landing-chat`
+
+**Security Hardening — 07/05/2026** (100%) ✅
+- Rate limiting in-memory por CF-Connecting-IP:
+  - `/api/landing-chat`: 10 req/min (anti abuse chat IA)
+  - `/api/waitlist`: 3 req/hora (anti spam formulario)
+  - `/api/lead`: 5 req/hora (anti spam captura)
+- Input sanitization completa:
+  - Emails validados RFC 5322 regex
+  - Strings limitados (max 100-1000 chars según campo)
+  - Números validados min/max
+  - Prevención XSS en todos los inputs públicos
+- Security headers en todas las respuestas:
+  - `Strict-Transport-Security` (HSTS)
+  - `X-Content-Type-Options: nosniff`
+  - `X-Frame-Options: DENY`
+  - `X-XSS-Protection: 1; mode=block`
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+- Error handling mejorado:
+  - Mensajes genéricos en errores 500+ (no expone estructura interna)
+  - Stack traces filtrados en producción
+- Límite 20 mensajes en chat history (anti abuse tokens Anthropic)
+- TEST_RESULTS.md con security audit completo (13 áreas auditadas)
+
 **Pendiente testing manual:**
-- Ejecutar checklist completo de 170+ items
-- Corregir bugs críticos encontrados
-- Testing con usuarios reales (primer restaurante)
-- Ajustes basados en feedback
+- Ejecutar migraciones 014-018 en Supabase Dashboard
+- Configurar secrets faltantes en Cloudflare Workers (ver SETUP.md)
+- Configurar cron jobs (tipo cambio lunes, seguimientos diario, informes mensual)
+- Testing checklist completo de 170+ items
+- Testing con primer restaurante piloto
+- Ajustes basados en feedback real
 
 ### 🎯 Estado del Proyecto
 
