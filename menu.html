@@ -22,7 +22,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); min-height: 100vh; }
 
-    #loading, #error-view {
+    #error-view {
       min-height: 100vh; display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       color: var(--muted); font-size: 15px; gap: 10px; padding: 20px; text-align: center;
@@ -37,6 +37,7 @@
     .translating-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.7); z-index: 500; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--muted); backdrop-filter: blur(4px); }
     .translating-overlay.show { display: flex; }
     .translating-spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     @keyframes spin { to { transform: rotate(360deg); } }
     .pedidos-bar { margin-top: 12px; background: var(--accent-light); border: 1px solid color-mix(in srgb, var(--accent) 25%, white); border-radius: 10px; padding: 9px 14px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
     .pedidos-bar-text { font-size: 13px; color: var(--accent); font-weight: 500; }
@@ -61,7 +62,9 @@
     .category-desc { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
     .featured-section { background: linear-gradient(180deg, rgba(232,200,122,0.08) 0%, transparent 100%); border-radius: 0 0 12px 12px; }
 
-    .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; }
+    .item-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 10px; display: flex; gap: 12px; transition: box-shadow 0.2s, transform 0.15s; animation: cardIn 0.3s ease backwards; }
+    .item-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); transform: translateY(-1px); }
+    @keyframes cardIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     .item-card.item-unavailable { opacity: 0.5; }
     .item-img { width: 80px; height: 80px; border-radius: 10px; background: var(--accent-light); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
     .item-info { flex: 1; min-width: 0; }
@@ -101,12 +104,16 @@
     .cart-empty { text-align: center; color: var(--muted); font-size: 14px; padding: 32px 20px; }
     .cart-footer { padding: 16px 20px 0; border-top: 1px solid var(--border); }
     .cart-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 500; margin-bottom: 14px; }
-    .checkout-btn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; }
-    .checkout-btn:disabled { opacity: 0.6; }
+    .checkout-btn { width: 100%; background: var(--accent); color: white; border: none; border-radius: 14px; padding: 15px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.1s, box-shadow 0.2s; box-shadow: 0 4px 12px rgba(184,90,48,0.3); }
+    .checkout-btn:hover:not(:disabled) { background: #a04d29; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(184,90,48,0.4); }
+    .checkout-btn:active:not(:disabled) { transform: translateY(0); }
+    .checkout-btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
 
     .cerrado-banner { background: #fff3cd; border-bottom: 1px solid #ffc107; padding: 10px 20px; display: none; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; color: #856404; }
     .mesa-warning { font-size: 12px; color: #856404; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; display: none; }
-    .mozo-fab { position: fixed; bottom: 24px; right: 20px; background: #1a1208; color: #fdf8f4; border: none; border-radius: 28px; padding: 12px 18px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; box-shadow: 0 4px 16px rgba(0,0,0,0.18); z-index: 150; text-decoration: none; }
+    .mozo-fab { position: fixed; bottom: 80px; right: 16px; background: #1a1208; color: #e8c87a; border-radius: 50px; padding: 12px 18px; font-size: 13px; font-weight: 500; text-decoration: none; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); transition: transform 0.2s, box-shadow 0.2s; z-index: 50; font-family: 'DM Sans', sans-serif; }
+    .mozo-fab:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.4); }
+    .mozo-fab:active { transform: translateY(0); }
 
     .confirm-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 300; display: none; align-items: center; justify-content: center; }
     .confirm-overlay.open { display: flex; }
@@ -141,7 +148,44 @@
 </head>
 <body>
 
-  <div id="loading">Cargando menú…</div>
+  <div id="loading" style="min-height:100vh;background:var(--bg)">
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:18px 20px 14px">
+    <div style="height:24px;width:140px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:8px;margin-bottom:8px"></div>
+    <div style="height:12px;width:80px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+  </div>
+  <div style="padding:16px;display:flex;gap:8px;background:var(--surface);border-bottom:1px solid var(--border)">
+    <div style="height:32px;width:80px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:20px;flex-shrink:0"></div>
+    <div style="height:32px;width:80px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:20px;flex-shrink:0"></div>
+    <div style="height:32px;width:80px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:20px;flex-shrink:0"></div>
+    <div style="height:32px;width:80px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:20px;flex-shrink:0"></div>
+  </div>
+  <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;animation-delay:100ms">
+      <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;flex-shrink:0"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+        <div style="height:16px;width:70%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+        <div style="height:12px;width:90%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+        <div style="height:12px;width:50%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;animation-delay:200ms">
+      <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;flex-shrink:0"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+        <div style="height:16px;width:70%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+        <div style="height:12px;width:90%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+        <div style="height:12px;width:50%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+      </div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;gap:12px;animation-delay:300ms">
+      <div style="width:80px;height:80px;border-radius:10px;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;flex-shrink:0"></div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:8px">
+        <div style="height:16px;width:70%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+        <div style="height:12px;width:90%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+        <div style="height:12px;width:50%;background:linear-gradient(90deg,var(--border) 25%,var(--cream2) 50%,var(--border) 75%);background-size:200% 100%;animation:shimmer 1.2s infinite;border-radius:6px"></div>
+      </div>
+    </div>
+  </div>
+</div>
   <div id="error-view" style="display:none">
     <div style="font-size:36px">😕</div>
     <div id="error-msg">No se encontró el menú.</div>
@@ -429,7 +473,7 @@
           '<div class="category-section featured-section" id="cat-featured">'
           + '<div class="category-title" style="color:var(--gold)">⭐ Destacados</div>'
           + '<div class="category-desc">Los favoritos de la casa</div>'
-          + featuredItems.map(itemCardHtml).join('')
+          + featuredItems.map((item, idx) => itemCardHtml(item, idx)).join('')
           + '</div>'
           + '<div class="divider"></div>'
         )
@@ -441,7 +485,7 @@
         return '<div class="category-section" id="cat-' + cat.id + '">'
           + '<div class="category-title">' + (cat.emoji ? cat.emoji + ' ' : '') + esc(cat.name) + '</div>'
           + (cat.description ? '<div class="category-desc">' + esc(cat.description) + '</div>' : '')
-          + items.map(itemCardHtml).join('')
+          + items.map((item, idx) => itemCardHtml(item, idx)).join('')
           + '</div>'
           + (i < cats.length - 1 ? '<div class="divider"></div>' : '')
       }))
@@ -450,7 +494,7 @@
       Object.keys(itemsById).forEach(renderCtrl)
     }
 
-    function itemCardHtml(item) {
+    function itemCardHtml(item, idx = 0) {
       const key = item.id.replace(/-/g, '_')
       const price = Number(item.price)
       const tags = (item.tags || []).map(t => {
@@ -460,7 +504,7 @@
       const img = item.image_url
         ? '<img src="' + esc(item.image_url) + '" alt="" style="width:80px;height:80px;border-radius:10px;object-fit:cover;flex-shrink:0;">'
         : '<div class="item-img">' + (item.emoji || '🍽️') + '</div>'
-      return '<div class="item-card' + (!item.is_available ? ' item-unavailable' : '') + '">'
+      return '<div class="item-card' + (!item.is_available ? ' item-unavailable' : '') + '" style="animation-delay:' + (idx * 40) + 'ms">'
         + img
         + '<div class="item-info">'
         + '<div class="item-name">'
@@ -1050,7 +1094,7 @@ CATEGORIES: ${JSON.stringify(catNames)}`
           '<div class="category-section featured-section" id="cat-featured">'
           + '<div class="category-title" style="color:var(--gold)">⭐ Destacados</div>'
           + '<div class="category-desc">Los favoritos de la casa</div>'
-          + featuredItemsTr.map(itemCardHtml).join('')
+          + featuredItemsTr.map((item, idx) => itemCardHtml(item, idx)).join('')
           + '</div>'
           + '<div class="divider"></div>'
         )
@@ -1064,7 +1108,7 @@ CATEGORIES: ${JSON.stringify(catNames)}`
         const itemsHtml = items.map(item => {
           const t = itemTrans[item.id]
           const translatedItem = t ? { ...item, name: t.name || item.name, description: t.description || item.description } : item
-          return itemCardHtml(translatedItem)
+          return itemCardHtml(translatedItem, i)
         }).join('')
 
         return '<div class="category-section" id="cat-' + cat.id + '">'
