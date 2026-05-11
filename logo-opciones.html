@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Opciones de logo — Vitrina</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #FAF7F2; padding: 40px 24px; color: #1C1208; }
+    h1 { font-family: 'DM Sans', sans-serif; font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    p { font-size: 14px; color: #8A7A6A; margin-bottom: 40px; }
+
+    .logos-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; max-width: 900px; margin: 0 auto; }
+
+    .logo-card {
+      background: white; border: 1.5px solid #E8DDD0;
+      border-radius: 20px; padding: 32px;
+      display: flex; flex-direction: column; gap: 24px;
+    }
+    .logo-card h2 { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #8A7A6A; }
+    .logo-card p.desc { font-size: 13px; color: #8A7A6A; line-height: 1.5; margin: 0; }
+
+    .preview-row {
+      display: flex; align-items: center; gap: 32px;
+      padding: 24px; border-radius: 12px;
+    }
+    .preview-row.on-light { background: #FAF7F2; }
+    .preview-row.on-dark { background: #1C1208; }
+    .preview-row.on-terra { background: #B85A30; }
+
+    .size-label { font-size: 10px; color: #aaa; text-align: center; margin-top: 6px; }
+
+    .divider { height: 1px; background: #E8DDD0; }
+  </style>
+</head>
+<body>
+
+<h1>Opciones de logo — Vitrina</h1>
+<p>4 direcciones distintas. Cada una se muestra en tamaño navegación (20px), normal (32px) y grande (48px), sobre fondo claro y oscuro.</p>
+
+<div class="logos-grid">
+
+  <!-- OPCIÓN A: Solo wordmark -->
+  <div class="logo-card">
+    <h2>A — Solo wordmark</h2>
+    <p class="desc">Solo el nombre en tipografía serif. Sin ícono. Lo usan las marcas más premium: Notion, Linear, Vercel. Atemporal y elegante.</p>
+
+    <div class="preview-row on-light">
+      <!-- 20px -->
+      <div style="text-align:center">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#B85A30;letter-spacing:.02em">Vitrina</span>
+        <div class="size-label">Nav</div>
+      </div>
+      <!-- 32px -->
+      <div style="text-align:center">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:#B85A30;letter-spacing:.02em">Vitrina</span>
+        <div class="size-label">Normal</div>
+      </div>
+      <!-- 48px -->
+      <div style="text-align:center">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:500;color:#B85A30;letter-spacing:.02em">Vitrina</span>
+        <div class="size-label">Grande</div>
+      </div>
+    </div>
+
+    <div class="preview-row on-dark">
+      <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#e8c87a;letter-spacing:.02em">Vitrina</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:#e8c87a;letter-spacing:.02em">Vitrina</span>
+      <span style="font-family:'Cormorant Garamond',serif;font-size:48px;font-weight:500;color:#e8c87a;letter-spacing:.02em">Vitrina</span>
+    </div>
+
+    <div style="padding:16px;background:#FAF7F2;border-radius:10px;text-align:center">
+      <span style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:500;color:#B85A30;letter-spacing:.02em">Vitrina</span>
+      <span style="font-size:13px;color:#8A7A6A;margin-left:6px">— El negocio digital</span>
+    </div>
+  </div>
+
+  <!-- OPCIÓN B: Wordmark + línea accent -->
+  <div class="logo-card">
+    <h2>B — Wordmark con acento</h2>
+    <p class="desc">El nombre con una línea debajo de la primera letra o una barra vertical a la izquierda. Sutil, da personalidad sin ser pretencioso.</p>
+
+    <div class="preview-row on-light">
+      <!-- Con barra izquierda -->
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:8px">
+          <div style="width:3px;height:20px;background:#B85A30;border-radius:2px"></div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#1C1208;letter-spacing:.01em">Vitrina</span>
+        </div>
+        <div class="size-label">Nav</div>
+      </div>
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:10px">
+          <div style="width:3px;height:32px;background:#B85A30;border-radius:2px"></div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:#1C1208;letter-spacing:.01em">Vitrina</span>
+        </div>
+        <div class="size-label">Normal</div>
+      </div>
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:12px">
+          <div style="width:4px;height:44px;background:#B85A30;border-radius:2px"></div>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:500;color:#1C1208;letter-spacing:.01em">Vitrina</span>
+        </div>
+        <div class="size-label">Grande</div>
+      </div>
+    </div>
+
+    <div class="preview-row on-dark">
+      <div style="display:inline-flex;align-items:center;gap:8px">
+        <div style="width:3px;height:20px;background:#e8c87a;border-radius:2px"></div>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:white;letter-spacing:.01em">Vitrina</span>
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:10px">
+        <div style="width:3px;height:32px;background:#e8c87a;border-radius:2px"></div>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:500;color:white;letter-spacing:.01em">Vitrina</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN C: Ícono simple + wordmark -->
+  <div class="logo-card">
+    <h2>C — Ícono geométrico + nombre</h2>
+    <p class="desc">Un cuadrado redondeado con una chispa/asterisco adentro, representando el "escaparate que ilumina". Moderno, tecnológico pero cálido.</p>
+
+    <div class="preview-row on-light">
+      <!-- 20px -->
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:7px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <rect x="1" y="1" width="22" height="22" rx="6" fill="#B85A30"/>
+            <path d="M12 6v12M6 12h12M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:'DM Sans',sans-serif;font-size:16px;font-weight:600;color:#1C1208;letter-spacing:-.01em">Vitrina</span>
+        </div>
+        <div class="size-label">Nav</div>
+      </div>
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:10px">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <rect x="1" y="1" width="22" height="22" rx="6" fill="#B85A30"/>
+            <path d="M12 6v12M6 12h12M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:600;color:#1C1208;letter-spacing:-.01em">Vitrina</span>
+        </div>
+        <div class="size-label">Normal</div>
+      </div>
+    </div>
+
+    <div class="preview-row on-dark">
+      <div style="display:inline-flex;align-items:center;gap:8px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+          <rect x="1" y="1" width="22" height="22" rx="6" fill="#e8c87a"/>
+          <path d="M12 6v12M6 12h12M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#1C1208" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span style="font-family:'DM Sans',sans-serif;font-size:18px;font-weight:600;color:white;letter-spacing:-.01em">Vitrina</span>
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:10px">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+          <rect x="1" y="1" width="22" height="22" rx="6" fill="#e8c87a"/>
+          <path d="M12 6v12M6 12h12M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="#1C1208" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        <span style="font-family:'DM Sans',sans-serif;font-size:22px;font-weight:600;color:white;letter-spacing:-.01em">Vitrina</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OPCIÓN D: Vidriera arquitectónica minimalista -->
+  <div class="logo-card">
+    <h2>D — Arco de vidriera + nombre</h2>
+    <p class="desc">Un arco semicircular (como una vidriera clásica de local) sin elementos internos. Conecta con el concepto "vitrina" de forma elegante y reconocible.</p>
+
+    <div class="preview-row on-light">
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:7px">
+          <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
+            <!-- Base -->
+            <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#B85A30"/>
+            <!-- Parantes -->
+            <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/>
+            <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/>
+            <!-- Arco -->
+            <path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:500;color:#1C1208;letter-spacing:.02em">Vitrina</span>
+        </div>
+        <div class="size-label">Nav</div>
+      </div>
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:10px">
+          <svg width="26" height="32" viewBox="0 0 18 22" fill="none">
+            <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#B85A30"/>
+            <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/>
+            <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/>
+            <path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:#1C1208;letter-spacing:.02em">Vitrina</span>
+        </div>
+        <div class="size-label">Normal</div>
+      </div>
+      <div style="text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:12px">
+          <svg width="36" height="44" viewBox="0 0 18 22" fill="none">
+            <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#B85A30"/>
+            <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/>
+            <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/>
+            <path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          </svg>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:500;color:#1C1208;letter-spacing:.02em">Vitrina</span>
+        </div>
+        <div class="size-label">Grande</div>
+      </div>
+    </div>
+
+    <div class="preview-row on-dark">
+      <div style="display:inline-flex;align-items:center;gap:8px">
+        <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
+          <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#e8c87a"/>
+          <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+          <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+          <path d="M2.5 8 Q9 1 15.5 8" stroke="#e8c87a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:white;letter-spacing:.02em">Vitrina</span>
+      </div>
+      <div style="display:inline-flex;align-items:center;gap:10px">
+        <svg width="26" height="32" viewBox="0 0 18 22" fill="none">
+          <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#e8c87a"/>
+          <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+          <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+          <path d="M2.5 8 Q9 1 15.5 8" stroke="#e8c87a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:500;color:white;letter-spacing:.02em">Vitrina</span>
+      </div>
+    </div>
+
+    <div class="preview-row on-terra">
+      <div style="display:inline-flex;align-items:center;gap:8px">
+        <svg width="18" height="22" viewBox="0 0 18 22" fill="none">
+          <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="white"/>
+          <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="white"/>
+          <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="white"/>
+          <path d="M2.5 8 Q9 1 15.5 8" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:white;letter-spacing:.02em">Vitrina</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div style="max-width:900px;margin:32px auto 0;padding:20px 24px;background:white;border-radius:14px;border:1px solid #E8DDD0">
+  <div style="font-size:13px;font-weight:600;color:#1C1208;margin-bottom:8px">Mi recomendación</div>
+  <div style="font-size:13.5px;color:#4A3828;line-height:1.7">
+    <strong>D (arco de vidriera)</strong> es la que conecta más claramente con el nombre y tiene carácter propio. El arco es universal, reconocible como "local/tienda", funciona a cualquier tamaño y tiene elegancia sin artificios.<br><br>
+    <strong>A (solo wordmark)</strong> es la apuesta más segura y atemporal — muchas marcas SaaS exitosas usan solo tipografía. Si el nombre es fuerte, no necesita ícono.<br><br>
+    <strong>Decime cuál te gusta y la implemento en todas las páginas en 5 minutos.</strong>
+  </div>
+</div>
+
+</body>
+</html>
