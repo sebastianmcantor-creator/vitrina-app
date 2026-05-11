@@ -210,6 +210,13 @@
       document.getElementById('rest-name').textContent = rest.name
       document.title = rest.name + ' — Asistente'
 
+      // Mostrar logo si existe
+      if (rest.logo_url) {
+        const logoEl = document.getElementById('rest-name')
+        logoEl.insertAdjacentHTML('beforebegin',
+          '<img src="' + rest.logo_url + '" alt="Logo" style="width:32px;height:32px;border-radius:6px;object-fit:contain;margin-bottom:4px;display:block">')
+      }
+
       // Badge: mesa + estado del restaurante
       ;(function updateBadge() {
         const parts = []
@@ -385,6 +392,19 @@
     }
 
     function addGreeting(rest, lang = currentLang) {
+      // Verificar si está cerrado ahora
+      let closedNote = ''
+      if (rest.opening_hours) {
+        const now = new Date()
+        const day = now.getDay()
+        const hm  = now.getHours() * 100 + now.getMinutes()
+        const toN = s => { const [hh,mm] = s.split(':').map(Number); return hh*100+mm }
+        const h   = rest.opening_hours[day]
+        if (!h || hm < toN(h.o) || hm >= toN(h.c)) {
+          closedNote = ' (Estamos cerrados ahora, pero te respondo igual 😊)'
+        }
+      }
+
       let msg
       if (lang !== 'es') {
         msg = LANG_GREETINGS[lang](rest.name)
@@ -394,6 +414,7 @@
             + 'Puedo ayudarte con los platos, ingredientes, opciones vegetarianas, veganas o sin TACC, y hacerte recomendaciones. '
             + '¿En qué te puedo ayudar?'
       }
+      if (typeof msg === 'string') msg += closedNote
       addMessage('assistant', msg)
     }
 

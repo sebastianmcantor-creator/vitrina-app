@@ -193,9 +193,17 @@
       <div class="header-title">🍳 Panel de Cocina</div>
       <div class="header-sub" id="rest-sub">Cargando…</div>
     </div>
-    <div class="conn-label">
-      <span class="status-dot" id="status-dot"></span>
-      <span id="conn-label">Conectando...</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="btn-mute-sound" onclick="toggleMuteSound()" title="Silenciar alertas"
+        style="background:none;border:1px solid #3a3a3a;color:#888;border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;transition:all .15s;font-family:'DM Sans',sans-serif"
+        onmouseover="this.style.borderColor='#c8a84a';this.style.color='#c8a84a'"
+        onmouseout="if(!soundMuted){this.style.borderColor='#3a3a3a';this.style.color='#888'}">
+        🔊 Sonido
+      </button>
+      <div class="conn-label">
+        <span class="status-dot" id="status-dot"></span>
+        <span id="conn-label">Conectando...</span>
+      </div>
     </div>
   </div>
   <div class="filter-bar" id="filter-bar">
@@ -236,6 +244,18 @@
   let realtimeChannel = null
   let currentFilter = 'active' // all | active | pending | preparing | ready
   let elapsedTimer = null
+  let soundMuted = localStorage.getItem('cocina_muted') === '1'
+  function toggleMuteSound() {
+    soundMuted = !soundMuted
+    localStorage.setItem('cocina_muted', soundMuted ? '1' : '0')
+    const btn = document.getElementById('btn-mute-sound')
+    if (btn) {
+      btn.textContent = soundMuted ? '🔇 Silenciado' : '🔊 Sonido'
+      btn.style.borderColor = soundMuted ? '#c8553d' : '#3a3a3a'
+      btn.style.color = soundMuted ? '#c8553d' : '#888'
+    }
+  }
+  window.toggleMuteSound = toggleMuteSound
 
   // ── Auth ──────────────────────────────────────────────────────────────────────
   async function init() {
@@ -259,6 +279,16 @@
     show('main-view')
     await fetchPedidos()
     suscribirRealtime()
+
+    // Restaurar estado del botón de sonido
+    ;(function initSoundBtn() {
+      const btn = document.getElementById('btn-mute-sound')
+      if (btn && soundMuted) {
+        btn.textContent = '🔇 Silenciado'
+        btn.style.borderColor = '#c8553d'
+        btn.style.color = '#c8553d'
+      }
+    })()
   }
 
   window.loginGoogle = async function () {
@@ -370,6 +400,7 @@
 
   // ── Sound ─────────────────────────────────────────────────────────────────────
   function playSound() {
+    if (soundMuted) return
     try {
       const ctx = new AudioContext()
       const osc = ctx.createOscillator()
