@@ -1531,6 +1531,9 @@ input:checked + .toggle-slider:before {
       <button class="nav-item" data-section="crm" onclick="switchSection('crm', this)">
         <span class="nav-icon">👥</span> Clientes
       </button>
+      <button class="nav-item" data-section="campanas" onclick="switchSection('campanas', this)">
+        <span class="nav-icon">📣</span> Campañas
+      </button>
 
       <button class="nav-item" data-section="catalogo" onclick="switchSection('catalogo', this)">
         <span class="nav-icon">🛒</span> Mi Catálogo
@@ -1587,6 +1590,11 @@ input:checked + .toggle-slider:before {
           <div class="viti-subtitle">Asistente de marketing y estrategia</div>
         </div>
       </div>
+      <button onclick="clearVitiHistory()" title="Limpiar conversación"
+        style="background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:6px;transition:color .15s"
+        onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.4)'">
+        🗑️ Limpiar
+      </button>
       <button class="viti-close" onclick="closeViti()">✕</button>
     </div>
 
@@ -1992,6 +2000,63 @@ input:checked + .toggle-slider:before {
           </div>
         </div>
       </div>
+
+      <div id="section-campanas" class="panel-section">
+  <div class="page-header">
+    <div class="page-title">Campañas</div>
+    <div class="page-subtitle">Enviá mensajes promocionales a tus clientes por WhatsApp.</div>
+  </div>
+
+  <!-- Nueva campaña -->
+  <div class="card">
+    <div class="card-title">📣 Nueva campaña</div>
+    <div class="form-grid">
+      <div class="form-field col-2">
+        <label class="form-label">Nombre de la campaña</label>
+        <input class="form-input" id="campana-nombre" placeholder="Ej: Promo del fin de semana">
+      </div>
+      <div class="form-field col-2">
+        <label class="form-label">Mensaje <span>*</span></label>
+        <textarea class="form-textarea" id="campana-mensaje" placeholder="Escribí tu mensaje. Se agregará automáticamente el nombre de tu negocio al final." style="min-height:100px" oninput="document.getElementById('campana-char-count').textContent=this.value.length+' caracteres'"></textarea>
+        <span class="form-hint" id="campana-char-count">0 caracteres</span>
+      </div>
+      <div class="form-field col-2">
+        <label class="form-label">Destinatarios</label>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px">
+            <input type="radio" name="campana-seg" value="todos" checked onchange="updateCampanaPreview()" style="accent-color:var(--terra)">
+            Todos los clientes con teléfono
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px">
+            <input type="radio" name="campana-seg" value="ultimos30" onchange="updateCampanaPreview()" style="accent-color:var(--terra)">
+            Clientes de los últimos 30 días
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13.5px">
+            <input type="radio" name="campana-seg" value="ultimos7" onchange="updateCampanaPreview()" style="accent-color:var(--terra)">
+            Clientes de los últimos 7 días
+          </label>
+        </div>
+        <div id="campana-preview" style="margin-top:10px;padding:10px 12px;background:var(--cream2);border-radius:8px;font-size:13px;color:var(--muted)">
+          Cargando destinatarios...
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;align-items:center">
+      <button class="btn-primary" id="btn-enviar-campana" onclick="enviarCampana()">
+        📤 Enviar campaña
+      </button>
+      <span style="font-size:12px;color:var(--muted)">Máx. 50 mensajes/mes incluidos en el plan · Cada mensaje abre ventana de 24hs</span>
+    </div>
+  </div>
+
+  <!-- Historial -->
+  <div class="card">
+    <div class="card-title">📋 Campañas enviadas</div>
+    <div id="campanas-historial">
+      <div style="padding:20px;text-align:center;color:var(--muted);font-size:13.5px">Cargando historial...</div>
+    </div>
+  </div>
+</div>
 
       <div id="section-estadisticas" class="panel-section">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
@@ -3521,6 +3586,7 @@ window.switchSection = function (name, btn) {
   if (name === 'pedidos')      loadPedidos()
   if (name === 'historial')    loadHistorial()
   if (name === 'crm')          loadCRM()
+  if (name === 'campanas')     loadCampanas()
   if (name === 'estadisticas') loadEstadisticas()
   if (name === 'analisis')     loadAnalisis()
   if (name === 'catalogo')     loadCatalogo()
@@ -4176,6 +4242,13 @@ function formatHora(iso) {
   return new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
 }
 
+function formatElapsedPedido(iso) {
+  const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000)
+  if (mins < 1) return 'hace un momento'
+  if (mins < 60) return 'hace ' + mins + 'min'
+  return 'hace ' + Math.floor(mins/60) + 'h'
+}
+
 function renderPedidos() {
   const container = document.getElementById('pedidos-body')
   if (!container) return
@@ -4201,7 +4274,7 @@ function renderPedidos() {
       <div class="pedido-card">
         <div class="pedido-card-header">
           <div class="pedido-mesa">Mesa ${o.table_number}</div>
-          <div class="pedido-hora">${formatHora(o.created_at)}</div>
+          <div class="pedido-hora">${formatHora(o.created_at)} · ${formatElapsedPedido(o.created_at)}</div>
           <span class="pedido-status-badge status-${o.status ?? 'pending'}">${STATUS_LABELS[o.status] ?? o.status}</span>
         </div>
         <div class="pedido-items-list">
@@ -6945,6 +7018,30 @@ window.cancelarPedido = async function (id) {
 // ═══════════════════════════════════════════
 let vitiHistory = []
 let vitiLoading = false
+let vitiSessionId = null
+const VITI_HISTORY_KEY = () => 'viti_history_' + (currentRestaurant?.id || 'x')
+const VITI_MAX_MESSAGES = 20 // máximo mensajes a guardar
+
+function saveVitiHistory() {
+  try {
+    // Guardar en sessionStorage (persiste mientras la pestaña está abierta)
+    sessionStorage.setItem(VITI_HISTORY_KEY(), JSON.stringify(vitiHistory.slice(-VITI_MAX_MESSAGES)))
+  } catch {}
+}
+
+function loadVitiHistory() {
+  try {
+    const saved = sessionStorage.getItem(VITI_HISTORY_KEY())
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        vitiHistory = parsed
+        return true
+      }
+    }
+  } catch {}
+  return false
+}
 
 let vitiContext = null // se carga async en openViti()
 
@@ -7032,8 +7129,20 @@ window.openViti = async function () {
   document.getElementById('viti-overlay').classList.add('open')
   document.body.style.overflow = 'hidden'
 
-  // Saludo inicial solo la primera vez
-  if (vitiHistory.length === 0) {
+  // Restaurar historial de la sesión si existe
+  const hadHistory = loadVitiHistory()
+  if (hadHistory && vitiHistory.length > 0) {
+    // Re-renderizar el historial guardado solo si el contenedor está vacío
+    const container = document.getElementById('viti-messages')
+    const typing = document.getElementById('viti-typing')
+    if (container && container.querySelectorAll('.viti-msg').length === 0) {
+      vitiHistory.forEach(msg => {
+        const role = msg.role === 'assistant' ? 'viti' : 'user'
+        vitiAddMessage(role, msg.content)
+      })
+    }
+  } else if (vitiHistory.length === 0) {
+    // Saludo inicial solo la primera vez
     const name = currentRestaurant?.name ?? 'tu restaurante'
     vitiAddMessage('viti', `¡Hola! Soy Viti 👋\n\nEstoy acá para ayudarte con la estrategia de marketing y el negocio de **${name}**.\n\nPodés preguntarme sobre precios, qué platos destacar, cómo mejorar tu presencia digital, análisis de competidores o cualquier duda del negocio. ¿Por dónde querés arrancar?`)
   }
@@ -7108,6 +7217,16 @@ async function loadVitiContext() {
   vitiContext = ctx
 }
 
+window.clearVitiHistory = function () {
+  vitiHistory = []
+  saveVitiHistory()
+  const container = document.getElementById('viti-messages')
+  if (container) container.innerHTML = '<div class="viti-typing" id="viti-typing"><span></span><span></span><span></span></div>'
+  // Mostrar saludo de nuevo
+  const name = currentRestaurant?.name ?? 'tu restaurante'
+  vitiAddMessage('viti', `¡Hola! Soy Viti 👋\n\nEstoy acá para ayudarte con la estrategia de marketing y el negocio de **${name}**.\n\nPodés preguntarme sobre precios, qué platos destacar, cómo mejorar tu presencia digital, análisis de competidores o cualquier duda del negocio. ¿Por dónde querés arrancar?`)
+}
+
 window.closeViti = function () {
   document.getElementById('viti-drawer').classList.remove('open')
   document.getElementById('viti-overlay').classList.remove('open')
@@ -7149,6 +7268,7 @@ window.vitiSend = async function () {
   input.value = ''
   vitiAddMessage('user', text)
   vitiHistory.push({ role: 'user', content: text })
+  saveVitiHistory()
   vitiLoading = true
   vitiShowTyping(true)
   document.getElementById('viti-send-btn').disabled = true
@@ -7177,6 +7297,7 @@ window.vitiSend = async function () {
     const data = await res.json()
     const reply = data.content?.[0]?.text || 'No pude procesar tu consulta. ¿Podés repetirla?'
     vitiHistory.push({ role: 'assistant', content: reply })
+    saveVitiHistory()
     vitiShowTyping(false)
     vitiAddMessage('viti', reply)
   } catch (e) {
