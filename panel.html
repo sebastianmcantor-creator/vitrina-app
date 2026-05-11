@@ -2075,6 +2075,9 @@ input:checked + .toggle-slider:before {
               <button class="stats-period-btn" data-days="90" onclick="setStatsPeriod(90)">3 meses</button>
             </div>
             <button id="btn-export-csv" onclick="exportStatsCSV()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;color:var(--muted);cursor:pointer">⬇ CSV</button>
+            <button class="btn-secondary" onclick="enviarResumenDiario()" style="font-size:13px;padding:7px 14px">
+              📤 Enviar resumen por WA
+            </button>
           </div>
         </div>
         <div id="stats-body">
@@ -6041,7 +6044,21 @@ window.contactProspect = async function (prospectId) {
 
   try {
     // Preparar mensaje personalizado
-    const message = agentConfig.whatsapp_template.replace('{nombre}', prospect.name)
+    const mensajeWA = `Hola ${prospect.name || 'Buen día'} 👋
+
+Soy Sebastián de *Vitrina* — una plataforma para que los comercios tengan presencia digital completa sin complicaciones.
+
+Vi que ${prospect.name || 'tu negocio'} está en ${prospect.address || 'la zona'} y quería contarte que en 15 minutos podés tener:
+✅ Menú/catálogo digital con QR
+✅ Sistema de pedidos con MercadoPago
+✅ Asistente IA que atiende 24/7
+✅ Análisis de tu competencia
+
+*14 días gratis, sin tarjeta.*
+
+¿Te mando más info o pasamos a probarlo directo?
+— vitrinaapp.com.ar`
+    const message = mensajeWA
 
     const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/contact', {
       method: 'POST',
@@ -7125,6 +7142,25 @@ window.setStatsPeriod = async function (days) {
     b.classList.toggle('active', Number(b.dataset.days) === days)
   })
   await window.loadEstadisticas()
+}
+
+window.enviarResumenDiario = async function () {
+  if (!currentRestaurant) return
+  if (!currentRestaurant.whatsapp_gestion) {
+    showToast('Configurá el WhatsApp de gestión en Configuración primero', 'error')
+    return
+  }
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/reports/daily-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id }),
+    })
+    if (res.ok) showToast('✅ Resumen enviado por WhatsApp', 'success')
+    else showToast('Error al enviar', 'error')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
 }
 
 window.loadEstadisticas = async function () {
