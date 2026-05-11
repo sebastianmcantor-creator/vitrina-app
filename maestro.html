@@ -784,8 +784,9 @@ async function renderClients() {
           <td style="font-size:12px;color:var(--muted)">${createdAt}</td>
           <td style="font-size:12px">${tanoUsed > 0 ? tanoUsed + ' msgs' : '—'}</td>
           <td style="font-size:12px;color:var(--muted)">${lastActivity}</td>
-          <td>
-            <a href="/panel.html" onclick="localStorage.setItem('maestro_view_rest','${r.id}')" target="_blank" style="font-size:12px;color:var(--terra);text-decoration:none;font-weight:500">Ver panel →</a>
+          <td style="display:flex;gap:8px;align-items:center">
+            <a href="/panel.html" onclick="localStorage.setItem('maestro_view_rest','${r.id}')" target="_blank" style="font-size:12px;color:var(--terra);text-decoration:none;font-weight:500">Ver →</a>
+            <button onclick="deleteRestaurant('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid #ddd;border-radius:6px;cursor:pointer;color:#aaa;font-family:'DM Sans',sans-serif" title="Eliminar">🗑️</button>
           </td>
         </tr>
       `
@@ -899,6 +900,40 @@ function renderCosts() {
       </div>
     </div>
   `
+}
+
+window.deleteRestaurant = async function (id, name) {
+  if (!confirm(`⚠️ Eliminar "${name}" permanentemente?\n\nEsto borra el restaurante, su menú y todos sus datos. No se puede deshacer.`)) return
+
+  try {
+    const res = await fetch(
+      `${supabase.supabaseUrl}/rest/v1/restaurants?id=eq.${id}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'apikey': supabase.supabaseKey,
+          'Authorization': 'Bearer ' + supabase.supabaseKey,
+        }
+      }
+    )
+    if (res.ok || res.status === 204) {
+      alert(`"${name}" eliminado correctamente.`)
+      await renderClients()
+    } else {
+      const err = await res.text()
+      alert('Error al eliminar: ' + err)
+    }
+  } catch (e) {
+    // Fallback: usar supabase client directamente
+    try {
+      const { error } = await supabase.from('restaurants').delete().eq('id', id)
+      if (error) throw error
+      alert(`"${name}" eliminado correctamente.`)
+      await renderClients()
+    } catch (e2) {
+      alert('Error: ' + e2.message)
+    }
+  }
 }
 
 window.switchTab = function(tabName) {

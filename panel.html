@@ -3316,27 +3316,50 @@ window.loadRestaurant = async function () {
 // ─────────────────────────────────────────────
 const DAYS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado']
 
+// Normaliza el formato de horarios — soporta formato viejo {o,c} y nuevo [{o,c},{o,c}]
+function normalizeHourSlots(h) {
+  if (!h) return null
+  if (Array.isArray(h)) return h
+  return [h] // formato viejo → array
+}
+
 function renderOpeningHours(hours) {
   const container = document.getElementById('opening-hours-grid')
   if (!container) return
   container.innerHTML = DAYS.map((day, i) => {
-    const h = hours?.[i]
-    const isOpen = !!h
+    const slots = normalizeHourSlots(hours?.[i])
+    const isOpen = !!slots
+    const s0 = slots?.[0] || { o: '09:00', c: '22:00' }
+    const s1 = slots?.[1] || null
     return `
       <div class="hours-row" id="hours-row-${i}">
         <div class="hours-day">${day}</div>
-        <div class="hours-controls">
-          <label class="hours-toggle">
+        <div class="hours-controls" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <label class="hours-toggle" style="align-self:flex-start">
             <input type="checkbox" ${isOpen ? 'checked' : ''}
               onchange="toggleHoursDay(${i}, this.checked)">
-            ${isOpen ? 'Abierto' : 'Cerrado'}
+            <span id="hours-label-${i}">${isOpen ? 'Abierto' : 'Cerrado'}</span>
           </label>
-          <div id="hours-times-${i}" style="display:${isOpen ? 'flex' : 'none'};align-items:center;gap:8px;flex-wrap:wrap">
-            <input class="hours-time" type="time" id="hours-open-${i}"
-              value="${isOpen ? h.o : '11:00'}">
-            <span style="font-size:13px;color:var(--muted)">a</span>
-            <input class="hours-time" type="time" id="hours-close-${i}"
-              value="${isOpen ? h.c : '23:00'}">
+          <div id="hours-slots-${i}" style="display:${isOpen ? 'flex' : 'none'};flex-direction:column;gap:6px;width:100%">
+            <!-- Slot 1 -->
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <input class="hours-time" type="time" id="hours-open-${i}-0" value="${s0.o}">
+              <span style="font-size:13px;color:var(--muted)">a</span>
+              <input class="hours-time" type="time" id="hours-close-${i}-0" value="${s0.c}">
+              <button id="btn-add-slot-${i}" onclick="addHoursSlot(${i})"
+                style="font-size:11px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--terra);font-family:'DM Sans',sans-serif;display:${s1 ? 'none' : 'inline'}"
+                title="Agregar 2° turno (horario cortado)">+ 2° turno</button>
+            </div>
+            <!-- Slot 2 (opcional) -->
+            <div id="hours-slot2-${i}" style="display:${s1 ? 'flex' : 'none'};align-items:center;gap:8px;flex-wrap:wrap">
+              <input class="hours-time" type="time" id="hours-open-${i}-1" value="${s1?.o || '18:00'}">
+              <span style="font-size:13px;color:var(--muted)">a</span>
+              <input class="hours-time" type="time" id="hours-close-${i}-1" value="${s1?.c || '23:00'}">
+              <button onclick="removeHoursSlot(${i})"
+                style="font-size:11px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif"
+                title="Quitar 2° turno">✕</button>
+            </div>
+            <div id="hours-error-${i}" style="font-size:11px;color:var(--bad);display:none"></div>
           </div>
         </div>
       </div>`
@@ -3344,35 +3367,91 @@ function renderOpeningHours(hours) {
 }
 
 window.toggleHoursDay = function (day, isOpen) {
-  const el = document.getElementById('hours-times-' + day)
+  const el    = document.getElementById('hours-slots-' + day)
+  const label = document.getElementById('hours-label-' + day)
   if (el) el.style.display = isOpen ? 'flex' : 'none'
-  const label = document.querySelector('#hours-row-' + day + ' .hours-toggle')
-  if (label) label.lastChild.textContent = isOpen ? 'Abierto' : 'Cerrado'
+  if (label) label.textContent = isOpen ? 'Abierto' : 'Cerrado'
+}
+
+window.addHoursSlot = function (day) {
+  const slot2  = document.getElementById('hours-slot2-' + day)
+  const btnAdd = document.getElementById('btn-add-slot-' + day)
+  // Precargar el 2° turno 3h después del cierre del 1°
+  const close1 = document.getElementById('hours-close-' + day + '-0')?.value || '15:00'
+  const [hh, mm] = close1.split(':').map(Number)
+  const start2 = String((hh + 1) % 24).padStart(2, '0') + ':' + String(mm).padStart(2, '0')
+  const end2   = String((hh + 4) % 24).padStart(2, '0') + ':' + String(mm).padStart(2, '0')
+  const open2  = document.getElementById('hours-open-' + day + '-1')
+  const close2 = document.getElementById('hours-close-' + day + '-1')
+  if (open2) open2.value = start2
+  if (close2) close2.value = end2
+  if (slot2) slot2.style.display = 'flex'
+  if (btnAdd) btnAdd.style.display = 'none'
+}
+
+window.removeHoursSlot = function (day) {
+  const slot2  = document.getElementById('hours-slot2-' + day)
+  const btnAdd = document.getElementById('btn-add-slot-' + day)
+  if (slot2) slot2.style.display = 'none'
+  if (btnAdd) btnAdd.style.display = 'inline'
+}
+
+function timeToMin(t) {
+  const [h, m] = t.split(':').map(Number)
+  return h * 60 + m
 }
 
 window.saveOpeningHours = async function () {
   if (!currentRestaurant) return
   const hours = {}
+  let hasError = false
+
   DAYS.forEach((_, i) => {
-    const chk = document.getElementById('opening-hours-grid')
-      ?.querySelector(`#hours-row-${i} input[type=checkbox]`)
-    if (chk?.checked) {
-      hours[i] = {
-        o: document.getElementById('hours-open-' + i)?.value  || '11:00',
-        c: document.getElementById('hours-close-' + i)?.value || '23:00',
+    const chk = document.querySelector(`#hours-row-${i} input[type=checkbox]`)
+    const errEl = document.getElementById('hours-error-' + i)
+    if (errEl) errEl.style.display = 'none'
+    if (!chk?.checked) return
+
+    const o0 = document.getElementById(`hours-open-${i}-0`)?.value  || '09:00'
+    const c0 = document.getElementById(`hours-close-${i}-0`)?.value || '22:00'
+
+    const slot2Visible = document.getElementById(`hours-slot2-${i}`)?.style.display !== 'none'
+    const o1 = document.getElementById(`hours-open-${i}-1`)?.value  || ''
+    const c1 = document.getElementById(`hours-close-${i}-1`)?.value || ''
+
+    if (slot2Visible && o1 && c1) {
+      // Validar que no se superpongan
+      const c0min = timeToMin(c0)
+      const o1min = timeToMin(o1)
+      const c1min = timeToMin(c1)
+
+      if (o1min <= c0min) {
+        if (errEl) { errEl.textContent = 'El 2° turno debe comenzar después del cierre del 1° (' + c0 + ')'; errEl.style.display = 'block' }
+        hasError = true
+        return
       }
+      if (c1min <= o1min && c1min > 60) { // tolerar cierres después de medianoche
+        if (errEl) { errEl.textContent = 'El horario de cierre del 2° turno no es válido'; errEl.style.display = 'block' }
+        hasError = true
+        return
+      }
+      hours[i] = [{ o: o0, c: c0 }, { o: o1, c: c1 }]
+    } else {
+      hours[i] = [{ o: o0, c: c0 }]
     }
   })
+
+  if (hasError) { showToast('Corregí los horarios con error antes de guardar', 'error'); return }
+
   const status = document.getElementById('hours-save-status')
   if (status) { status.textContent = 'Guardando…'; status.style.color = 'var(--muted)' }
   try {
     await restaurants.update(currentRestaurant.id, { opening_hours: hours })
     currentRestaurant.opening_hours = hours
-    if (status) { status.textContent = '✓ Guardado'; status.style.color = 'var(--success)' }
+    if (status) { status.textContent = '✓ Guardado'; status.style.color = 'var(--sage)' }
     showToast('Horarios guardados ✓', 'success')
     setTimeout(() => { if (status) status.textContent = '' }, 3000)
   } catch (e) {
-    if (status) { status.textContent = 'Error: ' + e.message; status.style.color = 'var(--error)' }
     showToast('Error: ' + e.message, 'error')
   }
 }

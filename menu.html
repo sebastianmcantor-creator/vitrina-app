@@ -437,26 +437,31 @@
     // ─── Menu rendering ────────────────────────────────────────────────────────
     function getOpeningStatus(hours) {
       if (!hours) return null
-      const now   = new Date()
-      const day   = now.getDay()    // 0=Dom ... 6=Sab
-      const hm    = now.getHours() * 100 + now.getMinutes() // e.g. 1430 = 14:30
-      const h     = hours[day]
+      const now = new Date()
+      const day = now.getDay()
+      const hm  = now.getHours() * 100 + now.getMinutes()
+      const raw = hours[day]
+      if (!raw) return '🔴 Cerrado hoy'
 
-      if (!h) return '🔴 Cerrado hoy'
+      // Normalizar: soportar formato viejo {o,c} y nuevo [{o,c}] o [{o,c},{o,c}]
+      const slots = Array.isArray(raw) ? raw : [raw]
+      const toN = s => { const [hh, mm] = s.split(':').map(Number); return hh * 100 + mm }
 
-      const toNum = str => { const [hh, mm] = str.split(':').map(Number); return hh * 100 + mm }
-      const openN = toNum(h.o)
-      const closeN= toNum(h.c)
-
-      if (hm < openN) {
-        return '🕐 Abre a las ' + h.o + ' hs'
-      } else if (hm >= closeN) {
-        // Ver si abre mañana
-        const tomorrow = hours[(day + 1) % 7]
-        return tomorrow ? '🔴 Cerrado · Abre mañana a las ' + tomorrow.o : '🔴 Cerrado'
-      } else {
-        return '🟢 Abierto · Cierra a las ' + h.c + ' hs'
+      for (const slot of slots) {
+        const openN  = toN(slot.o)
+        const closeN = toN(slot.c)
+        if (hm >= openN && hm < closeN) {
+          return '🟢 Abierto · Cierra a las ' + slot.c + ' hs'
+        }
       }
+
+      // Cerrado — ver cuándo abre
+      const nextSlot = slots.find(s => hm < toN(s.o))
+      if (nextSlot) return '🕐 Abre a las ' + nextSlot.o + ' hs'
+
+      const tomorrow = hours[(day + 1) % 7]
+      const tSlots   = tomorrow ? (Array.isArray(tomorrow) ? tomorrow : [tomorrow]) : null
+      return tSlots ? '🔴 Cerrado · Abre mañana a las ' + tSlots[0].o : '🔴 Cerrado'
     }
 
     function buildMenu() {

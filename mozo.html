@@ -230,16 +230,17 @@
           const now  = new Date()
           const day  = now.getDay()
           const hm   = now.getHours() * 100 + now.getMinutes()
-          const h    = rest.opening_hours[day]
+          const raw  = rest.opening_hours[day]
           const toN  = s => { const [hh, mm] = s.split(':').map(Number); return hh*100+mm }
-          if (!h) {
+          if (!raw) {
             parts.push('🔴 Cerrado hoy')
-          } else if (hm < toN(h.o)) {
-            parts.push('🕐 Abre a las ' + h.o)
-          } else if (hm >= toN(h.c)) {
-            parts.push('🔴 Cerrado')
           } else {
-            parts.push('🟢 Abierto')
+            const slots = Array.isArray(raw) ? raw : [raw]
+            const isOpen = slots.some(s => hm >= toN(s.o) && hm < toN(s.c))
+            const nextSlot = slots.find(s => hm < toN(s.o))
+            if (isOpen) parts.push('🟢 Abierto')
+            else if (nextSlot) parts.push('🕐 Abre a las ' + nextSlot.o)
+            else parts.push('🔴 Cerrado')
           }
         } else {
           parts.push('Asistente activo')
@@ -322,8 +323,10 @@
       if (!hours) return ''
       const DAYS = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb']
       const lines = DAYS.map((d, i) => {
-        const h = hours[i]
-        return h ? d + ': ' + h.o + ' – ' + h.c : d + ': Cerrado'
+        const raw = hours[i]
+        if (!raw) return d + ': Cerrado'
+        const slots = Array.isArray(raw) ? raw : [raw]
+        return d + ': ' + slots.map(s => s.o + ' – ' + s.c).join(' y ')
       })
       return lines.join(' | ')
     }
