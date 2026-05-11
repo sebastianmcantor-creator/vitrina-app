@@ -1,643 +1,747 @@
-# CLAUDE.md — Vitrina App
-
-> Este archivo es el contexto maestro del proyecto. Leerlo completo antes de cualquier acción.
-
+---
+name: vitrina
+description: Skill maestro del proyecto Vitrina — SaaS de presencia digital inteligente para restaurantes, comercios y vendedores online, desarrollado por Sebastián. Activar SIEMPRE que Sebastián mencione Vitrina, restaurantes, locales, su app, su proyecto, clientes, menú digital, QR, mozo IA, Tano, Viti, La Panera Rosa, vitrinaapp.com.ar, Cloudflare, planes, precios, MercadoLibre, Tienda Nube, agente programador, o cualquier tema relacionado con el desarrollo de su plataforma.
 ---
 
-## Quién es Sebastián (el dueño del proyecto)
+# Vitrina — Skill Maestro del Proyecto (actualizado 10/05/2026)
 
-Trabaja solo, sin programadores. No sabe programar — construye Vitrina con Claude Code. Experiencia en banca y finanzas (8 años). Respuestas directas, sin frases condescendientes. Cuando no hay contexto específico, mostrar estado actual y sugerir próximo paso lógico.
+## Quién es Sebastián
+Trabaja solo, sin programadores. Experiencia en banca y finanzas (8 años). No sabe programar — construye Vitrina con Claude Code. Respuestas directas, sin "qué buena pregunta", "perfecto", "excelente", ni condescendencia. Cuando no hay contexto específico, mostrar estado actual y sugerir próximo paso lógico.
 
 ---
 
 ## Qué es Vitrina
 
-SaaS para restaurantes con dos servicios contratables juntos o por separado:
+SaaS de presencia digital inteligente para cualquier comercio a la calle o vendedor online. No es solo para restaurantes. Centraliza en un solo panel: catálogo/menú digital, pedidos, pagos, marketing en redes, análisis de competidores, integración con MercadoLibre y Tienda Nube, asistente IA para clientes finales, gestión de publicidad paga, reservas y turnos, y CRM básico.
 
-**Servicio 1 — Posicionamiento Digital:** análisis de presencia online + estrategia de marketing mensual. Google, Instagram, TikTok, Facebook. Datos reales, comparativas con competidores, plan de acción, publicación automática, gestión de publicidad paga. El asistente de este módulo se llama **Viti** (sin género — siempre "Viti dice", "Viti analizó", nunca "él" ni "ella").
-
-**Servicio 2 — Menú Digital Inteligente:** menú QR con **Tano** (mozo IA, tono cálido e informal, suena humano), sistema de pedidos, pantalla de cocina en tiempo real, pagos MercadoPago, analytics del restaurante.
+**Dos asistentes IA:**
+- **Tano** — asistente para clientes finales de restaurantes. Nombre default, personalizable por el dueño en el onboarding. Tono cálido, informal, humano. Solo habla del menú y del negocio.
+- **Viti** — asistente estratégico del dueño. Sin género (siempre "Viti dice", "Viti analizó", nunca "él" ni "ella"). Analiza datos, genera estrategia, gestiona automatizaciones, responde consultas del negocio.
+- **Asistente personalizable** — para rubros no gastronómicos. El dueño elige el nombre en el onboarding. Misma tecnología que Tano, adaptada al rubro.
 
 ---
 
 ## Stack técnico
 
-- **Dominio**: `www.vitrinaapp.com.ar` (DNS Cloudflare — nameservers apollo + eleanor)
-- **Frontend**: HTML/JS → GitHub Pages (`github.com/sebastianmcantor-creator/vitrina-app`)
-- **Backend**: Cloudflare Workers (`vitrina-worker.vitrinaapp.workers.dev`)
-- **Base de datos**: Supabase (migración desde D1 — decisión firme)
-- **Email**: Google Workspace (`contacto@vitrinaapp.com.ar`)
-- **IA**: Claude Haiku 4.5 vía API Anthropic (cuenta separada en console.anthropic.com)
-- **Local**: Node.js v24.15.0, Wrangler 4.85.0 autenticado
-- **Carpetas locales**: `C:\Users\sebas\vitrina-app` y `C:\Users\sebas\vitrina-server-worker`
+- **Dominio:** vitrinaapp.com.ar (DNS Cloudflare — nameservers apollo + eleanor)
+- **Frontend:** HTML/JS → GitHub Pages (github.com/sebastianmcantor-creator/vitrina-app)
+- **Backend:** Cloudflare Workers (vitrina-worker.vitrinaapp.workers.dev) — carpeta local C:\Users\sebas\vitrina-server-worker
+- **Base de datos:** Supabase (migrado desde Cloudflare D1)
+- **IA principal:** Claude Haiku 4.5 vía API Anthropic
+- **Email:** Google Workspace (contacto@vitrinaapp.com.ar)
+- **Mensajería:** Twilio WhatsApp Business API (Sandbox activo: +1 415 523 8886)
+- **Pagos:** MercadoPago (credenciales productivas configuradas)
+- **Local:** Claude Code desktop, Node.js v24.15.0, Wrangler 4.85.0 autenticado
+- **Carpetas:** C:\Users\sebas\vitrina-app (frontend) y C:\Users\sebas\vitrina-server-worker (backend)
 
 ---
 
-## Estado actual (06/05/2026)
+## Secrets configurados en Cloudflare (actualizado 10/05/2026)
 
-### ✅ Bloques completos
-**Bloque 1 — Login + Supabase + BD + Panel + Roles** (100%)
-- Login Google + gestión de sesión
-- Supabase completo con capa de abstracción (lib/db.js)
-- Estructura BD completa: profiles, restaurants, restaurant_staff, menu_categories, menu_items, orders, order_items, order_sessions, restaurant_tables
-- Sistema de roles (owner | admin | staff) implementado
-- panel.html con selector de restaurantes
+ANTHROPIC_API_KEY         OK
+SUPABASE_URL              OK
+SUPABASE_SERVICE_KEY      OK
+MP_ACCESS_TOKEN           OK (credenciales productivas)
+MP_PUBLIC_KEY             OK
+RESEND_API_KEY            OK
+TWILIO_ACCOUNT_SID        OK
+TWILIO_AUTH_TOKEN         OK (rotado el 10/05/2026)
+TWILIO_WHATSAPP_FROM      OK (whatsapp:+14155238886 — Sandbox)
+GOOGLE_PLACES_API_KEY     OK
+OPENAI_API_KEY            OK ($5 USD cargados — Whisper transcripción)
+ML_APP_ID                 OK (3797856969955324)
+ML_CLIENT_SECRET          OK
+TN_APP_ID                 OK (31471)
+TN_CLIENT_SECRET          OK
+AI (Workers AI binding)   OK (Cloudflare AI gratuito — fotos con IA)
 
-**Bloque 2 — Menú + Tano + QR + Cocina + Pedidos + Idiomas** (100%)
-- `menu.html` — menú responsive con categorías, filtros dietarios, destacados, idiomas (ES/EN/PT)
-- `mozo.html` — Tano (Claude Haiku) con detección de idioma, tono configurable, límite de mensajes
-- `cocina.html` — tiempo real vía Supabase, agrupación por mesa, filtros por estado, botón deshacer individual, botón "Todo listo" por mesa
-- Sistema de pedidos completo: carrito → checkout → cocina → notificación cliente
-- Seguimiento múltiples pedidos por mesa con overlay de estado en tiempo real
-- Reseteo automático de sesión (>3h en menu, >4h en mozo) + botones manuales
-- Notificación cliente cuando pedido listo (toast + notificación sistema + sonido)
-- QR por mesa implementado
-- Confirmación de pedido por email (cliente)
-- Notificación WhatsApp operativo (Twilio) al recibir pedido
+## Secrets pendientes de configurar
 
-**Features adicionales implementadas:**
-- Upload logo y portada del restaurante
-- Platos destacados con sección especial en menú
-- Horarios de apertura configurables con estado en vivo
-- Historial de pedidos con filtros
-- Configuración de Tano (tono, mensaje bienvenida, límite mensajes)
-- Tipo de cambio dinámico (BCRA API) para precios en ARS
-- Panel maestro con stats y exportación CSV
+METRICOOL_API_KEY         PENDIENTE — activar cuando llegue el primer cliente de marketing ($25/mes plan Starter)
+METRICOOL_USER_TOKEN      PENDIENTE — mismo lugar
+REPLICATE_API_KEY         NO NECESARIO — reemplazado por Cloudflare AI (gratuito)
 
-**Bloque 3 — MercadoPago suscripciones + lógica de planes + prueba gratis** (100%) ✅
-- Migración 011: tablas `subscriptions`, `subscription_payments` + columnas en `restaurants`
-- Worker actualizado con endpoints `/api/mp/crear-suscripcion` y webhook `/api/mp/webhook`
-- Lógica de planes: Free (45 platos, 75 Tano/mes) | Básico (ilimitado, sin pedidos) | Pro (pedidos + cocina) | Full (3 sucursales)
-- `lib/plans.js`: funciones para validar límites por plan
-- Panel de facturación: plan actual, estado trial, uso de Tano, historial de pagos
-- Modal de upgrade con tarjetas de planes y checkout MercadoPago
-- Trial de 14 días automático
-- Worker deployado: `https://vitrina-tano.vitrinaapp.workers.dev`
-- Validación `can_take_orders` en menu.html antes de confirmar pedidos
+## Páginas publicadas en vitrinaapp.com.ar
 
-**Pendiente manual (ver SETUP_SUBSCRIPTIONS.md):**
-- Ejecutar migración SQL en Supabase Dashboard
-- Configurar webhook en MercadoPago Dashboard
-- Testing con credenciales sandbox de MP
-
-**Bloque 4 — Google Business API + Instagram básica + análisis + Viti** (100%) ✅
-- Migración 012: tablas `integrations`, `analytics_cache`, `competitors`
-- OAuth Google Business Profile: endpoints `/api/google/auth`, `/api/google/callback`, `/api/google/business-data`
-- OAuth Instagram Basic Display: endpoints `/api/instagram/auth`, `/api/instagram/callback`, `/api/instagram/metrics`
-- Endpoint `/api/places/nearby-competitors` para búsqueda automática de competidores
-- Dashboard de análisis en panel.html: cards de Google Business, Instagram y Competidores
-- Viti: drawer lateral con chat, contexto enriquecido (menú, precios, pedidos, stats), endpoint `/api/claude`
-- Funciones `loadAnalisis()`, `renderGoogleBusinessData()`, `renderInstagramData()`, `loadCompetitors()`
-- Manejo de callbacks OAuth con navegación automática y toasts
-- Worker deployado con todos los endpoints nuevos
-
-**Pendiente manual (ver migración 012_integrations.sql):**
-- Ejecutar migración SQL en Supabase Dashboard
-- Configurar secrets en Cloudflare: `INSTAGRAM_APP_ID`, `INSTAGRAM_APP_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_PLACES_API_KEY`
-- Crear app de Instagram en Meta Developers
-- Crear proyecto OAuth en Google Cloud Console
-
-**Bloque 5 — Publicación automática vía Metricool + calendario de contenido** (100%) ✅
-- Migración 013: tablas `scheduled_posts`, `content_templates`, `content_calendar_suggestions`
-- Módulos en lib/db.js: scheduledPosts, contentTemplates, contentCalendarSuggestions
-- OAuth Metricool: endpoints `/api/metricool/auth`, `/callback`, `/schedule-post`, `/posts`
-- Sección Marketing en panel: calendario de contenido con filtros por estado
-- Modales para crear posts programados y guardar templates
-- Sistema de templates reutilizables con categorías
-- Integración completa con Metricool API para publicación en Instagram, Facebook, Google Business
-- Renderizado de posts con estados (programadas, publicadas, fallidas, canceladas)
-- Worker deployado con todos los endpoints
-
-**Pendiente manual:**
-- Ejecutar migración 013 en Supabase Dashboard
-- Configurar secrets en Cloudflare: `METRICOOL_CLIENT_ID`, `METRICOOL_CLIENT_SECRET`
-- Crear cuenta en Metricool y obtener credenciales de API
-
-**Bloque 6 — Replicate fotos + historial precios + competidores automático** (100%) ✅
-- Integración Replicate API (modelo real-esrgan) para mejorar fotos de platos con upscaling 2x
-- Botón "✨ Mejorar" en modal de platos con polling automático de resultados
-- Endpoints `/api/replicate/enhance-image` y `/api/replicate/prediction/:id`
-- Historial de precios ya estaba implementado: se muestra al editar plato, registra cambios automáticamente
-- Endpoint `/api/competitors/update-metrics` para actualizar ratings y reviews desde Google Places
-- Botón "🔄 Actualizar métricas" en sección de competidores (se muestra cuando hay competidores)
-- Muestra fecha de última actualización en cada competidor
-- Worker deployado con todos los endpoints nuevos
-
-**Pendiente manual:**
-- Configurar secret en Cloudflare: `REPLICATE_API_TOKEN`
-- Crear cuenta en Replicate (https://replicate.com) y generar API token
-
-**Bloque 7 — Landing page con estética gastronómica** (100%) ✅
-- Landing page completa en index.html con paleta de colores tierra (terracota, beige, crema, marrón)
-- Hero con animación de partículas flotantes en fondo (CSS keyframes)
-- Secciones: Hero + demo visual, Servicios (Menú Digital y Marketing), Cómo funciona, Pricing, Diferenciadores, FAQ, CTA
-- Tabla de precios con toggle mensual/anual y descuento del 20% en plan anual
-- FAQ accordion con 6 preguntas frecuentes
-- Animaciones de scroll con Intersection Observer API
-- Diseño mobile-first responsive (breakpoint 768px)
-- Botón de WhatsApp flotante
-- Tipografía: Cormorant Garamond para títulos, Outfit para cuerpo
-- Idioma: español únicamente
-- Todo en un solo archivo para GitHub Pages
-
-**Bloque 8 — Agente de ventas + Twilio WhatsApp** (100%) ✅
-- Migración 014: tablas `sales_prospects`, `sales_contacts`, `sales_agent_config`, `sales_metrics`
-- Módulos en lib/db.js: salesProspects, salesContacts, salesAgentConfig, salesMetrics
-- Worker con endpoints completos: `/api/sales/search-restaurants`, `/generate-diagnosis`, `/create-prospect`, `/contact`, `/process-followups`, `/prospects`, `/config`, `/metrics`
-- Búsqueda automática de restaurantes con Google Places API (por ubicación y radio)
-- Generación de diagnóstico preliminar automático: análisis de presencia online, fit score, pain points
-- Envío de WhatsApp personalizado vía Twilio con templates configurables
-- Sistema de seguimiento automático a 3 días con endpoint cron `/process-followups`
-- Sección completa en panel.html: métricas del agente, lista de prospectos con filtros, configuración, búsqueda manual
-- Estados de prospectos: discovered → contacted → interested/not_interested → converted
-- Modales para detalle de prospecto y búsqueda manual de restaurantes
-- Métricas: prospectos encontrados, contactados, interesados, convertidos, costo total
-- Toggle para activar/desactivar el agente, configuración de templates y límites diarios
-- Worker deployado con todos los endpoints nuevos
-
-**Pendiente manual:**
-- Ejecutar migración 014 en Supabase Dashboard
-- Configurar cron job en Cloudflare Workers para `/api/sales/process-followups` (diario a las 10 AM)
-- Testing del flujo completo con prospectos reales
-
-**Bloque 9 — Panel maestro completo + sistema de productores** (100%) ✅
-- Migración 015: tablas `producers`, `producer_commissions`, `master_dashboard_cache`, columna `producer_id` en restaurants
-- Trigger automático para actualizar comisiones de productores top (10+ clientes activos → 25%/15% en lugar de 20%/10%)
-- Módulos en lib/db.js: producers, producerCommissions, masterDashboardCache
-- maestro.html: panel completo con 6 pestañas (Vista General, Clientes, Facturación, Productores, Agentes IA, Costos)
-- Vista General: clientes activos, facturación, margen, prospectos, distribución por plan, alertas de churn (7+ días inactivos)
-- Clientes: tabla completa con plan, estado, productor, uso de Tano, última actividad
-- Facturación: suscripciones, fees transacciones, fees publicidad, proyección mensual
-- Productores: tabla con clientes activos, comisiones pendientes/pagadas, botón "Marcar pagado"
-- Agentes IA: métricas de Tano, Viti y Sales Agent con costos en USD
-- Costos: fijos vs variables, costo total, costo por cliente, desglose detallado
-- Cache de métricas con TTL de 1 hora para evitar recalculo constante
-- Acceso restringido solo a sebastianmcantor@gmail.com
-- Link desde panel.html (solo visible para Sebastián)
-
-**Pendiente manual:**
-- Ejecutar migración 015 en Supabase Dashboard
-- Implementar cálculo real de facturación (actualmente en $0 — requiere integración con historial de pagos MP)
-- Agregar exportación CSV de reportes
-
-**Bloque 10 — Informe ejecutivo + medición de éxito del plan** (100%) ✅
-- Migración 017: tablas `marketing_projections`, `executive_reports`, `monthly_metrics_snapshots`
-- Sistema de proyecciones en 3 escenarios (optimista, moderado, pesimista) con estrategia mensual
-- Snapshots automáticos de métricas al inicio y fin de cada mes para comparación
-- Endpoint `/api/reports/generate-executive`: genera informe con análisis de Viti (Claude Haiku)
-- Comparación automática resultados reales vs proyecciones, determina escenario alcanzado
-- Análisis estructurado por Viti: resumen ejecutivo, factores de éxito, áreas de mejora, recomendaciones
-- Endpoint `/api/reports/send-monthly`: envía informes pendientes por email (cron mensual)
-- Módulos en lib/db.js: marketingProjections, executiveReports, monthlyMetricsSnapshots
-- Worker deployado con endpoints completos
-
-**Pendiente manual adicional Bloques 8-10:**
-- Ejecutar migraciones 014, 015, 016 y 017 en Supabase Dashboard
-- Configurar cron jobs en Cloudflare Workers:
-  - `/api/exchange-rate/update` cada lunes a las 10 AM
-  - `/api/reports/send-monthly` día 1 de cada mes a las 9 AM
-  - `/api/sales/process-followups` diario a las 10 AM
-- Implementar generación de PDF para informes (actualmente solo JSON/HTML)
-- Completar integración envío de email HTML via Resend en informes ejecutivos
-
-**Bloque 11 — Documentación completa y preparación final** (100%) ✅
-- README.md con stack técnico, estructura del proyecto, bloques implementados
-- SETUP.md con guía paso a paso desde cero: Supabase, Cloudflare Workers, GitHub Pages, secrets, cron jobs, testing inicial
-- TESTING_CHECKLIST.md con 170+ items para testing completo de todos los flujos
-- Troubleshooting común documentado
-- Verificación de flujos principales completos
-- Sistema listo para primeros clientes
-
-**Mejoras Landing Page — 07/05/2026** (100%) ✅
-- Logo SVG con ventana y paleta cálida (terracota/beige/marrón) — reemplaza emoji
-- Hero con foto de restaurante lleno (Unsplash) — más atractivo que comida
-- Menú hamburguesa mobile funcional con JS + overlay CSS
-- Sección Marketing convertida a "Próximamente" con formulario waitlist
-- Chat IA flotante (Claude Haiku) — reemplaza WhatsApp:
-  - System prompt completo con info de Vitrina
-  - Detección automática de interés (palabras clave)
-  - Captura de leads con validación de email
-  - Notificaciones automáticas a contacto@vitrinaapp.com.ar
-- Demo interactiva `demo.html` — restaurante ficticio "El Origen" (13 platos, 4 categorías)
-- Link a demo desde hero CTAs
-- Migración 018: tablas `waitlist` y `leads`
-- Endpoints backend: `/api/waitlist`, `/api/lead`, `/api/landing-chat`
-
-**Security Hardening — 07/05/2026** (100%) ✅
-- Rate limiting in-memory por CF-Connecting-IP:
-  - `/api/landing-chat`: 10 req/min (anti abuse chat IA)
-  - `/api/waitlist`: 3 req/hora (anti spam formulario)
-  - `/api/lead`: 5 req/hora (anti spam captura)
-- Input sanitization completa:
-  - Emails validados RFC 5322 regex
-  - Strings limitados (max 100-1000 chars según campo)
-  - Números validados min/max
-  - Prevención XSS en todos los inputs públicos
-- Security headers en todas las respuestas:
-  - `Strict-Transport-Security` (HSTS)
-  - `X-Content-Type-Options: nosniff`
-  - `X-Frame-Options: DENY`
-  - `X-XSS-Protection: 1; mode=block`
-  - `Referrer-Policy: strict-origin-when-cross-origin`
-- Error handling mejorado:
-  - Mensajes genéricos en errores 500+ (no expone estructura interna)
-  - Stack traces filtrados en producción
-- Límite 20 mensajes en chat history (anti abuse tokens Anthropic)
-- TEST_RESULTS.md con security audit completo (13 áreas auditadas)
-
-**Pendiente testing manual:**
-- Ejecutar migraciones 014-018 en Supabase Dashboard
-- Configurar secrets faltantes en Cloudflare Workers (ver SETUP.md)
-- Configurar cron jobs (tipo cambio lunes, seguimientos diario, informes mensual)
-- Testing checklist completo de 170+ items
-- Testing con primer restaurante piloto
-- Ajustes basados en feedback real
-
-### 🎯 Estado del Proyecto
-
-**Bloques completados:** 11/11 (100%)
-
-**Funcionalidades listas para producción:**
-- Core completo: login, menú, pedidos, cocina, QR
-- Tano (mozo IA) con límites por plan
-- MercadoPago suscripciones + planes
-- Google Business + Instagram + Viti
-- Agente de ventas automático
-- Panel maestro para Sebastián
-- Sistema de productores
-- Informes ejecutivos mensuales
-- Tipo de cambio automático con notificaciones
-- Landing page profesional
-
-**Próximos pasos sugeridos:**
-1. Ejecutar todas las migraciones en Supabase (014-017)
-2. Configurar todos los secrets en Cloudflare Workers
-3. Configurar cron jobs en Cloudflare
-4. Testing completo con checklist
-5. Primer cliente piloto
-6. Iterar basado en feedback real
+privacy.html              OK — Política de Privacidad (incluye sección Instagram Graph API para Meta)
+terms.html                OK — Términos y Condiciones (incluye tipo de cambio, servicios variables)
+oauth-callback.html       OK — Maneja callbacks OAuth de ML, TN y Google
 
 ---
 
-## Decisiones firmes — NO negociar
+## Cron jobs activos en Cloudflare
 
-- **Base de datos: Supabase.** Gratuito hasta ~100 restaurantes, $25 USD/mes después. Tiempo real nativo elimina el polling. Código con capa de abstracción (`db.guardarPedido()`) para que cambios futuros no rompan nada.
-- **Google Business Profile API desde el arranque.** Sin esto el análisis no tiene valor real.
-- **Meta API básica primero, avanzada en paralelo.**
-- **Publicación automática vía Metricool** mientras no hay credenciales propias de Meta aprobadas.
-- **Todas las fases se construyen completas.**
-- **Términos de servicio y política de privacidad** necesarios antes del primer pago real y antes de solicitar aprobación de Meta.
+0 10 * * 1   — tipo de cambio Banco Nación (lunes 10am)
+0 10 * * *   — seguimiento ventas (diario 10am)
+0 9 1 * *    — informes ejecutivos (día 1 de cada mes, 9am)
 
 ---
 
-## Tano — mozo IA
+## Migraciones Supabase ejecutadas
 
-- Tono: cálido, informal, humano. Nunca suena a bot.
-- Responde solo sobre el menú: ingredientes, alergias, recomendaciones, platos del día, opciones veganas/vegetarianas/celíacas.
-- Fuera del menú: "Eso no te lo puedo contestar yo, pero el equipo te ayuda."
-- El dueño configura el tono en el onboarding.
-- **Idiomas:** detección automática por navegador + opción de cambio manual. Iniciales: español, inglés, portugués. Escalable a italiano y francés.
-- Al subir un plato en español, botón "traducir automáticamente" genera versiones con Claude — el dueño revisa y aprueba.
-
-**Cuando Tano se queda sin créditos (plan free):**
-- A 15 mensajes restantes: alerta WhatsApp al dueño.
-- Al agotarse: las nuevas mesas ven a Tano con cartel "No disponible por ahora — el equipo te atiende en persona."
+OK Vitrina schema (restaurantes, menú, pedidos)
+OK 011_subscriptions (planes y pagos MP)
+OK 012_integrations (Google, Instagram, competidores)
+OK 013_content_calendar (Metricool, posts programados)
+OK ALL_PENDING_MIGRATIONS (014 al 018 — waitlist, leads, agente ventas, tipo cambio, informes)
 
 ---
 
-## Viti — asistente IA del dueño
+## Orden de vinculaciones pendientes por prioridad
 
-- Sin género — siempre "Viti dice", "Viti analizó", "Viti sugiere". Nunca "él" ni "ella".
-- Asesora sobre marketing, análisis, estrategia, competidores, publicidad, datos de ventas.
-- Solo responde sobre temas del restaurante y el negocio.
-- Usa todos los datos disponibles: análisis de Google/redes, historial de pedidos, precios históricos, competidores, campañas anteriores.
+### Esta semana — desbloquean features core
 
----
+1. Google Cloud Console → Places API → GOOGLE_PLACES_API_KEY
+   - console.cloud.google.com → Crear proyecto "Vitrina" → Habilitar Places API + Maps JavaScript API → Generar API Key con restricción de dominio
+   - $200 USD/mes de crédito gratuito de Google (alcanza para ~100 clientes sin pagar nada)
 
-## Estructura de cuentas
+2. OpenAI → Whisper → OPENAI_API_KEY
+   - platform.openai.com → Billing → cargar $10 USD → API Keys → Create
+   - Costo: $0.006 USD/minuto de audio. 10 videos de 90 seg = $0.09 USD/mes por cliente
 
-- **Cuenta madre** (marca) con N sucursales adentro.
-- Login → selector de sucursal o vista consolidada.
-- Cada sucursal: menú propio, QR propio, cocina propia, pedidos propios, análisis propio.
-- **Roles:**
-  - **Administrador:** acceso completo.
-  - **Operativo:** solo cocina, estado de pedidos y menú del día.
-- Usuarios operativos: **ilimitados en todos los planes**, sin costo adicional.
-- **Sucursal adicional**: 35% del plan base por cada una más allá del límite.
+3. Replicate → fotos IA → REPLICATE_API_KEY
+   - replicate.com → Billing → cargar $10 USD → Account Settings → API Tokens
+   - Costo: $0.07 USD/foto. 80 fotos/mes = $5.60 USD/cliente
 
----
+### Cuando llegue el primer cliente Marketing o Full
 
-## Cliente final (quien escanea el QR)
+4. Metricool → plan Starter ($25/mes) → tokens → publicación automática
+   - Activar desde el primer cliente. Slot 1 = marca Vitrina propia. Slots 2-5 = primeros clientes.
+   - Panel Metricool → Settings → API → Generate token → cargar METRICOOL_API_KEY y METRICOOL_USER_TOKEN
 
-- Email se pide al **confirmar el pedido** (no al entrar).
-- Con email: historial guardado durante la sesión, confirmación automática por mail.
-- Sin email: nombre y apellido, pierde historial al cerrar.
-- Los emails pertenecen al restaurante. Vitrina no los usa sin permiso explícito del cliente.
+### Cuando llegue el primer cliente con ML activo
 
----
+5. MercadoLibre → app de desarrollador → OAuth por cliente
+   - developers.mercadolibre.com.ar → Mis aplicaciones → Crear
+   - URL callback: https://vitrina-server-worker.[usuario].workers.dev/auth/ml/callback
+   - Testear con ML Sandbox antes de producción
 
-## Historial de datos
+6. Tienda Nube → app de partners → OAuth por cliente
+   - partners.tiendanube.com → Crear aplicación
 
-- **Platos borrados:** quedan en historial con nombre, precio y descripción exactos al momento del pedido. Etiqueta discreta "plato descontinuado".
-- **Historial de precios:** cada modificación queda registrada con fecha y precio anterior. Viti usa ese historial para sugerencias.
+### Cuando el primer cliente pago quiera número propio
 
----
+7. Verificación identidad Twilio con pasaporte → WhatsApp Sender propio
+   - El DNI nuevo con QR no es reconocido — usar pasaporte
+   - Una vez verificado: registrar número WhatsApp Business propio de Vitrina
+   - Luego: un número dedicado por cliente que contrate plan +WA
 
-## Notificaciones
+### 4-6 semanas después de iniciar trámite con Meta
 
-**Canal de gestión** (dueño): alertas de créditos, vencimientos, rendimiento de campañas, reseñas Google, resumen semanal. WhatsApp o email.
-
-**Canal operativo** (local): nuevos pedidos, pedido listo, alertas de mesa. WhatsApp obligatorio. Puede ser número distinto al del dueño.
-
-**Implementación:** Twilio API. ~$1-3 USD/restaurante/mes.
-
----
-
-## Análisis de competidores
-
-- **Grupo base (automático):** 5 competidores más cercanos geográficamente con Google Places API. Se actualizan automáticamente cada mes.
-- **Seguimiento manual:** hasta 2 adicionales elegidos por el restaurante.
-- **Alerta:** si algún competidor crece más del 20% en seguidores o tiene pico de reseñas, Vitrina genera una alerta especial.
+8. Instagram Graph API → métricas propias y publicación directa
+   - Crear app en developers.facebook.com → tipo Business → agregar Instagram Graph API
+   - Permisos: instagram_basic, instagram_manage_insights, instagram_content_publish
+   - Requiere política de privacidad y términos publicados en vitrinaapp.com.ar
+   - Mientras no está aprobada: Metricool cubre publicación automática
+   - IMPORTANTE: Instagram Basic Display API no existe desde diciembre 2024. Solo Graph API. No mencionar Basic Display API en ningún contexto.
 
 ---
 
-## Medición del éxito del plan
+## Arquitectura WhatsApp — número dedicado por cliente
 
-Al generar la estrategia mensual, Vitrina registra proyecciones en tres escenarios (optimista, moderado, pesimista). Al inicio del mes siguiente, Viti hace el cierre: compara métricas reales vs proyecciones, qué funcionó, qué no, qué ajusta el mes siguiente. La nueva estrategia evoluciona con el restaurante — no es plantilla repetida.
+Cada cliente que contrata plan +WA recibe su propio número de WhatsApp Business gestionado desde la cuenta de Twilio de Vitrina.
+
+Lo que ve el cliente final del negocio: el NOMBRE del negocio en grande (ej: "Ferretería López"), verificado con tilde verde si está aprobado. El número de EEUU aparece en segundo plano — igual que lo hacen Mercado Libre, bancos y aerolíneas.
+
+Flujo técnico:
+1. Cliente contrata plan +WA
+2. Vitrina registra un número nuevo en Twilio (~$2 USD/mes)
+3. Ese número se registra en WhatsApp Business API de Meta (~$8-10 USD/mes)
+4. Twilio configura webhook del número → apunta al Worker de Vitrina
+5. El Worker identifica a qué cliente pertenece el número entrante
+6. Claude Haiku procesa el mensaje con contexto completo de ese negocio
+7. Responde en nombre del negocio
+
+Costo real para Vitrina por número: $10-12 USD/mes
+Diferencia de precio entre plan con y sin WA: $12
+Margen en el add-on WA: mínimo, pero el valor percibido para el cliente es enorme.
+
+Si el cliente quiere su número argentino existente: puede migrarlo a Twilio. Proceso de 1-3 días, sin costo extra. Opcional.
+
+Sandbox actual (testing y primeros pilotos): +1 415 523 8886, código: join behavior-weigh. Solo para desarrollo, no para clientes productivos.
+
+### Cómo se vende el WA por rubro
+- Restaurante/Bar: "Mozo Virtual por WhatsApp"
+- Ferretería/Bazar: "Asesor de Productos por WhatsApp"
+- Peluquería/Estética: "Asistente de Turnos por WhatsApp"
+- Vendedor ML/TN: "Vendedor Automático por WhatsApp"
+- Cualquier rubro: "Tu asistente inteligente, disponible 24/7"
 
 ---
 
-## Tipo de cambio
+## Flujo de pedidos y WhatsApp — ahorro de costos Meta
 
-- Planes denominados en USD, cobrados en pesos al tipo de cambio oficial Banco Nación (venta).
-- Referencia actual: **$1.410 ARS por USD** (mayo 2026).
-- El sistema consulta API del BCRA o bluelytics.com.ar todos los lunes.
-- Variación >2%: recalcula + notifica con 7 días de anticipación.
-- Variación >5%: recalcula + notifica con 15 días de anticipación.
+Cuando el comensal confirma un pedido desde el menú QR:
+1. Aparece botón verde "Confirmar por WhatsApp"
+2. Al tocarlo, el celular del comensal abre WhatsApp con mensaje pre-escrito: "Pedido #234 — Mesa 7: 2 milanesas, 1 agua. [Nombre restaurante]"
+3. El comensal toca Enviar — él inicia la conversación, abre ventana gratuita de 24 hs
+4. Dentro de esa ventana: confirmación, aviso de listo, seguimiento — todo gratis para Vitrina
+5. El pedido queda registrado en el sistema aunque el comensal no mande el WhatsApp
+
+Costo Meta por conversación iniciada por el negocio: $0.056 USD. Iniciada por el cliente: $0.
 
 ---
 
 ## Planes y precios
 
-### Solo Menú
+### RESTAURANTES / GASTRONOMÍA
 
-| Plan | Precio/mes | Fee | Tano | Pedidos | Cocina | Pagos | Sucursales |
-|------|-----------|-----|------|---------|--------|-------|-----------|
-| Free | $0 | — | 75/mes | ❌ | ❌ | ❌ | 1 (máx 45 platos) |
-| Básico | USD 12 | — | Ilimitado | ❌ | ❌ | ❌ | 1 |
-| Pro | USD 22 | 1% | Ilimitado | ✅ | ✅ | ✅ | 1 |
-| Full | USD 35 | 0.8% | Ilimitado | ✅ | ✅ | ✅ | 3 |
+#### Plan Solo Menú — $27 USD/mes
+- Menú digital QR (por mesa numerada o genérico)
+- Tano ilimitado (nombre personalizable en onboarding)
+- Sistema de pedidos en tiempo real
+- Pantalla de cocina (polling 10 seg)
+- Pagos con MercadoPago (el cliente paga desde su celular)
+- 80 fotos con IA por mes (compartidas, todos los usos)
+- Sistema de reservas completo: calendario interno + Google Calendar opcional
+- 50 mensajes promocionales/mes a base de comensales registrados
+- Informes operativos: diario (primeras 4 semanas → sistema consulta preferencia) + semanal + mensual PDF
+- WhatsApp canal operativo (cocina/encargado)
+- Multiidioma: español, inglés, portugués (traducción automática con Claude)
+- Sin Viti, sin análisis de competidores, sin publicaciones en redes, sin subtítulos
 
-### Solo Marketing
+Sin fee sobre las ventas del menú. Precio fijo mensual.
 
-| Plan | Precio/mes | Publicaciones auto/mes | Publicidad gestionada | Sucursales |
-|------|-----------|----------------------|-------------------|-----------|
-| Starter | USD 20 | 4 vía Metricool | ❌ | 1 |
-| Pro | USD 42 | 12 vía Metricool | Hasta $60 USD | 1 |
-| Full | USD 72 | 30 | Hasta $180 USD | 2 |
+#### Plan Menú + WA — $39 USD/mes
+Todo Solo Menú más:
+- Número WhatsApp Business dedicado con nombre del negocio
+- Asistente respondiendo consultas de clientes 24/7
+- Gestión de reservas por WhatsApp (Tano agenda, consulta disponibilidad, confirma)
 
-### Combo (Menú + Marketing)
+#### Plan Marketing — $65 USD/mes
+Todo Plan Menú más:
+- Viti ilimitado
+- 30 publicaciones automáticas/mes en Instagram + Facebook + Google Business Profile vía Metricool
+- Análisis de competidores Google Places: 3x/semana, historial completo en Supabase
+- Análisis de redes propias: métricas Instagram/Facebook vía Metricool
+- Respuestas automáticas: Google Reviews, comentarios Instagram, comentarios Facebook (5 aprobaciones → modo auto)
+- Análisis Rappi/PedidosYa: vía screenshot semanal procesado por Claude Vision
+- 10 subtítulos automáticos/mes para videos que sube el dueño (Whisper, máx 90 seg por video)
+- $10 USD crédito de bienvenida para publicidad
+- Gestión de publicidad paga incluida: Google Ads + Meta Ads (cliente pone su propio presupuesto directo en Google/Meta, Vitrina gestiona campañas, audiencias, creatividades — sin fee extra)
+- Informes completos: diario + semanal + mensual PDF profesional con logo
 
-| Plan | Precio/mes | Fee | Sucursales |
-|------|-----------|-----|-----------|
-| Combo Starter | USD 28 | 0.8% | 1 |
-| Combo Pro | USD 58 | 0.6% | 2 |
-| Combo Full | USD 95 | 0.5% | 5 |
+#### Plan Marketing + WA — $78 USD/mes
+Todo Marketing más número WA Business dedicado y asistente completo.
 
-### Fee de transacción escalonado
+#### Plan Combo — $85 USD/mes
+Todo Marketing más:
+- Análisis de competidores: 5x/semana (en lugar de 3x)
+- Seguimiento avanzado de publicidad paga con optimización mensual incluida
+- Informe mensual con comparación proyección vs resultado real por canal
 
-| Facturación mensual | Fee |
-|--------------------|-----|
-| Hasta $1.000.000 ARS | Fee del plan |
-| $1.000.001 a $3.000.000 ARS | 0.4% |
-| $3.000.001 a $6.000.000 ARS | 0.25% |
-| Más de $6.000.000 ARS | 0.15% |
-
----
-
-## APIs — mapa definitivo
-
-| API | Uso | Costo aprox |
-|-----|-----|-------------|
-| Metricool | Publicación automática (hasta tener Meta directo) | $15-22 USD/restaurante/mes |
-| Google Business Profile API | Análisis de presencia local | Gratis |
-| Google Places API | Competidores + prospección | ~$2 USD/restaurante/mes |
-| Instagram Basic Display API | Métricas básicas (1-5 días aprobación) | Gratis |
-| Instagram Graph API | Métricas privadas (2-8 semanas aprobación) | Gratis |
-| Claude Haiku 4.5 | Tano, Viti, análisis | ~$1-8 USD/restaurante/mes |
-| Replicate | Mejora de fotos | ~$2-8 USD/restaurante/mes |
-| Runway ML | Video IA | ~$8-10 USD/restaurante/mes |
-| Twilio | WhatsApp Business | $0.05-0.08 USD/mensaje |
-| MercadoPago | Suscripciones + pagos clientes | 3.99% por transacción |
-| Whisper (OpenAI) | Subtítulos automáticos en videos | $0.006 USD/minuto |
+#### Plan Combo + WA — $95 USD/mes
+Todo Combo más número WA Business dedicado y asistente completo.
 
 ---
 
-## Costos operativos fijos mensuales
+### COMERCIOS, SERVICIOS Y VENDEDORES ONLINE
 
-| Componente | USD |
-|-----------|-----|
-| Cloudflare | $10 |
-| Dominio | $1.25 |
-| Google Workspace | $6 |
-| Claude Pro Sebastián | $20 |
-| **Total** | **$37.25** |
+Rubros disponibles desde el lanzamiento:
+Restaurante/Bar/Café · Heladería/Pastelería · Rotisería/Delivery · Dietética/Almacén natural · Ropa/Calzado/Accesorios · Ferretería/Bazar/Herramientas · Peluquería/Barbería · Estética/Spa/Uñas · Veterinaria · Librería/Papelería · Kiosco/Minimarket · Servicios profesionales (contador, abogado, etc.) · Vendedor online puro (ML/TN sin local físico) · Otro (genérico)
+
+El rubro elegido en el onboarding adapta automáticamente: terminología, features disponibles, tipo de análisis de competidores, flujo del catálogo QR, nombre y comportamiento del asistente.
+
+No hay plan "solo catálogo" sin marketing — sin redes el catálogo digital solo no agrega valor real.
+
+#### Plan Marketing — $65 USD/mes
+- Catálogo digital QR (configurable: solo informativo o con pedido y pago según rubro)
+- Asistente IA con nombre personalizable por el dueño
+- Mi Catálogo: productos con costo de compra, precio de venta, margen mínimo, stock, peso y dimensiones
+- Integración MercadoLibre: lectura de publicaciones/ventas/reputación/preguntas, publicación desde Vitrina con fotos IA y descripción optimizada (5 aprobaciones → modo auto), análisis top 10 competidores misma categoría, respuestas automáticas a preguntas ML (5 aprobaciones → modo auto), sincronización de stock bidireccional ML↔TN
+- Integración Tienda Nube: lectura de stock/precios/ventas, sync bidireccional con ML
+- Viti ilimitado
+- 30 publicaciones automáticas/mes vía Metricool
+- Análisis de competidores Google Places: 3x/semana
+- Respuestas automáticas Google Reviews, Instagram, Facebook (5 aprobaciones → modo auto)
+- Sistema de reservas/turnos para rubros de servicios: calendario interno + Google Calendar opcional
+- CRM básico: base de contactos con teléfono, nombre si detectado, historial de compras/consultas
+- 50 mensajes promocionales/mes a base de contactos
+- 80 fotos con IA/mes
+- 10 subtítulos/mes (máx 90 seg/video)
+- $10 USD crédito bienvenida publicidad
+- Gestión publicidad paga incluida (Google Ads + Meta Ads, sin fee extra)
+- Informes completos: diario (4 semanas → consulta preferencia) + semanal + mensual PDF
+- Sin fee sobre ventas
+
+#### Plan Marketing + WA — $78 USD/mes
+Todo Marketing más:
+- Número WhatsApp Business dedicado con nombre del negocio
+- Asistente vendedor 24/7: responde consultas de productos/servicios, arma carrito inteligente
+- Al querer comprar, el asistente ofrece tres destinos: carrito en Vitrina, tienda en Tienda Nube, o link directo a publicación específica en ML + link al perfil completo del vendedor en ML
+- Gestión de turnos por WhatsApp para rubros de servicios
+- CRM ampliado: cada conversación enriquece la base de contactos
+- Análisis de competidores: 5x/semana (en lugar de 3x)
 
 ---
 
-## Bloques de desarrollo
+## Trial 14 días
 
-| Bloque | Contenido | Horas est. |
-|--------|-----------|-----------|
-| 1 | Login Google + Supabase + estructura BD + panel básico + roles | 12-15h |
-| 2 | Menú + Tano + QR + cocina + pedidos + idiomas | 10-12h |
-| 3 | MercadoPago suscripciones + lógica de planes + prueba gratis | 6-8h |
-| 4 | Google Business API + Instagram básica + análisis + Viti | 10-12h |
-| 5 | Publicación automática vía Metricool + calendario de contenido | 6-8h |
-| 6 | Replicate fotos + historial precios + competidores | 6-8h |
-| 7 | Landing page con animaciones + videos IA | 8-10h |
-| → **Agente programador entra acá** | Configuración | 3-4h |
-| 8 | Agente de ventas + Twilio WhatsApp | 5-6h |
-| 9 | Panel maestro completo + sistema de productores | 6-8h |
-| 10 | Informe ejecutivo PDF + medición de éxito del plan | 4-6h |
-| 11 | Testing, bugs, onboarding, primeros clientes reales | 8-10h |
-| **Total** | | **84-107h** |
+Equivale a: Plan Marketing para restaurantes / Plan Marketing para no gastronómicos.
+WhatsApp dedicado: NO disponible. Al terminar el trial, Vitrina informa sobre la posibilidad de tener línea propia suscribiéndose al plan +WA.
+Metricool durante el trial: se agrega la marca, se borra al terminar, cupo liberado inmediatamente.
+
+Límites del trial (comunicados como features, no como restricciones):
+
+| Feature | Trial | Plan pago | Mensaje al límite |
+|---------|-------|-----------|-------------------|
+| Fotos IA | 10 | 80/mes | "En el plan pago tenés 80 fotos/mes" |
+| Subtítulos | 3 videos | 10/mes | "Con el plan pago subtitulás hasta 10 videos por mes" |
+| Publicaciones auto | 3 | 30/mes | "En el plan pago publicamos todos los días si querés" |
+| Consultas Viti | 15 | Ilimitadas | "Viti te responde ilimitado con el plan pago" |
+| Análisis competidores | 1x/semana | 3x/semana (5x en +WA) | "Con el plan pago analizamos 3 veces por semana y guardamos toda la evolución" |
+| Productos Mi Catálogo | 10 | Ilimitados | "Con el plan pago cargás todo tu catálogo sin límite" |
+| Publicaciones en ML | 10 productos | Ilimitadas | mensaje similar |
+| Mensajes promo WA | 10 | 50/mes | mensaje similar |
+| Respuestas auto ML/IG/FB | Manual (sin modo auto) | Auto tras 5 aprobaciones | — |
+| Informes | Solo diario básico | Completos | — |
+| Reservas/turnos | Completo | Completo | — |
+| Tano/asistente | Ilimitado | Ilimitado | — |
+| Pedidos y pagos | Completo | Completo | — |
+| WA dedicado | No disponible | Con plan +WA | "Sumá tu línea WA propia por $12 más/mes" |
+
+Lo que NUNCA se limita en el trial: Tano, pedidos, cocina, pagos, reservas. El dueño tiene que sentir que el negocio ya funciona desde el día 1.
 
 ---
 
-## Agentes
+## Extensiones (todos los planes)
 
-### Agente programador (este agente)
-- Entra después de login + Supabase funcionando (Bloque 1 completo).
-- **Hace solo:** features completas, deploy a prueba, corrección de errores, iteración.
-- **Consulta a Sebastián:** deploy a producción, cambios de precios/planes, features nuevas no definidas, errores sin resolver en 2 intentos.
-- **Trabaja de noche:** computadora prendida + pantalla bloqueada (no hibernando).
+El cliente nunca se bloquea. Si tiene "extensión automática" activada, se descuenta solo. Si no, Vitrina avisa por WhatsApp: "Usaste tus 80 fotos del mes. ¿Sumás 30 más por $3?" con botón de pago directo.
 
-### Agente de ventas
-- Entra cuando menú funciona con cliente real y landing está publicada.
-- Busca restaurantes con Google Places API, genera diagnóstico preliminar, manda WhatsApp + email personalizado, seguimiento a los 3 días.
-- Avisa a Sebastián cuando alguien muestra interés real.
+| Recurso | Incluido/mes | Extensión | Precio |
+|---------|-------------|-----------|--------|
+| Fotos IA | 80 | +30 fotos | $3 USD |
+| Subtítulos | 10 videos | +10 videos | $2 USD |
+| Publicaciones auto | 30 | +15 publicaciones | $3 USD |
+| Mensajes promo WA | 50 | +50 mensajes | $3 USD |
+| Análisis competidores | 3x/semana (5x en top) | No extendible | — |
+| Consultas Viti | Ilimitadas | — | — |
+| Respuestas auto | Ilimitadas | — | — |
 
-**Todos los agentes se conectan vía Supabase.** Un agente detecta algo → lo escribe en Supabase → otro agente lo toma.
+---
+
+## Flujo de fotos con IA — protección de créditos
+
+Antes de generar cualquier foto, Vitrina muestra 3 estilos con descripción visual:
+1. Fondo neutro blanco — producto puro, estilo catálogo profesional
+2. Ambiente cálido — madera, luz dorada, contexto del local
+3. Minimalista oscuro — fondo negro/gris, producto destacado, estilo premium
+
+El cliente elige un estilo. Vitrina genera 1 foto de ejemplo (consume 1 crédito de prueba separado, NO del lote mensual). Si le gusta: genera el resto del lote. Si no: elige otro estilo, nueva muestra. Solo cuando confirma se consumen los créditos del mes.
+
+---
+
+## Sistema de respuestas automáticas — lógica unificada
+
+Aplica a: preguntas ML, publicaciones ML desde Vitrina, respuestas IG/FB/Google, bajada de stock en TN tras venta en ML, publicaciones en redes desde Viti.
+
+SIEMPRE son 5 aprobaciones consecutivas para activar el modo automático.
+
+- Si el dueño rechaza una sugerencia: el contador vuelve a 0.
+- Tras 5 aprobaciones seguidas: Viti pregunta "¿Querés que lo haga solo de ahora en más?" — botones Sí / No.
+- En modo automático: actúa en menos de 2 minutos, manda resumen diario con todo lo ejecutado.
+- Excepción siempre: si Viti no tiene certeza de la respuesta correcta, manda al dueño sin importar el modo.
+- El dueño puede pausar el modo automático en cualquier canal diciéndoselo a Viti: "Viti, pausá las respuestas de Instagram." Se reactiva igual de fácil.
+
+Canales con respuestas automáticas disponibles:
+- Preguntas de compradores en MercadoLibre
+- Comentarios en Instagram (feed + Reels)
+- Mensajes directos en Instagram (solo en plan +WA)
+- Comentarios en Facebook
+- Reseñas en Google Business Profile
+- Mensajes de WhatsApp (solo en plan +WA)
+
+Cómo aprende el estilo: Viti analiza las últimas 50 respuestas dadas por el dueño en cada canal antes de proponer respuestas propias. Siempre intenta mejorar el tono y la efectividad manteniendo la voz del dueño.
+
+---
+
+## Mi Catálogo — gestión de stock, costos y márgenes
+
+### Pantalla de elección de método de carga
+
+Antes de elegir, Vitrina explica ambas opciones:
+
+"Tenés dos formas de cargar tu catálogo. Con Tienda Nube sincronizás automáticamente productos y stock — los precios de Mercado Libre se calculan sumando comisiones, envío y Mercado Pago sobre tu precio actual. Con PDF, cargás tus productos con costos reales y Vitrina calcula tu ganancia neta exacta en cada venta. Esta segunda opción te da más control sobre tus márgenes reales."
+
+### Opción A — Sincronización desde Tienda Nube
+- OAuth: el dueño autoriza a Vitrina con su cuenta TN
+- Vitrina lee: productos, precios de venta, stock actual
+- Para publicar en ML: toma precio de TN y suma comisión ML (11-16.5% según categoría) + costo envío estimado + fee MercadoPago
+- El dueño completa en Vitrina: costo de compra, margen pretendido, stock mínimo de alerta
+- Sync bidireccional: venta en ML → descuenta stock en TN. Venta en TN → descuenta stock en ML. Automático tras 5 aprobaciones.
+
+### Opción B — PDF
+- Dueño sube PDF (lista de precios, catálogo, lo que tenga)
+- Claude Vision lo lee y extrae: nombre del producto, precio de venta, descripción
+- Vitrina muestra tabla pre-completada con lo encontrado
+- Campos marcados en rojo = no encontrados, dueño los completa: costo de compra, margen pretendido, stock, peso y dimensiones
+- Al confirmar: Vitrina genera plantilla PDF de ejemplo para que la próxima vez sea más fácil
+
+### Campos por producto
+- Nombre
+- Foto (cruda → Vitrina mejora con IA)
+- Costo de compra
+- Precio de venta pretendido
+- Margen mínimo aceptable (%)
+- Stock actual
+- Stock mínimo de alerta
+- Peso y dimensiones (para envíos ML — se pregunta en primeras 5 publicaciones si no están cargados)
+- Categoría ML (si publica en ML)
+
+### Cálculo automático de precio ML
+Precio publicación = costo + margen pretendido + comisión ML + envío estimado. Si ese precio no es competitivo contra los top 10 competidores detectados, Viti avisa: "Para cubrir tu margen necesitás publicar a $8.500. Tus competidores directos están a $7.800. Si bajás el margen mínimo al 28% quedás competitivo. ¿Lo ajustamos?"
+
+### Alertas de stock
+WhatsApp automático cuando el stock llega al mínimo: "Quedan 3 unidades de [producto]. ¿Recibiste mercadería nueva? Actualizá el stock para mantener la publicación activa en ML."
+
+### Alerta por venta en ML
+WhatsApp al dueño: "Venta en ML: 1 unidad de [producto] a $8.400. Ganancia neta después de comisiones: $2.847. Preparar despacho."
+Un solo mensaje por ventana de 24 horas (Meta cobra 1 conversación/día, no 1 por venta).
+
+---
+
+## Publicaciones en MercadoLibre desde Vitrina
+
+Flujo:
+1. Dueño inicia publicación desde Mi Catálogo
+2. Viti genera: título optimizado para algoritmo ML, descripción detallada, fotos mejoradas con Replicate, atributos del producto, precio calculado
+3. Primeras 5 publicaciones: Viti pregunta peso y dimensiones si no están cargados
+4. Vitrina muestra preview completo "así se verá en ML"
+5. Dueño aprueba → Vitrina publica en ML vía API
+6. Tras 5 aprobaciones: modo automático disponible (Viti consulta si lo activa)
+
+Combos de productos: Viti puede sugerir combos cuando el envío compartido mejora el margen. Genera la publicación del combo automáticamente.
+
+---
+
+## Sistema de reservas y turnos
+
+### Configuración del dueño (una sola vez)
+- Restaurante: cantidad y tipo de mesas (2p, 4p, grupos), turnos disponibles, duración promedio de mesa, días de cierre
+- Servicios: servicios con duración, profesionales disponibles, horarios, días libres, buffer entre turnos
+
+### Flujo conversacional por WhatsApp (plan +WA)
+Cliente: "Quiero reservar para el sábado"
+Asistente: "Claro, ¿para cuántas personas?"
+Cliente: "Somos 4"
+Asistente: "Tengo disponible el sábado a las 20:30 o 21:15. ¿Cuál preferís?"
+Cliente: "21:15"
+Asistente: "Reservado. ¿A nombre de quién?"
+Cliente: "Martín"
+Asistente: "Listo Martín, reserva para 4 el sábado 21:15. Te mando recordatorio el viernes."
+
+Recordatorio automático: 24 hs antes por WhatsApp + email.
+Si no confirma: Vitrina avisa al dueño para que decida si libera el lugar.
+Calendarios: interno de Vitrina (default) + Google Calendar como alternativa.
+
+---
+
+## CRM básico (Plan Marketing y superiores)
+
+Al final de cada conversación de WhatsApp o pedido completado, Vitrina guarda automáticamente:
+- Número de teléfono
+- Nombre si fue detectado en la conversación
+- Si no hay nombre: número con referencia del pedido o consulta
+- Historial de compras/consultas
+- Fecha del último contacto
+
+### Mensajes promocionales a la base
+- 50/mes incluidos en el plan
+- El dueño arma el mensaje desde el panel, Viti sugiere mejoras
+- Vitrina lo envía en horario óptimo según historial de apertura
+- Se envían como mensajes de tipo Marketing de Meta (~$0.061 USD/mensaje)
+- Para evitar bloqueos: máximo 1 campaña cada 7 días a los mismos contactos, nunca más de 3 mensajes al mismo número en 30 días, siempre con opción de darse de baja
+- Extensión: +50 mensajes por $3 USD
+
+---
+
+## Sistema de alertas de costos variables
+
+### Para Sebastián (panel maestro)
+- Cada costo variable (foto, subtítulo, mensaje promo, análisis) suma al acumulado del mes en Supabase por cliente
+- Al 80% del costo estimado mensual de ese cliente: alerta en panel maestro + WhatsApp a Sebastián
+- Al 100%: segunda alerta
+- Al 120%: pausa automática de servicios variables (fotos, subtítulos, análisis extra). NUNCA se pausa: Tano, pedidos, cocina, pagos, reservas.
+- Dentro de 24 hs hábiles de la pausa: Vitrina contacta al cliente para resolverlo
+
+### Para el cliente
+Al 80% de fotos del mes: "Usaste 64 de tus 80 fotos. Te quedan 16 o podés sumar 30 más por $3." Mismo sistema para subtítulos, publicaciones y mensajes promo.
+
+### Texto en términos y condiciones (aprobado)
+"Los servicios variables de Vitrina (procesamiento de imágenes con IA, generación de subtítulos, análisis de competidores y mensajería WhatsApp) están dimensionados para un uso normal según el plan contratado. Vitrina se reserva el derecho de notificar al cliente y, de ser necesario, pausar temporalmente servicios variables ante un uso significativamente superior al estimado para el plan, sin afectar en ningún caso los servicios operativos (catálogo digital, sistema de pedidos y pagos). Ante cualquier pausa, Vitrina contactará al cliente dentro de las 24 horas hábiles para resolverlo."
+
+---
+
+## Informes automáticos (todos los planes)
+
+### Frecuencia
+- Semanas 1-4: informe diario
+- Inicio de semana 5: Viti pregunta "¿Seguís con informe diario o pasamos a semanal más completo?" — botones de elección
+- Siempre: informe semanal (jueves o viernes, configurable) + informe mensual PDF el día 1
+
+### Canales
+WhatsApp + email simultáneos. PDF como adjunto en email y como link de Supabase Storage en WhatsApp.
+
+### Informe diario (texto, no PDF)
+- Plan Menú: pedidos del día, facturación, platos más pedidos, reseñas nuevas en Google
+- Planes con marketing: métricas de redes del día, publicaciones publicadas, nuevas preguntas ML, ventas ML, stock crítico
+- Máximo 5 líneas en WhatsApp
+
+### Informe semanal (PDF 2 páginas)
+- Métricas de la semana vs semana anterior
+- Top 3 publicaciones de redes
+- Alertas importantes
+- Competidores: qué hicieron esta semana
+
+### Informe mensual (PDF 8-12 páginas)
+- Logo del restaurante/local en el encabezado
+- Performance vs proyecciones por escenario
+- Análisis por canal (Google, Instagram, Facebook, ML, TN)
+- Qué funcionó y qué no, con datos
+- Estrategia ajustada para el mes siguiente
+- Firma discreta al pie: "Generado por Vitrina"
+- El dueño puede presentarlo como propio
+
+Diseño del PDF: A4, márgenes generosos, fuente mínima 12pt, funciona impreso en blanco y negro, gráficos de barras y líneas (no tortas).
+
+---
+
+## Onboarding del cliente
+
+1. Registro: Google login o email + contraseña
+2. Tipo de negocio: elige entre los rubros disponibles. Adapta terminología y features automáticamente.
+3. Conexión de redes (primero): Google Business Profile + Instagram → análisis preliminar en 2-3 min. Valor visible antes de pagar.
+4. Nombre del asistente: restaurantes default "Tano" (personalizable), otros rubros eligen nombre desde el inicio.
+5. Canales de notificación: canal de gestión (dueño) y canal operativo (local). WhatsApp obligatorio para operativo.
+6. Carga del catálogo/menú: restaurantes cargan platos con fotos, precios, categorías, filtros. Otros rubros eligen Tienda Nube o PDF (con explicación de diferencias antes de elegir).
+7. QR: configuración por mesa (restaurantes) o genérico. ¿Modo informativo o con pedido y pago? Generación de PDF + PNG con logo en el centro. Envío automático por email.
+8. Google OAuth: el dueño autoriza a Vitrina con su cuenta Google Business Profile para que Viti pueda responder reseñas automáticamente.
+9. Conexión ML/TN: OAuth de MercadoLibre y/o Tienda Nube. Solo en planes que incluyen estas integraciones.
+10. Activación del plan: cobro automático vía MercadoPago. Primer mes con $10 USD de crédito para publicidad en planes Marketing y superiores.
+
+---
+
+## Metricool — detalle técnico
+
+### Escala de planes
+| Clientes marketing activos | Plan Metricool | Costo/mes |
+|---------------------------|---------------|-----------|
+| 0-4 (+ Vitrina propia) | Starter | $25 |
+| 5-14 | Advanced mensual | $67 |
+| 15-24 | Advanced+ | $97 |
+| 25+ | Enterprise | $139+ |
+
+Slot 1 siempre reservado para Vitrina propia (vitrinaapp.com.ar).
+Activar desde el primer cliente de marketing — no esperar.
+
+### Lo que Metricool hace para Vitrina
+- Publicación automática programada en Instagram, Facebook, Google Business Profile
+- Analytics: alcance, engagement, mejores horarios, performance por post
+- Stories e Instagram Reels
+- Confirmación de publicación + métricas 24 hs después
+
+### Límites técnicos
+- 200 requests/hora por cuenta (no es limitación práctica)
+- Imágenes: mínimo 1080x1080px para feed, 1080x1920px para Stories
+- Video: máximo 60 seg para feed, 15 seg para Stories
+- Tokens OAuth: caducan cada 60 días — Vitrina avisa 7 días antes al dueño
+
+### Flujo de publicación
+1. Viti arma el post (imagen + copy + hashtags + timestamp)
+2. Dueño aprueba desde panel Vitrina (o auto si modo automático)
+3. Vitrina llama API Metricool con todos los datos
+4. Metricool confirma que quedó programado
+5. Vitrina guarda en tabla content_calendar de Supabase con estado "programado"
+6. 24 hs después: Vitrina consulta métricas y actualiza Supabase
+
+### Baja de cliente
+Borrar brand en Metricool → Connections → tres puntos → Delete brand. Cupo liberado inmediatamente.
+
+### Secrets
+METRICOOL_API_KEY → wrangler secret put METRICOOL_API_KEY
+METRICOOL_USER_TOKEN → wrangler secret put METRICOOL_USER_TOKEN
+
+---
+
+## Costos reales por plan y márgenes
+
+Todos los valores en USD/mes por cliente.
+"5c" = con 5 clientes activos de marketing (Metricool $5/cliente diluido).
+"15c" = con 15 clientes activos (Metricool $1.67/cliente diluido).
+
+### RESTAURANTES
+
+| Plan | Precio | Costo 5c | Costo 15c | Margen 5c | Margen 15c |
+|------|--------|----------|----------|-----------|-----------|
+| Solo Menú | $27 | $12.27 | $12.27 | $14.73 (55%) | $14.73 (55%) |
+| Menú + WA | $39 | $16.27 | $16.27 | $22.73 (58%) | $22.73 (58%) |
+| Marketing | $65 | $26.58 | $23.25 | $38.42 (59%) | $41.75 (64%) |
+| Marketing + WA | $78 | $30.58 | $27.25 | $47.42 (61%) | $50.75 (65%) |
+| Combo | $85 | $33.42 | $30.09 | $51.58 (61%) | $54.91 (65%) |
+| Combo + WA | $95 | $37.42 | $34.09 | $57.58 (61%) | $60.91 (64%) |
+
+### NO GASTRONÓMICOS
+
+| Plan | Precio | Costo 5c | Costo 15c | Margen 5c | Margen 15c |
+|------|--------|----------|----------|-----------|-----------|
+| Marketing | $65 | $26.58 | $23.25 | $38.42 (59%) | $41.75 (64%) |
+| Marketing + WA | $78 | $30.58 | $27.25 | $47.42 (61%) | $50.75 (65%) |
+
+El Plan Marketing de no gastronómicos incluye ML/TN. El costo adicional de ML/TN (~$1.50 USD por Haiku) está absorbido en el margen, no se diferencia en precio.
+
+### Desglose de costos por componente
+
+| Componente | Qué hace | Costo/cliente/mes |
+|-----------|---------|-----------------|
+| Claude Haiku — Tano | Responde a comensales en el menú | $1.50 |
+| Claude Haiku — Viti | Análisis, estrategia, copies, respuestas auto | $4.00-6.00 |
+| Claude Vision — PDF/screenshots | Lee PDFs de catálogo y screenshots Rappi/PedidosYa | $0.20 |
+| Replicate | Mejora fotos con IA (80/mes máx, $0.07/foto) | $5.60 |
+| Whisper (OpenAI) | Subtítulos automáticos (10/mes, 90 seg máx) | $0.09 |
+| Google Places API | Análisis de competidores 3-5x/semana | $4.45-7.40 |
+| Google Calendar API | Sincronización de reservas | $0 |
+| Metricool (diluido) | Publicación automática en redes | $1.67-5.00 |
+| Twilio WhatsApp mensajes | Fee por mensaje operativo ($0.005/msg) | $0.50 |
+| Meta WhatsApp promo | 50 mensajes promo/mes a $0.061 | $3.05 |
+| Twilio número dedicado | Número WA Business por cliente (solo +WA) | $2.00 |
+| Meta WA Business número | Registro número WA Business (solo +WA) | $8-10 |
+| MercadoPago fee suscripción | 3.99% sobre precio del plan | $1.08-3.79 |
+| ML API | Lectura/escritura publicaciones, ventas, preguntas | $0 |
+| Tienda Nube API | Lectura/escritura stock, productos | $0 |
+| Supabase (prorrateado) | Base de datos, storage PDFs e informes | $0.50 |
+
+### Ganancia neta mensual proyectada
+
+Mix realista: 40% Solo Menú, 20% Marketing, 20% Marketing+WA, 10% Combo, 10% Full.
+
+| Clientes | Ingresos | Costos variables | Metricool fijo | Neto USD | Neto ARS |
+|---------|---------|-----------------|---------------|----------|---------|
+| 5 | $256 | $105 | $25 | $126 | $176.400 |
+| 10 | $513 | $210 | $25 | $278 | $389.200 |
+| 15 | $769 | $315 | $67 | $387 | $541.800 |
+| 20 | $1.025 | $420 | $67 | $538 | $753.200 |
+| 30 | $1.538 | $630 | $97 | $811 | $1.135.400 |
+| 50 | $2.563 | $1.050 | $139 | $1.374 | $1.923.600 |
+
+No incluye extensiones ni ingresos adicionales de número WA.
+
+---
+
+## Estructura de cuentas y sucursales
+
+- Cuenta madre con N sucursales adentro
+- Login → selector de sucursal o vista consolidada
+- Cada sucursal: catálogo propio, QR propio, pedidos propios, análisis propio
+- Plan y facturación: unificados por cuenta madre
+- Sucursal adicional: 35% del plan base
+
+Roles:
+- Administrador: acceso completo
+- Operativo: solo pantalla de cocina/pedidos y catálogo del día. Sin facturación, sin análisis, sin Viti.
+- Usuarios operativos: ilimitados en todos los planes, sin costo adicional.
+
+---
+
+## Sistema de notificaciones
+
+Canal de gestión (dueño): alertas de uso, vencimientos, rendimiento, reseñas nuevas, publicaciones ejecutadas, resumen de actividad. WhatsApp y/o email según preferencia.
+
+Canal operativo (local/cocina): pedidos nuevos, cambios de estado, alertas urgentes. Solo WhatsApp.
+
+El dueño puede configurar ambos en el mismo número si lo prefiere.
+
+---
+
+## Landing page — cambios pendientes para Claude Code
+
+- Imagen hero: vitrina de local comercial de noche, imagen libre de derechos (Unsplash/Pexels), genérica sin encasillar en ningún rubro
+- Nueva sección "¿Qué tipo de negocio sos?" con íconos de cada rubro — muestra versatilidad
+- Copys: reescribir para sonar humanos, no generados por IA. Usar especificidad ("El dueño de La Panera Rosa tardaba 3 horas/semana en Instagram. Ahora tarda 0."), frases coloquiales intencionales, números concretos
+- Botón "Empezar gratis 14 días" repetido cada 2-3 secciones
+- Cuando haya clientes reales: sección de casos de éxito con datos concretos
 
 ---
 
 ## Panel maestro de Sebastián
 
-- **Clientes:** total activos, nuevos este mes, bajas, por plan, conversión, alertas churn (sin actividad 7+ días).
-- **Facturación:** suscripciones, fees transacción, fees publicidad, total vs mes anterior, proyección del mes.
-- **Agentes:** actividad, eficacia, costo en tokens/USD por agente.
-- **Costos:** fijos discriminados, variables por cliente, margen bruto del mes.
-- **Productores:** clientes por productor, comisión generada, "marcar como pagado", reporte descargable.
-- **Por cliente:** plan activo, productor asignado, plan cortesía on/off, sucursales, uso de IA este mes.
+- Clientes: activos, nuevos, bajas, por plan, conversión trial→pago, churn (sin actividad 7+ días)
+- Facturación: suscripciones, extensiones, total vs mes anterior, proyección
+- Costos: Metricool fijo, variables por cliente, margen bruto del mes
+- Metricool: slots disponibles, cuándo hacer upgrade
+- Números WA: cuántos activos, costo fijo total
+- Agentes: actividad, eficacia, costo en tokens/USD
+- Por cliente: plan activo, productor asignado, uso IA este mes, costos acumulados, alertas
 
 ---
 
 ## Sistema de productores / revendedores
 
-- Comisión estándar: 20% primer mes + 10% recurrente.
-- Productor top (+10 clientes activos): 25% primer mes + 15% recurrente.
-- El panel muestra comisión generada por productor ese mes y botón "marcar como pagado".
+- Sebastián carga productores en el panel maestro
+- Comisión estándar: 20% primer mes + 10% recurrente mientras el cliente siga activo
+- Productor top (+10 clientes activos): 25% primer mes + 15% recurrente
+- Panel muestra comisión por productor + botón "marcar como pagado"
+- Reporte descargable para el contador
 
 ---
 
-## Competencia
+## Los agentes
 
-- **SoyMenu**: $20.000 ARS/mes, 384 clientes, solo carta QR sin cocina ni IA.
-- **Carta.menu**: $15.000-25.000 ARS/mes, similar.
-- **Agencias de marketing**: $150.000-400.000 ARS/mes, sin tecnología propia.
-- Nadie hace menú + marketing + IA integrado para restaurantes chicos en Argentina.
+### Agente programador
+- Entra después de login + Supabase funcionando
+- Hace solo: features completas, deploy, corrección de errores
+- Consulta a Sebastián: deploy a producción, cambios de precios/planes, features nuevas no definidas
+- Trabaja de noche: computadora prendida, pantalla bloqueada (no hibernando)
+- Costo nocturno: Claude Haiku vía API — $0.50-2 USD por noche
 
----
+### Agente de ventas
+- Busca negocios con Google Places API según rubro objetivo
+- Genera diagnóstico preliminar del negocio
+- Manda WhatsApp (plantilla aprobada Meta) + email personalizado
+- Seguimiento a los 3 días
+- Registra todo en Supabase
+- Avisa a Sebastián cuando hay interés real
 
-## Comentarios en platos
+### Agente de relaciones
+- Seguimiento de clientes activos
+- Detección de churn (sin actividad 7+ días)
+- Encuestas de satisfacción
+- Alimenta backlog del agente programador
 
-### Cómo funciona
-- **Por plato individual:** cada ítem del carrito tiene sus opciones de personalización.
-- **Comentario general al final:** campo adicional antes de confirmar el pedido para aclaraciones globales.
+### Agente de productores / contabilidad
+- Comisiones mes a mes
+- Reportes para Sebastián y contador
+- Control de pagos de servicios
 
-### Opciones predefinidas generadas por IA
-Al cargar o editar un plato, Claude Haiku analiza nombre, descripción, ingredientes y categoría, y genera automáticamente las opciones de personalización que tienen sentido para ese plato. El dueño las ve, puede aprobarlas, editarlas o eliminarlas — quedan guardadas para ese plato.
-
-**Lógica de generación:**
-- Platos ya preparados (empanadas, sushi, pizza al corte): Haiku no sugiere opciones si no hay nada modificable.
-- Carnes y proteínas: punto de cocción (jugoso / a punto / bien cocido).
-- Sándwiches y hamburguesas: sin ingredientes específicos (sin tomate, sin cebolla, sin mayonesa), extras.
-- Bebidas: con/sin azúcar, con/sin hielo, variantes de leche.
-- Pastas: salsa aparte, sin queso rallado.
-- Si el dueño no cargó descripción, Haiku infiere del nombre + categoría.
-
-**Siempre disponible:** campo de texto libre para aclaraciones que no entran en ninguna opción predefinida.
-
-### Dónde llegan los comentarios
-- **Pantalla de cocina:** visible junto a cada ítem del pedido.
-- **Tano:** tiene acceso al pedido completo con comentarios para poder confirmar aclaraciones al cliente. Ejemplo: si el cliente pregunta "¿anotaron que quiero el bife jugoso?", Tano puede confirmar.
+Todos se conectan vía Supabase. Un agente detecta algo → lo escribe en Supabase → otro agente lo toma.
 
 ---
 
-## Diseño del menú
+## Decisiones firmes (no se negocian)
 
-### Personalización por restaurante
-Cada restaurante tiene su propio diseño de menú. Elementos personalizables: color de fondo, colores de acento, tipografía, logo, foto de portada, estilo de tarjetas de platos.
-
-### Generación de propuestas con IA
-Durante el onboarding, cuando el restaurante conecta Instagram y Google Business, Haiku analiza las imágenes y paleta de colores predominante, y genera **3 propuestas de diseño** para el menú. El dueño elige una.
-
-**Plan B — sin redes conectadas:** se ofrecen 3 propuestas genéricas prediseñadas (clara, oscura, neutra) que el dueño puede personalizar después.
-
-### Reglas
-- El dueño puede cambiar el diseño en cualquier momento desde el panel.
-- También puede subir su propio diseño (imagen o paleta personalizada).
-- El diseño se aplica a todo el menú: header, categorías, tarjetas de platos, carrito, pantalla de confirmación.
+- Sin fee sobre ventas del menú/catálogo. Precio fijo mensual sin comisiones sobre transacciones.
+- Sin fee sobre presupuesto publicitario. Gestión de publicidad paga incluida en el plan.
+- Base de datos Supabase desde el arranque.
+- Metricool activado desde el primer cliente de marketing (incluye marca Vitrina propia como slot 1).
+- Instagram Basic Display API no existe desde diciembre 2024. Solo Instagram Graph API (4-6 semanas de aprobación). No mencionar Basic Display API en ningún contexto.
+- Runway y videos generados con IA eliminados del producto. Solo subtítulos con Whisper para videos que sube el dueño.
+- 5 aprobaciones consecutivas para cualquier modo automático (respuestas ML, publicaciones, stock sync, respuestas redes, respuestas Google).
+- Tano es el nombre default para restaurantes, personalizable en onboarding.
+- Asistente de locales no gastronómicos: el dueño elige el nombre desde el inicio del onboarding.
+- Términos y condiciones y política de privacidad publicados antes del primer pago real y antes de solicitar aprobación de Meta.
 
 ---
 
-## Generación y gestión de QR
+## Competencia y diferenciadores
 
-### Tipos de QR
-- **QR genérico:** un solo código para todo el restaurante. Sirve para locales sin mesas asignadas o para usar en redes sociales.
-- **QR por mesa numerada:** un código distinto por mesa. El pedido llega a cocina identificado con el número de mesa.
-- Ambos disponibles para el dueño desde el panel.
+- SoyMenu / Carta.menu: $15-25 USD/mes, solo carta QR sin IA ni marketing
+- Agencias de marketing: $150-400 USD/mes, sin tecnología propia ni integración con el negocio
+- Nubimetrics: $30-50 USD/mes, solo análisis ML, sin presencia física ni redes
+- Ningún competidor hace menú + pedidos + redes + ML/TN + IA conversacional + reservas + CRM en un solo panel para comercios argentinos
 
-### Estética
-- Logo del restaurante en el centro del QR.
-- Si no tiene logo cargado, usa las iniciales del restaurante.
-
-### Descarga
-- PDF listo para imprimir (tamaño de mesa, con nombre del restaurante y número de mesa).
-- PNG del QR individual.
-- Envío automático por email al dueño al generarlos.
+Diferenciador real: integración. No se vende como "marketing digital" ni "carta QR" sino como "el primer sistema que centraliza toda la presencia digital de un comercio en un lugar."
 
 ---
 
-## Onboarding del restaurante
+## Monitoreo de novedades
 
-### Pasos obligatorios (mínimo para funcionar)
-1. Registro (Google login o datos manuales).
-2. Nombre del restaurante + dirección.
-3. Cargar al menos un plato.
-4. Generar QR.
-
-### Pasos opcionales (completan la experiencia)
-- Conectar Instagram y Google Business → activa análisis y propuestas de diseño.
-- Configurar tono de Tano (informal/cálido, neutro/profesional, sofisticado).
-- Configurar canales de notificación (gestión y operativo).
-- Elegir diseño del menú (si no elige, va con propuesta genérica clara).
-- Subir foto de portada y logo.
-
-### Experiencia de carga
-- **Barra de progreso** siempre visible (Paso 2 de 4, etc.) — diferencia pasos obligatorios de opcionales.
-- **Preview en tiempo real del menú** mientras el dueño carga los datos — ve cómo va quedando su menú a medida que completa cada paso.
-
----
-
-## Dashboard del dueño (panel principal)
-
-### Estructura de la pantalla principal
-1. **Alertas arriba:** notificaciones pendientes (créditos bajos, reseñas nuevas, pedidos con problema, etc.).
-2. **Resumen de hoy en grande:** pedidos del día, ventas del día, platos más pedidos, mesas activas.
-3. **Métricas del mes abajo:** ventas acumuladas, nuevos seguidores, campañas activas, comparativa con mes anterior.
-4. **Accesos directos:** Menú, Cocina, QR, Tano, Viti, Publicaciones.
-
-### Navegación
-- **Barra inferior tipo app móvil** con las secciones principales: Inicio, Menú, Marketing, Configuración, Viti.
-- Diseñada para uso desde celular — el dueño gestiona todo desde el teléfono.
-
----
-
-## Carrito y confirmación del pedido
-
-### Cómo ve el cliente el carrito
-- **Barra fija en la parte inferior** de la pantalla mientras navega el menú.
-- Muestra: cantidad de ítems, total acumulado y botón "Confirmar pedido".
-- Al tocar un plato se abre la tarjeta con opciones de personalización (comentarios predefinidos + texto libre) antes de agregar al carrito.
-
-### Dos flujos de confirmación
-
-**Flujo A — Clásico:**
-Barra inferior → pantalla de resumen del pedido → datos del cliente (nombre + email opcional) → confirmación → pedido va a cocina.
-
-**Flujo B — Con Tano:**
-El cliente le dice a Tano lo que quiere. Tano arma el pedido conversacionalmente, confirma los ítems y las aclaraciones, pide nombre y email, y confirma el envío a cocina.
-
-Ambos flujos generan el mismo objeto de pedido en Supabase y aparecen igual en la pantalla de cocina.
-
-### Modificaciones post-confirmación
-- Mientras el pedido está en estado **Recibido**: el cliente puede agregar ítems al pedido existente (no eliminar — solo sumar).
-- Una vez que pasa a **Preparando**: el pedido queda cerrado, no se puede modificar.
-- Si quiere algo más después de Preparando: genera un nuevo pedido.
-
----
-
-## Reglas de autonomía para el agente programador
-
-1. Implementar features definidas en este documento sin pedir confirmación.
-2. Deployar a entorno de prueba sin pedir confirmación.
-3. Corregir bugs sin pedir confirmación.
-4. Si un problema no se resuelve en 2 intentos, detener y escribir un resumen claro del problema para Sebastián.
-5. **NO deployar a producción sin confirmación explícita de Sebastián.**
-6. **NO modificar precios, planes ni lógica comercial sin confirmación.**
-7. **NO crear nuevas features no definidas en este documento sin confirmación.**
-8. Para acceder a Supabase, Cloudflare o GitHub: usar CLI y variables de entorno. No abrir navegador.
-9. Usar Sonnet 4.6 para implementación. Usar Opus solo para problemas de arquitectura difíciles.
-10. Al terminar la noche o la sesión, escribir un resumen de qué se hizo, qué quedó pendiente y cuál es el próximo paso sugerido.
+En cada sesión relevante mencionar proactivamente: nuevos modelos de IA más baratos, cambios en políticas de Meta/Google/ML/TN, nuevas APIs, herramientas de automatización, competidores nuevos en el mercado argentino.
