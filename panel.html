@@ -2160,6 +2160,41 @@ input:checked + .toggle-slider:before {
             <!-- Se llena con JS -->
           </div>
         </div>
+
+        <!-- Subtítulos automáticos con Whisper -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;gap:10px">
+            <span>🎙️ Subtítulos automáticos para videos</span>
+          </div>
+          <p style="font-size:13.5px;color:var(--muted);margin:8px 0 16px;line-height:1.5">
+            Subí un video de tu negocio y Vitrina genera los subtítulos automáticamente con IA (Whisper). Perfectos para Reels e Instagram.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <label class="form-label">Idioma del audio</label>
+              <select class="form-select" id="whisper-lang" style="max-width:200px">
+                <option value="es">Español</option>
+                <option value="en">Inglés</option>
+                <option value="pt">Portugués</option>
+              </select>
+            </div>
+            <div>
+              <label class="btn-secondary" style="cursor:pointer;font-size:13px;padding:8px 16px;display:inline-block">
+                📤 Subir audio/video
+                <input type="file" id="whisper-file" accept="audio/*,video/*" onchange="transcribeWithWhisper(this)" style="display:none">
+              </label>
+              <span class="form-hint" style="margin-left:10px">MP3, MP4, MOV, WAV — máx 25MB</span>
+            </div>
+            <div id="whisper-status" style="display:none"></div>
+            <div id="whisper-result" style="display:none">
+              <label class="form-label">Subtítulos generados</label>
+              <textarea id="whisper-text" class="form-textarea" style="min-height:120px;font-size:13px" readonly></textarea>
+              <button class="btn-secondary" onclick="copyWhisperText()" style="font-size:13px;padding:6px 14px;margin-top:8px">
+                📋 Copiar texto
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div id="section-config" class="panel-section">
@@ -5186,6 +5221,62 @@ window.loadMarketing = async function () {
 window.connectMetricool = function () {
   if (!currentRestaurant) return
   window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/metricool/auth?restaurant_id=${currentRestaurant.id}`
+}
+
+// ─────────────────────────────────────────────
+// Whisper — subtítulos automáticos
+// ─────────────────────────────────────────────
+window.transcribeWithWhisper = async function (input) {
+  if (!input.files || !input.files[0]) return
+  const file = input.files[0]
+  const maxSize = 25 * 1024 * 1024 // 25MB
+  if (file.size > maxSize) {
+    showToast('El archivo debe ser menor a 25MB', 'error')
+    input.value = ''
+    return
+  }
+
+  const lang = document.getElementById('whisper-lang').value
+  const statusEl = document.getElementById('whisper-status')
+  const resultEl = document.getElementById('whisper-result')
+  const textEl   = document.getElementById('whisper-text')
+
+  statusEl.style.display = 'block'
+  statusEl.innerHTML = '<div style="font-size:13px;color:var(--muted)">⏳ Transcribiendo... puede tardar hasta 30 segundos.</div>'
+  resultEl.style.display = 'none'
+
+  try {
+    const formData = new FormData()
+    formData.append('audio', file)
+    formData.append('language', lang)
+
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/whisper/transcribe', {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!res.ok) {
+      const errText = await res.text()
+      throw new Error('Error Whisper: ' + errText)
+    }
+
+    const data = await res.json()
+    textEl.value = data.text || ''
+    statusEl.innerHTML = `<div style="font-size:13px;color:var(--sage)">✅ Transcripción completada${data.duration ? ' · ' + Math.round(data.duration) + 's de audio' : ''}</div>`
+    resultEl.style.display = 'block'
+    showToast('Subtítulos generados ✓', 'success')
+  } catch (e) {
+    statusEl.innerHTML = `<div style="font-size:13px;color:var(--bad)">❌ Error: ${e.message}</div>`
+    showToast('Error al transcribir: ' + e.message, 'error')
+  } finally {
+    input.value = ''
+  }
+}
+
+window.copyWhisperText = function () {
+  const text = document.getElementById('whisper-text').value
+  if (!text) return
+  navigator.clipboard.writeText(text).then(() => showToast('Texto copiado ✓', 'success'))
 }
 
 window.openCreatePostModal = function () {
