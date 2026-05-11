@@ -939,74 +939,133 @@
 
     <!-- RESTAURANTES -->
     <div id="pricing-rest">
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:900px;margin:0 auto">
+      <div style="max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:32px">
 
-        <!-- Solo Menú -->
-        <div class="plan-card">
-          <div class="plan-name">Solo Menú</div>
-          <div class="plan-desc">Menú QR, pedidos, cocina y reservas</div>
-          <div class="plan-price"><span class="p-rest-menu">$38.286</span></div>
-          <div class="plan-tc">USD 27 · TC oficial hoy</div>
-          <ul class="plan-features">
-            <li>Menú QR ilimitado — ES/EN/PT</li>
-            <li>Tano atiende consultas del menú</li>
-            <li>Pedidos online + MercadoPago</li>
-            <li>Pantalla de cocina en tiempo real</li>
-            <li>Sistema de reservas de mesas</li>
-            <li>Fotos de platos con IA</li>
-            <li>WhatsApp canal operativo/cocina</li>
-          </ul>
-          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        <!-- NIVEL 1: Solo el menú -->
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap">Solo el menú</div>
+            <div style="flex:1;height:1px;background:var(--border)"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="plan-card">
+              <div class="plan-name" style="font-size:20px">Solo Menú</div>
+              <div class="plan-desc">QR, pedidos, cocina y reservas</div>
+              <div class="plan-price" style="font-size:32px"><span class="p-rest-menu">$38.286</span></div>
+              <div class="plan-tc">USD 27/mes · TC oficial</div>
+              <ul class="plan-features" style="margin-top:12px">
+                <li>Menú QR ilimitado — ES/EN/PT</li>
+                <li>Tano atiende consultas del menú</li>
+                <li>Pedidos online + MercadoPago</li>
+                <li>Pantalla de cocina en tiempo real</li>
+                <li>Sistema de reservas de mesas</li>
+                <li>Fotos de platos con IA</li>
+                <li>WhatsApp canal operativo</li>
+              </ul>
+              <a href="/panel.html" class="plan-cta" style="margin-top:16px">Probar 14 días gratis</a>
+            </div>
+            <div class="plan-card" style="border-color:var(--border)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <div class="plan-name" style="font-size:20px">Menú + WhatsApp</div>
+                <span style="background:var(--terra-pale);color:var(--terra);font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap">+$12</span>
+              </div>
+              <div class="plan-desc">Todo lo anterior + reservas por WA</div>
+              <div class="plan-price" style="font-size:32px"><span class="p-rest-wa">$55.302</span></div>
+              <div class="plan-tc">USD 39/mes · TC oficial</div>
+              <ul class="plan-features" style="margin-top:12px">
+                <li>Todo Solo Menú +</li>
+                <li>Número WhatsApp Business con el nombre de tu restaurante</li>
+                <li>Reservas automáticas por WhatsApp</li>
+                <li>Confirmaciones y recordatorios automáticos</li>
+                <li>Asistente responde horarios, dirección y menú</li>
+              </ul>
+              <a href="/panel.html" class="plan-cta" style="margin-top:16px">Probar 14 días gratis</a>
+            </div>
+          </div>
         </div>
 
-        <!-- Menú + WA -->
-        <div class="plan-card featured" style="position:relative">
-          <div class="plan-popular">Más elegido</div>
-          <div class="plan-name">Menú + WhatsApp</div>
-          <div class="plan-desc">Todo Solo Menú + número WA Business propio</div>
-          <div class="plan-price"><span class="p-rest-wa">$55.302</span></div>
-          <div class="plan-tc">USD 39 · TC oficial hoy</div>
-          <ul class="plan-features">
-            <li>Todo Solo Menú +</li>
-            <li>Número WhatsApp Business con tu nombre</li>
-            <li>Reservas automáticas por WhatsApp</li>
-            <li>Confirmaciones y recordatorios al cliente</li>
-            <li>Asistente responde consultas de horarios y menú</li>
-          </ul>
-          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        <!-- NIVEL 2: Solo marketing -->
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap">Solo marketing digital</div>
+            <div style="flex:1;height:1px;background:var(--border)"></div>
+            <div style="font-size:11px;color:var(--muted);white-space:nowrap">para quien ya tiene sistema de pedidos</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="plan-card">
+              <div class="plan-name" style="font-size:20px">Marketing</div>
+              <div class="plan-desc">Presencia digital y redes sociales con IA</div>
+              <div class="plan-price" style="font-size:32px"><span class="p-rest-mkt">$82.244</span></div>
+              <div class="plan-tc">USD 58/mes · TC oficial</div>
+              <ul class="plan-features" style="margin-top:12px">
+                <li>Viti: estrategia mensual personalizada</li>
+                <li>30 publicaciones automáticas/mes</li>
+                <li>Google Business Profile integrado</li>
+                <li>Instagram + Facebook analytics</li>
+                <li>Análisis de 5 competidores cercanos</li>
+                <li>$10 USD crédito publicidad de bienvenida</li>
+                <li>Informe PDF mensual profesional</li>
+              </ul>
+              <a href="/panel.html" class="plan-cta" style="margin-top:16px">Probar 14 días gratis</a>
+            </div>
+            <div class="plan-card" style="border-color:var(--border)">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                <div class="plan-name" style="font-size:20px">Marketing + WA</div>
+                <span style="background:var(--terra-pale);color:var(--terra);font-size:10px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap">+$10</span>
+              </div>
+              <div class="plan-desc">Marketing + reservas y consultas por WhatsApp</div>
+              <div class="plan-price" style="font-size:32px"><span class="p-rest-mktwa">$96.424</span></div>
+              <div class="plan-tc">USD 68/mes · TC oficial</div>
+              <ul class="plan-features" style="margin-top:12px">
+                <li>Todo Marketing +</li>
+                <li>Número WhatsApp Business con tu nombre</li>
+                <li>Reservas automáticas 24/7</li>
+                <li>Campañas a tu base de clientes (50/mes)</li>
+                <li>CRM básico: historial de reservas</li>
+              </ul>
+              <a href="/panel.html" class="plan-cta" style="margin-top:16px">Probar 14 días gratis</a>
+            </div>
+          </div>
         </div>
 
-        <!-- Marketing -->
-        <div class="plan-card">
-          <div class="plan-name">Marketing</div>
-          <div class="plan-desc">Todo Solo Menú + presencia digital con IA</div>
-          <div class="plan-price"><span class="p-rest-mkt">$92.170</span></div>
-          <div class="plan-tc">USD 65 · TC oficial hoy</div>
-          <ul class="plan-features">
-            <li>Todo Solo Menú +</li>
-            <li>Viti: estrategia mensual con IA</li>
-            <li>30 publicaciones automáticas/mes</li>
-            <li>Google Business + Instagram + Facebook</li>
-            <li>Análisis de 5 competidores cercanos</li>
-            <li>$10 USD crédito publicidad de bienvenida</li>
-            <li>Informe PDF mensual profesional</li>
-          </ul>
-          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
-        </div>
-
-        <!-- Marketing + WA -->
-        <div class="plan-card">
-          <div class="plan-name">Marketing + WhatsApp</div>
-          <div class="plan-desc">Todo Marketing + número WA Business propio</div>
-          <div class="plan-price"><span class="p-rest-mktwa">$110.604</span></div>
-          <div class="plan-tc">USD 78 · TC oficial hoy</div>
-          <ul class="plan-features">
-            <li>Todo Marketing +</li>
-            <li>Número WhatsApp Business con tu nombre</li>
-            <li>Reservas + consultas automáticas 24/7</li>
-            <li>Campañas promocionales a tu base de clientes</li>
-          </ul>
-          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        <!-- NIVEL 3: Combos -->
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--terra);white-space:nowrap">✦ Combo — menú + marketing</div>
+            <div style="flex:1;height:1px;background:color-mix(in srgb, var(--terra) 20%, transparent)"></div>
+            <div style="background:var(--terra-pale);color:var(--terra);font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;white-space:nowrap">Ahorrás vs contratar por separado</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="plan-card featured" style="position:relative">
+              <div class="plan-popular">Más completo</div>
+              <div class="plan-name" style="font-size:20px">Menú + Marketing</div>
+              <div class="plan-desc">Todo el sistema operativo + presencia digital</div>
+              <div class="plan-price" style="font-size:32px"><span class="p-rest-combo">$106.350</span></div>
+              <div class="plan-tc">USD 75/mes · <span style="color:var(--green);font-weight:600">Ahorrás USD 10 vs separado</span></div>
+              <ul class="plan-features" style="margin-top:12px">
+                <li>Todo Solo Menú</li>
+                <li>Todo Marketing</li>
+                <li>Tano + Viti trabajando juntos</li>
+                <li>Panel unificado: operaciones + marketing</li>
+              </ul>
+              <a href="/panel.html" class="plan-cta" style="margin-top:16px">Probar 14 días gratis</a>
+            </div>
+            <div class="plan-card featured" style="position:relative;border-color:var(--terra)">
+              <div class="plan-popular" style="background:var(--ink)">Todo incluido</div>
+              <div class="plan-name" style="font-size:20px">Menú + Mkt + WA</div>
+              <div class="plan-desc">La solución completa para tu restaurante</div>
+              <div class="plan-price" style="font-size:32px"><span class="p-rest-full">$123.366</span></div>
+              <div class="plan-tc">USD 87/mes · <span style="color:var(--green);font-weight:600">Ahorrás USD 13 vs separado</span></div>
+              <ul class="plan-features" style="margin-top:12px">
+                <li>Todo Menú + Marketing</li>
+                <li>Número WhatsApp Business propio</li>
+                <li>Reservas, consultas y campañas automáticas</li>
+                <li>CRM de clientes del restaurante</li>
+                <li>Informe PDF mensual con logo propio</li>
+              </ul>
+              <a href="/panel.html" class="plan-cta" style="margin-top:16px">Probar 14 días gratis</a>
+            </div>
+          </div>
         </div>
 
       </div>
@@ -1335,8 +1394,10 @@ function showPricing(type) {
     // Restaurantes
     document.querySelectorAll('.p-rest-menu').forEach(el => el.textContent = fmt(27))
     document.querySelectorAll('.p-rest-wa').forEach(el => el.textContent = fmt(39))
-    document.querySelectorAll('.p-rest-mkt').forEach(el => el.textContent = fmt(65))
-    document.querySelectorAll('.p-rest-mktwa').forEach(el => el.textContent = fmt(78))
+    document.querySelectorAll('.p-rest-mkt').forEach(el => el.textContent = fmt(58))
+    document.querySelectorAll('.p-rest-mktwa').forEach(el => el.textContent = fmt(68))
+    document.querySelectorAll('.p-rest-combo').forEach(el => el.textContent = fmt(75))
+    document.querySelectorAll('.p-rest-full').forEach(el => el.textContent = fmt(87))
     // Comercios
     document.querySelectorAll('.p-local-mkt').forEach(el => el.textContent = fmt(65))
     document.querySelectorAll('.p-local-mktwa').forEach(el => el.textContent = fmt(78))
