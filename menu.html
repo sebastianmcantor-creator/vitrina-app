@@ -198,7 +198,28 @@
           style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--surface);outline:none">
         <div style="font-size:11px;color:var(--muted);margin-top:4px;padding:0 4px">📱 Te avisamos por WhatsApp cuando tu pedido esté listo</div>
       </div>
-      <button class="checkout-btn" id="checkout-btn" onclick="checkout()">Confirmar pedido →</button>
+      <button class="checkout-btn" id="checkout-btn" onclick="showCheckoutSummary()">Ver resumen →</button>
+    </div>
+  </div>
+
+  <!-- Checkout summary modal -->
+  <div class="confirm-overlay" id="checkout-summary-overlay">
+    <div class="confirm-box" style="max-width:380px">
+      <div class="confirm-heading">Confirmá tu pedido</div>
+      <div class="confirm-mesa-label" id="checkout-mesa-label">Mesa —</div>
+      <div id="checkout-summary-items" style="overflow-y:auto;max-height:200px;margin-bottom:14px;border:1px solid var(--border, #ede8e2);border-radius:10px;padding:10px 12px"></div>
+      <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:600;color:#1a1208;margin-bottom:16px;padding:0 2px">
+        <span>Total</span>
+        <span id="checkout-total">$0</span>
+      </div>
+      <input type="text" id="checkout-nombre" placeholder="Tu nombre (opcional)"
+        style="width:100%;padding:10px 14px;border:1px solid var(--border,#ede8e2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;margin-bottom:10px;background:#fff;outline:none;box-sizing:border-box">
+      <button class="checkout-btn" id="btn-confirm-order" onclick="checkout()" style="margin-bottom:8px">
+        ✓ Confirmar pedido
+      </button>
+      <button class="confirm-close" onclick="document.getElementById('checkout-summary-overlay').classList.remove('open')" style="width:100%;text-align:center">
+        Volver al carrito
+      </button>
     </div>
   </div>
 
@@ -536,6 +557,28 @@
     }
 
     // ─── Checkout ──────────────────────────────────────────────────────────────
+    function showCheckoutSummary() {
+      const ids = Object.keys(cart).filter(id => cart[id] > 0)
+      if (!ids.length) return
+
+      const total = ids.reduce((s, id) => s + Number(itemsById[id].price) * cart[id], 0)
+      const currency = rest.currency || 'ARS'
+
+      document.getElementById('checkout-mesa-label').textContent = mesa != null ? 'Mesa ' + mesa : 'Para llevar'
+      document.getElementById('checkout-total').textContent = currency + ' ' + total.toLocaleString('es-AR')
+      document.getElementById('checkout-summary-items').innerHTML = ids.map(id => {
+        const item = itemsById[id]
+        const subtotal = Number(item.price) * cart[id]
+        return `<div style="display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-bottom:1px solid #f0e8dd">
+          <span><strong>${cart[id]}x</strong> ${item.name}</span>
+          <span style="color:#8a7a6a">${currency} ${subtotal.toLocaleString('es-AR')}</span>
+        </div>`
+      }).join('')
+
+      document.getElementById('checkout-summary-overlay').classList.add('open')
+      setTimeout(() => document.getElementById('checkout-nombre').focus(), 80)
+    }
+
     async function checkout() {
       const ids = Object.keys(cart).filter(id => cart[id] > 0)
       if (!ids.length) return
@@ -546,9 +589,13 @@
         return
       }
 
-      const btn = document.getElementById('checkout-btn')
-      btn.textContent = 'Enviando...'
-      btn.disabled = true
+      // Cerrar resumen y abrir el overlay de tracking
+      document.getElementById('checkout-summary-overlay').classList.remove('open')
+
+      const btn = document.getElementById('btn-confirm-order')
+      if (btn) { btn.textContent = 'Enviando...'; btn.disabled = true }
+      const checkoutBtn = document.getElementById('checkout-btn')
+      if (checkoutBtn) { checkoutBtn.disabled = true }
       try {
         const session = mesa != null ? await orderSessions.getOrCreate(rest.id, mesa) : null
         const total = ids.reduce((s, id) => s + Number(itemsById[id].price) * cart[id], 0)
@@ -567,12 +614,17 @@
           if (!customerPhone.startsWith('+')) customerPhone = '+54' + customerPhone
         }
 
+        // Capturar nombre del cliente del resumen
+        const nombreInput = document.getElementById('checkout-nombre')
+        const customerName = nombreInput?.value?.trim() || null
+
         const order = await orders.create({
           restaurant_id: rest.id,
           session_id: session?.id ?? null,
           table_number: mesa ?? null,
           total,
           customer_phone: customerPhone || null,
+          customer_name: customerName,
         })
         await orderItems.createBatch(ids.map(id => ({
           order_id: order.id,
@@ -634,9 +686,12 @@
         abrirOverlayEstado()
       } catch (e) {
         alert('Error al enviar el pedido. Intentá de nuevo.')
+      } finally {
+        const confirmBtn = document.getElementById('btn-confirm-order')
+        if (confirmBtn) { confirmBtn.textContent = '✓ Confirmar pedido'; confirmBtn.disabled = false }
+        const mainBtn = document.getElementById('checkout-btn')
+        if (mainBtn) { mainBtn.disabled = false }
       }
-      btn.textContent = 'Confirmar pedido →'
-      btn.disabled = false
     }
 
     // ─── Order status overlay ──────────────────────────────────────────────────
