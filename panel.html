@@ -254,15 +254,8 @@ html, body {
 .btn-logout:hover { color: var(--bad); }
 
 /* ── Viti Chat ── */
-.btn-viti {
-  display: flex; align-items: center; gap: 10px;
-  width: calc(100% - 32px); margin: 0 16px 12px;
-  padding: 10px 14px; border-radius: 12px; border: 1px solid rgba(200,150,60,.3);
-  background: rgba(200,150,60,.08); color: var(--gold);
-  font-family: 'Outfit', sans-serif; font-size: 13.5px; font-weight: 500;
-  cursor: pointer; text-align: left; transition: background .15s;
-}
-.btn-viti:hover { background: rgba(200,150,60,.16); }
+.btn-viti { background: linear-gradient(135deg, rgba(200,168,74,0.15) 0%, rgba(200,168,74,0.08) 100%); border: 1px solid rgba(200,168,74,0.3); border-radius: 12px; padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; width: 100%; transition: all 0.2s; color: var(--gold); font-family: 'Outfit', sans-serif; font-size: 13.5px; font-weight: 500; text-align: left; }
+.btn-viti:hover { background: linear-gradient(135deg, rgba(200,168,74,0.25) 0%, rgba(200,168,74,0.15) 100%); border-color: rgba(200,168,74,0.5); transform: translateY(-1px); }
 .btn-viti-dot {
   width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
   animation: pulse-gold 2s ease-in-out infinite; flex-shrink: 0;
@@ -1478,7 +1471,7 @@ input:checked + .toggle-slider:before {
   <aside class="sidebar" id="sidebar">
 
     <div class="sidebar-logo" id="sidebar-logo-wrap">
-      <div class="sidebar-logo-icon">🪟</div>
+      <div class="sidebar-logo-icon" style="font-size:22px">🪟</div>
       <div class="sidebar-logo-name">Vitrina</div>
     </div>
 
@@ -3078,6 +3071,13 @@ function renderSidebarRestaurant(rest) {
   document.getElementById('sidebar-rest-name').textContent = rest.name
   document.getElementById('sidebar-rest-plan').textContent =
     ({ free: 'Plan Free', starter: 'Plan Starter', pro: 'Plan Pro', full: 'Plan Full' })[rest.plan] ?? (rest.plan ?? 'Plan Free')
+  // Color del badge de plan
+  const planEl = document.getElementById('sidebar-rest-plan')
+  if (planEl) {
+    const colors = { free: '#8a7e74', basico: '#5a9e6a', pro: '#b85a30', full: '#c8a84a', marketing: '#4a90d9' }
+    const planKey = (rest.plan || 'free').toLowerCase()
+    planEl.style.color = colors[planKey] || '#8a7e74'
+  }
   updateOpenPill(rest.is_open ?? true)
 }
 
