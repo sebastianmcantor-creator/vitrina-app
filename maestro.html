@@ -560,20 +560,12 @@ async function loadDashboardData() {
   try {
     document.getElementById('last-updated').textContent = 'Cargando...'
 
-    // Intentar obtener del cache
-    const currentMonth = new Date().toISOString().slice(0, 7) // YYYY-MM
-    let cache = await masterDashboardCache.get('monthly_' + currentMonth)
-
-    // Si no está en cache o no está fresco, recalcular
-    if (!cache || !(await masterDashboardCache.isFresh('monthly_' + currentMonth))) {
-      cache = await calculateDashboardMetrics(currentMonth)
-      await masterDashboardCache.upsert('monthly_' + currentMonth, cache)
-    }
-
-    dashboardData = cache
+    // Calcular directo sin caché
+    const currentMonth = new Date().toISOString().slice(0, 7)
+    dashboardData = await calculateDashboardMetrics(currentMonth)
     renderCurrentTab()
 
-    const cachedAt = new Date(cache.cached_at)
+    const cachedAt = new Date()
     document.getElementById('last-updated').textContent =
       'Actualizado ' + cachedAt.toLocaleString('es-AR', {
         day: '2-digit',
