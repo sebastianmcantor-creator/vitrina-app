@@ -116,16 +116,24 @@
     /* ── HERO ─────────────────────────────────────────── */
     .hero {
       padding: 128px 24px 80px;
-      background: linear-gradient(160deg, var(--cream) 0%, #EDE4D8 100%);
+      background: var(--cream);
       text-align: center;
       position: relative; overflow: hidden;
+    }
+    /* Foto de fondo con overlay */
+    .hero-bg-img {
+      position: absolute; inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&q=80&fit=crop&crop=center');
+      background-size: cover; background-position: center 40%;
+      opacity: 0.06;
     }
     .hero::before {
       content: '';
       position: absolute; inset: 0;
-      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(184,90,48,.08), transparent);
-      pointer-events: none;
+      background: linear-gradient(180deg, rgba(250,247,242,.5) 0%, rgba(250,247,242,.95) 60%, var(--cream) 100%);
+      pointer-events: none; z-index: 1;
     }
+    .hero > * { position: relative; z-index: 2; }
 
     .hero-eyebrow {
       display: inline-flex; align-items: center; gap: 6px;
@@ -498,8 +506,9 @@
     </a>
 
     <ul class="nav-links">
-      <li><a href="#restaurantes">Para restaurantes</a></li>
-      <li><a href="#comercios">Para comercios</a></li>
+      <li><a href="#restaurantes">Restaurantes</a></li>
+      <li><a href="#comercios">Comercios</a></li>
+      <li><a href="#marketing">Marketing</a></li>
       <li><a href="#precios">Precios</a></li>
       <li><a href="#faq">FAQ</a></li>
     </ul>
@@ -516,6 +525,7 @@
 <div class="mobile-menu" id="mobile-menu">
   <a href="#restaurantes" onclick="closeMobileMenu()">Para restaurantes</a>
   <a href="#comercios" onclick="closeMobileMenu()">Para comercios</a>
+  <a href="#marketing" onclick="closeMobileMenu()">Marketing digital</a>
   <a href="#precios" onclick="closeMobileMenu()">Precios</a>
   <a href="#faq" onclick="closeMobileMenu()">FAQ</a>
   <a href="/panel.html" class="nav-cta">Empezar gratis →</a>
@@ -523,6 +533,7 @@
 
 <!-- ── HERO ──────────────────────────────────────────────── -->
 <section class="hero">
+  <div class="hero-bg-img"></div>
   <div class="hero-eyebrow">
     <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#B85A30" stroke-width="1.5"/><path d="M7 4v3l2 1.5" stroke="#B85A30" stroke-width="1.5" stroke-linecap="round"/></svg>
     Disponible en Argentina · 14 días gratis · Sin tarjeta
@@ -562,8 +573,10 @@
 </section>
 
 <!-- ── SECCIÓN RESTAURANTES ───────────────────────────────── -->
-<section class="section bg-white" id="restaurantes">
-  <div class="section-inner">
+<section class="section bg-white" id="restaurantes" style="position:relative;overflow:hidden">
+  <!-- Accent image background -->
+  <div style="position:absolute;right:-60px;top:0;bottom:0;width:45%;background:url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=75&fit=crop') center/cover;opacity:.06;border-radius:32px 0 0 32px;pointer-events:none"></div>
+  <div class="section-inner" style="position:relative;z-index:1">
     <div class="split">
       <div>
         <span class="section-eyebrow">Para restaurantes y bares</span>
@@ -573,7 +586,7 @@
         </p>
         <ul class="feature-list">
           <li>Menú QR por mesa — en español, inglés y portugués</li>
-          <li>Tano responde preguntas del menú las 24hs que el local esté abierto</li>
+          <li>Tano atiende las consultas del menú — ingredientes, alérgenos, recomendaciones</li>
           <li>Pedidos online con pago integrado en MercadoPago</li>
           <li>Pantalla de cocina: el pedido aparece en 2 segundos</li>
           <li>Clientes rastrean su pedido: Recibido → Preparando → Listo</li>
@@ -709,6 +722,98 @@
   </div>
 </section>
 
+<!-- ── MARKETING DIGITAL ─────────────────────────────────────── -->
+<section class="section" id="marketing" style="background: var(--ink); color: white; overflow: hidden; position: relative;">
+  <!-- Background texture -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 80% 50%, rgba(184,90,48,.15), transparent);pointer-events:none"></div>
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse 40% 40% at 10% 80%, rgba(200,150,60,.08), transparent);pointer-events:none"></div>
+
+  <div class="section-inner" style="position:relative">
+    <div class="split">
+      <div>
+        <span class="section-eyebrow" style="color:rgba(232,200,122,.7)">Marketing digital a la medida</span>
+        <h2 class="section-title" style="color:white;font-size:clamp(1.8rem,4vw,3rem)">Viti construye<br>tu estrategia mensual.<br><em style="color:#e8c87a;font-style:normal">Con datos reales.</em></h2>
+        <p style="color:rgba(255,255,255,.65);font-size:15px;line-height:1.75;margin-top:16px;max-width:480px">
+          No es un post automático genérico. Viti analiza tu negocio, tus competidores, qué funcionó el mes anterior y arma un plan de acción concreto: qué publicar, cuándo y con qué objetivo.
+        </p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px">
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px">
+            <div style="font-size:22px;margin-bottom:8px">📊</div>
+            <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:4px">Google Business</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.5">Viti responde reseñas, analiza búsquedas y vistas de tu perfil.</div>
+          </div>
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px">
+            <div style="font-size:22px;margin-bottom:8px">📱</div>
+            <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:4px">Instagram + Facebook</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.5">30 publicaciones automáticas por mes. Viti elige horario, copy y hashtags.</div>
+          </div>
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px">
+            <div style="font-size:22px;margin-bottom:8px">🏆</div>
+            <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:4px">Análisis de competidores</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.5">Monitoreo 3x por semana. Si alguno crece inusualmente, Viti te avisa.</div>
+          </div>
+          <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px">
+            <div style="font-size:22px;margin-bottom:8px">📈</div>
+            <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:4px">Publicidad paga</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.5);line-height:1.5">Gestión de Google Ads y Meta Ads incluida. Vos ponés el presupuesto, Viti lo optimiza.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:32px;padding:20px 22px;background:rgba(200,150,60,.12);border:1px solid rgba(200,150,60,.25);border-radius:14px">
+          <div style="font-size:13px;font-weight:600;color:#e8c87a;margin-bottom:6px">Informe mensual PDF profesional</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.6">Cada mes 1°: Viti cierra el período anterior — qué funcionó, qué no y por qué — y te entrega un informe con proyecciones para el mes siguiente. Con logo de tu negocio. Lo podés mostrar como propio.</div>
+        </div>
+
+        <a href="/panel.html" class="btn-primary-lg" style="margin-top:28px;display:inline-block">Probarlo 14 días gratis →</a>
+      </div>
+
+      <!-- Mock informe Viti -->
+      <div>
+        <div style="background:#2a2010;border-radius:24px;padding:24px;box-shadow:0 32px 80px rgba(0,0,0,.4)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(255,255,255,.1)">
+            <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#c8a84a,#e8c87a);display:flex;align-items:center;justify-content:center;font-size:16px">✦</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:#e8c87a">Viti</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.35)">Informe mensual · Mayo 2026</div>
+            </div>
+          </div>
+
+          <!-- Métricas -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+            <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px">
+              <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px">Alcance Instagram</div>
+              <div style="font-size:22px;font-weight:600;font-family:'Cormorant Garamond',serif;color:white">12.840</div>
+              <div style="font-size:11px;color:#5AC47C">↑ 34% vs abril</div>
+            </div>
+            <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px">
+              <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px">Nuevas reseñas Google</div>
+              <div style="font-size:22px;font-weight:600;font-family:'Cormorant Garamond',serif;color:white">8</div>
+              <div style="font-size:11px;color:#5AC47C">Promedio ⭐ 4.8</div>
+            </div>
+            <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px">
+              <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px">Posts publicados</div>
+              <div style="font-size:22px;font-weight:600;font-family:'Cormorant Garamond',serif;color:white">28</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.4)">de 30 programados</div>
+            </div>
+            <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px">
+              <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px">Inversión publicidad</div>
+              <div style="font-size:22px;font-weight:600;font-family:'Cormorant Garamond',serif;color:white">$48k</div>
+              <div style="font-size:11px;color:#e8a844">2.4x ROAS estimado</div>
+            </div>
+          </div>
+
+          <!-- Viti mensaje -->
+          <div style="background:rgba(200,168,74,.1);border:1px solid rgba(200,168,74,.2);border-radius:12px;padding:14px">
+            <div style="font-size:11px;color:rgba(232,200,122,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Análisis Viti</div>
+            <div style="font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.6">El contenido de las 20hs tuvo 3x más engagement. En junio movemos todas las publicaciones premium a ese horario. Tu competidor principal abrió una segunda sucursal — recomiendo aumentar presencia en búsquedas locales.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ── WHATSAPP BUSINESS ───────────────────────────────────── -->
 <section class="section bg-white" id="whatsapp">
   <div class="section-inner">
@@ -787,8 +892,8 @@
   <div class="section-inner centered">
     <div class="numbers fade">
       <div>
-        <div class="number-val">$0</div>
-        <div class="number-label">para empezar, sin tarjeta</div>
+        <div class="number-val">14</div>
+        <div class="number-label">días de prueba, sin tarjeta</div>
       </div>
       <div>
         <div class="number-val">15'</div>
@@ -817,23 +922,11 @@
       </p>
     </div>
 
-    <div class="pricing-grid">
-      <!-- Free -->
-      <div class="plan-card fade">
-        <div class="plan-name">Free</div>
-        <div class="plan-desc">Para conocer Vitrina</div>
-        <div class="plan-price">$0</div>
-        <div class="plan-tc">Para siempre gratis</div>
-        <ul class="plan-features">
-          <li>Catálogo QR hasta 45 productos</li>
-          <li>Asistente IA: 75 consultas/mes</li>
-          <li>Multiidioma ES/EN/PT</li>
-          <li class="no">Sin pedidos online</li>
-          <li class="no">Sin MercadoLibre/TN</li>
-        </ul>
-        <a href="/panel.html" class="plan-cta">Empezar gratis</a>
-      </div>
+    <p style="text-align:center;margin-bottom:32px;font-size:15px;color:var(--ink-soft)">
+      Todos los planes incluyen <strong>14 días de prueba completa</strong>, sin tarjeta de crédito.
+    </p>
 
+    <div class="pricing-grid">
       <!-- Solo Menú -->
       <div class="plan-card featured fade">
         <div class="plan-popular">Más elegido</div>
