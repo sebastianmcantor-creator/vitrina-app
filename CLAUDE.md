@@ -246,56 +246,78 @@ Costo Meta por conversación iniciada por el negocio: $0.056 USD. Iniciada por e
 
 ---
 
-## Planes y precios
+## Planes y precios (actualizados 11/05/2026)
+
+### Logo
+Logo D implementado: arco de vidriera SVG (storefront) + "Vitrina" en Cormorant Garamond serif.
+Color terra (#B85A30) sobre fondo claro, dorado (#e8c87a) sobre fondo oscuro.
+
+### Plan gratuito
+ELIMINADO. Solo hay trial de 14 días con acceso completo al plan elegido, sin tarjeta.
 
 ### RESTAURANTES / GASTRONOMÍA
 
-#### Plan Solo Menú — $27 USD/mes
-- Menú digital QR (por mesa numerada o genérico)
-- Tano ilimitado (nombre personalizable en onboarding)
-- Sistema de pedidos en tiempo real
-- Pantalla de cocina (polling 10 seg)
-- Pagos con MercadoPago (el cliente paga desde su celular)
-- 80 fotos con IA por mes (compartidas, todos los usos)
-- Sistema de reservas completo: calendario interno + Google Calendar opcional
-- 50 mensajes promocionales/mes a base de comensales registrados
-- Informes operativos: diario (primeras 4 semanas → sistema consulta preferencia) + semanal + mensual PDF
+#### Solo Menú — $27 USD/mes
+- Menú QR ilimitado, ES/EN/PT
+- Tano atiende consultas del menú
+- Pedidos online + MercadoPago
+- Pantalla de cocina en tiempo real
+- Sistema de reservas de mesas
+- Fotos de platos con IA (Cloudflare AI, gratis)
 - WhatsApp canal operativo (cocina/encargado)
-- Multiidioma: español, inglés, portugués (traducción automática con Claude)
-- Sin Viti, sin análisis de competidores, sin publicaciones en redes, sin subtítulos
 
-Sin fee sobre las ventas del menú. Precio fijo mensual.
-
-#### Plan Menú + WA — $39 USD/mes
+#### Menú + WhatsApp — $39 USD/mes
 Todo Solo Menú más:
-- Número WhatsApp Business dedicado con nombre del negocio
-- Asistente respondiendo consultas de clientes 24/7
-- Gestión de reservas por WhatsApp (Tano agenda, consulta disponibilidad, confirma)
+- Número WhatsApp Business dedicado con el nombre del restaurante
+- Reservas automáticas por WhatsApp
+- Confirmaciones y recordatorios automáticos al cliente
+- Asistente responde horarios, dirección y consultas del menú
 
-#### Plan Marketing — $65 USD/mes
-Todo Plan Menú más:
-- Viti ilimitado
-- 30 publicaciones automáticas/mes en Instagram + Facebook + Google Business Profile vía Metricool
-- Análisis de competidores Google Places: 3x/semana, historial completo en Supabase
-- Análisis de redes propias: métricas Instagram/Facebook vía Metricool
-- Respuestas automáticas: Google Reviews, comentarios Instagram, comentarios Facebook (5 aprobaciones → modo auto)
-- Análisis Rappi/PedidosYa: vía screenshot semanal procesado por Claude Vision
-- 10 subtítulos automáticos/mes para videos que sube el dueño (Whisper, máx 90 seg por video)
-- $10 USD crédito de bienvenida para publicidad
-- Gestión de publicidad paga incluida: Google Ads + Meta Ads (cliente pone su propio presupuesto directo en Google/Meta, Vitrina gestiona campañas, audiencias, creatividades — sin fee extra)
-- Informes completos: diario + semanal + mensual PDF profesional con logo
+#### Marketing — $58 USD/mes (solo marketing, SIN sistema de menú/pedidos)
+- Viti: estrategia mensual personalizada con IA
+- 30 publicaciones automáticas/mes en Instagram + Facebook + Google Business Profile
+- Google Business Profile integrado
+- Análisis de 5 competidores cercanos (3x/semana)
+- $10 USD crédito publicidad de bienvenida
+- Informe PDF mensual profesional con logo del restaurante
+- 10 subtítulos automáticos/mes con Whisper
 
-#### Plan Marketing + WA — $78 USD/mes
-Todo Marketing más número WA Business dedicado y asistente completo.
-
-#### Plan Combo — $85 USD/mes
+#### Marketing + WhatsApp — $68 USD/mes
 Todo Marketing más:
-- Análisis de competidores: 5x/semana (en lugar de 3x)
-- Seguimiento avanzado de publicidad paga con optimización mensual incluida
-- Informe mensual con comparación proyección vs resultado real por canal
+- Número WhatsApp Business dedicado
+- Reservas + consultas automáticas por WhatsApp
+- Campañas a base de clientes (50 mensajes/mes)
+- CRM básico de reservas
 
-#### Plan Combo + WA — $95 USD/mes
-Todo Combo más número WA Business dedicado y asistente completo.
+#### Menú + Marketing — $75 USD/mes (combo, ahorra $10 vs contratar por separado)
+= Solo Menú + Marketing en un solo plan
+
+#### Menú + Marketing + WhatsApp — $87 USD/mes (combo completo, ahorra $13 vs separado)
+= Solo Menú + Marketing + WhatsApp Business
+
+---
+
+### COMERCIOS, SERVICIOS Y VENDEDORES ONLINE
+
+#### Marketing — $65 USD/mes
+- Catálogo QR ilimitado
+- MercadoLibre: publicaciones, preguntas automáticas, stock
+- Tienda Nube: sincronización bidireccional
+- Viti: estrategia y análisis de competidores ML
+- 30 publicaciones automáticas/mes en redes
+- Google Business + Instagram
+- Fotos con IA (80/mes)
+- $10 USD crédito publicidad de bienvenida
+- Informes completos
+
+#### Marketing + WhatsApp — $78 USD/mes
+Todo Marketing más:
+- Número WhatsApp Business con nombre del negocio
+- Asistente de ventas 24/7: responde stock, precios, cierra ventas
+- Genera links de pago MercadoPago
+- Gestión de turnos para servicios
+- CRM: historial de cada cliente
+- 50 mensajes promocionales/mes
 
 ---
 
