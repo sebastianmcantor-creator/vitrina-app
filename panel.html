@@ -3619,6 +3619,18 @@ window.createRestaurant = async function () {
     if (setupWAEnabled) {
       setTimeout(() => showToast('📱 WhatsApp Business: te contactaremos para configurar tu número dedicado.', 'success'), 1800)
     }
+    // Notificar al admin del nuevo registro
+    fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notify/new-registration', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: currentRestaurant.name,
+        businessType: selectedBusinessType,
+        city: currentRestaurant.city,
+        email: currentUser.email,
+        wantsWhatsapp: setupWAEnabled,
+      }),
+    }).catch(() => {})
   } catch (e) {
     showToast('Error al crear: ' + e.message, 'error')
     btn.disabled = false
