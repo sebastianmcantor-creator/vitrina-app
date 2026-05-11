@@ -525,11 +525,21 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     currentUser = await requireAuth('/login.html')
 
-    // Verificar admin via worker (server-side, más seguro)
-    const adminCheck = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/admin/verify?email=${encodeURIComponent(currentUser.email)}`)
-    const adminData = await adminCheck.json()
+    // Verificar admin via worker — con fallback al email hardcodeado
+    const FALLBACK_ADMINS = ['sebastianmcantor@gmail.com']
+    let isAdmin = FALLBACK_ADMINS.includes(currentUser.email)
 
-    if (!adminData.isAdmin) {
+    try {
+      const adminCheck = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/admin/verify?email=${encodeURIComponent(currentUser.email)}`)
+      if (adminCheck.ok) {
+        const adminData = await adminCheck.json()
+        isAdmin = adminData.isAdmin || FALLBACK_ADMINS.includes(currentUser.email)
+      }
+    } catch {
+      // Si falla el worker, usar fallback
+    }
+
+    if (!isAdmin) {
       alert('No tenés acceso a este panel.')
       window.location.href = '/panel.html'
       return
