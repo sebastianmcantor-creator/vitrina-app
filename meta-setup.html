@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Setup Meta/Instagram — Vitrina</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #fdfaf6; color: #1c1612; line-height: 1.7; }
+    .header { background: #1c1612; padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; }
+    .header-logo { font-family: Georgia, serif; font-size: 20px; color: #e8c87a; font-weight: 600; text-decoration: none; }
+    .header-back { font-size: 13px; color: rgba(255,255,255,0.5); text-decoration: none; }
+    .header-back:hover { color: #e8c87a; }
+    .container { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+    h1 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 400; margin-bottom: 8px; }
+    .subtitle { font-size: 15px; color: #8a7e74; margin-bottom: 40px; }
+    .step { border: 1px solid #e8ddd0; border-radius: 16px; padding: 24px; margin-bottom: 20px; background: #fff; }
+    .step-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; background: #b85a30; color: #fff; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-num.done { background: #22863a; }
+    .step-title { font-size: 17px; font-weight: 600; color: #1c1612; }
+    .step-body { font-size: 14px; color: #3a3028; }
+    .step-body p { margin-bottom: 10px; }
+    .step-body ul { margin: 8px 0 10px 20px; }
+    .step-body ul li { margin-bottom: 5px; }
+    .step-body a { color: #b85a30; text-decoration: none; }
+    .step-body a:hover { text-decoration: underline; }
+    .btn-step { display: inline-block; margin-top: 10px; padding: 10px 20px; background: #b85a30; color: #fff; border-radius: 10px; font-size: 13px; font-weight: 500; text-decoration: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+    .btn-step:hover { background: #9a4827; }
+    .btn-step.secondary { background: #fff; color: #b85a30; border: 1px solid #b85a30; }
+    .code-block { background: #f7f2ea; border: 1px solid #e8ddd0; border-radius: 8px; padding: 12px 16px; font-family: monospace; font-size: 13px; color: #3a3028; margin: 10px 0; word-break: break-all; }
+    .highlight { background: #fdf3ee; border-left: 3px solid #b85a30; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 12px 0; font-size: 13.5px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+    .tag-ok { background: #e8f5e9; color: #2e7d32; }
+    .tag-wait { background: #fff8e1; color: #856404; }
+    .tag-manual { background: #fce4ec; color: #c62828; }
+    .footer-note { text-align: center; padding: 32px; font-size: 13px; color: #8a7e74; }
+  </style>
+</head>
+<body>
+
+<header class="header">
+  <a href="/" class="header-logo">🪟 Vitrina</a>
+  <a href="/panel.html" class="header-back">← Volver al panel</a>
+</header>
+
+<div class="container">
+  <h1>Setup Instagram Graph API</h1>
+  <p class="subtitle">Guía paso a paso para conectar Vitrina con Meta Developers. El proceso completo tarda 4–6 semanas — inicialo hoy.</p>
+
+  <!-- Prerequisitos -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num done">✓</div>
+      <div class="step-title">Prerequisitos completados <span class="tag tag-ok">LISTO</span></div>
+    </div>
+    <div class="step-body">
+      <p>Antes de crear la app en Meta, necesitás tener publicado:</p>
+      <ul>
+        <li>✅ <a href="/privacy.html" target="_blank">Política de Privacidad</a> publicada en vitrinaapp.com.ar</li>
+        <li>✅ <a href="/terms.html" target="_blank">Términos y Condiciones</a> publicados en vitrinaapp.com.ar</li>
+        <li>✅ Dominio vitrinaapp.com.ar activo y verificable por Meta</li>
+      </ul>
+      <div class="highlight">Estos tres puntos ya están completos. Podés iniciar el proceso.</div>
+    </div>
+  </div>
+
+  <!-- Paso 1 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Crear app en Meta Developers <span class="tag tag-manual">MANUAL</span></div>
+    </div>
+    <div class="step-body">
+      <p>Andá a <a href="https://developers.facebook.com/apps/create" target="_blank">developers.facebook.com/apps/create</a></p>
+      <ul>
+        <li>Tipo de app: <strong>Business</strong></li>
+        <li>Nombre: <strong>Vitrina</strong></li>
+        <li>Email de contacto: <strong>contacto@vitrinaapp.com.ar</strong></li>
+        <li>Business Account: usar tu cuenta personal o crear una nueva</li>
+      </ul>
+      <p>Una vez creada, guardá el <strong>App ID</strong> y el <strong>App Secret</strong> que aparecen en Configuración → Básica.</p>
+      <a href="https://developers.facebook.com/apps/create" target="_blank" class="btn-step">Crear app en Meta →</a>
+    </div>
+  </div>
+
+  <!-- Paso 2 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Agregar Instagram Graph API <span class="tag tag-manual">MANUAL</span></div>
+    </div>
+    <div class="step-body">
+      <p>Dentro de tu app en Meta Developers:</p>
+      <ul>
+        <li>Ir a <strong>Agregar productos</strong> → buscar <strong>Instagram Graph API</strong> → Configurar</li>
+        <li>En la sección de permisos, solicitar:
+          <ul>
+            <li><code>instagram_basic</code></li>
+            <li><code>instagram_manage_insights</code></li>
+            <li><code>instagram_content_publish</code></li>
+            <li><code>pages_read_engagement</code></li>
+            <li><code>pages_manage_posts</code></li>
+          </ul>
+        </li>
+      </ul>
+      <div class="highlight">⚠️ Instagram Basic Display API fue discontinuada en diciembre 2024. Solo existe Instagram Graph API. Ignorá cualquier referencia a la versión anterior.</div>
+    </div>
+  </div>
+
+  <!-- Paso 3 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Configurar URLs de la app <span class="tag tag-manual">MANUAL</span></div>
+    </div>
+    <div class="step-body">
+      <p>En <strong>Configuración → Básica</strong>, completar:</p>
+      <ul>
+        <li><strong>URL del sitio web:</strong></li>
+      </ul>
+      <div class="code-block">https://vitrinaapp.com.ar</div>
+      <ul>
+        <li><strong>URL de la política de privacidad:</strong></li>
+      </ul>
+      <div class="code-block">https://vitrinaapp.com.ar/privacy.html</div>
+      <ul>
+        <li><strong>URL de los términos de servicio:</strong></li>
+      </ul>
+      <div class="code-block">https://vitrinaapp.com.ar/terms.html</div>
+      <ul>
+        <li><strong>Redirect URI válidos (en Instagram Graph API → Configuración):</strong></li>
+      </ul>
+      <div class="code-block">https://vitrinaapp.com.ar/oauth-callback.html</div>
+      <div class="code-block">https://vitrina-tano.vitrinaapp.workers.dev/api/instagram/callback</div>
+    </div>
+  </div>
+
+  <!-- Paso 4 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Cargar secrets en Cloudflare <span class="tag tag-manual">MANUAL</span></div>
+    </div>
+    <div class="step-body">
+      <p>Una vez que tenés el App ID y App Secret de Meta, cargarlos en el worker:</p>
+      <div class="code-block">cd C:\Users\sebas\vitrina-server-worker<br>npx wrangler secret put INSTAGRAM_APP_ID<br>npx wrangler secret put INSTAGRAM_APP_SECRET</div>
+      <p style="margin-top:10px">También cargar el <strong>GOOGLE_CLIENT_ID</strong> y <strong>GOOGLE_CLIENT_SECRET</strong> que generaste en Google Cloud Console si todavía no los cargaste:</p>
+      <div class="code-block">npx wrangler secret put GOOGLE_CLIENT_ID<br>npx wrangler secret put GOOGLE_CLIENT_SECRET</div>
+    </div>
+  </div>
+
+  <!-- Paso 5 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div class="step-title">Solicitar revisión de Meta <span class="tag tag-wait">4–6 SEMANAS</span></div>
+    </div>
+    <div class="step-body">
+      <p>Una vez configurada la app y con los permisos agregados:</p>
+      <ul>
+        <li>Ir a <strong>Revisión de la app</strong> en Meta Developers</li>
+        <li>Solicitar los permisos que necesitás uno a uno</li>
+        <li>Para cada permiso, Meta pide:
+          <ul>
+            <li>Descripción de cómo usás el permiso</li>
+            <li>Video screencast mostrando el flujo</li>
+            <li>URL donde se puede probar la funcionalidad</li>
+          </ul>
+        </li>
+        <li>Enviar la revisión</li>
+      </ul>
+      <div class="highlight">
+        💡 Mientras Meta revisa (4–6 semanas), Metricool cubre la publicación automática sin interrupciones. El día que Meta aprueba, Vitrina publica directo sin Metricool.
+      </div>
+      <p>Mentras tanto, podés usar la app en <strong>modo desarrollo</strong> con tu propia cuenta de Instagram como cuenta de prueba.</p>
+    </div>
+  </div>
+
+  <!-- Estado actual -->
+  <div class="step" style="background:#f9fff9;border-color:#c8e6c9">
+    <div class="step-header">
+      <div class="step-num done">📋</div>
+      <div class="step-title">Estado actual del trámite</div>
+    </div>
+    <div class="step-body">
+      <ul>
+        <li>✅ privacy.html publicada</li>
+        <li>✅ terms.html publicada</li>
+        <li>✅ Dominio vitrinaapp.com.ar activo</li>
+        <li>✅ Endpoint /api/instagram/auth implementado</li>
+        <li>✅ Endpoint /api/instagram/callback implementado</li>
+        <li>⏳ App en Meta Developers — pendiente creación manual</li>
+        <li>⏳ INSTAGRAM_APP_ID / INSTAGRAM_APP_SECRET — pendiente</li>
+        <li>⏳ Revisión de Meta — pendiente inicio del trámite</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="footer-note">
+  Esta guía es solo para uso interno de Sebastián Medina Cantor — fundador de Vitrina.
+</div>
+
+</body>
+</html>
