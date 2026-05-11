@@ -1887,6 +1887,9 @@ input:checked + .toggle-slider:before {
             <div class="page-subtitle">Categorías y platos de tu restaurante</div>
           </div>
           <button class="btn-primary" onclick="openCategoryModal()" style="flex-shrink:0;margin-top:4px">+ Nueva categoría</button>
+          <button class="btn-secondary" onclick="openImportMenuModal()" style="flex-shrink:0;margin-top:4px;font-size:13px">
+            📸 Importar desde foto
+          </button>
         </div>
         <div id="menu-body">
           <div class="menu-empty">
@@ -2716,6 +2719,35 @@ input:checked + .toggle-slider:before {
   </div>
 </div>
 
+<!-- Modal importar menú desde foto -->
+<div class="modal-overlay" id="modal-import-menu" onclick="if(event.target===this)closeModal('modal-import-menu')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📸 Importar menú desde foto</div>
+      <button class="modal-close" onclick="closeModal('modal-import-menu')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Subí una foto de tu lista de precios, pizarrón o menú impreso. Vitrina detecta los platos y precios automáticamente con IA.
+      </p>
+      <div style="border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer" onclick="document.getElementById('import-menu-file').click()">
+        <div style="font-size:32px;margin-bottom:8px">📷</div>
+        <div style="font-size:14px;color:var(--muted)">Tocá para seleccionar una imagen</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">JPG, PNG · máx 5MB</div>
+        <input type="file" id="import-menu-file" accept="image/*" style="display:none" onchange="processMenuPhoto(this)">
+      </div>
+      <div id="import-menu-status" style="display:none;margin-top:16px"></div>
+      <div id="import-menu-results" style="margin-top:16px;display:none">
+        <div class="card-title" style="margin-bottom:10px">Platos detectados</div>
+        <div id="import-menu-items"></div>
+        <button class="btn-primary" onclick="confirmImportMenu()" id="btn-confirm-import" style="margin-top:12px;width:100%">
+          ✓ Importar todos los platos
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: plato -->
 <div class="modal-overlay" id="modal-item" onclick="if(event.target===this)closeModal('modal-item')">
   <div class="modal-box">
@@ -2749,6 +2781,10 @@ input:checked + .toggle-slider:before {
           <button class="btn-secondary" onclick="generateImageAI()" id="btn-generate-image" title="Generar foto con IA desde el nombre del plato" style="padding:8px 12px;font-size:12px;white-space:nowrap">
             🤖 Generar
           </button>
+          <label class="btn-secondary" style="cursor:pointer;font-size:12px;padding:8px 12px;white-space:nowrap" title="Subir foto desde el dispositivo">
+            📷 Subir
+            <input type="file" id="item-image-file" accept="image/*" onchange="uploadItemImage(this)" style="display:none">
+          </label>
         </div>
         <div id="item-image-preview-wrap" style="display:none;margin-top:8px">
           <img id="item-image-preview" src="" alt="Preview" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
@@ -5304,6 +5340,48 @@ window.acceptGeneratedImage = async function () {
   }
 }
 
+window.uploadItemImage = async function (input) {
+  if (!input.files || !input.files[0]) return
+  if (!currentRestaurant) return
+  const file = input.files[0]
+  if (file.size > 10 * 1024 * 1024) { showToast('La imagen debe ser menor a 10MB', 'error'); return }
+
+  const ext = file.name.split('.').pop().toLowerCase()
+  const allowed = ['jpg','jpeg','png','webp']
+  if (!allowed.includes(ext)) { showToast('Formato no válido. Usá JPG, PNG o WebP', 'error'); return }
+
+  // Mostrar preview inmediata
+  const reader = new FileReader()
+  reader.onload = e => {
+    const previewWrap = document.getElementById('item-image-preview-wrap')
+    const previewImg  = document.getElementById('item-image-preview')
+    if (previewImg) { previewImg.src = e.target.result; previewWrap.style.display = 'block' }
+  }
+  reader.readAsDataURL(file)
+
+  showToast('Subiendo imagen...', 'success')
+
+  try {
+    const path = currentRestaurant.id + '/items/' + Date.now() + '.' + ext
+    const { error: upErr } = await supabase.storage
+      .from('restaurant-images')
+      .upload(path, file, { upsert: true, contentType: file.type })
+    if (upErr) throw upErr
+
+    const { data: urlData } = supabase.storage
+      .from('restaurant-images')
+      .getPublicUrl(path)
+
+    document.getElementById('item-image-url').value = urlData.publicUrl
+    document.getElementById('item-image-preview-wrap').style.display = 'none'
+    showToast('Foto cargada ✓ Guardá el plato para confirmar.', 'success')
+  } catch (e) {
+    showToast('Error al subir: ' + e.message, 'error')
+  } finally {
+    input.value = ''
+  }
+}
+
 // ─────────────────────────────────────────────
 // Marketing y contenido
 // ─────────────────────────────────────────────
@@ -6721,6 +6799,130 @@ async function renderReservas() {
   }
 }
 
+// ─────────────────────────────────────────────
+// Importar menú desde foto (Claude Vision)
+// ─────────────────────────────────────────────
+let importedMenuItems = []
+
+window.openImportMenuModal = function () {
+  importedMenuItems = []
+  document.getElementById('import-menu-status').style.display = 'none'
+  document.getElementById('import-menu-results').style.display = 'none'
+  document.getElementById('import-menu-file').value = ''
+  document.getElementById('modal-import-menu').classList.add('open')
+}
+
+window.processMenuPhoto = async function (input) {
+  if (!input.files || !input.files[0]) return
+  const file = input.files[0]
+  if (file.size > 5 * 1024 * 1024) { showToast('La imagen debe ser menor a 5MB', 'error'); return }
+
+  const statusEl = document.getElementById('import-menu-status')
+  statusEl.style.display = 'block'
+  statusEl.innerHTML = '<div style="text-align:center;padding:12px;color:var(--muted)">⏳ Analizando imagen con IA... puede tardar unos segundos.</div>'
+
+  try {
+    // Convertir a base64
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = e => resolve(e.target.result.split(',')[1])
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: 'Sos un asistente que extrae información de menús y listas de precios desde imágenes. Respondé SOLO con un JSON válido, sin texto adicional, con el formato: {"items": [{"name": "Nombre del plato", "price": 1500, "description": "descripción si hay", "category": "categoría si se puede inferir"}]}. Si no podés identificar precios claros, igualá price a 0. Extraé todos los platos que encuentres.',
+        messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: file.type, data: base64 } }, { type: 'text', text: 'Extraé todos los platos y precios de esta imagen de menú.' }] }],
+        max_tokens: 2048,
+      }),
+    })
+
+    if (!res.ok) throw new Error('Error de IA')
+    const data = await res.json()
+    const text = data.content?.[0]?.text || ''
+
+    // Extraer JSON de la respuesta
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) throw new Error('No se pudo leer el menú')
+    const parsed = JSON.parse(jsonMatch[0])
+
+    importedMenuItems = (parsed.items || []).filter(i => i.name?.trim())
+    if (!importedMenuItems.length) throw new Error('No se encontraron platos')
+
+    statusEl.innerHTML = `<div style="text-align:center;padding:8px;color:var(--sage);font-size:13px">✅ Se encontraron ${importedMenuItems.length} platos</div>`
+
+    // Mostrar resultados editables
+    const resultsEl = document.getElementById('import-menu-results')
+    const itemsEl   = document.getElementById('import-menu-items')
+    resultsEl.style.display = 'block'
+    itemsEl.innerHTML = importedMenuItems.map((item, i) => `
+      <div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <input class="form-input" style="flex:2;font-size:13px" value="${escHtml(item.name)}" oninput="importedMenuItems[${i}].name=this.value" placeholder="Nombre">
+        <input class="form-input" style="flex:1;font-size:13px" type="number" value="${item.price || ''}" oninput="importedMenuItems[${i}].price=parseFloat(this.value)||0" placeholder="Precio">
+        <button onclick="importedMenuItems.splice(${i},1);processMenuPhoto.call({files:[]});document.getElementById('import-menu-items').innerHTML=''" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px" title="Eliminar">✕</button>
+      </div>`).join('')
+
+  } catch (e) {
+    statusEl.innerHTML = `<div style="text-align:center;padding:12px;color:var(--bad);font-size:13px">❌ Error: ${escHtml(e.message)}</div>`
+  } finally {
+    input.value = ''
+  }
+}
+
+window.confirmImportMenu = async function () {
+  if (!importedMenuItems.length || !currentRestaurant) return
+  const btn = document.getElementById('btn-confirm-import')
+  btn.disabled = true; btn.textContent = 'Importando...'
+
+  // Buscar o crear categoría "Importados"
+  let targetCatId = menuCats.find(c => c.name === 'Importados')?.id
+  if (!targetCatId) {
+    try {
+      const cat = await menuCategories.create({
+        restaurant_id: currentRestaurant.id,
+        name: 'Importados',
+        emoji: '📋',
+        sort_order: menuCats.length,
+        is_visible: true,
+      })
+      menuCats.push(cat)
+      menuItemsMap[cat.id] = []
+      targetCatId = cat.id
+    } catch (e) {
+      showToast('Error creando categoría: ' + e.message, 'error')
+      btn.disabled = false; btn.textContent = '✓ Importar todos los platos'
+      return
+    }
+  }
+
+  let created = 0
+  for (const item of importedMenuItems) {
+    if (!item.name?.trim() || !item.price) continue
+    try {
+      const newItem = await menuItems.create({
+        restaurant_id: currentRestaurant.id,
+        category_id: targetCatId,
+        name: item.name.trim(),
+        price: item.price,
+        description: item.description?.trim() || null,
+        is_available: true,
+        is_visible: true,
+      })
+      if (!menuItemsMap[targetCatId]) menuItemsMap[targetCatId] = []
+      menuItemsMap[targetCatId].push(newItem)
+      created++
+    } catch {}
+  }
+
+  closeModal('modal-import-menu')
+  renderMenu()
+  showToast(`✅ ${created} platos importados a la categoría "Importados"`, 'success')
+  btn.disabled = false; btn.textContent = '✓ Importar todos los platos'
+}
+
 window.openReservaModal = function () {
   editingReserva = null
   document.getElementById('modal-reserva-title').textContent = 'Nueva reserva'
@@ -7002,6 +7204,16 @@ function renderStats(data) {
   const totalPer  = data.reduce((s, o) => s + Number(o.total ?? 0), 0)
   const ticketProm = data.length ? totalPer / data.length : 0
 
+  // Comparar con período anterior del mismo largo
+  const mitad = Math.floor(data.length / 2)
+  const mitadReciente = data.slice(mitad)
+  const mitadAnterior = data.slice(0, mitad)
+  const revenueReciente = mitadReciente.reduce((s,o) => s+Number(o.total||0), 0)
+  const revenueAnterior = mitadAnterior.reduce((s,o) => s+Number(o.total||0), 0)
+  const tendenciaPct = revenueAnterior > 0
+    ? Math.round((revenueReciente - revenueAnterior) / revenueAnterior * 100)
+    : null
+
   // Bar chart — agrupa por día o semana según período
   const barCount = statsPeriod <= 14 ? statsPeriod : Math.ceil(statsPeriod / 7)
   const isWeekly = statsPeriod > 14
@@ -7037,6 +7249,16 @@ function renderStats(data) {
     .slice(0, 5)
   const maxQty = top5[0]?.[1] || 1
 
+  // Mesa más activa
+  const mesaCount = {}
+  data.forEach(o => {
+    if (o.table_number != null) {
+      const k = 'Mesa ' + o.table_number
+      mesaCount[k] = (mesaCount[k] || 0) + 1
+    }
+  })
+  const topMesa = Object.entries(mesaCount).sort((a,b) => b[1]-a[1])[0]
+
   const fmt = n => '$' + Math.round(n).toLocaleString('es-AR')
 
   document.getElementById('stats-body').innerHTML = `
@@ -7066,6 +7288,20 @@ function renderStats(data) {
         <div class="stat-value">${fmt(ticketProm)}</div>
         <div class="stat-label">Ticket promedio</div>
       </div>
+      ${tendenciaPct !== null ? `
+      <div class="stat-card">
+        <div class="stat-icon">${tendenciaPct >= 0 ? '📈' : '📉'}</div>
+        <div class="stat-value" style="color:${tendenciaPct >= 0 ? 'var(--sage)' : 'var(--bad)'}">
+          ${tendenciaPct >= 0 ? '+' : ''}${tendenciaPct}%
+        </div>
+        <div class="stat-label">Tendencia vs período anterior</div>
+      </div>` : ''}
+      ${topMesa ? `
+      <div class="stat-card">
+        <div class="stat-icon">🪑</div>
+        <div class="stat-value">${escHtml(topMesa[0])}</div>
+        <div class="stat-label">${topMesa[1]} pedidos · más activa</div>
+      </div>` : ''}
     </div>
 
     <div class="chart-card">
@@ -7080,6 +7316,25 @@ function renderStats(data) {
           </div>`).join('')}
       </div>
     </div>
+
+    ${(() => {
+      const maxTotal = Math.max(...days.map(d => d.total), 1)
+      return `<div class="chart-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="chart-title" style="margin:0">💰 Ingresos por ${isWeekly ? 'semana' : 'día'}</div>
+          <div style="font-size:11px;color:var(--muted)">${fmt(totalPer)} total</div>
+        </div>
+        <div class="chart-bars">
+          ${days.map(d => `
+            <div class="chart-bar-wrap">
+              <div class="chart-val">${d.total >= 1000 ? '$' + Math.round(d.total/1000) + 'k' : (d.total > 0 ? '$' + Math.round(d.total) : '')}</div>
+              <div class="chart-bar ${d.str === todayStr ? 'today' : ''}"
+                style="height:${Math.round((d.total / maxTotal) * 80) + 4}px"></div>
+              <div class="chart-day">${d.lbl}</div>
+            </div>`).join('')}
+        </div>
+      </div>`
+    })()}
 
     ${buildHourChart(data)}
 
