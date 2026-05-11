@@ -560,9 +560,14 @@ async function loadDashboardData() {
   try {
     document.getElementById('last-updated').textContent = 'Cargando...'
 
-    // Calcular directo sin caché
+    // Calcular métricas — si falla, usar datos vacíos
     const currentMonth = new Date().toISOString().slice(0, 7)
-    dashboardData = await calculateDashboardMetrics(currentMonth)
+    try {
+      dashboardData = await calculateDashboardMetrics(currentMonth)
+    } catch (calcErr) {
+      console.warn('calculateDashboardMetrics falló, usando datos vacíos:', calcErr)
+      dashboardData = { total_clients: 0, active_clients: 0, churn_alerts: [], total_revenue: 0, subscription_revenue: 0, transaction_fees: 0, ad_fees: 0, projected_revenue: 0, tano_messages_count: 0, tano_cost_usd: 0, viti_messages_count: 0, viti_cost_usd: 0, sales_prospects: 0, sales_cost_usd: 0, cloudflare_cost: 0, anthropic_cost: 0, replicate_cost: 0, twilio_cost: 0, google_workspace: 0 }
+    }
     renderCurrentTab()
 
     const cachedAt = new Date()
@@ -580,10 +585,14 @@ async function loadDashboardData() {
 }
 
 async function calculateDashboardMetrics(periodMonth) {
-  // Esta función calcula todas las métricas desde cero
-  const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
-  const adminData = await adminRes.json()
-  const allRestaurants = adminData.restaurants || []
+  // Cargar restaurantes via worker (usa service key, bypasa RLS)
+  let allRestaurants = []
+  try {
+    const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
+    const adminData = await adminRes.json()
+    allRestaurants = adminData.restaurants || []
+  } catch {}
+
   const activeRestaurants = allRestaurants.filter(r => r.subscription_status === 'active')
 
   const clientsByPlan = {
@@ -617,9 +626,10 @@ async function calculateDashboardMetrics(periodMonth) {
   const tanoTotal = allRestaurants.reduce((sum, r) => sum + (r.tano_month_count || 0), 0)
   const tanoCostUsd = (tanoTotal * 0.005) // Estimado: $0.005 por mensaje
 
-  // Prospectos del agente de ventas
-  const allProspects = await salesProspects.list()
-  const salesCost = allProspects.length * 0.01 // Estimado: $0.01 por prospecto
+  // Prospectos del agente de ventas (tabla puede no existir)
+  let allProspects = []
+  try { allProspects = await salesProspects.list() } catch {}
+  const salesCost = allProspects.length * 0.01
 
   // Costos fijos mensuales
   const fixedCosts = {
