@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conectando cuenta — Vitrina</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #fdfaf6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      color: #1c1612;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e8ddd0;
+      border-radius: 20px;
+      padding: 48px 40px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .logo { font-size: 32px; margin-bottom: 8px; }
+    .logo-text { font-family: Georgia, serif; font-size: 22px; font-weight: 600; color: #1c1612; }
+    .divider { border: none; border-top: 1px solid #f0e8dd; margin: 24px 0; }
+    .icon { font-size: 48px; margin-bottom: 16px; }
+    .title { font-size: 20px; font-weight: 600; margin-bottom: 8px; }
+    .subtitle { font-size: 14px; color: #8a7e74; line-height: 1.6; }
+    .btn {
+      display: inline-block;
+      margin-top: 24px;
+      padding: 12px 28px;
+      background: #b85a30;
+      color: #fff;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .btn:hover { opacity: 0.9; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid #f0e8dd;
+      border-top-color: #b85a30;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .status-ok { color: #22863a; }
+    .status-err { color: #c0392b; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🪟</div>
+    <div class="logo-text">Vitrina</div>
+    <hr class="divider">
+    <div id="content">
+      <div class="spinner"></div>
+      <div class="title">Conectando cuenta…</div>
+      <div class="subtitle">Procesando la autorización, un momento.</div>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND = 'https://vitrina-tano.vitrinaapp.workers.dev'
+    const params = new URLSearchParams(location.search)
+
+    async function init() {
+      const code  = params.get('code')
+      const state = params.get('state')
+      const error = params.get('error')
+
+      // Error del proveedor OAuth
+      if (error) {
+        showError('El proveedor rechazó la autorización: ' + error)
+        return
+      }
+
+      if (!code) {
+        showError('No se recibió el código de autorización.')
+        return
+      }
+
+      // Detectar proveedor desde state
+      let provider = 'unknown'
+      let restaurantId = null
+
+      try {
+        const stateObj = JSON.parse(atob(decodeURIComponent(state || '')))
+        provider     = stateObj.provider || 'unknown'
+        restaurantId = stateObj.restaurant_id
+      } catch {
+        // TN envía el state como restaurantId directamente (string)
+        provider     = 'tiendanube'
+        restaurantId = state
+      }
+
+      // ML usa callback del frontend; TN usa callback del worker
+      // Este archivo maneja el redirect final del worker para ML
+      const oauthParam = params.get('oauth')
+
+      if (oauthParam === 'ml_ok') {
+        showSuccess('mercadolibre', '¡MercadoLibre conectado!',
+          'Ya podés gestionar tus publicaciones y ventas desde Vitrina.',
+          restaurantId || params.get('restaurant'))
+        return
+      }
+
+      if (oauthParam === 'tn_ok') {
+        showSuccess('tiendanube', '¡Tienda Nube conectada!',
+          'Ya podés sincronizar tu catálogo y ventas desde Vitrina.',
+          restaurantId || params.get('restaurant'))
+        return
+      }
+
+      // Si llegamos acá con un code, procesarlo en el worker según proveedor
+      if (provider === 'ml' || provider === 'mercadolibre') {
+        try {
+          // Redirigir al worker callback que hace el intercambio
+          const workerCallback = BACKEND + '/api/ml/callback?code=' + encodeURIComponent(code)
+            + '&state=' + encodeURIComponent(state || '')
+          location.href = workerCallback
+        } catch (e) {
+          showError('Error al conectar MercadoLibre: ' + e.message)
+        }
+        return
+      }
+
+      if (provider === 'google') {
+        try {
+          const workerCallback = BACKEND + '/api/google/callback?code=' + encodeURIComponent(code)
+            + '&state=' + encodeURIComponent(state || '')
+          location.href = workerCallback
+        } catch (e) {
+          showError('Error al conectar Google: ' + e.message)
+        }
+        return
+      }
+
+      showError('Proveedor no reconocido: ' + provider)
+    }
+
+    function showSuccess(provider, title, subtitle, restaurantId) {
+      const icons = { mercadolibre: '🛒', tiendanube: '🏪', google: '🔍', instagram: '📸' }
+      document.getElementById('content').innerHTML = `
+        <div class="icon">${icons[provider] || '✅'}</div>
+        <div class="title status-ok">${title}</div>
+        <div class="subtitle">${subtitle}</div>
+        <a class="btn" href="panel.html${restaurantId ? '?rest=' + restaurantId : ''}">
+          Volver al panel →
+        </a>
+      `
+    }
+
+    function showError(msg) {
+      document.getElementById('content').innerHTML = `
+        <div class="icon">❌</div>
+        <div class="title status-err">Error de conexión</div>
+        <div class="subtitle">${msg}</div>
+        <a class="btn" href="panel.html" style="background:#888">
+          Volver al panel
+        </a>
+      `
+    }
+
+    init()
+  </script>
+</body>
+</html>
