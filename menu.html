@@ -48,6 +48,10 @@
 
     .cat-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; overflow-x: auto; scrollbar-width: none; }
     .cat-nav::-webkit-scrollbar { display: none; }
+    .search-bar { padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .search-input { width: 100%; padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); outline: none; transition: border-color .15s; }
+    .search-input:focus { border-color: var(--accent); }
+    .search-empty { padding: 60px 20px; text-align: center; color: var(--muted); font-size: 15px; }
     .cat-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
     .cat-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
 
@@ -182,6 +186,9 @@
       <span class="pedidos-bar-text">📋 Ver estado de mis pedidos</span>
       <span class="pedidos-bar-hint">Tocá para ver →</span>
     </div>
+    <div class="search-bar" id="search-bar" style="display:none">
+  <input class="search-input" id="menu-search" type="search" placeholder="Buscar en el menú..." oninput="searchMenu(this.value)">
+</div>
     <nav class="cat-nav" id="cat-nav"></nav>
     <div class="content" id="content"></div>
   </div>
@@ -337,6 +344,7 @@
       }
 
       buildMenu()
+      document.getElementById('search-bar').style.display = 'block'
 
       // Mostrar selector de idioma
       document.getElementById('lang-switcher').style.display = 'flex'
@@ -872,6 +880,32 @@
       const activeBtn = document.querySelector('.cat-btn.active')
       if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
     })
+
+    // ─── Búsqueda ─────────────────────────────────────────────────────────────
+    window.searchMenu = function (q) {
+      const content = document.getElementById('content')
+      const nav = document.getElementById('cat-nav')
+      if (!q.trim()) {
+        // Restaurar vista normal
+        buildMenu()
+        nav.style.display = 'flex'
+        return
+      }
+      nav.style.display = 'none'
+      const lq = q.toLowerCase()
+      const results = Object.values(itemsById).filter(item =>
+        item.is_visible &&
+        (item.name.toLowerCase().includes(lq) ||
+         (item.description || '').toLowerCase().includes(lq) ||
+         (item.tags || []).some(t => t.includes(lq)))
+      )
+      if (!results.length) {
+        content.innerHTML = '<div class="search-empty">😕 No encontramos platos con "' + esc(q) + '"</div>'
+        return
+      }
+      content.innerHTML = '<div class="category-section"><div class="category-title" style="color:var(--muted);font-size:14px">' + results.length + ' resultado' + (results.length !== 1 ? 's' : '') + ' para "' + esc(q) + '"</div>' + results.map(itemCardHtml).join('') + '</div>'
+      Object.keys(itemsById).forEach(renderCtrl)
+    }
 
     window.addItem = addItem
     window.removeItem = removeItem

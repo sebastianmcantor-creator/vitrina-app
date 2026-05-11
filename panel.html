@@ -6441,6 +6441,110 @@ window.removeStaffMember = async function (id) {
 // ─────────────────────────────────────────────
 // CRM — Clientes
 // ─────────────────────────────────────────────
+// Campañas
+// ─────────────────────────────────────────────
+let campanaContactos = []
+
+window.loadCampanas = async function () {
+  if (!currentRestaurant) return
+  await Promise.all([loadCampanaContactos(), loadCampanasHistorial()])
+}
+
+async function loadCampanaContactos() {
+  try {
+    const data = await orders.listHistory(currentRestaurant.id, 90, 500)
+    const phoneMap = {}
+    const now = Date.now()
+    data.forEach(o => {
+      if (!o.customer_phone) return
+      const key = o.customer_phone
+      if (!phoneMap[key]) phoneMap[key] = { phone: key, name: o.customer_name, lastOrder: o.created_at, count: 0 }
+      phoneMap[key].count++
+      if (o.created_at > phoneMap[key].lastOrder) phoneMap[key].lastOrder = o.created_at
+    })
+    campanaContactos = Object.values(phoneMap)
+    updateCampanaPreview()
+  } catch (e) { campanaContactos = [] }
+}
+
+window.updateCampanaPreview = function () {
+  const seg = document.querySelector('input[name="campana-seg"]:checked')?.value || 'todos'
+  const now = Date.now()
+  let filtered = campanaContactos
+  if (seg === 'ultimos30') filtered = campanaContactos.filter(c => (now - new Date(c.lastOrder).getTime()) < 30*24*3600*1000)
+  if (seg === 'ultimos7')  filtered = campanaContactos.filter(c => (now - new Date(c.lastOrder).getTime()) < 7*24*3600*1000)
+  const preview = document.getElementById('campana-preview')
+  if (preview) preview.textContent = filtered.length + ' contacto' + (filtered.length !== 1 ? 's' : '') + ' recibirán este mensaje'
+  return filtered
+}
+
+async function loadCampanasHistorial() {
+  const el = document.getElementById('campanas-historial')
+  try {
+    const { data } = await supabase.from('campanas')
+      .select('*')
+      .eq('restaurant_id', currentRestaurant.id)
+      .order('created_at', { ascending: false })
+      .limit(20)
+    if (!data?.length) {
+      el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13.5px">Todavía no enviaste ninguna campaña.</div>'
+      return
+    }
+    el.innerHTML = data.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);gap:12px;flex-wrap:wrap">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:var(--ink)">${escHtml(c.nombre)}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${escHtml(c.mensaje.slice(0,80))}${c.mensaje.length > 80 ? '...' : ''}</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:13px;color:var(--sage);font-weight:500">✓ ${c.enviados} enviados</div>
+          ${c.errores ? `<div style="font-size:11px;color:var(--bad)">${c.errores} errores</div>` : ''}
+          <div style="font-size:11px;color:var(--muted)">${new Date(c.created_at).toLocaleDateString('es-AR', {day:'2-digit',month:'short',year:'2-digit'})}</div>
+        </div>
+      </div>`).join('')
+  } catch {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13.5px">Error cargando historial.</div>'
+  }
+}
+
+window.enviarCampana = async function () {
+  const nombre   = document.getElementById('campana-nombre').value.trim() || 'Campaña sin nombre'
+  const mensaje  = document.getElementById('campana-mensaje').value.trim()
+  if (!mensaje) { showToast('Escribí el mensaje antes de enviar', 'error'); return }
+  if (!currentRestaurant.whatsapp_operativo && !currentRestaurant.phone) {
+    showToast('Configurá un número de WhatsApp en Configuración primero', 'error'); return
+  }
+
+  const filtered = updateCampanaPreview()
+  if (!filtered.length) { showToast('No hay contactos para este segmento', 'error'); return }
+
+  const seg = document.querySelector('input[name="campana-seg"]:checked')?.value || 'todos'
+  const phones = filtered.map(c => c.phone).slice(0, 50) // Límite del plan
+
+  if (!confirm(`¿Enviar "${nombre}" a ${phones.length} contacto${phones.length !== 1 ? 's' : ''}?`)) return
+
+  const btn = document.getElementById('btn-enviar-campana')
+  btn.disabled = true; btn.textContent = '⏳ Enviando...'
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/campana/enviar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id, nombre, mensaje, phones, segmento: seg }),
+    })
+    if (!res.ok) throw new Error('Error del servidor')
+    const data = await res.json()
+    showToast(`✅ Campaña enviada: ${data.sent} mensajes${data.errors ? `, ${data.errors} errores` : ''}`, 'success')
+    document.getElementById('campana-mensaje').value = ''
+    await loadCampanasHistorial()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = '📤 Enviar campaña'
+  }
+}
+
+// ─────────────────────────────────────────────
 let crmData = []
 
 window.loadCRM = async function () {
