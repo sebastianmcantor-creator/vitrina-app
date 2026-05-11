@@ -50,6 +50,13 @@
     .cat-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; overflow-x: auto; scrollbar-width: none; }
     .cat-nav::-webkit-scrollbar { display: none; }
     .search-bar { padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .diet-filter-bar { padding: 8px 16px 0; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
+    .diet-filter-bar::-webkit-scrollbar { display: none; }
+    .diet-btn { flex-shrink: 0; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; color: var(--muted); transition: all 0.15s; }
+    .diet-btn.active-veg { background: var(--tag-veg); border-color: var(--tag-veg-text); color: var(--tag-veg-text); }
+    .diet-btn.active-vegan { background: var(--tag-vegan); border-color: var(--tag-vegan-text); color: var(--tag-vegan-text); }
+    .diet-btn.active-celiac { background: var(--tag-celiac); border-color: var(--tag-celiac-text); color: var(--tag-celiac-text); }
+    .diet-btn.active-popular { background: #fce4ec; border-color: #c62828; color: #c62828; }
     .search-input { width: 100%; padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); outline: none; transition: border-color .15s; }
     .search-input:focus { border-color: var(--accent); }
     .search-empty { padding: 60px 20px; text-align: center; color: var(--muted); font-size: 15px; }
@@ -233,6 +240,12 @@
     <div class="search-bar" id="search-bar" style="display:none">
   <input class="search-input" id="menu-search" type="search" placeholder="Buscar en el menú..." oninput="searchMenu(this.value)">
 </div>
+<div class="diet-filter-bar" id="diet-filter-bar" style="display:none">
+  <button class="diet-btn" id="df-veg"     onclick="toggleDietFilter('veg')">🌿 Vegetariano</button>
+  <button class="diet-btn" id="df-vegan"   onclick="toggleDietFilter('vegan')">🌱 Vegano</button>
+  <button class="diet-btn" id="df-celiac"  onclick="toggleDietFilter('celiac')">🌾 Sin TACC</button>
+  <button class="diet-btn" id="df-popular" onclick="toggleDietFilter('popular')">🔥 Populares</button>
+</div>
     <nav class="cat-nav" id="cat-nav"></nav>
     <div class="content" id="content"></div>
   </div>
@@ -389,6 +402,10 @@
 
       buildMenu()
       document.getElementById('search-bar').style.display = 'block'
+
+      // Mostrar diet filter bar si hay items con tags
+      const hasTags = Object.values(itemsById).some(i => i.tags?.length > 0)
+      if (hasTags) document.getElementById('diet-filter-bar').style.display = 'flex'
 
       // Mostrar selector de idioma
       document.getElementById('lang-switcher').style.display = 'flex'
@@ -955,6 +972,7 @@
       const nav = document.getElementById('cat-nav')
       if (!q.trim()) {
         // Restaurar vista normal
+        activeDietFilter = null; document.querySelectorAll('.diet-btn').forEach(b => { b.className = 'diet-btn' })
         buildMenu()
         nav.style.display = 'flex'
         return
@@ -972,6 +990,38 @@
         return
       }
       content.innerHTML = '<div class="category-section"><div class="category-title" style="color:var(--muted);font-size:14px">' + results.length + ' resultado' + (results.length !== 1 ? 's' : '') + ' para "' + esc(q) + '"</div>' + results.map(itemCardHtml).join('') + '</div>'
+      Object.keys(itemsById).forEach(renderCtrl)
+    }
+
+    // ─── Filtros por dieta ────────────────────────────────────────────────────
+    let activeDietFilter = null
+    const DIET_ACTIVE_CLASS = { veg: 'active-veg', vegan: 'active-vegan', celiac: 'active-celiac', popular: 'active-popular' }
+
+    window.toggleDietFilter = function (tag) {
+      if (activeDietFilter === tag) {
+        activeDietFilter = null
+        document.getElementById('df-' + tag)?.classList.remove(DIET_ACTIVE_CLASS[tag])
+        buildMenu()
+        return
+      }
+      if (activeDietFilter) document.getElementById('df-' + activeDietFilter)?.classList.remove(DIET_ACTIVE_CLASS[activeDietFilter])
+      activeDietFilter = tag
+      document.getElementById('df-' + tag)?.classList.add(DIET_ACTIVE_CLASS[tag])
+      applyDietFilter(tag)
+    }
+
+    function applyDietFilter(tag) {
+      const content = document.getElementById('content')
+      const results = Object.values(itemsById).filter(item =>
+        item.is_visible && item.is_available &&
+        (item.tags || []).includes(tag)
+      )
+      if (!results.length) {
+        content.innerHTML = '<div class="search-empty">No encontramos platos con ese filtro 🌿</div>'
+        return
+      }
+      const TAG_NAMES = { veg: 'Vegetarianos', vegan: 'Veganos', celiac: 'Sin TACC', popular: 'Populares' }
+      content.innerHTML = '<div class="category-section"><div class="category-title" style="color:var(--muted);font-size:14px">' + results.length + ' platos ' + (TAG_NAMES[tag] || '') + '</div>' + results.map((item, i) => itemCardHtml(item, i)).join('') + '</div>'
       Object.keys(itemsById).forEach(renderCtrl)
     }
 
