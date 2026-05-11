@@ -2598,11 +2598,19 @@ input:checked + .toggle-slider:before {
         <label class="form-label">URL de imagen</label>
         <div style="display:flex;gap:8px;align-items:flex-start">
           <input class="form-input" id="item-image-url" placeholder="https://... (opcional)" style="flex:1">
-          <button class="btn-secondary" onclick="enhanceImage()" id="btn-enhance-image" style="padding:8px 12px;font-size:12px;white-space:nowrap">
-            ✨ Mejorar
+          <button class="btn-secondary" onclick="generateImageAI()" id="btn-generate-image" title="Generar foto con IA desde el nombre del plato" style="padding:8px 12px;font-size:12px;white-space:nowrap">
+            🤖 Generar
           </button>
         </div>
-        <span class="form-hint">Imagen que se muestra en el menú público. Usá el botón "Mejorar" para aumentar la calidad con IA.</span>
+        <div id="item-image-preview-wrap" style="display:none;margin-top:8px">
+          <img id="item-image-preview" src="" alt="Preview" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
+          <div style="display:flex;gap:6px;margin-top:6px">
+            <button class="btn-secondary" onclick="acceptGeneratedImage()" style="font-size:12px;padding:5px 12px">✓ Usar esta foto</button>
+            <button class="btn-secondary" onclick="generateImageAI()" style="font-size:12px;padding:5px 12px">🔄 Generar otra</button>
+            <button class="btn-secondary" onclick="document.getElementById('item-image-preview-wrap').style.display='none'" style="font-size:12px;padding:5px 12px;color:var(--muted)">✕</button>
+          </div>
+        </div>
+        <span class="form-hint">Imagen que se muestra en el menú público. Usá 🤖 para generar una foto profesional con IA desde el nombre del plato.</span>
       </div>
       <div class="form-field">
         <label class="form-label">Etiquetas</label>
@@ -5012,6 +5020,125 @@ window.enhanceImage = async function () {
       btn.textContent = originalText
       btn.disabled = false
     }
+  }
+}
+
+// ─────────────────────────────────────────────
+// Generación de imagen con IA (Cloudflare AI)
+// ─────────────────────────────────────────────
+let generatedImageBase64 = null
+
+const AI_STYLES = [
+  { key: 'professional', label: 'Fondo neutro blanco — estilo catálogo', desc: 'Producto en fondo blanco limpio, luz uniforme, sombra suave.' },
+  { key: 'warm',         label: 'Ambiente cálido — madera y luz dorada', desc: 'Contexto de restaurante, madera, luz dorada, atmósfera acogedora.' },
+  { key: 'dark',         label: 'Minimalista oscuro — premium',           desc: 'Fondo negro/gris, spotlight, estilo premium y exclusivo.' },
+]
+
+window.generateImageAI = async function () {
+  const name = document.getElementById('item-name').value.trim()
+  const desc = document.getElementById('item-desc').value.trim()
+
+  if (!name) {
+    showToast('Completá el nombre del plato primero', 'error')
+    return
+  }
+
+  // Mostrar selector de estilo si es la primera vez
+  const existingPicker = document.getElementById('ai-style-picker')
+  if (!existingPicker) {
+    const pickerHtml = `
+      <div id="ai-style-picker" style="margin-top:10px;padding:14px;background:var(--cream2);border:1px solid var(--border);border-radius:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px">Elegí el estilo de la foto:</div>
+        ${AI_STYLES.map(s => `
+          <label style="display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;cursor:pointer">
+            <input type="radio" name="ai-style" value="${s.key}" ${s.key === 'professional' ? 'checked' : ''}
+              style="margin-top:3px;accent-color:var(--terra)">
+            <div>
+              <div style="font-size:13px;font-weight:500;color:var(--ink)">${s.label}</div>
+              <div style="font-size:12px;color:var(--muted)">${s.desc}</div>
+            </div>
+          </label>`).join('')}
+        <button class="btn-primary" onclick="doGenerateImage()" style="margin-top:8px;font-size:13px;padding:8px 18px">
+          🎨 Generar foto
+        </button>
+      </div>`
+    document.getElementById('item-image-preview-wrap').insertAdjacentHTML('beforebegin', pickerHtml)
+  } else {
+    doGenerateImage()
+  }
+}
+
+window.doGenerateImage = async function () {
+  const name = document.getElementById('item-name').value.trim()
+  const desc = document.getElementById('item-desc').value.trim()
+  const style = document.querySelector('input[name="ai-style"]:checked')?.value || 'professional'
+
+  const btn = document.getElementById('btn-generate-image')
+  btn.textContent = '⏳ Generando...'
+  btn.disabled = true
+
+  try {
+    const prompt = name + (desc ? ', ' + desc : '') + '. Comida argentina, plato de restaurante.'
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/cf-ai/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, style }),
+    })
+
+    if (!res.ok) throw new Error('Error generando imagen (' + res.status + ')')
+    const data = await res.json()
+
+    if (!data.imageBase64) throw new Error('No se generó imagen')
+
+    generatedImageBase64 = data.imageBase64
+    const previewWrap = document.getElementById('item-image-preview-wrap')
+    const previewImg  = document.getElementById('item-image-preview')
+    previewImg.src = data.imageBase64
+    previewWrap.style.display = 'block'
+
+    showToast('✨ Foto generada — aceptala para usarla', 'success')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.textContent = '🤖 Generar'
+    btn.disabled = false
+  }
+}
+
+window.acceptGeneratedImage = async function () {
+  if (!generatedImageBase64 || !currentRestaurant) return
+
+  // Subir la imagen generada a Supabase Storage
+  const btn = document.querySelector('#item-image-preview-wrap button')
+  try {
+    // Convertir base64 a blob
+    const res = await fetch(generatedImageBase64)
+    const blob = await res.blob()
+    const filename = 'ai-' + Date.now() + '.png'
+    const path = currentRestaurant.id + '/items/' + filename
+
+    const { error: upErr } = await supabase.storage
+      .from('restaurant-images')
+      .upload(path, blob, { upsert: true, contentType: 'image/png' })
+
+    if (upErr) throw upErr
+
+    const { data: urlData } = supabase.storage
+      .from('restaurant-images')
+      .getPublicUrl(path)
+
+    document.getElementById('item-image-url').value = urlData.publicUrl
+    document.getElementById('item-image-preview-wrap').style.display = 'none'
+    document.getElementById('ai-style-picker')?.remove()
+    generatedImageBase64 = null
+    showToast('Foto cargada ✓ Guardá el plato para confirmar.', 'success')
+  } catch (e) {
+    // Fallback: usar base64 directamente (no ideal pero funciona)
+    document.getElementById('item-image-url').value = generatedImageBase64
+    document.getElementById('item-image-preview-wrap').style.display = 'none'
+    document.getElementById('ai-style-picker')?.remove()
+    generatedImageBase64 = null
+    showToast('Foto cargada como URL interna ✓', 'success')
   }
 }
 
