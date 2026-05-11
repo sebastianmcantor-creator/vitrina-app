@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QR Mesas — Vitrina</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #fdfaf6; color: #1c1612; }
+
+    .header {
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #e8ddd0;
+      background: #fff;
+    }
+    .header-logo { font-family: 'Playfair Display', serif; font-size: 20px; color: #b85a30; }
+    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .btn-print {
+      background: #b85a30; color: #fff; border: none; border-radius: 10px;
+      padding: 10px 20px; font-size: 14px; font-weight: 500; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-print:hover { background: #9a4827; }
+    .btn-back { color: #8a7e74; text-decoration: none; font-size: 13px; }
+
+    .page-header {
+      padding: 32px;
+      text-align: center;
+    }
+    .rest-name { font-family: 'Playfair Display', serif; font-size: 28px; color: #1c1612; }
+    .rest-sub { font-size: 14px; color: #8a7e74; margin-top: 4px; }
+
+    .controls {
+      padding: 0 32px 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .controls label { font-size: 13px; color: #8a7e74; }
+    .controls select, .controls input {
+      padding: 6px 12px; border: 1px solid #e8ddd0; border-radius: 8px;
+      font-size: 13px; font-family: 'DM Sans', sans-serif; background: #fff;
+    }
+
+    .qr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 0 32px 40px;
+    }
+
+    .qr-card {
+      background: #fff;
+      border: 1px solid #e8ddd0;
+      border-radius: 16px;
+      padding: 20px 16px;
+      text-align: center;
+      break-inside: avoid;
+    }
+    .qr-card img {
+      width: 140px;
+      height: 140px;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto 12px;
+    }
+    .qr-mesa-label {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      color: #1c1612;
+      margin-bottom: 4px;
+    }
+    .qr-rest-name {
+      font-size: 11px;
+      color: #b85a30;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .qr-hint {
+      font-size: 10px;
+      color: #8a7e74;
+      margin-top: 6px;
+    }
+    .qr-card-actions {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+    .btn-dl {
+      font-size: 11px; padding: 4px 10px; background: #f7f2ea;
+      border: 1px solid #e8ddd0; border-radius: 6px; cursor: pointer;
+      color: #3a3028; text-decoration: none; font-family: 'DM Sans', sans-serif;
+    }
+    .btn-dl:hover { background: #ede8e0; }
+
+    .empty { padding: 60px; text-align: center; color: #8a7e74; }
+    .loading { padding: 60px; text-align: center; color: #8a7e74; }
+
+    @media print {
+      .header, .controls, .btn-print, .qr-card-actions, .page-header .btn-back { display: none !important; }
+      body { background: #fff; }
+      .qr-grid { padding: 20px; gap: 16px; }
+      .qr-card { border: 1px solid #ccc; page-break-inside: avoid; break-inside: avoid; }
+      .page-header { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header" id="header-bar">
+  <div class="header-logo">🪟 Vitrina</div>
+  <div class="header-actions">
+    <a class="btn-back" id="link-back" href="/panel.html">← Volver al panel</a>
+    <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+  </div>
+</div>
+
+<div class="page-header">
+  <div class="rest-name" id="rest-name">Cargando...</div>
+  <div class="rest-sub" id="rest-sub"></div>
+</div>
+
+<div class="controls" id="controls" style="display:none">
+  <label>Tamaño QR:
+    <select id="qr-size" onchange="renderQRs()">
+      <option value="140">Pequeño (140px)</option>
+      <option value="200" selected>Mediano (200px)</option>
+      <option value="280">Grande (280px)</option>
+    </select>
+  </label>
+  <label>Tipo de QR:
+    <select id="qr-type" onchange="renderQRs()">
+      <option value="menu">Menú + pedidos</option>
+      <option value="mozo">Asistente Tano</option>
+    </select>
+  </label>
+  <label style="display:flex;align-items:center;gap:6px">
+    <input type="checkbox" id="qr-show-hint" checked onchange="renderQRs()">
+    Mostrar texto debajo
+  </label>
+</div>
+
+<div id="qr-grid-container">
+  <div class="loading">Cargando mesas...</div>
+</div>
+
+<script type="module">
+  import { restaurants, restaurantTables } from './lib/db.js'
+
+  const params = new URLSearchParams(location.search)
+  const slug = params.get('slug')
+  const BACKEND = 'https://vitrina-tano.vitrinaapp.workers.dev'
+
+  let rest = null
+  let mesas = []
+
+  async function init() {
+    if (!slug) {
+      document.getElementById('qr-grid-container').innerHTML = '<div class="empty">Falta el parámetro slug en la URL.<br>Ejemplo: qr-print.html?slug=mi-restaurante</div>'
+      return
+    }
+
+    try {
+      rest = await restaurants.getBySlug(slug)
+      mesas = await restaurantTables.list(rest.id)
+    } catch {
+      document.getElementById('qr-grid-container').innerHTML = '<div class="empty">No se encontró el restaurante.</div>'
+      return
+    }
+
+    document.getElementById('rest-name').textContent = rest.name
+    document.getElementById('rest-sub').textContent = [rest.tagline, rest.address, rest.city].filter(Boolean).join(' · ') || 'Menú digital Vitrina'
+    document.getElementById('link-back').href = '/panel.html'
+    document.title = 'QR Mesas — ' + rest.name
+
+    document.getElementById('controls').style.display = 'flex'
+    renderQRs()
+  }
+
+  function qrUrl(data, size) {
+    return 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size
+      + '&data=' + encodeURIComponent(data)
+      + '&margin=8&color=1c1612&bgcolor=fdfaf6'
+  }
+
+  window.renderQRs = function () {
+    if (!rest || !mesas.length) {
+      document.getElementById('qr-grid-container').innerHTML = '<div class="empty">Este restaurante no tiene mesas creadas todavía.<br>Creálas desde el panel en la sección "Mesas".</div>'
+      return
+    }
+
+    const size = parseInt(document.getElementById('qr-size').value) || 200
+    const type = document.getElementById('qr-type').value
+    const showHint = document.getElementById('qr-show-hint').checked
+    const base = 'https://vitrinaapp.com.ar/'
+
+    document.getElementById('qr-grid-container').innerHTML = '<div class="qr-grid">' +
+      mesas.map(mesa => {
+        const url = base + (type === 'mozo' ? 'mozo.html' : 'menu.html') + '?slug=' + slug + '&mesa=' + mesa.number
+        const imgSrc = qrUrl(url, size)
+        const label = mesa.label || 'Mesa ' + mesa.number
+        const hint = type === 'mozo' ? 'Escaneá para hablar con Tano' : 'Escaneá para ver el menú y pedir'
+        return `
+          <div class="qr-card">
+            <img src="${imgSrc}" alt="QR ${label}" width="${size}" height="${size}">
+            <div class="qr-mesa-label">${label}</div>
+            <div class="qr-rest-name">${rest.name}</div>
+            ${showHint ? '<div class="qr-hint">' + hint + '</div>' : ''}
+            <div class="qr-card-actions">
+              <a class="btn-dl" href="${qrUrl(url, 400)}" download="qr-mesa-${mesa.number}.png" target="_blank">⬇️ Descargar</a>
+              <a class="btn-dl" href="${url}" target="_blank">🔗 Ver</a>
+            </div>
+          </div>`
+      }).join('') + '</div>'
+  }
+
+  init()
+</script>
+</body>
+</html>

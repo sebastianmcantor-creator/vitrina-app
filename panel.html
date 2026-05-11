@@ -1836,6 +1836,7 @@ input:checked + .toggle-slider:before {
           <div class="card-title">🔗 Links rápidos</div>
           <div class="quick-links-grid" id="quick-links-grid">
             <a class="btn-quick-link" id="link-menu" href="#" target="_blank">🍽️ Ver menú público</a>
+            <a class="btn-quick-link" id="link-qr-print" href="#" target="_blank">🖨️ Imprimir QRs</a>
             <a class="btn-quick-link" id="link-cocina" href="#" target="_blank">🧑‍🍳 Panel de cocina</a>
             <a class="btn-quick-link" id="link-mozo" href="#" target="_blank">💬 Ver asistente</a>
           </div>
@@ -3131,9 +3132,10 @@ function fillForm(rest) {
 
 function updateQuickLinks(slug) {
   const base = 'https://vitrinaapp.com.ar/'
-  document.getElementById('link-menu').href   = base + 'menu.html?slug=' + slug
-  document.getElementById('link-cocina').href = base + 'cocina.html?slug=' + slug
-  document.getElementById('link-mozo').href   = base + 'mozo.html?slug=' + slug + '&mesa=1'
+  document.getElementById('link-menu').href     = base + 'menu.html?slug=' + slug
+  document.getElementById('link-qr-print').href = base + 'qr-print.html?slug=' + slug
+  document.getElementById('link-cocina').href   = base + 'cocina.html?slug=' + slug
+  document.getElementById('link-mozo').href     = base + 'mozo.html?slug=' + slug + '&mesa=1'
   updateMenuQr(slug)
 }
 
