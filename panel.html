@@ -6482,6 +6482,43 @@ window.exportStatsCSV = function () {
   a.click()
 }
 
+function buildHourChart(data) {
+  // Distribuir pedidos por franja horaria
+  const slots = [
+    { label: '6-9', hours: [6,7,8], count: 0, total: 0 },
+    { label: '9-12', hours: [9,10,11], count: 0, total: 0 },
+    { label: '12-15', hours: [12,13,14], count: 0, total: 0 },
+    { label: '15-18', hours: [15,16,17], count: 0, total: 0 },
+    { label: '18-21', hours: [18,19,20], count: 0, total: 0 },
+    { label: '21-0', hours: [21,22,23], count: 0, total: 0 },
+  ]
+  data.forEach(o => {
+    const h = new Date(o.created_at).getHours()
+    const slot = slots.find(s => s.hours.includes(h))
+    if (slot) { slot.count++; slot.total += Number(o.total ?? 0) }
+  })
+  const maxC = Math.max(...slots.map(s => s.count), 1)
+  const peakSlot = slots.reduce((a, b) => a.count >= b.count ? a : b)
+  if (!data.length) return ''
+
+  return `
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="chart-title" style="margin:0">🕐 Pedidos por franja horaria</div>
+        <div style="font-size:11px;color:var(--muted)">Pico: ${peakSlot.label}hs</div>
+      </div>
+      <div class="chart-bars">
+        ${slots.map(s => `
+          <div class="chart-bar-wrap">
+            <div class="chart-val">${s.count || ''}</div>
+            <div class="chart-bar ${s.label === peakSlot.label ? 'today' : ''}"
+              style="height:${Math.round((s.count / maxC) * 80) + 4}px"></div>
+            <div class="chart-day">${s.label}</div>
+          </div>`).join('')}
+      </div>
+    </div>`
+}
+
 function renderStats(data) {
   const todayStr = new Date().toISOString().slice(0, 10)
 
@@ -6569,6 +6606,8 @@ function renderStats(data) {
           </div>`).join('')}
       </div>
     </div>
+
+    ${buildHourChart(data)}
 
     ${top5.length ? `
     <div class="card">
