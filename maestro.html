@@ -751,22 +751,34 @@ async function renderClients() {
       return
     }
 
+    // Ordenar: más recientes primero
+    allRestaurants.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+
     tbody.innerHTML = allRestaurants.map(r => {
-      const plan = r.subscription_tier || 'free'
-      const status = r.subscription_status || 'inactive'
+      const plan = r.plan || r.subscription_tier || 'free'
+      const status = r.subscription_status || 'trial'
       const tanoUsed = r.tano_month_count || 0
-      const lastActivity = r.updated_at ? new Date(r.updated_at).toLocaleDateString('es-AR') : 'Nunca'
+      const createdAt = r.created_at ? new Date(r.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'2-digit' }) : '—'
+      const lastActivity = r.updated_at ? new Date(r.updated_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short' }) : '—'
+      const isNew = r.created_at && (Date.now() - new Date(r.created_at).getTime()) < 7 * 24 * 3600 * 1000
+      const planColors = { free: '#8a7e74', basico: '#22863a', pro: '#b85a30', full: '#c8963c', marketing: '#1565c0' }
+      const planColor = planColors[plan] || '#8a7e74'
 
       return `
-        <tr>
-          <td><strong>${r.name}</strong></td>
-          <td><span class="badge badge-${plan}">${plan.toUpperCase()}</span></td>
-          <td><span class="badge badge-${status}">${status}</span></td>
-          <td>${r.producer_id ? 'Asignado' : '-'}</td>
-          <td>${tanoUsed}</td>
-          <td>${lastActivity}</td>
+        <tr style="${isNew ? 'background:rgba(184,90,48,.04)' : ''}">
           <td>
-            <button class="action-btn" onclick="window.open('/panel.html?restaurant=${r.id}', '_blank')">Ver</button>
+            <div style="display:flex;align-items:center;gap:8px">
+              <strong>${r.name}</strong>
+              ${isNew ? '<span style="background:#fdf3ee;color:var(--terra);font-size:10px;font-weight:700;padding:2px 6px;border-radius:8px">NUEVO</span>' : ''}
+            </div>
+            <div style="font-size:11px;color:var(--muted);margin-top:2px">${r.city || '—'} · ${r.email || '—'}</div>
+          </td>
+          <td><span style="background:${planColor}20;color:${planColor};font-size:11px;font-weight:700;padding:3px 8px;border-radius:8px;white-space:nowrap">${plan.toUpperCase()}</span></td>
+          <td style="font-size:12px;color:var(--muted)">${createdAt}</td>
+          <td style="font-size:12px">${tanoUsed > 0 ? tanoUsed + ' msgs' : '—'}</td>
+          <td style="font-size:12px;color:var(--muted)">${lastActivity}</td>
+          <td>
+            <a href="/panel.html" onclick="localStorage.setItem('maestro_view_rest','${r.id}')" target="_blank" style="font-size:12px;color:var(--terra);text-decoration:none;font-weight:500">Ver panel →</a>
           </td>
         </tr>
       `
