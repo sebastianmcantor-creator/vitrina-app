@@ -1822,8 +1822,14 @@ input:checked + .toggle-slider:before {
             </div>
             <div class="form-field col-2">
               <label class="form-label">Sitio web propio <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
-              <input type="url" class="form-input" id="f-website" placeholder="https://www.tunegocio.com.ar">
-              <span class="form-hint">Generamos un botón en tu menú QR que enlaza a tu web. Próximamente: widget embebible.</span>
+              <div style="display:flex;gap:8px;align-items:center">
+                <input type="url" class="form-input" id="f-website" placeholder="https://www.tunegocio.com.ar" style="flex:1">
+                <button class="btn-secondary" onclick="analyzeWebsite()" id="btn-analyze-web" style="padding:8px 14px;font-size:13px;white-space:nowrap;flex-shrink:0">
+                  🔍 Analizar
+                </button>
+              </div>
+              <span class="form-hint">Vitrina analiza tu sitio para personalizar informes y detectar oportunidades. Detecta automáticamente Tienda Nube y MercadoLibre.</span>
+              <div id="website-analysis-result" style="display:none;margin-top:12px;padding:14px 16px;background:var(--cream2);border-radius:10px;border:1px solid var(--border);font-size:13.5px;line-height:1.6"></div>
             </div>
             <div class="form-field">
               <label class="form-label">Moneda</label>
@@ -3703,6 +3709,97 @@ window.saveRestaurant = async function () {
 // ─────────────────────────────────────────────
 // Imágenes — upload y preview
 // ─────────────────────────────────────────────
+// ─────────────────────────────────────────────
+// Análisis de sitio web
+// ─────────────────────────────────────────────
+window.analyzeWebsite = async function () {
+  const url = document.getElementById('f-website').value.trim()
+  if (!url) { showToast('Ingresá la URL de tu sitio web primero', 'error'); return }
+
+  const btn    = document.getElementById('btn-analyze-web')
+  const result = document.getElementById('website-analysis-result')
+
+  btn.textContent = '⏳ Analizando...'
+  btn.disabled    = true
+  result.style.display = 'none'
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/analyze-website', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ websiteUrl: url }),
+    })
+
+    if (!res.ok) throw new Error('Error del servidor')
+    const data = await res.json()
+
+    if (!data.ok) {
+      result.style.display = 'block'
+      result.innerHTML = '<span style="color:var(--muted)">No se pudo analizar el sitio. Verificá que la URL sea correcta y sea pública.</span>'
+      return
+    }
+
+    const a = data.analysis
+    let html = ''
+
+    // Badge plataforma detectada
+    if (data.isTiendaNube) {
+      html += '<div style="display:inline-block;background:#e8f4fd;color:#1565c0;font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px;margin-bottom:10px">🏪 Tienda Nube detectada</div> '
+    }
+    if (data.isMercadoLibre) {
+      html += '<div style="display:inline-block;background:#fff8e1;color:#f57f17;font-size:11px;font-weight:700;padding:3px 10px;border-radius:8px;margin-bottom:10px">🛒 MercadoLibre detectado</div> '
+    }
+
+    // Info extraída
+    if (a.business_name || a.description) {
+      html += '<div style="margin-bottom:8px">'
+      if (a.business_name) html += '<strong>' + escHtml(a.business_name) + '</strong> '
+      if (a.category) html += '<span style="color:var(--muted)">· ' + escHtml(a.category) + '</span>'
+      if (a.description) html += '<div style="color:var(--muted);margin-top:2px">' + escHtml(a.description) + '</div>'
+      html += '</div>'
+    }
+
+    const items = []
+    if (a.location) items.push('📍 ' + a.location)
+    if (a.phone) items.push('📞 ' + a.phone)
+    if (a.instagram) items.push('📸 @' + a.instagram.replace('@',''))
+    if (a.products_hint) items.push('📦 ' + a.products_hint)
+    if (a.tone) items.push('💬 Tono: ' + a.tone)
+
+    if (items.length) {
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">'
+      html += items.map(i => `<span style="background:white;border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:12px;color:var(--ink-soft)">${escHtml(i)}</span>`).join('')
+      html += '</div>'
+    }
+
+    // Sugerencias de Viti
+    if (a.suggestions?.length) {
+      html += '<div style="font-size:12px;font-weight:600;color:var(--terra);margin-bottom:4px">✦ Viti puede hacer por vos:</div>'
+      html += '<ul style="margin:0 0 0 14px;padding:0">'
+      html += a.suggestions.map(s => `<li style="font-size:12.5px;color:var(--ink-soft);margin-bottom:3px">${escHtml(s)}</li>`).join('')
+      html += '</ul>'
+    }
+
+    // Si es TN, sugerir conectar
+    if (data.isTiendaNube) {
+      html += '<div style="margin-top:10px;padding:8px 12px;background:#e8f4fd;border-radius:8px;font-size:12.5px;color:#1565c0">'
+      html += '💡 Conectá tu Tienda Nube desde "Mi Catálogo" para sincronizar todo el catálogo automáticamente sin cargar nada manualmente.'
+      html += '</div>'
+    }
+
+    result.style.display = 'block'
+    result.innerHTML = html
+
+    showToast('✅ Sitio analizado', 'success')
+  } catch (e) {
+    result.style.display = 'block'
+    result.innerHTML = '<span style="color:var(--muted)">Error: ' + escHtml(e.message) + '</span>'
+  } finally {
+    btn.textContent = '🔍 Analizar'
+    btn.disabled    = false
+  }
+}
+
 window.previewImgFromUrl = function (type, url) {
   const preview = document.getElementById(type + '-preview')
   const wrap = document.getElementById(type + '-preview-wrap')
