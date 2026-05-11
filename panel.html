@@ -1525,6 +1525,9 @@ input:checked + .toggle-slider:before {
       <button class="nav-item" data-section="historial" onclick="switchSection('historial', this)">
         <span class="nav-icon">📋</span> Historial
       </button>
+      <button class="nav-item" data-section="crm" onclick="switchSection('crm', this)">
+        <span class="nav-icon">👥</span> Clientes
+      </button>
 
       <button class="nav-item" data-section="catalogo" onclick="switchSection('catalogo', this)">
         <span class="nav-icon">🛒</span> Mi Catálogo
@@ -1942,6 +1945,23 @@ input:checked + .toggle-slider:before {
         </div>
         <div id="historial-body">
           <div style="padding:40px;text-align:center;color:var(--muted)">Cargando historial...</div>
+        </div>
+      </div>
+
+      <div id="section-crm" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">Clientes</div>
+          <div class="page-subtitle">Contactos y historial de pedidos de tus clientes.</div>
+        </div>
+        <div class="card">
+          <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+            <input type="text" id="crm-search" placeholder="Buscar por nombre o teléfono..."
+              class="form-input" style="flex:1;min-width:180px" oninput="filterCRM(this.value)">
+            <span id="crm-count" style="font-size:13px;color:var(--muted);white-space:nowrap"></span>
+          </div>
+          <div id="crm-body">
+            <div style="padding:40px;text-align:center;color:var(--muted)">Cargando clientes...</div>
+          </div>
         </div>
       </div>
 
@@ -3471,6 +3491,7 @@ window.switchSection = function (name, btn) {
   if (name === 'mesas')        loadMesas()
   if (name === 'pedidos')      loadPedidos()
   if (name === 'historial')    loadHistorial()
+  if (name === 'crm')          loadCRM()
   if (name === 'estadisticas') loadEstadisticas()
   if (name === 'analisis')     loadAnalisis()
   if (name === 'catalogo')     loadCatalogo()
@@ -6308,6 +6329,93 @@ window.removeStaffMember = async function (id) {
   } catch (e) { showToast('Error: ' + e.message, 'error') }
 }
 
+// ─────────────────────────────────────────────
+// CRM — Clientes
+// ─────────────────────────────────────────────
+let crmData = []
+
+window.loadCRM = async function () {
+  if (!currentRestaurant) return
+  document.getElementById('crm-body').innerHTML =
+    '<div style="padding:40px;text-align:center;color:var(--muted)">Cargando clientes...</div>'
+  try {
+    // Traer todos los pedidos con datos de cliente (90 días)
+    const data = await orders.listHistory(currentRestaurant.id, 90, 500)
+    // Agrupar por teléfono o nombre
+    const clienteMap = {}
+    data.forEach(o => {
+      const key = o.customer_phone || o.customer_name || ('anonimo-' + o.id.slice(-6))
+      if (!clienteMap[key]) {
+        clienteMap[key] = {
+          phone: o.customer_phone || null,
+          name: o.customer_name || null,
+          orders: [],
+          total: 0,
+          lastOrder: null,
+        }
+      }
+      clienteMap[key].orders.push(o)
+      clienteMap[key].total += Number(o.total || 0)
+      if (!clienteMap[key].lastOrder || o.created_at > clienteMap[key].lastOrder) {
+        clienteMap[key].lastOrder = o.created_at
+      }
+    })
+    // Convertir a array y ordenar por último pedido
+    crmData = Object.values(clienteMap)
+      .filter(c => c.phone || c.name) // solo con datos de contacto
+      .sort((a, b) => (b.lastOrder || '').localeCompare(a.lastOrder || ''))
+    document.getElementById('crm-count').textContent = crmData.length + ' clientes'
+    renderCRM(crmData)
+  } catch (e) {
+    document.getElementById('crm-body').innerHTML =
+      '<div style="padding:40px;text-align:center;color:var(--muted)">No hay datos todavía. Los clientes aparecen cuando hacen pedidos.</div>'
+  }
+}
+
+window.filterCRM = function (q) {
+  if (!q.trim()) { renderCRM(crmData); return }
+  const lq = q.toLowerCase()
+  renderCRM(crmData.filter(c =>
+    (c.name || '').toLowerCase().includes(lq) ||
+    (c.phone || '').includes(lq)
+  ))
+}
+
+function renderCRM(list) {
+  const fmt = n => '$' + Math.round(n).toLocaleString('es-AR')
+  if (!list.length) {
+    document.getElementById('crm-body').innerHTML =
+      '<div style="padding:40px;text-align:center;color:var(--muted)">Sin resultados.</div>'
+    return
+  }
+  document.getElementById('crm-body').innerHTML = `
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+        <thead>
+          <tr style="border-bottom:2px solid var(--border);text-align:left">
+            <th style="padding:8px 12px;color:var(--muted);font-weight:500">Cliente</th>
+            <th style="padding:8px 12px;color:var(--muted);font-weight:500">Teléfono</th>
+            <th style="padding:8px 12px;color:var(--muted);font-weight:500;text-align:right">Pedidos</th>
+            <th style="padding:8px 12px;color:var(--muted);font-weight:500;text-align:right">Total</th>
+            <th style="padding:8px 12px;color:var(--muted);font-weight:500">Último pedido</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map(c => `
+            <tr style="border-bottom:1px solid var(--border);transition:background .1s" onmouseover="this.style.background='var(--cream2)'" onmouseout="this.style.background=''">
+              <td style="padding:10px 12px;font-weight:500">${escHtml(c.name || '—')}</td>
+              <td style="padding:10px 12px;color:var(--muted)">
+                ${c.phone ? `<a href="https://wa.me/${c.phone.replace(/[^0-9]/g,'')}" target="_blank" style="color:var(--sage);text-decoration:none">📱 ${c.phone}</a>` : '—'}
+              </td>
+              <td style="padding:10px 12px;text-align:right">${c.orders.length}</td>
+              <td style="padding:10px 12px;text-align:right;font-weight:500;color:var(--terra)">${fmt(c.total)}</td>
+              <td style="padding:10px 12px;color:var(--muted)">${c.lastOrder ? new Date(c.lastOrder).toLocaleDateString('es-AR', {day:'2-digit',month:'short',year:'2-digit'}) : '—'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`
+}
+
 // ═══════════════════════════════════════════
 // HISTORIAL
 // ═══════════════════════════════════════════
@@ -6418,6 +6526,7 @@ function renderHistorial(data) {
             <div style="flex:1;min-width:0">
               <div style="font-size:14px;font-weight:500">
                 ${o.table_number != null ? 'Mesa ' + o.table_number : 'Sin mesa'}
+                ${o.customer_name ? `<span style="font-size:12px;color:var(--sage);font-weight:400;margin-left:6px">· ${escHtml(o.customer_name)}</span>` : ''}
                 <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:6px">
                   ${new Date(o.created_at).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}
                 </span>
