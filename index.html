@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Vitrina - Menú digital inteligente y estrategia de marketing para comercios, restaurantes y vendedores online. Tano, tu mozo IA, y análisis real de tu presencia online.">
-  <title>Vitrina - Menú Digital + Marketing para Restaurantes</title>
+  <title>Vitrina - Presencia digital para comercios, restaurantes y vendedores online</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1267,54 +1267,60 @@
           <span class="price-period">/mes</span>
         </div>
         <ul class="plan-features">
-          <li>Hasta 45 platos</li>
-          <li>Menú QR sin pedidos</li>
-          <li>Tano: 75 mensajes/mes</li>
-          <li>1 sucursal</li>
+          <li>Catálogo/menú QR</li>
+          <li>Hasta 45 productos</li>
+          <li>Asistente IA: 75 consultas/mes</li>
+          <li>Multiidioma (ES/EN/PT)</li>
         </ul>
         <button class="btn-plan" onclick="window.location.href='/panel.html'">Empezar gratis</button>
       </div>
 
-      <!-- Pro (Featured) -->
+      <!-- Solo Menú (Featured) -->
       <div class="price-card featured fade-in">
-        <h3 class="plan-name">Pro</h3>
-        <p class="plan-desc">Más popular</p>
+        <h3 class="plan-name">Solo Menú</h3>
+        <p class="plan-desc">Para empezar</p>
         <div>
-          <span class="price-amount price-value" data-mensual="31000" data-anual="24800">$31.000</span>
+          <span class="price-amount" id="landing-precio-menu">$38.286</span>
           <span class="price-period">/mes</span>
+          <div style="font-size:0.75rem;color:var(--brown-light);margin-top:2px">USD 27 · TC oficial</div>
         </div>
         <ul class="plan-features">
-          <li>Platos ilimitados</li>
-          <li>Pedidos online + pago</li>
-          <li>Pantalla de cocina</li>
-          <li>Tano ilimitado</li>
-          <li>1 sucursal</li>
-          <li>Fee 1% por transacción</li>
+          <li>Catálogo/menú QR ilimitado</li>
+          <li>Pedidos online + pagos MP</li>
+          <li>Pantalla de cocina en tiempo real</li>
+          <li>Asistente IA ilimitado</li>
+          <li>Fotos con IA incluidas</li>
+          <li>Sistema de reservas</li>
+          <li>WhatsApp operativo</li>
         </ul>
         <button class="btn-plan" onclick="window.location.href='/panel.html'">Probar 14 días gratis</button>
       </div>
 
-      <!-- Full -->
+      <!-- Marketing -->
       <div class="price-card fade-in">
-        <h3 class="plan-name">Full</h3>
-        <p class="plan-desc">Más restaurantes</p>
+        <h3 class="plan-name">Marketing</h3>
+        <p class="plan-desc">Crecimiento digital</p>
         <div>
-          <span class="price-amount price-value" data-mensual="49500" data-anual="39600">$49.500</span>
+          <span class="price-amount" id="landing-precio-mkt">$92.170</span>
           <span class="price-period">/mes</span>
+          <div style="font-size:0.75rem;color:var(--brown-light);margin-top:2px">USD 65 · TC oficial</div>
         </div>
         <ul class="plan-features">
-          <li>Todo de Pro</li>
-          <li>Hasta 3 sucursales</li>
-          <li>Fee 0.8% por transacción</li>
-          <li>Soporte prioritario</li>
-          <li>Integración personalizada</li>
+          <li>Todo de Solo Menú</li>
+          <li>MercadoLibre + Tienda Nube</li>
+          <li>Google Business + Instagram</li>
+          <li>30 publicaciones auto/mes</li>
+          <li>Viti: estrategia con IA</li>
+          <li>Análisis de competidores</li>
+          <li>Subtítulos automáticos (Whisper)</li>
+          <li>$10 USD crédito publicidad</li>
         </ul>
         <button class="btn-plan" onclick="window.location.href='/panel.html'">Probar 14 días gratis</button>
       </div>
     </div>
 
     <p style="text-align: center; margin-top: 2rem; color: var(--brown-light); font-size: 0.9rem;">
-      💡 Los precios se actualizan mensualmente según el tipo de cambio oficial.
+      💡 Precios en pesos al tipo de cambio oficial del Banco Nación. Se actualizan semanalmente. · <a href="/terms.html" style="color:var(--terra);text-decoration:none">Más info</a>
     </p>
   </section>
 
@@ -1588,6 +1594,21 @@
         price.textContent = '$' + (type === 'mensual' ? mensual : anual).toLocaleString('es-AR');
       });
     }
+
+    // Actualizar precios con tipo de cambio oficial en tiempo real
+    ;(async function updateLandingPrices() {
+      try {
+        const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio')
+        if (!res.ok) return
+        const data = await res.json()
+        const tc = data.oficial || 1418
+        const fmtARS = n => '$' + Math.round(n * tc).toLocaleString('es-AR')
+        const elMenu = document.getElementById('landing-precio-menu')
+        const elMkt  = document.getElementById('landing-precio-mkt')
+        if (elMenu) elMenu.textContent = fmtARS(27)
+        if (elMkt)  elMkt.textContent  = fmtARS(65)
+      } catch {}
+    })()
 
     // Waitlist form handler
     document.getElementById('waitlist-form')?.addEventListener('submit', async (e) => {
