@@ -1518,6 +1518,9 @@ input:checked + .toggle-slider:before {
       <button class="nav-item" data-section="mesas" onclick="switchSection('mesas', this)">
         <span class="nav-icon">🪑</span> Mesas
       </button>
+      <button class="nav-item" data-section="reservas" onclick="switchSection('reservas', this)">
+        <span class="nav-icon">📅</span> Reservas
+      </button>
       <button class="nav-item" data-section="pedidos" onclick="switchSection('pedidos', this)">
         <span class="nav-icon">🔔</span> Pedidos
         <span class="nav-badge" id="pedidos-badge" style="display:none">0</span>
@@ -1905,6 +1908,31 @@ input:checked + .toggle-slider:before {
           </div>
         </div>
       </div>
+
+      <div id="section-reservas" class="panel-section">
+  <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+    <div>
+      <div class="page-title">Reservas</div>
+      <div class="page-subtitle">Gestioná las reservas de mesas y turnos de tus clientes.</div>
+    </div>
+    <button class="btn-primary" onclick="openReservaModal()" style="flex-shrink:0;margin-top:4px">+ Nueva reserva</button>
+  </div>
+
+  <!-- Filtro de fecha -->
+  <div class="card" style="margin-bottom:0">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+      <button class="filter-btn active" data-rfilter="hoy" onclick="setReservasFilter('hoy',this)">Hoy</button>
+      <button class="filter-btn" data-rfilter="manana" onclick="setReservasFilter('manana',this)">Mañana</button>
+      <button class="filter-btn" data-rfilter="semana" onclick="setReservasFilter('semana',this)">Esta semana</button>
+      <button class="filter-btn" data-rfilter="todas" onclick="setReservasFilter('todas',this)">Todas</button>
+      <span id="reservas-count" style="margin-left:auto;font-size:13px;color:var(--muted)"></span>
+    </div>
+  </div>
+
+  <div id="reservas-body" style="margin-top:16px">
+    <div style="padding:40px;text-align:center;color:var(--muted)">Cargando reservas...</div>
+  </div>
+</div>
 
       <div id="section-pedidos" class="panel-section">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
@@ -3489,6 +3517,7 @@ window.switchSection = function (name, btn) {
   closeSidebar()
   if (name === 'menu')         loadMenu()
   if (name === 'mesas')        loadMesas()
+  if (name === 'reservas')     loadReservas()
   if (name === 'pedidos')      loadPedidos()
   if (name === 'historial')    loadHistorial()
   if (name === 'crm')          loadCRM()
@@ -6419,6 +6448,160 @@ function renderCRM(list) {
 // ═══════════════════════════════════════════
 // HISTORIAL
 // ═══════════════════════════════════════════
+// ─────────────────────────────────────────────
+// Reservas
+// ─────────────────────────────────────────────
+let reservasFilter = 'hoy'
+let editingReserva = null
+
+window.loadReservas = async function () {
+  if (!currentRestaurant) return
+  await renderReservas()
+}
+
+window.setReservasFilter = function (f, btn) {
+  reservasFilter = f
+  document.querySelectorAll('[data-rfilter]').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderReservas()
+}
+
+async function renderReservas() {
+  const body = document.getElementById('reservas-body')
+  body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">Cargando...</div>'
+  try {
+    const now = new Date()
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+    const todayEnd   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59).toISOString()
+    const tomorrow   = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    const tomorrowEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 23, 59, 59).toISOString()
+    const weekEnd    = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 7).toISOString()
+
+    let query = supabase.from('reservations')
+      .select('*')
+      .eq('restaurant_id', currentRestaurant.id)
+      .order('reserved_for', { ascending: true })
+
+    if (reservasFilter === 'hoy')    query = query.gte('reserved_for', todayStart).lte('reserved_for', todayEnd)
+    if (reservasFilter === 'manana') query = query.gte('reserved_for', tomorrow.toISOString()).lte('reserved_for', tomorrowEnd)
+    if (reservasFilter === 'semana') query = query.gte('reserved_for', todayStart).lte('reserved_for', weekEnd)
+
+    const { data, error } = await query
+    if (error) throw error
+
+    const reservas = data || []
+    document.getElementById('reservas-count').textContent = reservas.length + ' reserva' + (reservas.length !== 1 ? 's' : '')
+
+    if (!reservas.length) {
+      body.innerHTML = `
+        <div class="coming-soon" style="padding:40px 24px">
+          <div class="coming-soon-icon">📅</div>
+          <div class="coming-soon-label">Sin reservas${reservasFilter === 'hoy' ? ' hoy' : reservasFilter === 'manana' ? ' mañana' : ''}</div>
+          <div class="coming-soon-desc">Creá la primera con el botón "+ Nueva reserva".</div>
+        </div>`
+      return
+    }
+
+    const STATUS_LABELS = { confirmed: '✅ Confirmada', cancelled: '❌ Cancelada', completed: '✓ Completada', no_show: '🚫 No se presentó' }
+    const STATUS_COLORS = { confirmed: 'var(--sage)', cancelled: 'var(--bad)', completed: 'var(--muted)', no_show: 'var(--muted)' }
+
+    body.innerHTML = reservas.map(r => {
+      const dt = new Date(r.reserved_for)
+      const dateStr = dt.toLocaleDateString('es-AR', { weekday:'short', day:'2-digit', month:'short' })
+      const timeStr = dt.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' })
+      return `
+        <div style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:10px;background:var(--surface)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--ink)">${escHtml(r.customer_name)}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">
+                ${r.customer_phone ? `📱 ${r.customer_phone}` : ''} ${r.party_size} personas
+                ${r.table_number ? ` · Mesa ${r.table_number}` : ''}
+              </div>
+              ${r.notes ? `<div style="font-size:12px;color:var(--muted);margin-top:4px;font-style:italic">${escHtml(r.notes)}</div>` : ''}
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:14px;font-weight:600;color:var(--ink)">${dateStr} ${timeStr}</div>
+              <div style="font-size:11px;color:${STATUS_COLORS[r.status] || 'var(--muted)'};margin-top:4px">${STATUS_LABELS[r.status] || r.status}</div>
+            </div>
+          </div>
+          ${r.status === 'confirmed' ? `
+          <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+            <button onclick="updateReservaStatus('${r.id}','completed')" style="font-size:12px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--ink)">✓ Completada</button>
+            <button onclick="updateReservaStatus('${r.id}','no_show')" style="font-size:12px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--muted)">🚫 No se presentó</button>
+            <button onclick="updateReservaStatus('${r.id}','cancelled')" style="font-size:12px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--bad)">Cancelar</button>
+            ${r.customer_phone ? `<a href="https://wa.me/${r.customer_phone.replace(/[^0-9]/g,'')}" target="_blank" style="font-size:12px;padding:4px 10px;background:#25D36620;border:1px solid #25D36640;border-radius:8px;text-decoration:none;color:#128c7e">📱 WhatsApp</a>` : ''}
+          </div>` : ''}
+        </div>`
+    }).join('')
+  } catch (e) {
+    body.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">Error cargando reservas. Ejecutá la migration 013 en Supabase.</div>'
+  }
+}
+
+window.openReservaModal = function () {
+  editingReserva = null
+  document.getElementById('modal-reserva-title').textContent = 'Nueva reserva'
+  document.getElementById('reserva-nombre').value = ''
+  document.getElementById('reserva-telefono').value = ''
+  document.getElementById('reserva-email').value = ''
+  document.getElementById('reserva-notas').value = ''
+  document.getElementById('reserva-personas').value = '2'
+  document.getElementById('reserva-mesa').value = ''
+  // Default: mañana a las 20:00
+  const dt = new Date()
+  dt.setDate(dt.getDate() + 1)
+  dt.setHours(20, 0, 0, 0)
+  document.getElementById('reserva-datetime').value = dt.toISOString().slice(0, 16)
+  document.getElementById('modal-reserva').classList.add('open')
+  setTimeout(() => document.getElementById('reserva-nombre').focus(), 80)
+}
+
+window.saveReserva = async function () {
+  const nombre = document.getElementById('reserva-nombre').value.trim()
+  const datetime = document.getElementById('reserva-datetime').value
+  if (!nombre) { showToast('El nombre es obligatorio', 'error'); return }
+  if (!datetime) { showToast('La fecha y hora son obligatorias', 'error'); return }
+
+  const btn = document.getElementById('btn-save-reserva')
+  btn.disabled = true; btn.textContent = 'Guardando...'
+
+  try {
+    const payload = {
+      restaurant_id: currentRestaurant.id,
+      customer_name: nombre,
+      customer_phone: document.getElementById('reserva-telefono').value.trim() || null,
+      customer_email: document.getElementById('reserva-email').value.trim() || null,
+      party_size: parseInt(document.getElementById('reserva-personas').value) || 2,
+      reserved_for: new Date(datetime).toISOString(),
+      table_number: parseInt(document.getElementById('reserva-mesa').value) || null,
+      notes: document.getElementById('reserva-notas').value.trim() || null,
+      status: 'confirmed',
+    }
+
+    const { error } = await supabase.from('reservations').insert(payload)
+    if (error) throw error
+
+    closeModal('modal-reserva')
+    showToast('Reserva creada ✓', 'success')
+    renderReservas()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar reserva'
+  }
+}
+
+window.updateReservaStatus = async function (id, status) {
+  try {
+    const { error } = await supabase.from('reservations').update({ status }).eq('id', id)
+    if (error) throw error
+    renderReservas()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
+
 let historialData = []
 let historialDays = 30
 let historialQuery = ''
@@ -7031,5 +7214,51 @@ window.showToast = function (msg, type = 'default') {
   }
 })()
 </script>
+
+<!-- Modal nueva reserva -->
+<div class="modal-overlay" id="modal-reserva" onclick="if(event.target===this)closeModal('modal-reserva')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-reserva-title">Nueva reserva</div>
+      <button class="modal-close" onclick="closeModal('modal-reserva')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field col-2">
+          <label class="form-label">Nombre del cliente <span>*</span></label>
+          <input class="form-input" id="reserva-nombre" placeholder="Juan García">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Teléfono</label>
+          <input class="form-input" id="reserva-telefono" placeholder="+54 11 1234-5678" type="tel">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="reserva-email" placeholder="juan@email.com" type="email">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Fecha y hora <span>*</span></label>
+          <input class="form-input" id="reserva-datetime" type="datetime-local">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Personas</label>
+          <input class="form-input" id="reserva-personas" type="number" min="1" max="50" value="2">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Mesa (opcional)</label>
+          <input class="form-input" id="reserva-mesa" type="number" min="1" placeholder="Nº mesa">
+        </div>
+        <div class="form-field col-2">
+          <label class="form-label">Notas</label>
+          <textarea class="form-textarea" id="reserva-notas" placeholder="Ocasión especial, alergias, preferencias..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-reserva')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-reserva" onclick="saveReserva()">Guardar reserva</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
