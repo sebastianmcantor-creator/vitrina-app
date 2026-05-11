@@ -763,6 +763,12 @@ html, body {
 }
 .biz-type-btn:active { transform: translateY(0); }
 
+/* WhatsApp option card en setup */
+.setup-wa-card:hover { border-color: var(--terra); background: var(--cream2); }
+.setup-wa-card.active { border-color: #25D366; background: #f0fff4; }
+.setup-wa-card.active #setup-wa-toggle { background: #25D366; }
+.setup-wa-card.active #setup-wa-toggle div { transform: translateX(16px); }
+
 /* ══ Menu editor ══ */
 .coming-soon, .menu-empty {
   text-align: center; padding: 60px 24px; display: flex; flex-direction: column;
@@ -1678,8 +1684,35 @@ input:checked + .toggle-slider:before {
                   <label class="form-label">Teléfono</label>
                   <input type="text" class="form-input" id="setup-phone" placeholder="+54 11 1234-5678">
                 </div>
+                <div class="form-field">
+                  <label class="form-label">Sitio web actual <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+                  <input type="url" class="form-input" id="setup-website" placeholder="https://www.tulocal.com.ar">
+                  <span class="form-hint">Si tenés web propia, generamos un botón para vincularla con tu catálogo de Vitrina.</span>
+                </div>
               </div>
-              <div class="actions" style="margin-top:24px;gap:10px">
+
+              <!-- WhatsApp Business option -->
+              <div id="setup-wa-option" style="margin-top:16px;border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s"
+                onclick="toggleSetupWA()" class="setup-wa-card">
+                <div style="display:flex;align-items:flex-start;gap:12px">
+                  <div style="font-size:24px;flex-shrink:0">📱</div>
+                  <div style="flex:1">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+                      <div style="font-size:14px;font-weight:600;color:var(--ink)" id="setup-wa-title">Agregar número de WhatsApp Business</div>
+                      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                        <span style="font-size:11px;font-weight:600;color:var(--terra)">+$12 USD/mes</span>
+                        <div id="setup-wa-toggle" style="width:36px;height:20px;border-radius:20px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0">
+                          <div style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:white;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="font-size:12.5px;color:var(--muted);line-height:1.5" id="setup-wa-desc">Un número con el nombre de tu negocio para que los clientes te escriban directamente.</div>
+                  </div>
+                </div>
+              </div>
+              <div id="setup-wa-enabled" style="display:none;margin-top:8px;padding:10px 14px;background:var(--terra-pale);border-radius:10px;font-size:13px;color:var(--terra-dark);line-height:1.5" id="setup-wa-note"></div>
+
+              <div class="actions" style="margin-top:20px;gap:10px">
                 <button class="btn-secondary" onclick="backToTypeSelector()" style="flex-shrink:0">← Cambiar rubro</button>
                 <button class="btn-primary" style="flex:1" id="btn-create-rest" onclick="createRestaurant()">
                   Crear mi negocio
@@ -1786,6 +1819,11 @@ input:checked + .toggle-slider:before {
             <div class="form-field">
               <label class="form-label">Ciudad</label>
               <input type="text" class="form-input" id="f-city" placeholder="Buenos Aires">
+            </div>
+            <div class="form-field col-2">
+              <label class="form-label">Sitio web propio <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+              <input type="url" class="form-input" id="f-website" placeholder="https://www.tunegocio.com.ar">
+              <span class="form-hint">Generamos un botón en tu menú QR que enlaza a tu web. Próximamente: widget embebible.</span>
             </div>
             <div class="form-field">
               <label class="form-label">Moneda</label>
@@ -3163,8 +3201,9 @@ function fillForm(rest) {
   updateQuickLinks(rest.slug)
   renderOpeningHours(rest.opening_hours)
   // Imágenes
-  document.getElementById('f-logo-url').value  = rest.logo_url  || ''
-  document.getElementById('f-cover-url').value = rest.cover_url || ''
+  document.getElementById('f-logo-url').value  = rest.logo_url   || ''
+  document.getElementById('f-cover-url').value = rest.cover_url  || ''
+  document.getElementById('f-website').value   = rest.website_url || ''
   previewImgFromUrl('logo',  rest.logo_url  || '')
   previewImgFromUrl('cover', rest.cover_url || '')
 }
@@ -3435,6 +3474,9 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'casa-lucia',
     btnText: 'Crear mi restaurante',
     successMsg: '¡Restaurante creado! 🎉',
+    waTitle: 'Agregar WhatsApp Business para reservas',
+    waDesc: 'Un número con el nombre de tu restaurante. Los clientes reservan, preguntan horarios y reciben recordatorios automáticos.',
+    waNote: '✓ Reservas automáticas · ✓ Confirmaciones por WA · ✓ Recordatorios 24hs antes · ✓ Respuestas a consultas de horario y menú',
   },
   local: {
     icon: '🏪',
@@ -3445,6 +3487,9 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'ferreteria-lopez',
     btnText: 'Crear mi local',
     successMsg: '¡Local creado! 🎉',
+    waTitle: 'Agregar WhatsApp Business como asistente de ventas',
+    waDesc: 'Un número con el nombre de tu local. Los clientes escriben desde Instagram, Google o tu vitrina — el asistente responde y vende 24/7.',
+    waNote: '✓ Responde stock y precios · ✓ Genera links de pago · ✓ Gestiona consultas 24/7 · ✓ CRM de clientes automático',
   },
   services: {
     icon: '💆',
@@ -3455,6 +3500,9 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'peluqueria-mia',
     btnText: 'Crear mi negocio',
     successMsg: '¡Negocio creado! 🎉',
+    waTitle: 'Agregar WhatsApp Business para turnos',
+    waDesc: 'Un número con el nombre de tu negocio. Los clientes reservan turno por WhatsApp y reciben recordatorio automático.',
+    waNote: '✓ Agenda turnos automáticamente · ✓ Recordatorios al cliente · ✓ Gestión de cancelaciones · ✓ Respuestas a consultas',
   },
   ecommerce: {
     icon: '📦',
@@ -3465,11 +3513,17 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'mi-tienda',
     btnText: 'Crear mi tienda',
     successMsg: '¡Tienda creada! 🎉',
+    waTitle: 'Agregar WhatsApp Business como vendedor automático',
+    waDesc: 'Un número con tu marca. Los compradores preguntan por WhatsApp y el asistente responde, cotiza y genera el link de pago.',
+    waNote: '✓ Responde consultas de productos · ✓ Cotiza y genera link de pago · ✓ Seguimiento de pedidos · ✓ 24/7 sin intervención',
   },
 }
 
+let setupWAEnabled = false
+
 window.selectBusinessType = function (type) {
   selectedBusinessType = type
+  setupWAEnabled = false
   const cfg = BIZ_CONFIG[type]
 
   document.getElementById('setup-biz-icon').textContent = cfg.icon
@@ -3480,9 +3534,34 @@ window.selectBusinessType = function (type) {
   document.getElementById('setup-slug').placeholder = cfg.slugPlaceholder
   document.getElementById('btn-create-rest').textContent = cfg.btnText
 
+  // Adaptar card de WhatsApp al rubro
+  document.getElementById('setup-wa-title').textContent = cfg.waTitle
+  document.getElementById('setup-wa-desc').textContent = cfg.waDesc
+
+  // Reset WA toggle
+  const card = document.getElementById('setup-wa-option')
+  card.classList.remove('active')
+  document.getElementById('setup-wa-enabled').style.display = 'none'
+
   document.getElementById('setup-step-type').style.display = 'none'
   document.getElementById('setup-step-form').style.display = 'flex'
   setTimeout(() => document.getElementById('setup-name').focus(), 80)
+}
+
+window.toggleSetupWA = function () {
+  setupWAEnabled = !setupWAEnabled
+  const card = document.getElementById('setup-wa-option')
+  const noteEl = document.getElementById('setup-wa-enabled')
+  const cfg = BIZ_CONFIG[selectedBusinessType]
+
+  card.classList.toggle('active', setupWAEnabled)
+
+  if (setupWAEnabled) {
+    noteEl.style.display = 'block'
+    noteEl.textContent = cfg.waNote
+  } else {
+    noteEl.style.display = 'none'
+  }
 }
 
 window.backToTypeSelector = function () {
@@ -3491,11 +3570,12 @@ window.backToTypeSelector = function () {
 }
 
 window.createRestaurant = async function () {
-  const name  = document.getElementById('setup-name').value.trim()
-  const slug  = document.getElementById('setup-slug').value.trim()
-  const city  = document.getElementById('setup-city').value.trim()
-  const phone = document.getElementById('setup-phone').value.trim()
-  const cfg   = BIZ_CONFIG[selectedBusinessType]
+  const name    = document.getElementById('setup-name').value.trim()
+  const slug    = document.getElementById('setup-slug').value.trim()
+  const city    = document.getElementById('setup-city').value.trim()
+  const phone   = document.getElementById('setup-phone').value.trim()
+  const website = document.getElementById('setup-website').value.trim() || null
+  const cfg     = BIZ_CONFIG[selectedBusinessType]
 
   if (!name || !slug) {
     showToast('El nombre y la URL son obligatorios.', 'error')
@@ -3524,6 +3604,8 @@ window.createRestaurant = async function () {
       name, slug, city, phone,
       owner_id: currentUser.id,
       business_type: selectedBusinessType,
+      website_url: website,
+      wants_whatsapp: setupWAEnabled,
     })
 
     restaurantList.push(currentRestaurant)
@@ -3534,6 +3616,9 @@ window.createRestaurant = async function () {
     if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
     initPedidosBadge()
     showToast(cfg.successMsg, 'success')
+    if (setupWAEnabled) {
+      setTimeout(() => showToast('📱 WhatsApp Business: te contactaremos para configurar tu número dedicado.', 'success'), 1800)
+    }
   } catch (e) {
     showToast('Error al crear: ' + e.message, 'error')
     btn.disabled = false
@@ -3586,8 +3671,9 @@ window.saveRestaurant = async function () {
       primary_color: document.getElementById('f-color').value,
       is_open:       document.getElementById('f-is-open').checked,
       is_active:     document.getElementById('f-is-active').checked,
-      logo_url:      document.getElementById('f-logo-url').value.trim() || null,
+      logo_url:      document.getElementById('f-logo-url').value.trim()  || null,
       cover_url:     document.getElementById('f-cover-url').value.trim() || null,
+      website_url:   document.getElementById('f-website').value.trim()   || null,
     }
 
     currentRestaurant = await restaurants.update(currentRestaurant.id, updates)
