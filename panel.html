@@ -743,6 +743,26 @@ html, body {
   margin-top: -12px;
 }
 
+/* Botones selector de tipo de negocio */
+.biz-type-btn {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--ink);
+}
+.biz-type-btn:hover {
+  border-color: var(--terra);
+  box-shadow: 0 6px 20px rgba(184,90,48,.12);
+  transform: translateY(-2px);
+  background: var(--cream2);
+}
+.biz-type-btn:active { transform: translateY(0); }
+
 /* ══ Menu editor ══ */
 .coming-soon, .menu-empty {
   text-align: center; padding: 60px 24px; display: flex; flex-direction: column;
@@ -1594,22 +1614,58 @@ input:checked + .toggle-slider:before {
 
       <!-- ══ PANTALLA: sin restaurante ══ -->
       <div id="section-setup" class="panel-section active">
-        <div class="setup-screen">
-          <div class="setup-icon">🏪</div>
-          <div class="setup-title">Creá tu restaurante</div>
-          <div class="setup-subtitle">Completá la información básica para empezar a gestionar tu menú y pedidos.</div>
+
+        <!-- PASO 1: Selector de tipo de negocio -->
+        <div id="setup-step-type" class="setup-screen">
+          <div class="setup-icon">🪟</div>
+          <div class="setup-title">¿Qué tipo de negocio tenés?</div>
+          <div class="setup-subtitle">Elegí tu rubro para que Vitrina se adapte a lo que necesitás.</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px;margin-top:8px">
+
+            <button onclick="selectBusinessType('restaurant')" class="biz-type-btn">
+              <span style="font-size:32px;margin-bottom:8px;display:block">🍽️</span>
+              <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Restaurante / Bar</span>
+              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Menú QR, pedidos, cocina, reservas y Tano como asistente</span>
+            </button>
+
+            <button onclick="selectBusinessType('local')" class="biz-type-btn">
+              <span style="font-size:32px;margin-bottom:8px;display:block">🏪</span>
+              <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Local / Comercio</span>
+              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Catálogo QR, MercadoLibre, Tienda Nube y asistente de ventas</span>
+            </button>
+
+            <button onclick="selectBusinessType('services')" class="biz-type-btn">
+              <span style="font-size:32px;margin-bottom:8px;display:block">💆</span>
+              <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Servicios / Turnos</span>
+              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Peluquería, estética, salud, profesionales — agenda y reservas</span>
+            </button>
+
+            <button onclick="selectBusinessType('ecommerce')" class="biz-type-btn">
+              <span style="font-size:32px;margin-bottom:8px;display:block">📦</span>
+              <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Vendedor online</span>
+              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">MercadoLibre y Tienda Nube — Viti gestiona publicaciones y preguntas</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- PASO 2: Formulario adaptado al rubro -->
+        <div id="setup-step-form" class="setup-screen" style="display:none">
+          <div class="setup-icon" id="setup-biz-icon">🏪</div>
+          <div class="setup-title" id="setup-biz-title">Creá tu negocio</div>
+          <div class="setup-subtitle" id="setup-biz-subtitle">Completá la información básica para empezar.</div>
           <div style="width:100%; max-width:480px">
             <div class="card" style="text-align:left">
               <div class="form-grid full">
                 <div class="form-field">
-                  <label class="form-label">Nombre del restaurante <span>*</span></label>
-                  <input type="text" class="form-input" id="setup-name" placeholder="Casa Lucía" oninput="autoSlug()">
+                  <label class="form-label" id="setup-name-label">Nombre del negocio <span>*</span></label>
+                  <input type="text" class="form-input" id="setup-name" placeholder="Mi negocio" oninput="autoSlug()">
                 </div>
                 <div class="form-field">
                   <label class="form-label">URL pública <span>*</span></label>
                   <div class="slug-preview">
                     <span class="slug-prefix">vitrinaapp.com.ar/</span>
-                    <input type="text" class="slug-input" id="setup-slug" placeholder="casa-lucia" oninput="checkSlug()">
+                    <input type="text" class="slug-input" id="setup-slug" placeholder="mi-negocio" oninput="checkSlug()">
                     <span class="slug-status" id="setup-slug-status"></span>
                   </div>
                   <span class="form-hint">Solo letras minúsculas, números y guiones.</span>
@@ -1623,14 +1679,16 @@ input:checked + .toggle-slider:before {
                   <input type="text" class="form-input" id="setup-phone" placeholder="+54 11 1234-5678">
                 </div>
               </div>
-              <div class="actions" style="margin-top:24px">
-                <button class="btn-primary" style="width:100%" id="btn-create-rest" onclick="createRestaurant()">
-                  Crear restaurante
+              <div class="actions" style="margin-top:24px;gap:10px">
+                <button class="btn-secondary" onclick="backToTypeSelector()" style="flex-shrink:0">← Cambiar rubro</button>
+                <button class="btn-primary" style="flex:1" id="btn-create-rest" onclick="createRestaurant()">
+                  Crear mi negocio
                 </button>
               </div>
             </div>
           </div>
         </div>
+
       </div>
 
       <!-- ══ SECCIÓN: Información ══ -->
@@ -3364,11 +3422,80 @@ window.showNewRestaurantSetup = function () {
 // ─────────────────────────────────────────────
 // Crear restaurante (setup)
 // ─────────────────────────────────────────────
+// ── Selector de tipo de negocio ────────────────
+let selectedBusinessType = 'restaurant'
+
+const BIZ_CONFIG = {
+  restaurant: {
+    icon: '🍽️',
+    title: 'Creá tu restaurante',
+    subtitle: 'Completá la información básica para gestionar tu menú, pedidos y reservas.',
+    nameLabel: 'Nombre del restaurante',
+    namePlaceholder: 'Casa Lucía',
+    slugPlaceholder: 'casa-lucia',
+    btnText: 'Crear mi restaurante',
+    successMsg: '¡Restaurante creado! 🎉',
+  },
+  local: {
+    icon: '🏪',
+    title: 'Creá tu local',
+    subtitle: 'Completá la información básica para gestionar tu catálogo, ventas y clientes.',
+    nameLabel: 'Nombre del local',
+    namePlaceholder: 'Ferretería López',
+    slugPlaceholder: 'ferreteria-lopez',
+    btnText: 'Crear mi local',
+    successMsg: '¡Local creado! 🎉',
+  },
+  services: {
+    icon: '💆',
+    title: 'Creá tu negocio de servicios',
+    subtitle: 'Completá la información básica para gestionar tu agenda, turnos y clientes.',
+    nameLabel: 'Nombre del negocio',
+    namePlaceholder: 'Peluquería Mía',
+    slugPlaceholder: 'peluqueria-mia',
+    btnText: 'Crear mi negocio',
+    successMsg: '¡Negocio creado! 🎉',
+  },
+  ecommerce: {
+    icon: '📦',
+    title: 'Creá tu tienda online',
+    subtitle: 'Completá la información básica para gestionar MercadoLibre, Tienda Nube y ventas.',
+    nameLabel: 'Nombre de tu tienda',
+    namePlaceholder: 'Mi Tienda Online',
+    slugPlaceholder: 'mi-tienda',
+    btnText: 'Crear mi tienda',
+    successMsg: '¡Tienda creada! 🎉',
+  },
+}
+
+window.selectBusinessType = function (type) {
+  selectedBusinessType = type
+  const cfg = BIZ_CONFIG[type]
+
+  document.getElementById('setup-biz-icon').textContent = cfg.icon
+  document.getElementById('setup-biz-title').textContent = cfg.title
+  document.getElementById('setup-biz-subtitle').textContent = cfg.subtitle
+  document.getElementById('setup-name-label').innerHTML = cfg.nameLabel + ' <span>*</span>'
+  document.getElementById('setup-name').placeholder = cfg.namePlaceholder
+  document.getElementById('setup-slug').placeholder = cfg.slugPlaceholder
+  document.getElementById('btn-create-rest').textContent = cfg.btnText
+
+  document.getElementById('setup-step-type').style.display = 'none'
+  document.getElementById('setup-step-form').style.display = 'flex'
+  setTimeout(() => document.getElementById('setup-name').focus(), 80)
+}
+
+window.backToTypeSelector = function () {
+  document.getElementById('setup-step-form').style.display = 'none'
+  document.getElementById('setup-step-type').style.display = 'flex'
+}
+
 window.createRestaurant = async function () {
-  const name = document.getElementById('setup-name').value.trim()
-  const slug = document.getElementById('setup-slug').value.trim()
-  const city = document.getElementById('setup-city').value.trim()
+  const name  = document.getElementById('setup-name').value.trim()
+  const slug  = document.getElementById('setup-slug').value.trim()
+  const city  = document.getElementById('setup-city').value.trim()
   const phone = document.getElementById('setup-phone').value.trim()
+  const cfg   = BIZ_CONFIG[selectedBusinessType]
 
   if (!name || !slug) {
     showToast('El nombre y la URL son obligatorios.', 'error')
@@ -3389,13 +3516,14 @@ window.createRestaurant = async function () {
     if (!available) {
       showToast('Esa URL ya está en uso. Elegí otra.', 'error')
       btn.disabled = false
-      btn.textContent = 'Crear restaurante'
+      btn.textContent = cfg.btnText
       return
     }
 
     currentRestaurant = await restaurants.create({
       name, slug, city, phone,
       owner_id: currentUser.id,
+      business_type: selectedBusinessType,
     })
 
     restaurantList.push(currentRestaurant)
@@ -3405,11 +3533,11 @@ window.createRestaurant = async function () {
     showSection('info')
     if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
     initPedidosBadge()
-    showToast('¡Restaurante creado! 🎉', 'success')
+    showToast(cfg.successMsg, 'success')
   } catch (e) {
     showToast('Error al crear: ' + e.message, 'error')
     btn.disabled = false
-    btn.textContent = 'Crear restaurante'
+    btn.textContent = cfg.btnText
   }
 }
 
