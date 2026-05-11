@@ -44,16 +44,13 @@
       gap: 16px; padding: 24px;
     }
 
-    .pedido-card {
-      background: #1a1a1a; border: 1px solid #2a2a2a;
-      border-radius: 14px; overflow: hidden;
-      animation: slideIn 0.3s ease;
-    }
+    .pedido-card { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 14px; overflow: hidden; animation: slideIn 0.3s ease; transition: border-color 0.2s; }
+    .pedido-card:hover:not(.status-ready) { border-color: #3a3a3a; }
+    .pedido-card.status-ready { border-color: #1a4a2a; opacity: 0.6; }
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(12px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    .pedido-card.status-ready { border-color: #1a4a2a; opacity: 0.6; }
 
     .pedido-header {
       background: #222; padding: 12px 16px;
@@ -74,15 +71,12 @@
     .item-name-cocina { flex: 1; }
 
     .pedido-footer { padding: 12px 16px; border-top: 1px solid #2a2a2a; display: flex; gap: 8px; }
-    .estado-btn {
-      flex: 1; border: none; border-radius: 10px; padding: 10px;
-      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
-      cursor: pointer; transition: opacity 0.15s;
-    }
-    .estado-btn.pending, .estado-btn.confirmed { background: #c8a84a; color: #0f0f0f; }
-    .estado-btn.preparing { background: #2255cc; color: white; }
-    .estado-btn.ready { background: #22aa44; color: white; }
-    .estado-btn:active { opacity: 0.8; }
+    .estado-btn { flex: 1; border: none; border-radius: 10px; padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+    .estado-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
+    .estado-btn:active:not(:disabled) { transform: translateY(0); }
+    .estado-btn.pending, .estado-btn.confirmed { background: #c8a84a; color: #0f0f0f; box-shadow: 0 2px 8px rgba(200,168,74,0.3); }
+    .estado-btn.preparing { background: #2255cc; color: white; box-shadow: 0 2px 8px rgba(34,85,204,0.3); }
+    .estado-btn.ready { background: #22aa44; color: white; box-shadow: 0 2px 8px rgba(34,170,68,0.3); }
     .estado-btn:disabled { opacity: 0.4; cursor: default; }
 
     .estado-badge { font-size: 11px; padding: 3px 8px; border-radius: 8px; font-weight: 500; }
@@ -148,11 +142,7 @@
       border-radius: 16px; overflow: hidden;
       display: flex; flex-direction: column; gap: 0;
     }
-    .mesa-group-header {
-      background: #1e1e1e; padding: 12px 18px;
-      display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid #2a2a2a;
-    }
+    .mesa-group-header { background: linear-gradient(135deg, #1e1e1e 0%, #242424 100%); padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2a2a; }
     .mesa-group-title { font-size: 18px; font-weight: 700; color: #f0f0f0; }
     .mesa-group-meta { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #888; }
     .mesa-order-count {

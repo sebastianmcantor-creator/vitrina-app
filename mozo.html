@@ -23,9 +23,10 @@
     .messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; scrollbar-width: none; }
     .messages::-webkit-scrollbar { display: none; }
 
-    .msg { max-width: 82%; font-size: 14px; line-height: 1.55; }
+    .msg { max-width: 82%; font-size: 14px; line-height: 1.55; animation: msgIn 0.25s ease backwards; }
     .msg.bot { align-self: flex-start; }
     .msg.user { align-self: flex-end; }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
     .msg-bubble { padding: 10px 14px; border-radius: 18px; }
     .msg.bot .msg-bubble { background: #2a2010; color: #d4b97a; border-bottom-left-radius: 4px; border: 0.5px solid #3a2e1a; }
     .msg.user .msg-bubble { background: #c8a84a; color: #1a1208; border-bottom-right-radius: 4px; font-weight: 500; }
@@ -45,7 +46,8 @@
     .error-msg { font-size: 12px; color: #8a5a3a; text-align: center; padding: 4px 16px; display: none; flex-shrink: 0; }
 
     .input-area { padding: 10px 14px 24px; display: flex; gap: 8px; align-items: center; border-top: 0.5px solid #2e2410; flex-shrink: 0; }
-    .chat-input { flex: 1; background: #2a2010; border: 0.5px solid #4a3820; border-radius: 22px; padding: 10px 16px; color: #e8c87a; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; -webkit-appearance: none; }
+    .chat-input { flex: 1; background: #2a2010; border: 0.5px solid #4a3820; border-radius: 22px; padding: 10px 16px; color: #e8c87a; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; -webkit-appearance: none; transition: border-color 0.2s; }
+    .chat-input:focus { border-color: #c8a84a; }
     .chat-input::placeholder { color: #5a4a2a; }
     .send-btn { width: 40px; height: 40px; border-radius: 50%; background: #c8a84a; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
     .send-btn:hover { background: #e8c87a; }
@@ -104,6 +106,7 @@
 
     <div class="messages" id="messages">
       <div class="msg typing" id="typing">
+        <div class="msg-label" style="opacity:0.6">Tano está escribiendo</div>
         <div class="msg-bubble">
           <div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
@@ -447,10 +450,11 @@
       const typing = document.getElementById('typing')
       const div = document.createElement('div')
       div.className = 'msg ' + (role === 'user' ? 'user' : 'bot')
+      const timeStr = new Date().toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
       if (role === 'assistant') {
-        div.innerHTML = '<div class="msg-label">Asistente</div><div class="msg-bubble">' + text.replace(/\n/g, '<br>') + '</div>'
+        div.innerHTML = '<div class="msg-label">Asistente</div><div class="msg-bubble">' + text.replace(/\n/g, '<br>') + '</div><div style="font-size:10px;color:#3a2e18;padding:2px 4px;margin-top:2px">' + timeStr + '</div>'
       } else {
-        div.innerHTML = '<div class="msg-bubble">' + text + '</div>'
+        div.innerHTML = '<div class="msg-bubble">' + text + '</div><div style="font-size:10px;color:rgba(26,18,8,.5);padding:2px 4px;margin-top:2px;text-align:right">' + timeStr + '</div>'
       }
       messages.insertBefore(div, typing)
       messages.scrollTop = messages.scrollHeight
