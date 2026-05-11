@@ -917,56 +917,151 @@
     <div class="centered">
       <span class="section-eyebrow">Precios transparentes</span>
       <h2 class="section-title">Sin comisiones. Sin permanencia.</h2>
-      <p class="section-sub">
-        Precio fijo mensual en pesos al tipo de cambio oficial del Banco Nación. Cancelás cuando querés desde el panel.
+      <p class="section-sub" style="margin-bottom:32px">
+        Precio fijo mensual en pesos al tipo de cambio oficial del Banco Nación.<br>
+        14 días de prueba completa en todos los planes, sin tarjeta.
       </p>
     </div>
 
-    <p style="text-align:center;margin-bottom:32px;font-size:15px;color:var(--ink-soft)">
-      Todos los planes incluyen <strong>14 días de prueba completa</strong>, sin tarjeta de crédito.
-    </p>
-
-    <div class="pricing-grid">
-      <!-- Solo Menú -->
-      <div class="plan-card featured fade">
-        <div class="plan-popular">Más elegido</div>
-        <div class="plan-name">Solo Menú</div>
-        <div class="plan-desc">Para restaurantes y comercios</div>
-        <div class="plan-price"><span id="p-menu">$38.286</span></div>
-        <div class="plan-tc">USD 27 · TC oficial hoy · <a id="p-menu-link" href="#precios" style="color:var(--terra);text-decoration:none;font-size:11px">¿Qué es esto?</a></div>
-        <ul class="plan-features">
-          <li>Todo gratis +</li>
-          <li>Catálogo/menú ilimitado</li>
-          <li>Pedidos online + MercadoPago</li>
-          <li>Pantalla de cocina en tiempo real</li>
-          <li>Sistema de reservas</li>
-          <li>Fotos con IA</li>
-          <li>WhatsApp canal operativo</li>
-        </ul>
-        <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
-      </div>
-
-      <!-- Marketing -->
-      <div class="plan-card fade">
-        <div class="plan-name">Marketing</div>
-        <div class="plan-desc">Con IA de ventas y redes</div>
-        <div class="plan-price"><span id="p-mkt">$92.170</span></div>
-        <div class="plan-tc">USD 65 · TC oficial hoy</div>
-        <ul class="plan-features">
-          <li>Todo Solo Menú +</li>
-          <li>MercadoLibre + Tienda Nube</li>
-          <li>Viti: estrategia IA ilimitada</li>
-          <li>30 publicaciones auto/mes</li>
-          <li>Google Business + Instagram</li>
-          <li>Análisis de competidores</li>
-          <li>$10 USD crédito publicidad</li>
-        </ul>
-        <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+    <!-- Tabs por tipo de negocio -->
+    <div style="display:flex;justify-content:center;margin-bottom:36px">
+      <div style="display:inline-flex;background:var(--white);border:1px solid var(--border);border-radius:14px;padding:4px;gap:4px">
+        <button id="tab-rest" onclick="showPricing('rest')"
+          style="padding:9px 22px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;background:var(--terra);color:white">
+          🍽️ Restaurantes
+        </button>
+        <button id="tab-local" onclick="showPricing('local')"
+          style="padding:9px 22px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;background:none;color:var(--muted)">
+          🏪 Comercios y vendedores
+        </button>
       </div>
     </div>
 
-    <p style="text-align:center;margin-top:24px;font-size:13px;color:var(--muted)">
-      ¿Necesitás número de WhatsApp Business propio? Se agrega +$12 USD/mes a cualquier plan. <a href="#whatsapp" style="color:var(--terra)">Más info →</a>
+    <!-- RESTAURANTES -->
+    <div id="pricing-rest">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:900px;margin:0 auto">
+
+        <!-- Solo Menú -->
+        <div class="plan-card">
+          <div class="plan-name">Solo Menú</div>
+          <div class="plan-desc">Menú QR, pedidos, cocina y reservas</div>
+          <div class="plan-price"><span class="p-rest-menu">$38.286</span></div>
+          <div class="plan-tc">USD 27 · TC oficial hoy</div>
+          <ul class="plan-features">
+            <li>Menú QR ilimitado — ES/EN/PT</li>
+            <li>Tano atiende consultas del menú</li>
+            <li>Pedidos online + MercadoPago</li>
+            <li>Pantalla de cocina en tiempo real</li>
+            <li>Sistema de reservas de mesas</li>
+            <li>Fotos de platos con IA</li>
+            <li>WhatsApp canal operativo/cocina</li>
+          </ul>
+          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        </div>
+
+        <!-- Menú + WA -->
+        <div class="plan-card featured" style="position:relative">
+          <div class="plan-popular">Más elegido</div>
+          <div class="plan-name">Menú + WhatsApp</div>
+          <div class="plan-desc">Todo Solo Menú + número WA Business propio</div>
+          <div class="plan-price"><span class="p-rest-wa">$55.302</span></div>
+          <div class="plan-tc">USD 39 · TC oficial hoy</div>
+          <ul class="plan-features">
+            <li>Todo Solo Menú +</li>
+            <li>Número WhatsApp Business con tu nombre</li>
+            <li>Reservas automáticas por WhatsApp</li>
+            <li>Confirmaciones y recordatorios al cliente</li>
+            <li>Asistente responde consultas de horarios y menú</li>
+          </ul>
+          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        </div>
+
+        <!-- Marketing -->
+        <div class="plan-card">
+          <div class="plan-name">Marketing</div>
+          <div class="plan-desc">Todo Solo Menú + presencia digital con IA</div>
+          <div class="plan-price"><span class="p-rest-mkt">$92.170</span></div>
+          <div class="plan-tc">USD 65 · TC oficial hoy</div>
+          <ul class="plan-features">
+            <li>Todo Solo Menú +</li>
+            <li>Viti: estrategia mensual con IA</li>
+            <li>30 publicaciones automáticas/mes</li>
+            <li>Google Business + Instagram + Facebook</li>
+            <li>Análisis de 5 competidores cercanos</li>
+            <li>$10 USD crédito publicidad de bienvenida</li>
+            <li>Informe PDF mensual profesional</li>
+          </ul>
+          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        </div>
+
+        <!-- Marketing + WA -->
+        <div class="plan-card">
+          <div class="plan-name">Marketing + WhatsApp</div>
+          <div class="plan-desc">Todo Marketing + número WA Business propio</div>
+          <div class="plan-price"><span class="p-rest-mktwa">$110.604</span></div>
+          <div class="plan-tc">USD 78 · TC oficial hoy</div>
+          <ul class="plan-features">
+            <li>Todo Marketing +</li>
+            <li>Número WhatsApp Business con tu nombre</li>
+            <li>Reservas + consultas automáticas 24/7</li>
+            <li>Campañas promocionales a tu base de clientes</li>
+          </ul>
+          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- COMERCIOS Y VENDEDORES -->
+    <div id="pricing-local" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:720px;margin:0 auto">
+
+        <!-- Marketing -->
+        <div class="plan-card featured" style="position:relative">
+          <div class="plan-popular">Más elegido</div>
+          <div class="plan-name">Marketing</div>
+          <div class="plan-desc">Catálogo, ML, TN, redes y IA de ventas</div>
+          <div class="plan-price"><span class="p-local-mkt">$92.170</span></div>
+          <div class="plan-tc">USD 65 · TC oficial hoy</div>
+          <ul class="plan-features">
+            <li>Catálogo QR ilimitado</li>
+            <li>MercadoLibre: publicaciones, preguntas, stock</li>
+            <li>Tienda Nube: sincronización bidireccional</li>
+            <li>Viti: estrategia y análisis de competidores ML</li>
+            <li>30 publicaciones automáticas/mes en redes</li>
+            <li>Google Business + Instagram</li>
+            <li>Fotos con IA (80/mes)</li>
+            <li>$10 USD crédito publicidad de bienvenida</li>
+          </ul>
+          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        </div>
+
+        <!-- Marketing + WA -->
+        <div class="plan-card">
+          <div class="plan-name">Marketing + WhatsApp</div>
+          <div class="plan-desc">Todo Marketing + vendedor IA en WhatsApp</div>
+          <div class="plan-price"><span class="p-local-mktwa">$110.604</span></div>
+          <div class="plan-tc">USD 78 · TC oficial hoy</div>
+          <ul class="plan-features">
+            <li>Todo Marketing +</li>
+            <li>Número WhatsApp Business con tu nombre</li>
+            <li>Asistente responde consultas de stock y precios 24/7</li>
+            <li>Cierra ventas y genera links de pago automáticamente</li>
+            <li>Gestión de turnos para servicios</li>
+            <li>CRM: historial de cada cliente</li>
+            <li>50 mensajes promocionales/mes</li>
+          </ul>
+          <a href="/panel.html" class="plan-cta">Probar 14 días gratis</a>
+        </div>
+
+      </div>
+      <p style="text-align:center;margin-top:20px;font-size:13px;color:var(--muted)">
+        El plan Marketing para comercios incluye MercadoLibre y Tienda Nube. No hay plan "solo catálogo" — sin presencia digital integrada el catálogo QR no genera suficiente valor.
+      </p>
+    </div>
+
+    <p style="text-align:center;margin-top:28px;font-size:13px;color:var(--muted)">
+      Precios en pesos al tipo de cambio oficial del Banco Nación, actualizados semanalmente. · <a href="/terms.html" style="color:var(--terra)">Ver términos →</a>
     </p>
   </div>
 </section>
@@ -1216,6 +1311,19 @@ function addChatMsg(role, text) {
   return bubble
 }
 
+// ── Tabs de precios ───────────────────────────────
+function showPricing(type) {
+  const isRest = type === 'rest'
+  document.getElementById('pricing-rest').style.display  = isRest ? 'block' : 'none'
+  document.getElementById('pricing-local').style.display = isRest ? 'none' : 'block'
+  const tabRest  = document.getElementById('tab-rest')
+  const tabLocal = document.getElementById('tab-local')
+  tabRest.style.background  = isRest ? 'var(--terra)' : 'none'
+  tabRest.style.color       = isRest ? 'white' : 'var(--muted)'
+  tabLocal.style.background = isRest ? 'none' : 'var(--terra)'
+  tabLocal.style.color      = isRest ? 'var(--muted)' : 'white'
+}
+
 // ── Precios dinámicos ─────────────────────────────
 ;(async function updatePrices() {
   try {
@@ -1224,10 +1332,14 @@ function addChatMsg(role, text) {
     const d = await res.json()
     const tc = d.oficial || 1418
     const fmt = usd => '$' + Math.round(usd * tc).toLocaleString('es-AR')
-    const m = document.getElementById('p-menu')
-    const k = document.getElementById('p-mkt')
-    if (m) m.textContent = fmt(27)
-    if (k) k.textContent = fmt(65)
+    // Restaurantes
+    document.querySelectorAll('.p-rest-menu').forEach(el => el.textContent = fmt(27))
+    document.querySelectorAll('.p-rest-wa').forEach(el => el.textContent = fmt(39))
+    document.querySelectorAll('.p-rest-mkt').forEach(el => el.textContent = fmt(65))
+    document.querySelectorAll('.p-rest-mktwa').forEach(el => el.textContent = fmt(78))
+    // Comercios
+    document.querySelectorAll('.p-local-mkt').forEach(el => el.textContent = fmt(65))
+    document.querySelectorAll('.p-local-mktwa').forEach(el => el.textContent = fmt(78))
   } catch {}
 })()
 </script>
