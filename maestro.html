@@ -25,7 +25,9 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/* Ocultar todo hasta que el auth valide — sin flash */
 body {
+  visibility: hidden;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: var(--white);
   color: var(--ink);
@@ -540,10 +542,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (!isAdmin) {
-      alert('No tenés acceso a este panel.')
       window.location.href = '/panel.html'
       return
     }
+
+    // Auth OK — mostrar el panel
+    document.body.style.visibility = 'visible'
 
     await loadDashboardData()
   } catch (e) {
