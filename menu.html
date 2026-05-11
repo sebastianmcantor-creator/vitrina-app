@@ -88,7 +88,7 @@
 
     .cart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: none; }
     .cart-overlay.open { display: block; }
-    .cart-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 201; max-height: 80vh; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s ease; padding: 0 0 32px; }
+    .cart-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 24px 24px 0 0; z-index: 201; max-height: 80vh; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.34, 1.1, 0.64, 1); padding: 0 0 32px; box-shadow: 0 -8px 32px rgba(0,0,0,0.12); }
     .cart-drawer.open { transform: translateY(0); }
     .cart-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 12px auto 0; }
     .cart-header { padding: 16px 20px 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
@@ -565,6 +565,24 @@
       cart[id] = (cart[id] || 0) + 1
       renderCtrl(id)
       updateCartCount()
+      // Animate cart badge
+      const badge = document.getElementById('cart-count')
+      if (badge) {
+        badge.style.transform = 'scale(1.4)'
+        badge.style.transition = 'transform 0.15s'
+        setTimeout(() => { badge.style.transform = 'scale(1)' }, 150)
+      }
+      // Flash visual en el card
+      const key = id.replace(/-/g, '_')
+      const ctrl = document.getElementById('ctrl-' + key)
+      if (ctrl) {
+        const card = ctrl.closest('.item-card')
+        if (card) {
+          card.style.transition = 'background 0.2s'
+          card.style.background = 'color-mix(in srgb, var(--accent) 8%, var(--surface))'
+          setTimeout(() => { card.style.background = '' }, 300)
+        }
+      }
       if (document.getElementById('cart-drawer').classList.contains('open')) renderCartItems()
     }
 
@@ -619,7 +637,13 @@
           + '<div class="cart-item-price">$' + sub.toLocaleString('es-AR') + '</div>'
           + '</div>'
       }).join('')
-      document.getElementById('cart-total').textContent = '$' + total.toLocaleString('es-AR')
+      const totalEl = document.getElementById('cart-total')
+      if (totalEl) {
+        totalEl.textContent = '$' + total.toLocaleString('es-AR')
+        totalEl.style.transition = 'color 0.2s'
+        totalEl.style.color = 'var(--accent)'
+        setTimeout(() => { totalEl.style.color = '' }, 400)
+      }
       footer.style.display = 'block'
     }
 
