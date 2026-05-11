@@ -67,6 +67,70 @@ privacy.html              OK — Política de Privacidad (incluye sección Insta
 terms.html                OK — Términos y Condiciones (incluye tipo de cambio, servicios variables)
 oauth-callback.html       OK — Maneja callbacks OAuth de ML, TN y Google
 
+## Features completadas (sesión 10/05 + 11/05/2026)
+
+### Panel admin (panel.html)
+- Platos destacados ⭐ con sección en menú público
+- QR del menú y asistente generados automáticamente
+- Sección "🛒 Mi Catálogo" con conexión ML y TN
+- Upload logo y portada a Supabase Storage
+- Fotos de platos con IA (Cloudflare AI, gratis)
+- Subtítulos automáticos de video con Whisper
+- Sección "📅 Reservas" con modal completo y CRUD
+- Sección "👥 Clientes (CRM)" desde datos de pedidos
+- Getting Started checklist 7 pasos
+- Gráfico ventas por franja horaria
+- Viti conoce integraciones activas ML/TN/Google
+- Geocoding real para buscar competidores
+- OAuth redirect handling (ML, TN)
+
+### Menú público (menu.html)
+- Sección "⭐ Destacados" al tope
+- Checkout con resumen previo + nombre del cliente
+- Botón "Confirmar por WhatsApp" post-pedido
+- Notificación audio + push cuando pedido listo
+- Portada y logo del restaurante en el header
+- Scroll spy con sección featured
+- Permiso de notificaciones al primer pedido
+
+### Cocina (cocina.html)
+- Filtros: Activos / Pendientes / Preparando / Listos
+- Tiempo transcurrido con color de urgencia
+- "✓ Todo listo" por mesa
+- Nombre del cliente en cada pedido
+
+### Asistente Tano (mozo.html)
+- Multiidioma ES/EN/PT con auto-detección
+- 3 tonos (cálido, neutro, sofisticado)
+- Botón 🔄 nueva sesión (expiración 4h)
+- Tano conoce platos destacados
+- Botón "⭐ Destacados" en sugerencias
+- "Llamar al mozo" tras 3 mensajes
+
+### Landing (index.html)
+- Expandida a todos los rubros (no solo restaurantes)
+- 12 chips de rubros disponibles
+- Planes actualizados: Free / Solo Menú / Marketing
+- Precios ARS dinámicos vía worker
+- FAQ de ML/TN
+- Título y meta corregidos
+
+### Worker (vitrina-tano)
+- 15 secrets configurados y funcionando
+- GET /api/health — estado de todos los servicios
+- GET /api/geocode — geocodificación real de direcciones
+- GET /api/ml/auth + /api/ml/callback — OAuth ML
+- GET /api/tn/auth + /api/tn/callback — OAuth TN
+- POST /api/whisper/transcribe — Whisper OpenAI
+- POST /api/cf-ai/generate-image — fotos con Cloudflare AI
+- POST /api/cf-ai/enhance-image — mejora de fotos
+
+## Migrations pendientes de correr en Supabase SQL Editor
+
+011: ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_name TEXT;
+012: ALTER TABLE integrations ADD COLUMN IF NOT EXISTS ml_user_id TEXT, ADD COLUMN IF NOT EXISTS tn_user_id TEXT;
+013: CREATE TABLE IF NOT EXISTS reservations (...) — ver archivo migrations/013_reservations.sql
+
 ---
 
 ## Cron jobs activos en Cloudflare
