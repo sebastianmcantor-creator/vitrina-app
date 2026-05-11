@@ -4931,10 +4931,16 @@ window.findCompetitors = async function () {
   btn.disabled = true
 
   try {
-    // Geocodificar la dirección (simplificado - en producción usar Google Geocoding API)
-    // Por ahora usar coordenadas mock de Buenos Aires
-    const lat = -34.6037
-    const lng = -58.3816
+    // Geocodificar la dirección del restaurante con Google Geocoding API (vía worker)
+    const fullAddress = [currentRestaurant.address, currentRestaurant.city, 'Argentina'].filter(Boolean).join(', ')
+    const geoRes = await fetch(
+      `https://vitrina-tano.vitrinaapp.workers.dev/api/geocode?address=${encodeURIComponent(fullAddress)}`
+    )
+    let lat = -34.6037, lng = -58.3816 // fallback Buenos Aires
+    if (geoRes.ok) {
+      const geoData = await geoRes.json()
+      if (geoData.lat && geoData.lng) { lat = geoData.lat; lng = geoData.lng }
+    }
 
     const res = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/places/nearby-competitors?lat=${lat}&lng=${lng}`)
     if (!res.ok) throw new Error('Error buscando competidores')
@@ -6221,12 +6227,13 @@ function renderGettingStarted() {
   const totalMenuItems = Object.values(menuItemsMap || {}).flat().length
 
   const steps = [
-    { label: 'Restaurante creado',                  done: true },
+    { label: 'Negocio creado ✓',                    done: true },
     { label: 'Descripción o tagline cargados',      done: !!(r.tagline || r.description), action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
     { label: 'Logo o foto de portada subidos',      done: !!(r.logo_url || r.cover_url),  action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
-    { label: 'Primer plato del menú agregado',      done: totalMenuItems > 0,             action: () => switchSection('menu',  document.querySelector('[data-section="menu"]'))  },
-    { label: 'Mesa con QR creada',                  done: mesasList.length > 0,           action: () => switchSection('mesas', document.querySelector('[data-section="mesas"]')) },
-    { label: 'WhatsApp de notificaciones guardado', done: !!(r.whatsapp_operativo),       action: () => switchSection('config',document.querySelector('[data-section="config"]'))},
+    { label: 'Primer plato o producto agregado',    done: totalMenuItems > 0,             action: () => switchSection('menu',  document.querySelector('[data-section="menu"]'))  },
+    { label: 'Mesa o QR generado',                  done: mesasList.length > 0,           action: () => switchSection('mesas', document.querySelector('[data-section="mesas"]')) },
+    { label: 'WhatsApp operativo configurado',      done: !!(r.whatsapp_operativo),       action: () => switchSection('config',document.querySelector('[data-section="config"]'))},
+    { label: 'Horarios de apertura cargados',       done: !!(r.opening_hours),            action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
   ]
 
   const doneCount  = steps.filter(s => s.done).length
@@ -6976,23 +6983,31 @@ function buildVitiSystemPrompt() {
       + (s.avgOrderValue ? `  - Ticket promedio: $${Number(s.avgOrderValue).toLocaleString('es-AR')} ARS` : '')
   }
 
-  return `Sos Viti, la asistente de marketing e inteligencia de negocios de Vitrina.
-Estás hablando con el dueño o administrador de "${r.name}"${r.city ? ', ubicado en ' + r.city : ''}.
+  // Integraciones activas
+  const hasML = vitiContext?.hasML || false
+  const hasTN = vitiContext?.hasTN || false
+  const hasGoogle = vitiContext?.hasGoogle || false
+  const hasInstagram = vitiContext?.hasInstagram || false
 
-DATOS DEL RESTAURANTE:
-- Plan actual: ${plan}
+  return `Sos Viti, la asistente estratégica de Vitrina para el negocio "${r.name}"${r.city ? ' (' + r.city + ')' : ''}.
+
+DATOS DEL NEGOCIO:
+- Plan: ${plan}
 - Moneda: ${r.currency || 'ARS'}
 ${r.address ? '- Dirección: ' + r.address : ''}
+${r.tagline ? '- Tagline: ' + r.tagline : ''}
+- Horarios configurados: ${r.opening_hours ? 'Sí' : 'No'}
+- Integraciones activas: ${[hasML&&'MercadoLibre', hasTN&&'Tienda Nube', hasGoogle&&'Google Business', hasInstagram&&'Instagram'].filter(Boolean).join(', ') || 'Ninguna por ahora'}
 ${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}
 
 TU ROL:
-- Asesorás al dueño sobre estrategia de marketing, gestión del menú, precios, análisis competitivo y tendencias gastronómicas.
-- Respondés preguntas sobre cómo mejorar la presencia digital, qué platos destacar, cómo manejar las redes sociales.
-- Usás todos los datos disponibles del restaurante para dar consejos específicos y concretos.
-- Si los datos muestran tendencias claras (precios que subieron y bajaron ventas, platos estrellas, etc.) los mencionás proactivamente.
-- Solo respondés sobre temas relacionados con el restaurante y su negocio.
-- Tono profesional pero cercano. Sin jerga de marketing vacía.
-- Respuestas directas y accionables. Máximo 4-5 párrafos.`
+- Asesorás al dueño sobre estrategia digital, marketing, gestión de catálogo/menú, precios y análisis competitivo.
+- Para negocios con ML/TN: analizás precios vs competencia, sugerís descripciones optimizadas, alertás sobre stock crítico.
+- Para restaurantes: estrategia de menú, platos destacados, horarios pico, análisis de competidores.
+- Conocés todas las features de Vitrina: reservas, CRM de clientes, fotos con IA, subtítulos Whisper, publicaciones en redes, análisis Google Places.
+- Usás todos los datos disponibles para dar consejos específicos. Si hay tendencias claras, las mencionás.
+- Solo respondés sobre el negocio y Vitrina. Fuera de ese contexto: "Eso está fuera de lo que puedo ayudarte."
+- Tono profesional pero directo. Sin jerga vacía. Máximo 4-5 párrafos por respuesta.`
 }
 
 function buildVitiMenuSummary() {
@@ -7079,6 +7094,16 @@ async function loadVitiContext() {
       }
     }
   } catch {}
+
+  // Integraciones activas
+  try {
+    const { integrations } = await import('./lib/db.js')
+    const ints = await integrations.listByRestaurant(restId)
+    ctx.hasML       = ints.some(i => i.provider === 'mercadolibre' && i.status === 'active')
+    ctx.hasTN       = ints.some(i => i.provider === 'tiendanube'   && i.status === 'active')
+    ctx.hasGoogle   = ints.some(i => i.provider === 'google_business' && i.status === 'active')
+    ctx.hasInstagram = ints.some(i => i.provider === 'instagram'   && i.status === 'active')
+  } catch { ctx.hasML = ctx.hasTN = ctx.hasGoogle = ctx.hasInstagram = false }
 
   vitiContext = ctx
 }
