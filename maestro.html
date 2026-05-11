@@ -525,8 +525,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     currentUser = await requireAuth('/login.html')
 
-    // Solo Sebastián puede acceder
-    if (currentUser.email !== 'sebastianmcantor@gmail.com') {
+    // Verificar admin via worker (server-side, más seguro)
+    const adminCheck = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/admin/verify?email=${encodeURIComponent(currentUser.email)}`)
+    const adminData = await adminCheck.json()
+
+    if (!adminData.isAdmin) {
       alert('No tenés acceso a este panel.')
       window.location.href = '/panel.html'
       return
@@ -572,7 +575,9 @@ async function loadDashboardData() {
 
 async function calculateDashboardMetrics(periodMonth) {
   // Esta función calcula todas las métricas desde cero
-  const allRestaurants = await restaurants.list()
+  const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
+  const adminData = await adminRes.json()
+  const allRestaurants = adminData.restaurants || []
   const activeRestaurants = allRestaurants.filter(r => r.subscription_status === 'active')
 
   const clientsByPlan = {
@@ -744,7 +749,9 @@ async function renderClients() {
   tbody.innerHTML = '<tr><td colspan="7" class="loading">Cargando clientes...</td></tr>'
 
   try {
-    const allRestaurants = await restaurants.list()
+    const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
+    const adminData = await adminRes.json()
+    const allRestaurants = adminData.restaurants || []
 
     if (allRestaurants.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No hay clientes todavía</td></tr>'
