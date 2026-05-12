@@ -2300,6 +2300,7 @@ input:checked + .toggle-slider:before {
               <button class="stats-period-btn active" data-days="7" onclick="setStatsPeriod(7)">7 días</button>
               <button class="stats-period-btn" data-days="30" onclick="setStatsPeriod(30)">30 días</button>
               <button class="stats-period-btn" data-days="90" onclick="setStatsPeriod(90)">3 meses</button>
+              <button class="stats-period-btn" data-days="0" onclick="setStatsPeriod(0)">Este mes</button>
             </div>
             <button id="btn-export-csv" onclick="exportStatsCSV()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;color:var(--muted);cursor:pointer">⬇ CSV</button>
             <button class="btn-secondary" onclick="enviarResumenDiario()" style="font-size:13px;padding:7px 14px">
@@ -8591,6 +8592,7 @@ window.setStatsPeriod = async function (days) {
   await window.loadEstadisticas()
 }
 
+
 window.enviarResumenDiario = async function () {
   if (!currentRestaurant) return
   if (!currentRestaurant.whatsapp_gestion) {
@@ -8615,7 +8617,13 @@ window.loadEstadisticas = async function () {
   document.getElementById('stats-body').innerHTML =
     '<div style="padding:40px;text-align:center;color:var(--muted)">Cargando estadísticas...</div>'
   try {
-    statsData = await orders.getStats(currentRestaurant.id, statsPeriod)
+    let sinceOverride = null
+    if (statsPeriod === 0) {
+      // Este mes calendario
+      const now = new Date()
+      sinceOverride = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+    }
+    statsData = await orders.getStats(currentRestaurant.id, statsPeriod, sinceOverride)
     renderStats(statsData)
   } catch (e) {
     showToast('Error cargando estadísticas: ' + e.message, 'error')
@@ -8639,7 +8647,7 @@ window.exportStatsCSV = function () {
   const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
-  a.download = `${currentRestaurant.name}_pedidos_${statsPeriod}d.csv`
+  a.download = `${currentRestaurant.name}_pedidos_${statsPeriod === 0 ? 'este-mes' : statsPeriod + 'd'}.csv`
   a.click()
 }
 
@@ -8684,6 +8692,7 @@ window.generarInformeMensual = async function () {
     resultEl.innerHTML = `
       <div style="background:var(--cream2);border-radius:10px;padding:20px;font-size:14px;line-height:1.8;color:var(--ink);white-space:pre-wrap;margin-bottom:12px">${escHtml(text)}</div>
       <button class="btn-secondary" onclick="copiarInforme()" style="font-size:13px">📋 Copiar texto</button>
+      <button class="btn-secondary" onclick="descargarInforme()" style="font-size:13px;padding:5px 12px;margin-left:6px">⬇️ Descargar</button>
       <script>window._informeText = ${JSON.stringify(text)}<\/script>`
 
   } catch (e) {
@@ -8699,6 +8708,18 @@ window.copiarInforme = function () {
   if (window._informeText) {
     navigator.clipboard.writeText(window._informeText).then(() => showToast('Informe copiado ✓', 'success'))
   }
+}
+
+window.descargarInforme = function () {
+  if (!window._informeText) return
+  const mes = new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+  const content = `INFORME MENSUAL — ${currentRestaurant?.name}\n${mes}\n\n${window._informeText}\n\nGenerado por Vitrina — vitrinaapp.com.ar`
+  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `informe-${mes.replace(' ', '-')}-${currentRestaurant?.slug || 'negocio'}.txt`
+  a.click()
+  showToast('Informe descargado ✓', 'success')
 }
 
 window.exportMenuCSV = function () {
@@ -8784,8 +8805,11 @@ function renderStats(data) {
     : null
 
   // Bar chart — agrupa por día o semana según período
-  const barCount = statsPeriod <= 14 ? statsPeriod : Math.ceil(statsPeriod / 7)
-  const isWeekly = statsPeriod > 14
+  const effectivePeriod = statsPeriod === 0
+    ? new Date().getDate() // días transcurridos en el mes actual
+    : statsPeriod
+  const barCount = effectivePeriod <= 14 ? effectivePeriod : Math.ceil(effectivePeriod / 7)
+  const isWeekly = effectivePeriod > 14
   const days = []
   for (let i = barCount - 1; i >= 0; i--) {
     const d = new Date()
@@ -8845,12 +8869,12 @@ function renderStats(data) {
       <div class="stat-card">
         <div class="stat-icon">📅</div>
         <div class="stat-value">${data.length}</div>
-        <div class="stat-label">Pedidos (${statsPeriod} días)</div>
+        <div class="stat-label">Pedidos (${statsPeriod === 0 ? 'este mes' : statsPeriod + ' días'})</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">💵</div>
         <div class="stat-value">${fmt(totalPer)}</div>
-        <div class="stat-label">Ingresos (${statsPeriod} días)</div>
+        <div class="stat-label">Ingresos (${statsPeriod === 0 ? 'este mes' : statsPeriod + ' días'})</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">🎯</div>
@@ -8871,6 +8895,15 @@ function renderStats(data) {
         <div class="stat-value">${escHtml(topMesa[0])}</div>
         <div class="stat-label">${topMesa[1]} pedidos · más activa</div>
       </div>` : ''}
+      ${(() => {
+        const activeDays = new Set(data.map(o => o.created_at.slice(0, 10))).size
+        const avgPerDay = activeDays > 0 ? Math.round(data.length / activeDays) : 0
+        return `<div class="stat-card">
+          <div class="stat-icon">📆</div>
+          <div class="stat-value">${avgPerDay}</div>
+          <div class="stat-label">Pedidos/día activo</div>
+        </div>`
+      })()}
     </div>
 
     <div class="chart-card">
@@ -8909,7 +8942,7 @@ function renderStats(data) {
 
     ${top5.length ? `
     <div class="card">
-      <div class="card-title">⭐ Top platos (${statsPeriod} días)</div>
+      <div class="card-title">⭐ Top platos (${statsPeriod === 0 ? 'este mes' : statsPeriod + ' días'})</div>
       <div class="top-list">
         ${top5.map(([name, qty], i) => `
           <div class="top-item-row">
