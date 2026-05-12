@@ -4006,6 +4006,13 @@ window.createRestaurant = async function () {
       trial_end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     })
 
+    // Setear trial_end en el worker (que tiene service key)
+    fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/restaurants/set-trial', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id }),
+    }).catch(() => {})
+
     restaurantList.push(currentRestaurant)
     renderSidebarRestaurant(currentRestaurant)
     renderRestSwitcher()
