@@ -52,6 +52,10 @@
     }
   }
   </script>
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'><rect x='0' y='18' width='18' height='2.5' rx='1.2' fill='%23B85A30'/><rect x='0' y='8' width='2.5' height='12' rx='1.2' fill='%23B85A30'/><rect x='15.5' y='8' width='2.5' height='12' rx='1.2' fill='%23B85A30'/><path d='M2.5 8 Q9 1 15.5 8' stroke='%23B85A30' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'><rect fill='%23FAF7F2' width='18' height='22'/><rect x='0' y='18' width='18' height='2.5' rx='1.2' fill='%23B85A30'/><rect x='0' y='8' width='2.5' height='12' rx='1.2' fill='%23B85A30'/><rect x='15.5' y='8' width='2.5' height='12' rx='1.2' fill='%23B85A30'/><path d='M2.5 8 Q9 1 15.5 8' stroke='%23B85A30' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -619,7 +623,7 @@
 
     <a href="/panel.html" class="nav-cta">Empezar gratis →</a>
 
-    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menú">
+    <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Abrir menú de navegación">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -1463,7 +1467,11 @@ let chatOpen = false
 function toggleChat() {
   chatOpen = !chatOpen
   document.getElementById('chat-panel').classList.toggle('open', chatOpen)
-  if (chatOpen) setTimeout(() => document.getElementById('chat-input').focus(), 100)
+  if (chatOpen) {
+    const notif = document.querySelector('.chat-notif')
+    if (notif) notif.remove()
+    setTimeout(() => document.getElementById('chat-input').focus(), 100)
+  }
 }
 
 async function sendChat() {
@@ -1486,6 +1494,17 @@ async function sendChat() {
     const reply = data.message || 'Disculpá, no pude responder.'
     typingEl.textContent = reply
     chatHistory.push({ role: 'assistant', content: reply })
+    // Si el chat está cerrado, mostrar badge
+    if (!chatOpen) {
+      const fab = document.getElementById('chat-fab')
+      if (fab && !fab.querySelector('.chat-notif')) {
+        const badge = document.createElement('span')
+        badge.className = 'chat-notif'
+        badge.style.cssText = 'position:absolute;top:-4px;right:-4px;width:12px;height:12px;background:#B85A30;border-radius:50%;border:2px solid var(--cream)'
+        fab.style.position = 'relative'
+        fab.appendChild(badge)
+      }
+    }
   } catch {
     typingEl.textContent = 'Ocurrió un error. Escribinos a contacto@vitrinaapp.com.ar'
   }
