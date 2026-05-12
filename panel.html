@@ -1510,6 +1510,9 @@ input:checked + .toggle-slider:before {
       <button class="nav-item" data-section="reservas" onclick="switchSection('reservas', this)">
         <span class="nav-icon">📅</span> Reservas
       </button>
+      <button class="nav-item" data-section="agenda" onclick="switchSection('agenda', this)">
+        <span class="nav-icon">🗓️</span> Agenda
+      </button>
       <button class="nav-item" data-section="pedidos" onclick="switchSection('pedidos', this)">
         <span class="nav-icon">🔔</span> Pedidos
         <span class="nav-badge" id="pedidos-badge" style="display:none">0</span>
@@ -2039,6 +2042,84 @@ input:checked + .toggle-slider:before {
 
   <div id="reservas-body" style="margin-top:16px">
     <div style="padding:40px;text-align:center;color:var(--muted)">Cargando reservas...</div>
+  </div>
+</div>
+
+<div id="section-agenda" class="panel-section">
+  <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+    <div>
+      <div class="page-title">Agenda y Turnos</div>
+      <div class="page-subtitle">Gestioná los turnos de tu negocio. Tus clientes reservan por WhatsApp, vos ves todo acá.</div>
+    </div>
+    <button class="btn-primary" onclick="openNewAppointment()" style="flex-shrink:0;margin-top:4px" id="btn-new-appt">+ Nuevo turno</button>
+  </div>
+
+  <!-- Setup inicial si no está configurado -->
+  <div id="agenda-setup-card" style="display:none">
+    <div class="card" style="background:linear-gradient(135deg,var(--terra-pale),var(--cream2));border:1px solid var(--terra)">
+      <div style="font-size:28px;margin-bottom:12px">🗓️</div>
+      <div style="font-size:18px;font-weight:600;margin-bottom:8px;font-family:'Cormorant Garamond',serif">Configurá tu agenda</div>
+      <p style="font-size:14px;color:var(--ink-soft);margin-bottom:20px;line-height:1.6">
+        Antes de empezar, contanos cómo funciona tu servicio para que la agenda se adapte perfectamente.
+      </p>
+      <button class="btn-primary" onclick="startAgendaSetup()" style="font-size:14px">Configurar ahora →</button>
+    </div>
+  </div>
+
+  <!-- Vista de agenda (se muestra cuando está configurada) -->
+  <div id="agenda-main" style="display:none">
+    <!-- Navegación de fecha -->
+    <div class="card" style="margin-bottom:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button onclick="agendaNavDate(-1)" style="background:var(--cream2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:16px">‹</button>
+          <div style="font-size:15px;font-weight:600;color:var(--ink)" id="agenda-date-label">Hoy</div>
+          <button onclick="agendaNavDate(1)" style="background:var(--cream2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:16px">›</button>
+          <button onclick="agendaGoToday()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:13px;color:var(--muted)">Hoy</button>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button onclick="setAgendaView('day')" id="agenda-view-day" class="btn-secondary" style="font-size:12px;padding:5px 12px">Día</button>
+          <button onclick="setAgendaView('week')" id="agenda-view-week" class="btn-secondary" style="font-size:12px;padding:5px 12px">Semana</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grilla de turnos del día -->
+    <div id="agenda-grid" style="margin-top:16px;min-height:200px">
+      <div style="padding:40px;text-align:center;color:var(--muted)">Cargando agenda...</div>
+    </div>
+  </div>
+
+  <!-- Config de servicios y profesionales (tab secundario) -->
+  <div id="agenda-config-view" style="display:none;margin-top:16px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <!-- Servicios -->
+      <div class="card">
+        <div class="card-title" style="display:flex;justify-content:space-between">
+          <span>✂️ Servicios</span>
+          <button onclick="openServiceModal()" style="font-size:12px;padding:4px 10px;background:var(--terra-pale);border:1px solid var(--terra);color:var(--terra);border-radius:8px;cursor:pointer">+ Agregar</button>
+        </div>
+        <div id="services-list">
+          <div style="font-size:13px;color:var(--muted)">Cargando servicios...</div>
+        </div>
+      </div>
+      <!-- Profesionales -->
+      <div class="card">
+        <div class="card-title" style="display:flex;justify-content:space-between">
+          <span>👤 Profesionales</span>
+          <button onclick="openStaffModal()" style="font-size:12px;padding:4px 10px;background:var(--terra-pale);border:1px solid var(--terra);color:var(--terra);border-radius:8px;cursor:pointer">+ Agregar</button>
+        </div>
+        <div id="staff-list-agenda">
+          <div style="font-size:13px;color:var(--muted)">Cargando profesionales...</div>
+        </div>
+      </div>
+    </div>
+    <button onclick="showAgendaMain()" class="btn-secondary" style="margin-top:12px;font-size:13px">← Volver a la agenda</button>
+  </div>
+
+  <!-- Link config -->
+  <div style="margin-top:12px;text-align:right">
+    <button onclick="document.getElementById('agenda-config-view').style.display='block';document.getElementById('agenda-main').style.display='none'" style="background:none;border:none;font-size:13px;color:var(--muted);cursor:pointer">⚙️ Configurar servicios y profesionales</button>
   </div>
 </div>
 
@@ -4109,6 +4190,7 @@ window.switchSection = function (name, btn) {
   if (name === 'menu')         loadMenu()
   if (name === 'mesas')        loadMesas()
   if (name === 'reservas')     loadReservas()
+  if (name === 'agenda')       loadAgenda()
   if (name === 'pedidos')      loadPedidos()
   if (name === 'historial')    loadHistorial()
   if (name === 'crm')          loadCRM()
@@ -7220,6 +7302,354 @@ function renderCRM(list) {
 let reservasFilter = 'hoy'
 let editingReserva = null
 
+// ─────────────────────────────────────────────
+// Agenda y Turnos
+// ─────────────────────────────────────────────
+let agendaDate = new Date()
+let agendaView = 'day'
+let agendaServices = []
+let agendaStaff = []
+let agendaConfig = null
+let setupStep = 1
+let setupData = {}
+
+window.switchSection = window.switchSection  // ya existe
+
+window.loadAgenda = async function () {
+  if (!currentRestaurant) return
+
+  // Cargar config
+  try {
+    const { data: cfg } = await supabase.from('agenda_config')
+      .select('*').eq('restaurant_id', currentRestaurant.id).maybeSingle()
+    agendaConfig = cfg
+
+    const { data: svcs } = await supabase.from('service_types')
+      .select('*').eq('restaurant_id', currentRestaurant.id).eq('is_active', true).order('sort_order')
+    agendaServices = svcs || []
+
+    const { data: stf } = await supabase.from('staff_resources')
+      .select('*').eq('restaurant_id', currentRestaurant.id).eq('is_active', true)
+    agendaStaff = stf || []
+  } catch {}
+
+  if (!agendaConfig && agendaServices.length === 0) {
+    document.getElementById('agenda-setup-card').style.display = 'block'
+    document.getElementById('agenda-main').style.display = 'none'
+    document.getElementById('btn-new-appt').style.display = 'none'
+  } else {
+    document.getElementById('agenda-setup-card').style.display = 'none'
+    document.getElementById('agenda-main').style.display = 'block'
+    document.getElementById('btn-new-appt').style.display = 'inline'
+    renderAgendaDay()
+    renderServicesList()
+    renderStaffList()
+  }
+}
+
+function renderAgendaDay() {
+  const label = document.getElementById('agenda-date-label')
+  const grid  = document.getElementById('agenda-grid')
+  const today = new Date(); today.setHours(0,0,0,0)
+  const d = new Date(agendaDate); d.setHours(0,0,0,0)
+  const diff = Math.round((d - today) / 86400000)
+  label.textContent = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana' : diff === -1 ? 'Ayer' :
+    agendaDate.toLocaleDateString('es-AR', { weekday:'long', day:'2-digit', month:'short' })
+
+  // Cargar turnos del día
+  const start = new Date(agendaDate); start.setHours(0,0,0,0)
+  const end   = new Date(agendaDate); end.setHours(23,59,59,999)
+
+  supabase.from('appointments')
+    .select('*, service_types(name,duration_min), staff_resources(name,color)')
+    .eq('restaurant_id', currentRestaurant.id)
+    .gte('starts_at', start.toISOString())
+    .lte('starts_at', end.toISOString())
+    .neq('status', 'cancelled')
+    .order('starts_at')
+    .then(({ data: appts }) => {
+      if (!appts || appts.length === 0) {
+        grid.innerHTML = `
+          <div style="text-align:center;padding:48px 24px;background:white;border-radius:14px;border:1px solid var(--border)">
+            <div style="font-size:40px;margin-bottom:12px">📅</div>
+            <div style="font-size:15px;font-weight:500;color:var(--ink);margin-bottom:6px">Sin turnos para este día</div>
+            <div style="font-size:13px;color:var(--muted)">Hacé click en "+ Nuevo turno" para agregar uno.</div>
+          </div>`
+        return
+      }
+
+      const STATUS = { confirmed: { label: 'Confirmado', color: 'var(--sage)' }, pending: { label: 'Pendiente', color: 'var(--gold)' }, completed: { label: 'Completado', color: 'var(--muted)' }, no_show: { label: 'No se presentó', color: 'var(--bad)' } }
+
+      grid.innerHTML = '<div style="display:flex;flex-direction:column;gap:10px">' +
+        appts.map(a => {
+          const timeStr = new Date(a.starts_at).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' })
+          const endStr  = new Date(a.ends_at).toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' })
+          const st = STATUS[a.status] || STATUS.confirmed
+          const staffColor = a.staff_resources?.color || 'var(--terra)'
+          return `<div style="background:white;border:1px solid var(--border);border-left:4px solid ${staffColor};border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--ink)">${escHtml(a.customer_name)}</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">
+                ${a.service_types?.name || 'Turno'} · ${a.staff_resources?.name || 'Sin asignar'}
+                ${a.customer_phone ? ' · 📱 ' + a.customer_phone : ''}
+              </div>
+            </div>
+            <div style="text-align:right;flex-shrink:0">
+              <div style="font-size:14px;font-weight:600">${timeStr} – ${endStr}</div>
+              <div style="font-size:11px;color:${st.color};font-weight:600;margin-top:2px">${st.label}</div>
+              ${a.status === 'confirmed' ? `<button onclick="completeAppointment('${a.id}')" style="font-size:11px;margin-top:4px;padding:2px 8px;background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted)">✓ Completado</button>` : ''}
+            </div>
+          </div>`
+        }).join('') + '</div>'
+    })
+}
+
+window.agendaNavDate = function (dir) { agendaDate.setDate(agendaDate.getDate() + dir); renderAgendaDay() }
+window.agendaGoToday = function () { agendaDate = new Date(); renderAgendaDay() }
+window.setAgendaView = function (v) { agendaView = v; renderAgendaDay() }
+window.showAgendaMain = function () {
+  document.getElementById('agenda-config-view').style.display = 'none'
+  document.getElementById('agenda-main').style.display = 'block'
+}
+
+window.completeAppointment = async function (id) {
+  try {
+    await supabase.from('appointments').update({ status: 'completed' }).eq('id', id)
+    renderAgendaDay()
+  } catch {}
+}
+
+// ── Setup wizard ──────────────────────────────
+const SETUP_STEPS = {
+  restaurant: [
+    { title: 'Reservas — Paso 1 de 2', q: '¿Cuántas mesas o personas podés atender al mismo tiempo?', field: 'max_simultaneous', type: 'number', placeholder: 'Ej: 10 mesas', hint: 'Si tenés 10 mesas, podés tomar 10 reservas en el mismo horario.' },
+    { title: 'Reservas — Paso 2 de 2', q: '¿Con cuánta anticipación mínima pueden reservar? (horas)', field: 'min_notice_hours', type: 'number', placeholder: 'Ej: 2', hint: 'Si ponés 2, no se puede reservar con menos de 2hs de anticipación.' },
+  ],
+  local: [
+    { title: 'Turnos — Paso 1 de 2', q: '¿Cuántas personas del equipo atienden clientes?', field: 'staff_count', type: 'number', placeholder: 'Ej: 2', hint: 'Esto define cuántos turnos simultáneos puede haber.' },
+    { title: 'Turnos — Paso 2 de 2', q: '¿Cuánto dura un turno estándar? (minutos)', field: 'slot_duration_min', type: 'number', placeholder: 'Ej: 60', hint: 'Podés ajustar esto por servicio después.' },
+  ],
+  services: [
+    { title: 'Agenda — Paso 1 de 3', q: '¿Cuánto dura un turno estándar? (minutos)', field: 'slot_duration_min', type: 'number', placeholder: 'Ej: 45', hint: 'Por ejemplo, 45 min para corte de cabello.' },
+    { title: 'Agenda — Paso 2 de 3', q: '¿Cuántos profesionales o sillas tienen?', field: 'max_simultaneous', type: 'number', placeholder: 'Ej: 2', hint: 'Si tenés 2 peluqueros, pueden atender 2 clientes al mismo tiempo.' },
+    { title: 'Agenda — Paso 3 de 3', q: '¿Dejás tiempo libre entre turnos? (minutos)', field: 'buffer_min', type: 'number', placeholder: 'Ej: 10', hint: 'Para limpiar o preparar entre cliente y cliente. Podés poner 0.' },
+  ],
+  ecommerce: [
+    { title: 'Turnos — Paso 1 de 1', q: '¿Cuánto dura una consulta o entrega? (minutos)', field: 'slot_duration_min', type: 'number', placeholder: 'Ej: 30', hint: 'Tiempo estimado por cliente.' },
+  ],
+}
+
+window.startAgendaSetup = function () {
+  setupStep = 0; setupData = {}
+  const btype = currentRestaurant?.business_type || 'services'
+  const steps = SETUP_STEPS[btype] || SETUP_STEPS.services
+  renderSetupStep(steps, btype)
+  document.getElementById('modal-agenda-setup').classList.add('open')
+}
+
+function renderSetupStep(steps, btype) {
+  const step = steps[setupStep]
+  document.getElementById('setup-step-title').textContent = step.title
+  document.getElementById('btn-setup-back').style.display = setupStep > 0 ? 'inline' : 'none'
+  document.getElementById('btn-setup-next').textContent = setupStep < steps.length - 1 ? 'Siguiente →' : '✓ Finalizar'
+
+  document.getElementById('setup-step-body').innerHTML = `
+    <div style="font-size:15px;font-weight:500;color:var(--ink);margin-bottom:12px">${step.q}</div>
+    <input class="form-input" id="setup-field-input" type="${step.type}" placeholder="${step.placeholder}" value="${setupData[step.field] || ''}">
+    <span class="form-hint" style="margin-top:6px;display:block">${step.hint}</span>
+  `
+  setTimeout(() => document.getElementById('setup-field-input')?.focus(), 80)
+  document.getElementById('modal-agenda-setup')._steps = steps
+  document.getElementById('modal-agenda-setup')._btype = btype
+}
+
+window.agendaSetupNext = async function () {
+  const modal = document.getElementById('modal-agenda-setup')
+  const steps = modal._steps
+  const btype = modal._btype
+  const step  = steps[setupStep]
+  const val   = document.getElementById('setup-field-input')?.value
+  if (!val) { showToast('Completá el campo antes de continuar', 'error'); return }
+  setupData[step.field] = parseInt(val) || val
+
+  if (setupStep < steps.length - 1) {
+    setupStep++
+    renderSetupStep(steps, btype)
+  } else {
+    // Guardar config
+    const btn = document.getElementById('btn-setup-next')
+    btn.disabled = true; btn.textContent = 'Guardando...'
+    try {
+      const cfg = {
+        restaurant_id: currentRestaurant.id,
+        slot_duration_min: setupData.slot_duration_min || 45,
+        max_simultaneous: setupData.max_simultaneous || 1,
+        min_notice_hours: setupData.min_notice_hours || 2,
+      }
+      await supabase.from('agenda_config').upsert(cfg, { onConflict: 'restaurant_id' })
+
+      // Crear staff por defecto si indicaron más de 1
+      if (setupData.staff_count > 1) {
+        for (let i = 1; i <= Math.min(setupData.staff_count, 5); i++) {
+          await supabase.from('staff_resources').insert({
+            restaurant_id: currentRestaurant.id,
+            name: 'Profesional ' + i,
+            simultaneous: 1,
+          }).select()
+        }
+      }
+
+      closeModal('modal-agenda-setup')
+      showToast('¡Agenda configurada! Ahora podés agregar tus servicios.', 'success')
+      await loadAgenda()
+    } catch (e) {
+      showToast('Error: ' + e.message, 'error')
+    } finally {
+      btn.disabled = false
+    }
+  }
+}
+
+window.agendaSetupBack = function () {
+  const modal = document.getElementById('modal-agenda-setup')
+  if (setupStep > 0) { setupStep--; renderSetupStep(modal._steps, modal._btype) }
+}
+
+// ── Nuevo turno ───────────────────────────────
+window.openNewAppointment = function () {
+  // Precargar fecha/hora = ahora + 1 hora, redondeado a 15min
+  const now = new Date()
+  now.setHours(now.getHours() + 1, Math.ceil(now.getMinutes()/15)*15, 0, 0)
+  document.getElementById('appt-datetime').value = now.toISOString().slice(0,16)
+  document.getElementById('appt-name').value = ''
+  document.getElementById('appt-phone').value = ''
+  document.getElementById('appt-notes').value = ''
+
+  // Poblar servicios
+  const selSvc = document.getElementById('appt-service')
+  selSvc.innerHTML = '<option value="">Sin servicio específico</option>' +
+    agendaServices.map(s => `<option value="${s.id}" data-duration="${s.duration_min}">${escHtml(s.name)} (${s.duration_min} min)</option>`).join('')
+
+  // Poblar staff
+  const selStf = document.getElementById('appt-staff')
+  selStf.innerHTML = '<option value="">Cualquiera disponible</option>' +
+    agendaStaff.map(s => `<option value="${s.id}">${escHtml(s.name)}</option>`).join('')
+
+  document.getElementById('modal-new-appt').classList.add('open')
+  setTimeout(() => document.getElementById('appt-name').focus(), 80)
+}
+
+window.updateApptDuration = function () {
+  const sel = document.getElementById('appt-service')
+  const opt = sel.selectedOptions[0]
+  const dur = opt?.dataset.duration
+  if (dur) document.getElementById('appt-duration').value = dur
+}
+
+window.saveAppointment = async function () {
+  const name = document.getElementById('appt-name').value.trim()
+  const dt   = document.getElementById('appt-datetime').value
+  if (!name || !dt) { showToast('Nombre y fecha son obligatorios', 'error'); return }
+
+  const dur   = parseInt(document.getElementById('appt-duration').value) || 45
+  const start = new Date(dt)
+  const end   = new Date(start.getTime() + dur * 60000)
+  const btn   = document.getElementById('btn-save-appt')
+  btn.disabled = true; btn.textContent = 'Guardando...'
+
+  try {
+    await supabase.from('appointments').insert({
+      restaurant_id: currentRestaurant.id,
+      customer_name: name,
+      customer_phone: document.getElementById('appt-phone').value.trim() || null,
+      notes: document.getElementById('appt-notes').value.trim() || null,
+      service_type_id: document.getElementById('appt-service').value || null,
+      staff_id: document.getElementById('appt-staff').value || null,
+      starts_at: start.toISOString(),
+      ends_at: end.toISOString(),
+      status: 'confirmed',
+      source: 'manual',
+    })
+    closeModal('modal-new-appt')
+    showToast('Turno guardado ✓', 'success')
+    agendaDate = start
+    renderAgendaDay()
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false; btn.textContent = 'Guardar turno'
+  }
+}
+
+function renderServicesList() {
+  const el = document.getElementById('services-list')
+  if (!el) return
+  if (!agendaServices.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted)">Sin servicios cargados todavía.</div>'
+    return
+  }
+  el.innerHTML = agendaServices.map(s => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div>
+        <div style="font-size:13.5px;font-weight:500">${escHtml(s.name)}</div>
+        <div style="font-size:11px;color:var(--muted)">${s.duration_min} min${s.price ? ' · $' + Number(s.price).toLocaleString('es-AR') : ''}</div>
+      </div>
+    </div>`).join('')
+}
+
+function renderStaffList() {
+  const el = document.getElementById('staff-list-agenda')
+  if (!el) return
+  if (!agendaStaff.length) {
+    el.innerHTML = '<div style="font-size:13px;color:var(--muted)">Sin profesionales cargados todavía.</div>'
+    return
+  }
+  el.innerHTML = agendaStaff.map(s => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:10px;height:10px;border-radius:50%;background:${s.color || 'var(--terra)'};flex-shrink:0"></div>
+        <div style="font-size:13.5px;font-weight:500">${escHtml(s.name)}</div>
+      </div>
+    </div>`).join('')
+}
+
+window.openServiceModal = async function () {
+  const name = prompt('Nombre del servicio (ej: Corte de cabello):')
+  if (!name) return
+  const dur = prompt('Duración en minutos:', '45')
+  if (!dur) return
+  const price = prompt('Precio (dejar vacío si no aplica):')
+  try {
+    const { data } = await supabase.from('service_types').insert({
+      restaurant_id: currentRestaurant.id,
+      name: name.trim(),
+      duration_min: parseInt(dur) || 45,
+      price: price ? parseFloat(price.replace(/[^0-9.]/g,'')) : null,
+      sort_order: agendaServices.length,
+    }).select().single()
+    agendaServices.push(data)
+    renderServicesList()
+    showToast('Servicio agregado ✓', 'success')
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+window.openStaffModal = async function () {
+  const name = prompt('Nombre del profesional:')
+  if (!name) return
+  const colors = ['#B85A30','#5A7A5E','#4A90D9','#C8963C','#7B52A6']
+  const color = colors[agendaStaff.length % colors.length]
+  try {
+    const { data } = await supabase.from('staff_resources').insert({
+      restaurant_id: currentRestaurant.id,
+      name: name.trim(),
+      color,
+    }).select().single()
+    agendaStaff.push(data)
+    renderStaffList()
+    showToast('Profesional agregado ✓', 'success')
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
 window.loadReservas = async function () {
   if (!currentRestaurant) return
   await renderReservas()
@@ -8326,6 +8756,73 @@ window.showToast = function (msg, type = 'default') {
   }
 })()
 </script>
+
+<!-- Modal setup de agenda -->
+<div class="modal-overlay" id="modal-agenda-setup" onclick="if(event.target===this)closeModal('modal-agenda-setup')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="setup-step-title">Configurar agenda — Paso 1 de 3</div>
+      <button class="modal-close" onclick="closeModal('modal-agenda-setup')">✕</button>
+    </div>
+    <div class="modal-body" id="setup-step-body">
+      <!-- Se llena dinámicamente -->
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" id="btn-setup-back" style="display:none" onclick="agendaSetupBack()">← Atrás</button>
+      <button class="btn-primary" id="btn-setup-next" onclick="agendaSetupNext()">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nuevo turno -->
+<div class="modal-overlay" id="modal-new-appt" onclick="if(event.target===this)closeModal('modal-new-appt')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Nuevo turno</div>
+      <button class="modal-close" onclick="closeModal('modal-new-appt')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-field col-2">
+          <label class="form-label">Cliente <span>*</span></label>
+          <input class="form-input" id="appt-name" placeholder="Nombre del cliente">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Teléfono</label>
+          <input class="form-input" id="appt-phone" type="tel" placeholder="+54 11 1234-5678">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Servicio</label>
+          <select class="form-select" id="appt-service" onchange="updateApptDuration()">
+            <option value="">Seleccionar...</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Profesional</label>
+          <select class="form-select" id="appt-staff">
+            <option value="">Cualquiera disponible</option>
+          </select>
+        </div>
+        <div class="form-field">
+          <label class="form-label">Fecha y hora <span>*</span></label>
+          <input class="form-input" id="appt-datetime" type="datetime-local">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Duración (min)</label>
+          <input class="form-input" id="appt-duration" type="number" value="45" min="15" step="15">
+        </div>
+        <div class="form-field col-2">
+          <label class="form-label">Notas</label>
+          <textarea class="form-textarea" id="appt-notes" placeholder="Notas sobre el turno..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-new-appt')">Cancelar</button>
+      <button class="btn-primary" id="btn-save-appt" onclick="saveAppointment()">Guardar turno</button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal nueva reserva -->
 <div class="modal-overlay" id="modal-reserva" onclick="if(event.target===this)closeModal('modal-reserva')">
