@@ -1640,6 +1640,12 @@ input:checked + .toggle-slider:before {
 
     <div class="content">
 
+      <!-- Banner de trial -->
+      <div id="trial-banner" style="display:none;background:linear-gradient(135deg,#B85A30,#9A4827);color:white;padding:10px 20px;text-align:center;font-size:13px;font-weight:500">
+        <span id="trial-banner-text">Tu prueba gratuita vence en X días</span>
+        · <a href="#" onclick="switchSection('facturacion', document.querySelector('[data-section=facturacion]'))" style="color:rgba(255,255,255,.85);text-decoration:underline">Ver planes →</a>
+      </div>
+
       <!-- ══ PANTALLA: sin restaurante ══ -->
       <div id="section-setup" class="panel-section active">
 
@@ -3452,6 +3458,19 @@ function fillForm(rest) {
   document.getElementById('f-website').value   = rest.website_url || ''
   previewImgFromUrl('logo',  rest.logo_url  || '')
   previewImgFromUrl('cover', rest.cover_url || '')
+
+  // Mostrar banner de trial si aplica
+  if (rest.trial_end && (rest.subscription_status === 'trialing' || rest.subscription_status === 'free')) {
+    const daysLeft = Math.ceil((new Date(rest.trial_end) - Date.now()) / 86400000)
+    const banner = document.getElementById('trial-banner')
+    const bannerText = document.getElementById('trial-banner-text')
+    if (banner && daysLeft > 0 && daysLeft <= 14) {
+      banner.style.display = 'block'
+      bannerText.textContent = daysLeft === 1
+        ? '⚠️ Tu prueba gratuita vence mañana'
+        : `⏳ Tu prueba gratuita vence en ${daysLeft} días`
+    }
+  }
 }
 
 function updateQuickLinks(slug) {
@@ -3952,6 +3971,7 @@ window.createRestaurant = async function () {
       business_type: selectedBusinessType,
       website_url: website,
       wants_whatsapp: setupWAEnabled,
+      trial_end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
     })
 
     restaurantList.push(currentRestaurant)
