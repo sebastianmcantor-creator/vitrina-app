@@ -194,10 +194,7 @@
     </div>
   </div>
 </div>
-  <div id="error-view" style="display:none">
-    <div style="font-size:36px">😕</div>
-    <div id="error-msg">No se encontró el menú.</div>
-  </div>
+  <div id="error-view" style="display:none"></div>
 
   <div id="app" style="display:none">
     <!-- Portada del restaurante (visible cuando hay cover_url) -->
@@ -482,7 +479,15 @@
 
     function showError(msg) {
       document.getElementById('loading').style.display = 'none'
-      document.getElementById('error-msg').textContent = msg
+      document.getElementById('error-view').innerHTML = `
+        <div style="font-size:40px;margin-bottom:16px">😕</div>
+        <div style="font-size:18px;font-weight:600;color:#1a1208;margin-bottom:8px">Menú no encontrado</div>
+        <div style="font-size:14px;color:#8a7a6a;margin-bottom:24px;line-height:1.6;max-width:300px">
+          Este link no está activo o fue dado de baja. Pedile al negocio el QR o link actualizado.
+        </div>
+        <a href="/" style="display:inline-block;background:#B85A30;color:white;padding:10px 20px;border-radius:10px;text-decoration:none;font-size:14px;font-weight:600">
+          Crear mi propio menú →
+        </a>`
       document.getElementById('error-view').style.display = 'flex'
     }
 

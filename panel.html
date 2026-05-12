@@ -2053,9 +2053,17 @@ input:checked + .toggle-slider:before {
             <div class="page-subtitle" id="menu-page-subtitle">Categorías y platos de tu restaurante</div>
           </div>
           <button class="btn-primary" onclick="openCategoryModal()" style="flex-shrink:0;margin-top:4px">+ Nueva categoría</button>
-          <button class="btn-secondary" onclick="openImportMenuModal()" style="flex-shrink:0;margin-top:4px;font-size:13px">
-            📸 Importar desde foto
-          </button>
+          <div style="display:flex;gap:6px;flex-shrink:0;margin-top:4px">
+            <button class="btn-secondary" onclick="openImportMenuModal()" style="font-size:13px">
+              📸 Importar desde foto
+            </button>
+            <button class="btn-secondary" onclick="toggleAllItemsAvailability(true)" style="font-size:12px;padding:6px 12px" title="Marcar todos disponibles">
+              ✅ Todo disponible
+            </button>
+            <button class="btn-secondary" onclick="toggleAllItemsAvailability(false)" style="font-size:12px;padding:6px 12px" title="Cerrar todo temporalmente">
+              🔴 Cerrar todo
+            </button>
+          </div>
         </div>
         <div id="menu-body">
           <div class="menu-empty">
@@ -8487,6 +8495,32 @@ async function renderReservas() {
 // Importar menú desde foto (Claude Vision)
 // ─────────────────────────────────────────────
 let importedMenuItems = []
+
+window.toggleAllItemsAvailability = async function (available) {
+  if (!currentRestaurant) return
+  const msg = available ? '¿Marcar todos los platos como disponibles?' : '⚠️ ¿Cerrar temporalmente TODOS los platos del menú?'
+  if (!confirm(msg)) return
+
+  const allItems = Object.values(menuItemsMap).flat()
+  if (!allItems.length) { showToast('No hay platos cargados', 'error'); return }
+
+  try {
+    // Actualizar todos en paralelo (lotes de 10)
+    const batchSize = 10
+    for (let i = 0; i < allItems.length; i += batchSize) {
+      const batch = allItems.slice(i, i + batchSize)
+      await Promise.all(batch.map(item => menuItems.update(item.id, { is_available: available })))
+    }
+    // Actualizar el mapa local
+    Object.keys(menuItemsMap).forEach(catId => {
+      menuItemsMap[catId] = menuItemsMap[catId].map(item => ({ ...item, is_available: available }))
+    })
+    renderMenu()
+    showToast(available ? '✅ Todo el menú está disponible' : '🔴 Menú cerrado temporalmente', 'success')
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  }
+}
 
 window.openImportMenuModal = function () {
   importedMenuItems = []
