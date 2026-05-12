@@ -396,7 +396,6 @@ tbody tr:hover {
             </tr>
           </thead>
           <tbody id="clients-tbody">
-            <tr><td colspan="7" class="loading">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -549,7 +548,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Auth OK — mostrar el panel
     document.body.style.visibility = 'visible'
 
-    await loadDashboardData()
+    // Cargar clientes inmediatamente (no esperar las métricas)
+    renderClients()
+
+    // Cargar métricas del dashboard en paralelo
+    loadDashboardData()
   } catch (e) {
     console.error('Error inicializando:', e)
     alert('Error cargando panel: ' + e.message)
