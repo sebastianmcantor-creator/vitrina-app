@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo Agenda — Estudio Nómade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #FAF7F2; color: #1C1208; }
+    .demo-banner { background: #1C1208; color: #e8c87a; padding: 10px 20px; text-align: center; font-size: 13px; }
+    .demo-banner a { color: #e8c87a; font-weight: 600; text-decoration: none; margin-left: 8px; }
+    .header { background: white; border-bottom: 1px solid #E8DDD0; padding: 24px 20px; text-align: center; }
+    .biz-name { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 500; color: #1C1208; margin-bottom: 4px; }
+    .biz-desc { font-size: 13px; color: #8A7A6A; }
+    .biz-badge { display: inline-block; background: #E8F5E9; color: #2E7D32; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; margin-top: 8px; }
+    .section { padding: 24px 20px; max-width: 640px; margin: 0 auto; }
+    h2 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 500; margin-bottom: 16px; color: #1C1208; }
+    .service-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .service-card { background: white; border: 1.5px solid #E8DDD0; border-radius: 14px; padding: 16px; cursor: pointer; transition: all .2s; }
+    .service-card:hover, .service-card.selected { border-color: #B85A30; background: #FDF3EE; }
+    .service-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .service-detail { font-size: 12px; color: #8A7A6A; }
+    .service-price { font-size: 15px; font-weight: 600; color: #B85A30; margin-top: 6px; }
+    .staff-cards { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+    .staff-card { background: white; border: 1.5px solid #E8DDD0; border-radius: 12px; padding: 12px 16px; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 10px; }
+    .staff-card:hover, .staff-card.selected { border-color: #B85A30; background: #FDF3EE; }
+    .staff-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .staff-name { font-size: 13.5px; font-weight: 500; }
+    .staff-role { font-size: 11px; color: #8A7A6A; }
+    .time-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 24px; }
+    .time-slot { background: white; border: 1.5px solid #E8DDD0; border-radius: 10px; padding: 10px 8px; text-align: center; cursor: pointer; font-size: 13px; font-weight: 500; transition: all .2s; }
+    .time-slot:hover, .time-slot.selected { border-color: #B85A30; background: #FDF3EE; color: #B85A30; }
+    .time-slot.unavailable { opacity: 0.35; cursor: not-allowed; text-decoration: line-through; }
+    .confirm-section { background: white; border: 1px solid #E8DDD0; border-radius: 16px; padding: 20px; margin-bottom: 24px; }
+    .form-field { margin-bottom: 14px; }
+    .form-label { font-size: 13px; font-weight: 500; margin-bottom: 6px; display: block; }
+    .form-input { width: 100%; padding: 10px 14px; border: 1px solid #E8DDD0; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; }
+    .form-input:focus { border-color: #B85A30; }
+    .btn-confirm { width: 100%; background: #B85A30; color: white; border: none; border-radius: 12px; padding: 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .btn-confirm:hover { background: #9A4827; }
+    .success-msg { display: none; background: #E8F5E9; border: 1px solid #B2DEC4; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px; }
+    .success-icon { font-size: 40px; margin-bottom: 12px; }
+    .footer { background: #1C1208; color: white; padding: 32px 24px; text-align: center; }
+    @media (max-width: 480px) {
+      .service-cards { grid-template-columns: 1fr; }
+      .time-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<div class="demo-banner">
+  ✨ Demo interactiva — Así funciona el sistema de turnos de Vitrina ·
+  <a href="/panel.html">Crear mi agenda gratis →</a>
+</div>
+
+<div class="header">
+  <div style="font-size:36px;margin-bottom:8px">✂️</div>
+  <div class="biz-name">Estudio Nómade</div>
+  <div class="biz-desc">Peluquería y estética · Palermo, Buenos Aires</div>
+  <div class="biz-badge">🟢 Turnos disponibles hoy</div>
+</div>
+
+<!-- PASO 1: Elegir servicio -->
+<div class="section" id="step-service">
+  <h2>¿Qué servicio necesitás?</h2>
+  <div class="service-cards">
+    <div class="service-card" onclick="selectService(this, 'Corte de cabello', 45, 12000)">
+      <div class="service-name">✂️ Corte de cabello</div>
+      <div class="service-detail">45 min · Incluye lavado y peinado</div>
+      <div class="service-price">$12.000</div>
+    </div>
+    <div class="service-card" onclick="selectService(this, 'Coloración completa', 120, 35000)">
+      <div class="service-name">🎨 Coloración completa</div>
+      <div class="service-detail">2 hs · Tinte + tratamiento</div>
+      <div class="service-price">$35.000</div>
+    </div>
+    <div class="service-card" onclick="selectService(this, 'Keratina', 180, 55000)">
+      <div class="service-name">💫 Keratina</div>
+      <div class="service-detail">3 hs · Alisado + hidratación</div>
+      <div class="service-price">$55.000</div>
+    </div>
+    <div class="service-card" onclick="selectService(this, 'Mechas + corte', 150, 48000)">
+      <div class="service-name">🌟 Mechas + corte</div>
+      <div class="service-detail">2:30 hs · Técnica + corte final</div>
+      <div class="service-price">$48.000</div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 2: Elegir profesional -->
+<div class="section" id="step-staff" style="display:none">
+  <h2>¿Con quién querés atenderte?</h2>
+  <div class="staff-cards">
+    <div class="staff-card" onclick="selectStaff(this, 'Valentina')">
+      <div class="staff-avatar" style="background:#FDF3EE">👩</div>
+      <div>
+        <div class="staff-name">Valentina</div>
+        <div class="staff-role">Colorista · 5 años exp.</div>
+      </div>
+    </div>
+    <div class="staff-card" onclick="selectStaff(this, 'Matías')">
+      <div class="staff-avatar" style="background:#E8F5E9">👨</div>
+      <div>
+        <div class="staff-name">Matías</div>
+        <div class="staff-role">Estilista · 8 años exp.</div>
+      </div>
+    </div>
+    <div class="staff-card" onclick="selectStaff(this, 'Cualquiera disponible')">
+      <div class="staff-avatar" style="background:#E3F2FD">🎲</div>
+      <div>
+        <div class="staff-name">Sin preferencia</div>
+        <div class="staff-role">El primero disponible</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PASO 3: Elegir horario -->
+<div class="section" id="step-time" style="display:none">
+  <h2>¿Cuándo venís?</h2>
+  <div style="display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px">
+    <button class="time-slot selected" style="white-space:nowrap;min-width:auto;padding:8px 14px" onclick="selectDate(this, 'Hoy')">Hoy</button>
+    <button class="time-slot" style="white-space:nowrap;min-width:auto;padding:8px 14px" onclick="selectDate(this, 'Mañana')">Mañana</button>
+    <button class="time-slot" style="white-space:nowrap;min-width:auto;padding:8px 14px" onclick="selectDate(this, 'Jue 15')">Jue 15</button>
+    <button class="time-slot" style="white-space:nowrap;min-width:auto;padding:8px 14px" onclick="selectDate(this, 'Vie 16')">Vie 16</button>
+    <button class="time-slot" style="white-space:nowrap;min-width:auto;padding:8px 14px" onclick="selectDate(this, 'Sáb 17')">Sáb 17</button>
+  </div>
+  <div class="time-grid">
+    <div class="time-slot unavailable">09:00</div>
+    <div class="time-slot unavailable">09:45</div>
+    <div class="time-slot" onclick="selectTime(this, '10:30')">10:30</div>
+    <div class="time-slot" onclick="selectTime(this, '11:15')">11:15</div>
+    <div class="time-slot unavailable">12:00</div>
+    <div class="time-slot" onclick="selectTime(this, '14:00')">14:00</div>
+    <div class="time-slot" onclick="selectTime(this, '14:45')">14:45</div>
+    <div class="time-slot unavailable">15:30</div>
+    <div class="time-slot" onclick="selectTime(this, '16:15')">16:15</div>
+    <div class="time-slot" onclick="selectTime(this, '17:00')">17:00</div>
+    <div class="time-slot unavailable">17:45</div>
+    <div class="time-slot" onclick="selectTime(this, '18:30')">18:30</div>
+  </div>
+</div>
+
+<!-- PASO 4: Confirmar -->
+<div class="section" id="step-confirm" style="display:none">
+  <h2>Confirmá tu turno</h2>
+  <div class="confirm-section">
+    <div id="booking-summary" style="background:#F4EDE4;border-radius:10px;padding:14px;margin-bottom:16px;font-size:14px;line-height:1.8"></div>
+    <div class="form-field">
+      <label class="form-label">Tu nombre <span style="color:#B85A30">*</span></label>
+      <input class="form-input" id="booking-name" placeholder="María García">
+    </div>
+    <div class="form-field">
+      <label class="form-label">WhatsApp</label>
+      <input class="form-input" id="booking-phone" type="tel" placeholder="+54 11 1234-5678">
+      <div style="font-size:12px;color:#8A7A6A;margin-top:4px">Te mandamos el recordatorio 24hs antes</div>
+    </div>
+    <button class="btn-confirm" onclick="confirmBooking()">Confirmar turno →</button>
+  </div>
+</div>
+
+<!-- Éxito -->
+<div class="section">
+  <div class="success-msg" id="success-msg">
+    <div class="success-icon">✅</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;margin-bottom:8px">¡Turno confirmado!</div>
+    <p style="font-size:14px;color:#4A3828;line-height:1.6" id="success-detail"></p>
+    <p style="font-size:13px;color:#8A7A6A;margin-top:12px">Te vamos a recordar por WhatsApp 24hs antes.</p>
+  </div>
+</div>
+
+<div class="footer">
+  <div style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#e8c87a;margin-bottom:8px">¿Querés este sistema para tu negocio?</div>
+  <p style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px;line-height:1.6">Agenda de turnos, WhatsApp Business y mucho más.<br>14 días gratis, sin tarjeta.</p>
+  <a href="/panel.html" style="display:inline-block;background:#B85A30;color:white;padding:13px 28px;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;font-family:sans-serif">
+    Crear mi agenda gratis →
+  </a>
+</div>
+
+<script>
+let booking = { service: null, staff: null, date: 'Hoy', time: null }
+
+function selectService(el, name, dur, price) {
+  document.querySelectorAll('.service-card').forEach(c => c.classList.remove('selected'))
+  el.classList.add('selected')
+  booking.service = { name, dur, price }
+  document.getElementById('step-staff').style.display = 'block'
+  document.getElementById('step-staff').scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+function selectStaff(el, name) {
+  document.querySelectorAll('.staff-card').forEach(c => c.classList.remove('selected'))
+  el.classList.add('selected')
+  booking.staff = name
+  document.getElementById('step-time').style.display = 'block'
+  document.getElementById('step-time').scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+function selectDate(el, date) {
+  document.querySelectorAll('.time-grid ~ div .time-slot, [onclick*="selectDate"]').forEach(b => b.classList.remove('selected'))
+  el.classList.add('selected')
+  booking.date = date
+}
+
+function selectTime(el, time) {
+  document.querySelectorAll('.time-grid .time-slot').forEach(s => s.classList.remove('selected'))
+  el.classList.add('selected')
+  booking.time = time
+  document.getElementById('step-confirm').style.display = 'block'
+  // Actualizar resumen
+  const s = booking.service
+  document.getElementById('booking-summary').innerHTML =
+    `<strong>${s.name}</strong><br>` +
+    `📅 ${booking.date} a las ${time}<br>` +
+    `👤 Con ${booking.staff}<br>` +
+    `⏱ ${s.dur} min · <strong style="color:#B85A30">$${s.price.toLocaleString('es-AR')}</strong>`
+  document.getElementById('step-confirm').scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+function confirmBooking() {
+  const name = document.getElementById('booking-name').value.trim()
+  if (!name) { alert('Por favor ingresá tu nombre'); return }
+  if (!booking.service || !booking.time) { alert('Seleccioná servicio y horario'); return }
+
+  document.getElementById('step-confirm').style.display = 'none'
+  const successEl = document.getElementById('success-msg')
+  successEl.style.display = 'block'
+  document.getElementById('success-detail').innerHTML =
+    `<strong>${booking.service.name}</strong> — ${booking.date} a las <strong>${booking.time}</strong><br>Con ${booking.staff} en Estudio Nómade`
+  successEl.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+</script>
+</body>
+</html>
