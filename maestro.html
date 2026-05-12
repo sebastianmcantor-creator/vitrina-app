@@ -816,17 +816,26 @@ async function renderClients() {
 }
 
 function renderRevenue() {
-  document.getElementById('revenue-subscriptions').textContent =
-    '$' + (dashboardData.subscription_revenue || 0).toLocaleString('es-AR')
-  document.getElementById('revenue-fees').textContent =
-    '$' + (dashboardData.transaction_fees || 0).toLocaleString('es-AR')
-  document.getElementById('revenue-ads').textContent =
-    '$' + (dashboardData.ad_fees || 0).toLocaleString('es-AR')
-  document.getElementById('revenue-projected').textContent =
-    '$' + (dashboardData.projected_revenue || 0).toLocaleString('es-AR')
+  const total = dashboardData.total_revenue || 0
+  const subs  = dashboardData.subscription_revenue || 0
+  const fees  = dashboardData.transaction_fees || 0
 
-  document.getElementById('revenue-details').innerHTML =
-    '<p style="color:var(--muted)">Detalles de facturación próximamente...</p>'
+  document.getElementById('revenue-subscriptions').textContent = '$' + subs.toLocaleString('es-AR')
+  document.getElementById('revenue-fees').textContent = '$' + fees.toLocaleString('es-AR')
+  document.getElementById('revenue-ads').textContent = '$' + (dashboardData.ad_fees || 0).toLocaleString('es-AR')
+  document.getElementById('revenue-projected').textContent = '$' + (dashboardData.projected_revenue || 0).toLocaleString('es-AR')
+
+  const details = document.getElementById('revenue-details')
+  if (total === 0) {
+    details.innerHTML = `
+      <div style="text-align:center;padding:40px 24px;color:var(--muted)">
+        <div style="font-size:40px;margin-bottom:12px">📈</div>
+        <div style="font-size:16px;font-weight:500;color:var(--ink);margin-bottom:8px">Sin facturación todavía</div>
+        <div style="font-size:14px;line-height:1.6">Acá vas a ver el detalle mensual cuando tengas clientes pagando.<br>Los primeros datos aparecen cuando alguien complete su trial de 14 días.</div>
+      </div>`
+  } else {
+    details.innerHTML = `<p style="color:var(--muted)">Detalle de ${dashboardData.active_clients} clientes activos.</p>`
+  }
 }
 
 async function renderProducers() {
@@ -868,6 +877,19 @@ async function renderProducers() {
 }
 
 function renderAgents() {
+  const container = document.getElementById('agents-content')
+  if (!container) {
+    // agents-content no existe; usar agents-performance para el estado vacío
+    const perf = document.getElementById('agents-performance')
+    if (perf && !dashboardData.tano_messages_count && !dashboardData.sales_prospects) {
+      perf.innerHTML = `
+        <div style="text-align:center;padding:40px 24px;color:var(--muted)">
+          <div style="font-size:40px;margin-bottom:12px">🤖</div>
+          <div style="font-size:16px;font-weight:500;color:var(--ink);margin-bottom:8px">Los agentes están listos</div>
+          <div style="font-size:14px;line-height:1.6">Tano y Viti empiezan a generar métricas cuando tengas clientes activos.<br>El agente de ventas se activa desde la sección "Agente de Ventas" en el panel.</div>
+        </div>`
+    }
+  }
   document.getElementById('agent-tano-messages').textContent = dashboardData.tano_messages_count || 0
   document.getElementById('agent-tano-cost').textContent = '$' + (dashboardData.tano_cost_usd || 0).toFixed(2) + ' USD'
 
