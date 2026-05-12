@@ -318,10 +318,9 @@
   </div>
 
   <a class="mozo-fab" id="mozo-fab" href="mozo.html">💬 Consultá al mozo</a>
-  <a id="reserva-fab" href="#" target="_blank"
-     style="display:none;position:fixed;bottom:136px;right:16px;background:#3D8C5A;color:white;border-radius:50px;padding:12px 18px;font-size:13px;font-weight:500;text-decoration:none;display:none;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.3);transition:transform .2s;z-index:50;font-family:'DM Sans',sans-serif"
-     onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
-    📅 Reservar turno
+  <a id="reserva-fab" href="#" style="display:none;position:fixed;bottom:80px;left:16px;background:#2e7d32;color:white;border-radius:50px;padding:10px 16px;font-size:13px;font-weight:500;text-decoration:none;box-shadow:0 4px 16px rgba(34,170,68,.35);font-family:'DM Sans',sans-serif;transition:all .2s;z-index:50"
+    onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">
+    📅 Reservar
   </a>
 
   <script type="module">
@@ -384,21 +383,43 @@
 
       document.documentElement.style.setProperty('--accent', rest.primary_color || '#B85A30')
       document.title = rest.name + ' — Menú'
+
+      // Meta tags dinámicos para sharing
+      let metaDesc = document.querySelector('meta[name="description"]')
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta')
+        metaDesc.name = 'description'
+        document.head.appendChild(metaDesc)
+      }
+      metaDesc.content = `Menú digital de ${rest.name}${rest.city ? ' · ' + rest.city : ''}. Pedí desde tu celular.`
+
+      // OG tags
+      const ogTags = {
+        'og:title': rest.name + ' — Menú Digital',
+        'og:description': `Menú digital de ${rest.name}. Pedí online sin esperar.`,
+        'og:url': `https://vitrinaapp.com.ar/menu.html?slug=${slug}`,
+      }
+      Object.entries(ogTags).forEach(([prop, content]) => {
+        let el = document.querySelector(`meta[property="${prop}"]`)
+        if (!el) { el = document.createElement('meta'); el.setAttribute('property', prop); document.head.appendChild(el) }
+        el.content = content
+      })
+
       document.getElementById('rest-name').textContent = rest.name
       const sub = [rest.tagline, rest.address].filter(Boolean).join(' · ')
       document.getElementById('rest-sub').textContent = sub || rest.city || ''
       document.getElementById('mozo-fab').href = 'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? '')
 
-      // Mostrar FAB de reserva si el negocio tiene agenda (para servicios) o reservas (para restaurante)
-      if (rest.business_type === 'services' || rest.business_type === 'restaurant') {
+      // Mostrar FAB de reserva si el restaurante tiene WhatsApp de gestión
+      if (rest.whatsapp_gestion || rest.whatsapp_operativo) {
         const reservaFab = document.getElementById('reserva-fab')
         if (reservaFab) {
-          const mozoUrl = 'mozo.html?slug=' + slug + (mesa ? '&mesa=' + mesa : '')
-          reservaFab.href = mozoUrl
+          const phone = (rest.whatsapp_gestion || rest.whatsapp_operativo).replace(/[^0-9]/g, '')
+          const msg = encodeURIComponent(`Hola! Quisiera reservar una mesa en ${rest.name}. ¿Tienen disponibilidad?`)
+          reservaFab.href = `https://wa.me/${phone}?text=${msg}`
           reservaFab.style.display = 'flex'
-          reservaFab.innerHTML = rest.business_type === 'services'
-            ? '📅 Sacar turno'
-            : '📅 Reservar mesa'
+          reservaFab.style.alignItems = 'center'
+          reservaFab.style.gap = '6px'
         }
       }
 
