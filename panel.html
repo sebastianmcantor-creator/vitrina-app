@@ -1538,6 +1538,9 @@ input:checked + .toggle-slider:before {
       <button class="nav-item" data-section="estadisticas" onclick="switchSection('estadisticas', this)">
         <span class="nav-icon">📊</span> Estadísticas
       </button>
+      <button class="nav-item" data-section="informes" onclick="switchSection('informes', this)">
+        <span class="nav-icon">📄</span> Informes
+      </button>
       <button class="nav-item" data-section="analisis" onclick="switchSection('analisis', this)">
         <span class="nav-icon">📈</span> Análisis
       </button>
@@ -1951,6 +1954,26 @@ input:checked + .toggle-slider:before {
             </div>
           </div>
         </div>
+
+        <!-- Widget para sitio web propio -->
+        <div class="card" style="margin-top:16px" id="widget-embed-card">
+          <div class="card-title">🌐 Widget para tu sitio web</div>
+          <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5">
+            Pegá este código en tu web para que los visitantes puedan ver el menú o hacer un pedido directamente desde tu sitio.
+          </p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div>
+              <label class="form-label">Botón flotante "Ver menú"</label>
+              <div style="background:var(--cream2);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:var(--ink);word-break:break-all;border:1px solid var(--border)" id="widget-code-btn"></div>
+              <button class="btn-secondary" onclick="copiarWidget('btn')" style="font-size:12px;padding:5px 12px;margin-top:6px">📋 Copiar</button>
+            </div>
+            <div>
+              <label class="form-label">iframe embebido (menú completo)</label>
+              <div style="background:var(--cream2);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:var(--ink);word-break:break-all;border:1px solid var(--border)" id="widget-code-iframe"></div>
+              <button class="btn-secondary" onclick="copiarWidget('iframe')" style="font-size:12px;padding:5px 12px;margin-top:6px">📋 Copiar</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- ══ Secciones proximamente ══ -->
@@ -2157,6 +2180,53 @@ input:checked + .toggle-slider:before {
           <div style="padding:40px;text-align:center;color:var(--muted)">Cargando estadísticas...</div>
         </div>
       </div>
+
+      <div id="section-informes" class="panel-section">
+  <div class="page-header">
+    <div class="page-title">Informes</div>
+    <div class="page-subtitle">Resúmenes de tu negocio listos para descargar o compartir.</div>
+  </div>
+
+  <!-- Informe del mes -->
+  <div class="card">
+    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <span>📊 Informe mensual</span>
+      <button class="btn-primary" onclick="generarInformeMensual()" id="btn-gen-informe" style="font-size:13px;padding:8px 16px">
+        Generar informe de mayo
+      </button>
+    </div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6">
+      Viti genera un resumen del mes con estadísticas, platos más vendidos, horario pico y recomendaciones para el mes siguiente.
+    </p>
+    <div id="informe-result" style="display:none"></div>
+  </div>
+
+  <!-- Resumen diario -->
+  <div class="card">
+    <div class="card-title">📱 Resumen diario por WhatsApp</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+      Recibí un resumen del día directamente en el WhatsApp de gestión: pedidos, facturación y ticket promedio.
+    </p>
+    <button class="btn-secondary" onclick="enviarResumenDiario()" style="font-size:13px">
+      📤 Enviar resumen de hoy
+    </button>
+    <span id="informe-wa-status" style="font-size:12px;color:var(--muted);margin-left:10px"></span>
+  </div>
+
+  <!-- Exportar datos -->
+  <div class="card">
+    <div class="card-title">💾 Exportar datos</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn-secondary" onclick="exportHistorialCSV()" style="font-size:13px">
+        📊 Pedidos en CSV
+      </button>
+      <button class="btn-secondary" onclick="exportMenuCSV()" id="btn-export-menu" style="font-size:13px">
+        🍽️ Menú en CSV
+      </button>
+    </div>
+    <span class="form-hint" style="margin-top:10px;display:block">Los archivos CSV se abren directamente en Excel o Google Sheets.</span>
+  </div>
+</div>
 
       <div id="section-analisis" class="panel-section">
         <div class="page-header">
@@ -3221,6 +3291,7 @@ function updateQuickLinks(slug) {
   document.getElementById('link-cocina').href   = base + 'cocina.html?slug=' + slug
   document.getElementById('link-mozo').href     = base + 'mozo.html?slug=' + slug + '&mesa=1'
   updateMenuQr(slug)
+  updateWidgetCode(slug)
 }
 
 function qrUrl(data, size = 140) {
@@ -3238,6 +3309,26 @@ function updateMenuQr(slug) {
   const mozoImg = document.getElementById('mozo-qr-img')
   if (menuImg) { menuImg.src = qrUrl(menuLink); menuImg.dataset.url = menuLink }
   if (mozoImg) { mozoImg.src = qrUrl(mozoLink); mozoImg.dataset.url = mozoLink }
+}
+
+function updateWidgetCode(slug) {
+  const base = 'https://vitrinaapp.com.ar/'
+  const menuUrl = base + 'menu.html?slug=' + slug
+
+  const btnCode = `<a href="${menuUrl}" target="_blank" style="position:fixed;bottom:24px;right:24px;background:#B85A30;color:white;padding:12px 20px;border-radius:30px;font-family:sans-serif;font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px rgba(184,90,48,.4);z-index:9999">🍽️ Ver menú</a>`
+
+  const iframeCode = `<iframe src="${menuUrl}" width="100%" height="600" frameborder="0" style="border-radius:12px;border:1px solid #e8ddd0" title="Menú ${slug}"></iframe>`
+
+  const btnEl = document.getElementById('widget-code-btn')
+  const iframeEl = document.getElementById('widget-code-iframe')
+  if (btnEl) btnEl.textContent = btnCode
+  if (iframeEl) iframeEl.textContent = iframeCode
+}
+
+window.copiarWidget = function (type) {
+  const el = document.getElementById('widget-code-' + type)
+  if (!el) return
+  navigator.clipboard.writeText(el.textContent).then(() => showToast('Código copiado ✓', 'success'))
 }
 
 window.updateMesaQr = function (num) {
@@ -4023,6 +4114,7 @@ window.switchSection = function (name, btn) {
   if (name === 'crm')          loadCRM()
   if (name === 'campanas')     loadCampanas()
   if (name === 'estadisticas') loadEstadisticas()
+  if (name === 'informes')     loadInformes()
   if (name === 'analisis')     loadAnalisis()
   if (name === 'catalogo')     loadCatalogo()
   if (name === 'marketing')    loadMarketing()
@@ -5318,6 +5410,7 @@ async function loadCompetitors() {
                 ${c.rating === maxRating && c.rating > 0 ? '<span style="font-size:10px;background:var(--gold);color:#1a1208;padding:1px 6px;border-radius:8px;font-weight:600">MEJOR RATING</span>' : ''}
               </div>
               <div style="font-size:12px;color:var(--muted);margin-top:2px">${escHtml(c.address || '—')}</div>
+              ${c.place_id ? `<a href="https://www.google.com/maps/place/?q=place_id:${c.place_id}" target="_blank" style="font-size:11px;color:var(--terra);text-decoration:none;display:inline-block;margin-top:4px">Ver en Google Maps →</a>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
               <div style="text-align:right">
@@ -7588,6 +7681,90 @@ window.exportStatsCSV = function () {
   a.href = URL.createObjectURL(blob)
   a.download = `${currentRestaurant.name}_pedidos_${statsPeriod}d.csv`
   a.click()
+}
+
+window.loadInformes = function () {
+  if (!currentRestaurant) return
+  const now = new Date()
+  const mes = now.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
+  document.getElementById('btn-gen-informe').textContent = 'Generar informe de ' + mes
+}
+
+window.generarInformeMensual = async function () {
+  if (!currentRestaurant) return
+  const btn = document.getElementById('btn-gen-informe')
+  const resultEl = document.getElementById('informe-result')
+  btn.disabled = true; btn.textContent = '⏳ Generando...'
+
+  try {
+    const stats = await orders.getStats(currentRestaurant.id, 30)
+    const total = stats.reduce((s, o) => s + Number(o.total || 0), 0)
+    const count = stats.length
+    const ticket = count > 0 ? Math.round(total / count) : 0
+
+    // Pedir análisis a Viti
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: 'Sos Viti, asistente estratégica de Vitrina. Generás informes mensuales concisos y accionables para dueños de negocios en Argentina. Respondé en español, tono profesional pero cercano. Máximo 5 párrafos.',
+        messages: [{
+          role: 'user',
+          content: `Generá un informe mensual para "${currentRestaurant.name}". Datos del mes: ${count} pedidos, facturación total $${total.toLocaleString('es-AR')} ARS, ticket promedio $${ticket.toLocaleString('es-AR')}. Incluí: resumen, qué mejorar, 3 recomendaciones concretas para el próximo mes.`
+        }],
+        max_tokens: 800,
+      })
+    })
+
+    if (!res.ok) throw new Error('Error generando informe')
+    const data = await res.json()
+    const text = data.content?.[0]?.text || 'No se pudo generar el informe.'
+
+    resultEl.style.display = 'block'
+    resultEl.innerHTML = `
+      <div style="background:var(--cream2);border-radius:10px;padding:20px;font-size:14px;line-height:1.8;color:var(--ink);white-space:pre-wrap;margin-bottom:12px">${escHtml(text)}</div>
+      <button class="btn-secondary" onclick="copiarInforme()" style="font-size:13px">📋 Copiar texto</button>
+      <script>window._informeText = ${JSON.stringify(text)}<\/script>`
+
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
+  } finally {
+    btn.disabled = false
+    const mes = new Date().toLocaleDateString('es-AR', { month: 'long' })
+    btn.textContent = 'Generar informe de ' + mes
+  }
+}
+
+window.copiarInforme = function () {
+  if (window._informeText) {
+    navigator.clipboard.writeText(window._informeText).then(() => showToast('Informe copiado ✓', 'success'))
+  }
+}
+
+window.exportMenuCSV = function () {
+  if (!currentRestaurant) return
+  const rows = [['Categoría', 'Plato', 'Precio', 'Descripción', 'Tags', 'Disponible', 'Destacado']]
+  menuCats.forEach(cat => {
+    const items = menuItemsMap[cat.id] || []
+    items.forEach(item => {
+      rows.push([
+        cat.name,
+        item.name,
+        item.price,
+        item.description || '',
+        (item.tags || []).join('|'),
+        item.is_available ? 'Sí' : 'No',
+        item.is_featured ? 'Sí' : 'No',
+      ])
+    })
+  })
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n')
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = `${currentRestaurant.name}_menu.csv`
+  a.click()
+  showToast('Menú exportado ✓', 'success')
 }
 
 function buildHourChart(data) {
