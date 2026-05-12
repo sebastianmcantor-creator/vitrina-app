@@ -2618,6 +2618,8 @@ input:checked + .toggle-slider:before {
             <div id="tano-usage-hint" style="font-size:12px;color:var(--muted);margin-top:6px">Se reinicia el 1° de cada mes.</div>
           </div>
 
+          <div id="trial-progress-block" style="display:none;margin-top:14px;padding:14px 16px;background:var(--cream2);border-radius:10px"></div>
+
           <div class="plan-cards-grid" id="plan-cards-grid">
             <!-- Se renderiza con JS -->
           </div>
@@ -5393,6 +5395,29 @@ window.loadFacturacion = async function () {
       `Tenés ${trialDays} día${trialDays !== 1 ? 's' : ''} restante${trialDays !== 1 ? 's' : ''} de prueba gratuita. Después se cobrará automáticamente.`
   } else {
     trialAlert.style.display = 'none'
+  }
+
+  // Barra de progreso del trial
+  if (currentRestaurant.trial_end && (currentRestaurant.subscription_status === 'trialing' || !currentRestaurant.subscription_status)) {
+    const trialEnd  = new Date(currentRestaurant.trial_end)
+    const trialStart = new Date(trialEnd.getTime() - 14 * 86400000)
+    const total   = trialEnd - trialStart
+    const elapsed = Date.now() - trialStart
+    const pct = Math.min(100, Math.round((elapsed / total) * 100))
+    const daysLeft = Math.ceil((trialEnd - Date.now()) / 86400000)
+
+    const trialEl = document.getElementById('trial-progress-block')
+    if (trialEl) {
+      trialEl.style.display = 'block'
+      trialEl.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:500">Período de prueba</span>
+          <span style="font-size:13px;color:${daysLeft <= 3 ? 'var(--bad)' : 'var(--muted)'}">${daysLeft > 0 ? daysLeft + ' días restantes' : 'Vencido'}</span>
+        </div>
+        <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden">
+          <div style="height:100%;border-radius:6px;background:${daysLeft <= 3 ? 'var(--bad)' : 'var(--terra)'};width:${pct}%;transition:width .4s"></div>
+        </div>`
+    }
   }
 
   // Badge de días de trial en el sidebar
