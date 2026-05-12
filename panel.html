@@ -1491,6 +1491,7 @@ input:checked + .toggle-slider:before {
       <div class="sidebar-rest-name" id="sidebar-rest-name">—</div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
         <div class="sidebar-rest-plan" id="sidebar-rest-plan">Plan Free</div>
+        <span id="trial-days-badge" style="display:none;font-size:10px;font-weight:700;background:#fff8e1;color:#f57f17;padding:2px 6px;border-radius:6px;margin-left:6px;white-space:nowrap"></span>
         <button class="rest-open-pill" id="rest-open-pill" onclick="event.stopPropagation();quickToggleOpen()" title="Cambiar estado">
           <span id="rest-open-dot">●</span> <span id="rest-open-label">Abierto</span>
         </button>
@@ -5258,6 +5259,19 @@ window.loadFacturacion = async function () {
     trialAlert.style.display = 'none'
   }
 
+  // Badge de días de trial en el sidebar
+  if (currentRestaurant.subscription_status === 'trialing' && currentRestaurant.trial_end) {
+    const trialEnd = new Date(currentRestaurant.trial_end)
+    const daysLeft = Math.ceil((trialEnd - Date.now()) / 86400000)
+    if (daysLeft > 0 && daysLeft <= 14) {
+      const trialBadge = document.getElementById('trial-days-badge')
+      if (trialBadge) {
+        trialBadge.style.display = 'inline'
+        trialBadge.textContent = `${daysLeft} días de prueba restantes`
+      }
+    }
+  }
+
   // Renderizar features del plan
   const featuresEl = document.getElementById('fact-features')
   const features = [
@@ -8807,6 +8821,11 @@ function buildVitiSystemPrompt() {
   const hasGoogle = vitiContext?.hasGoogle || false
   const hasInstagram = vitiContext?.hasInstagram || false
 
+  // Info de agenda
+  const agendaInfo = vitiContext?.upcomingAppointments > 0
+    ? `\n- Turnos próximos: ${vitiContext.upcomingAppointments} (${vitiContext.todayAppointments} hoy)`
+    : ''
+
   return `Sos Viti, la asistente estratégica de Vitrina para el negocio "${r.name}"${r.city ? ' (' + r.city + ')' : ''}.
 
 DATOS DEL NEGOCIO:
@@ -8815,7 +8834,7 @@ DATOS DEL NEGOCIO:
 ${r.address ? '- Dirección: ' + r.address : ''}
 ${r.tagline ? '- Tagline: ' + r.tagline : ''}
 - Horarios configurados: ${r.opening_hours ? 'Sí' : 'No'}
-- Integraciones activas: ${[hasML&&'MercadoLibre', hasTN&&'Tienda Nube', hasGoogle&&'Google Business', hasInstagram&&'Instagram'].filter(Boolean).join(', ') || 'Ninguna por ahora'}
+- Integraciones activas: ${[hasML&&'MercadoLibre', hasTN&&'Tienda Nube', hasGoogle&&'Google Business', hasInstagram&&'Instagram'].filter(Boolean).join(', ') || 'Ninguna por ahora'}${agendaInfo}
 ${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}
 
 TU ROL:
@@ -8934,6 +8953,28 @@ async function loadVitiContext() {
     ctx.hasGoogle   = ints.some(i => i.provider === 'google_business' && i.status === 'active')
     ctx.hasInstagram = ints.some(i => i.provider === 'instagram'   && i.status === 'active')
   } catch { ctx.hasML = ctx.hasTN = ctx.hasGoogle = ctx.hasInstagram = false }
+
+  // Datos de agenda si aplica
+  try {
+    if (restId) {
+      const { data: apptCount } = await supabase
+        .from('appointments')
+        .select('id', { count: 'exact', head: true })
+        .eq('restaurant_id', restId)
+        .gte('starts_at', new Date().toISOString())
+        .neq('status', 'cancelled')
+      ctx.upcomingAppointments = apptCount || 0
+
+      const { data: todayAppts } = await supabase
+        .from('appointments')
+        .select('id', { count: 'exact', head: true })
+        .eq('restaurant_id', restId)
+        .gte('starts_at', new Date().toISOString().split('T')[0] + 'T00:00:00')
+        .lte('starts_at', new Date().toISOString().split('T')[0] + 'T23:59:59')
+        .neq('status', 'cancelled')
+      ctx.todayAppointments = todayAppts || 0
+    }
+  } catch { ctx.upcomingAppointments = 0; ctx.todayAppointments = 0 }
 
   vitiContext = ctx
 }

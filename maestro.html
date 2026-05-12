@@ -347,6 +347,7 @@ tbody tr:hover {
 
   <!-- Vista General -->
   <div id="tab-overview" class="tab-content active">
+    <div id="wa-pending-alert" style="display:none"></div>
     <div class="metrics-grid">
       <div class="metric-card">
         <div class="metric-label">Clientes activos</div>
@@ -761,6 +762,25 @@ function renderOverview() {
   } else {
     alertsEl.innerHTML = ''
   }
+
+  // Alerta de clientes que solicitaron WhatsApp Business
+  try {
+    const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
+    const adminData = await adminRes.json()
+    const allRestaurants = adminData.restaurants || []
+    const pendingWA = allRestaurants.filter(r => r.wants_whatsapp)
+    if (pendingWA.length > 0) {
+      const alertEl = document.getElementById('wa-pending-alert')
+      if (alertEl) {
+        alertEl.style.display = 'block'
+        alertEl.innerHTML = `
+          <div class="alert alert-warning" style="margin-bottom:16px">
+            <strong>📱 ${pendingWA.length} cliente${pendingWA.length > 1 ? 's' : ''} solicitaron WhatsApp Business</strong>
+            <div style="margin-top:6px;font-size:13px">${pendingWA.map(r => r.name).join(', ')} — Recordá contactarlos para configurar su número dedicado.</div>
+          </div>`
+      }
+    }
+  } catch {}
 }
 
 async function renderClients() {
@@ -803,8 +823,9 @@ async function renderClients() {
           <td style="font-size:12px;color:var(--muted)">${createdAt}</td>
           <td style="font-size:12px">${tanoUsed > 0 ? tanoUsed + ' msgs' : '—'}</td>
           <td style="font-size:12px;color:var(--muted)">${lastActivity}</td>
-          <td style="display:flex;gap:8px;align-items:center">
+          <td style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <a href="/panel.html" onclick="localStorage.setItem('maestro_view_rest','${r.id}')" target="_blank" style="font-size:12px;color:var(--terra);text-decoration:none;font-weight:500">Ver →</a>
+            ${r.wants_whatsapp ? '<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;white-space:nowrap">📱 WA</span>' : ''}
             <button onclick="deleteRestaurant('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid #ddd;border-radius:6px;cursor:pointer;color:#aaa;font-family:'DM Sans',sans-serif" title="Eliminar">🗑️</button>
           </td>
         </tr>
