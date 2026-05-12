@@ -1784,7 +1784,7 @@ input:checked + .toggle-slider:before {
             </div>
             <div class="form-field col-2">
               <label class="form-label">Descripción</label>
-              <textarea class="form-textarea" id="f-description" placeholder="Contá de qué se trata tu restaurante…"></textarea>
+              <textarea class="form-textarea" id="f-description" placeholder="Contá de qué se trata tu negocio…"></textarea>
             </div>
             <div class="form-field col-2">
               <label class="form-label">URL pública <span>*</span></label>
@@ -2029,6 +2029,7 @@ input:checked + .toggle-slider:before {
             <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
             <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
             <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
+            <a href="/demo.html" target="_blank" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
           </div>
         </div>
       </div>
@@ -3453,6 +3454,17 @@ function fillForm(rest) {
   if (titleEl) titleEl.textContent = t
   if (subEl)   subEl.textContent   = s
 
+  const descEl = document.getElementById('f-description')
+  if (descEl) {
+    const placeholders = {
+      restaurant: 'Contá de qué se trata tu restaurante…',
+      local:      'Contá de qué se trata tu local y qué vendés…',
+      services:   'Contá qué servicios ofrecés y quiénes son tus clientes…',
+      ecommerce:  'Contá qué productos vendés y por qué elegirte…',
+    }
+    descEl.placeholder = placeholders[btype] || placeholders.restaurant
+  }
+
   document.getElementById('f-name').value        = rest.name        || ''
   document.getElementById('f-tagline').value     = rest.tagline     || ''
   document.getElementById('f-description').value = rest.description || ''
@@ -4450,6 +4462,7 @@ function renderMenu() {
         <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
         <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
         <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
+        <a href="/demo.html" target="_blank" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
       </div>`
     return
   }
