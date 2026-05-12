@@ -3351,6 +3351,28 @@ function renderSidebarRestaurant(rest) {
   // Actualizar labels del nav
   const menuNavBtn = document.querySelector('[data-section="menu"]')
   if (menuNavBtn) menuNavBtn.innerHTML = menuNavBtn.innerHTML.replace('Menú', terms.menu)
+
+  // Mostrar/ocultar nav items según tipo de negocio
+  const reservasBtn = document.querySelector('[data-section="reservas"]')
+  const agendaBtn   = document.querySelector('[data-section="agenda"]')
+  const catalogoBtn = document.querySelector('[data-section="catalogo"]')
+
+  if (btype === 'local' || btype === 'ecommerce') {
+    // No tienen reservas ni agenda, sí catálogo
+    if (reservasBtn) reservasBtn.style.display = 'none'
+    if (agendaBtn)   agendaBtn.style.display   = 'none'
+    if (catalogoBtn) catalogoBtn.style.display = 'flex'
+  } else if (btype === 'services') {
+    // Solo agenda (no reservas simples), no catálogo
+    if (reservasBtn) reservasBtn.style.display = 'none'
+    if (agendaBtn)   agendaBtn.style.display   = 'flex'
+    if (catalogoBtn) catalogoBtn.style.display = 'none'
+  } else {
+    // Restaurant: reservas + agenda + no catálogo
+    if (reservasBtn) reservasBtn.style.display = 'flex'
+    if (agendaBtn)   agendaBtn.style.display   = 'flex'
+    if (catalogoBtn) catalogoBtn.style.display = 'none'
+  }
 }
 
 function updateOpenPill(isOpen) {

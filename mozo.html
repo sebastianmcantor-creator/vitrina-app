@@ -338,6 +338,19 @@
       const tone = rest.tano_tone || 'calido'
       const hoursLine = rest.opening_hours ? '\nHorarios: ' + buildHoursText(rest.opening_hours) : ''
 
+      // Información de agenda/turnos si está configurada
+      let agendaLine = ''
+      if (rest.business_type === 'services' || rest.business_type === 'restaurant') {
+        const hasAgenda = rest.business_type !== 'local' && rest.business_type !== 'ecommerce'
+        if (hasAgenda) {
+          if (rest.business_type === 'restaurant') {
+            agendaLine = '\nRESERVAS: Los clientes pueden reservar mesa escribiendo por WhatsApp al número de reservas del restaurante. Podés informar sobre disponibilidad general pero no confirmás reservas desde este chat.'
+          } else {
+            agendaLine = '\nTURNOS: Los clientes pueden sacar turno escribiendo por WhatsApp al número de turnos del negocio. Podés informar que hay sistema de turnos disponible y dar el link de WhatsApp si te preguntan.'
+          }
+        }
+      }
+
       const toneDesc = tone === 'sofisticado'
         ? 'Tu tono es elegante y sofisticado. Vocabulario cuidado, sin contracciones informales ni emojis excesivos. Transmitís exclusividad.'
         : tone === 'neutro'
@@ -355,7 +368,8 @@
         + '2. Si te preguntan algo ajeno: "Eso no te lo puedo contestar yo, pero el equipo del restaurante te ayuda con gusto."\n'
         + '3. Nunca inventés platos ni precios. Si algo no figura, decí que consulten al personal.\n'
         + '4. Respuestas concisas, máximo 3-4 líneas. Si hay lista, viñetas cortas.\n\n'
-        + featuredLine + '\n\n'
+        + featuredLine
+        + agendaLine + '\n\n'
         + 'MENÚ DISPONIBLE:\n' + menuText
     }
 
