@@ -1947,6 +1947,9 @@ input:checked + .toggle-slider:before {
             <a class="btn-quick-link" id="link-qr-print" href="#" target="_blank">🖨️ Imprimir QRs</a>
             <a class="btn-quick-link" id="link-cocina" href="#" target="_blank">🧑‍🍳 Panel de cocina</a>
             <a class="btn-quick-link" id="link-mozo" href="#" target="_blank">💬 Ver asistente</a>
+            <button class="btn-quick-link" onclick="copyMenuLink()" id="btn-copy-link" style="background:var(--cream2)">
+              📋 Copiar link del menú
+            </button>
           </div>
         </div>
 
@@ -3483,6 +3486,23 @@ function updateQuickLinks(slug) {
   document.getElementById('link-mozo').href     = base + 'mozo.html?slug=' + slug + '&mesa=1'
   updateMenuQr(slug)
   updateWidgetCode(slug)
+}
+
+window.copyMenuLink = function () {
+  if (!currentRestaurant) return
+  const url = 'https://vitrinaapp.com.ar/menu.html?slug=' + currentRestaurant.slug
+  navigator.clipboard.writeText(url).then(() => {
+    const btn = document.getElementById('btn-copy-link')
+    if (btn) {
+      btn.textContent = '✓ ¡Link copiado!'
+      btn.style.background = 'var(--cream2)'
+      btn.style.color = 'var(--sage)'
+      setTimeout(() => { btn.textContent = '📋 Copiar link del menú'; btn.style.color = '' }, 2000)
+    }
+    showToast('Link copiado al portapapeles ✓', 'success')
+  }).catch(() => {
+    prompt('Copiá este link:', url)
+  })
 }
 
 function qrUrl(data, size = 140) {
@@ -7487,6 +7507,20 @@ window.loadAgenda = async function () {
             </button>
           </div>`)
       }
+    }
+    // Mostrar estado del WA
+    const hasWA = currentRestaurant.whatsapp_operativo || currentRestaurant.wants_whatsapp
+    if (!hasWA) {
+      // Agregar badge de "pendiente"
+      setTimeout(() => {
+        const card = document.getElementById('agenda-no-aplica')
+        if (card && !document.getElementById('wa-status-badge')) {
+          card.insertAdjacentHTML('beforeend', `
+            <div id="wa-status-badge" style="margin-top:16px;padding:12px 16px;background:#fff8e1;border:1px solid #ffd54f;border-radius:10px;font-size:13px;color:#856404;display:flex;align-items:center;gap:8px">
+              ⏳ Cuando contrates tu número de WhatsApp Business, te avisamos por email para configurarlo.
+            </div>`)
+        }
+      }, 100)
     }
     return
   }
