@@ -1868,6 +1868,18 @@ input:checked + .toggle-slider:before {
               <div id="website-analysis-result" style="display:none;margin-top:12px;padding:14px 16px;background:var(--cream2);border-radius:10px;border:1px solid var(--border);font-size:13.5px;line-height:1.6"></div>
             </div>
             <div class="form-field">
+              <label class="form-label">Instagram <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:13px;color:var(--muted);padding:8px 4px">@</span>
+                <input type="text" class="form-input" id="f-instagram" placeholder="tunegocio" style="flex:1">
+              </div>
+              <span class="form-hint">Sin el @. Ej: peluquerianomade</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Facebook <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
+              <input type="url" class="form-input" id="f-facebook" placeholder="https://www.facebook.com/tunegocio">
+            </div>
+            <div class="form-field">
               <label class="form-label">Moneda</label>
               <select class="form-select" id="f-currency">
                 <option value="ARS">ARS — Peso argentino</option>
@@ -3527,6 +3539,8 @@ function fillForm(rest) {
   document.getElementById('f-logo-url').value  = rest.logo_url   || ''
   document.getElementById('f-cover-url').value = rest.cover_url  || ''
   document.getElementById('f-website').value   = rest.website_url || ''
+  document.getElementById('f-instagram').value = rest.instagram_handle || ''
+  document.getElementById('f-facebook').value  = rest.facebook_url    || ''
   previewImgFromUrl('logo',  rest.logo_url  || '')
   previewImgFromUrl('cover', rest.cover_url || '')
 
@@ -4176,7 +4190,9 @@ window.saveRestaurant = async function () {
       is_active:     document.getElementById('f-is-active').checked,
       logo_url:      document.getElementById('f-logo-url').value.trim()  || null,
       cover_url:     document.getElementById('f-cover-url').value.trim() || null,
-      website_url:   document.getElementById('f-website').value.trim()   || null,
+      website_url:      document.getElementById('f-website').value.trim()   || null,
+      instagram_handle: document.getElementById('f-instagram').value.trim().replace('@','') || null,
+      facebook_url:     document.getElementById('f-facebook').value.trim() || null,
     }
 
     currentRestaurant = await restaurants.update(currentRestaurant.id, updates)
