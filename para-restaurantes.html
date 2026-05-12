@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitrina para Restaurantes — Menú QR, pedidos y Tano IA</title>
+  <meta name="description" content="Vitrina digitaliza tu restaurante: menú QR, pedidos online, pantalla de cocina, reservas y Tano — el asistente que atiende a tus clientes. 14 días gratis.">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #FAF7F2; color: #1C1208; overflow-x: hidden; }
+    .nav { background: rgba(250,247,242,.95); backdrop-filter: blur(12px); border-bottom: 1px solid #E8DDD0; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #B85A30; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .cta-nav { padding: 8px 18px; background: #B85A30; color: white; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; }
+    .hero { padding: 80px 24px 64px; text-align: center; background: linear-gradient(160deg, #FAF7F2, #F4EDE4); }
+    .badge { display: inline-block; background: #F4E8DF; color: #B85A30; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); margin-bottom: 16px; line-height: 1.15; }
+    h1 em { font-style: normal; color: #B85A30; }
+    .sub { font-size: 16px; color: #4A3828; max-width: 540px; margin: 0 auto 32px; line-height: 1.7; }
+    .cta-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary { padding: 13px 28px; background: #B85A30; color: white; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: 600; box-shadow: 0 4px 14px rgba(184,90,48,.3); transition: all .2s; display: inline-block; }
+    .btn-primary:hover { background: #9A4827; transform: translateY(-2px); }
+    .btn-ghost { padding: 13px 22px; border: 1.5px solid #E8DDD0; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500; color: #4A3828; display: inline-block; transition: all .2s; }
+    .btn-ghost:hover { border-color: #B85A30; color: #B85A30; }
+    .features { max-width: 1000px; margin: 0 auto; padding: 64px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .feat { background: white; border: 1px solid #E8DDD0; border-radius: 16px; padding: 24px; }
+    .feat-icon { font-size: 32px; margin-bottom: 14px; }
+    .feat h3 { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
+    .feat p { font-size: 14px; color: #8A7A6A; line-height: 1.6; }
+    .divider { height: 1px; background: #E8DDD0; margin: 0 24px; }
+    .flow { max-width: 800px; margin: 0 auto; padding: 64px 24px; }
+    .flow h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; text-align: center; margin-bottom: 40px; }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; }
+    .step { text-align: center; }
+    .step-num { width: 44px; height: 44px; border-radius: 50%; background: #F4E8DF; color: #B85A30; font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .step h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .step p { font-size: 13px; color: #8A7A6A; line-height: 1.5; }
+    .pricing-banner { background: #1C1208; color: white; padding: 48px 24px; text-align: center; }
+    .pricing-banner h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #e8c87a; margin-bottom: 12px; }
+    .pricing-banner p { font-size: 15px; color: rgba(255,255,255,.65); margin-bottom: 28px; line-height: 1.7; }
+    .price-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .price-card { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 14px; padding: 20px 24px; min-width: 160px; text-align: center; }
+    .price-val { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: #e8c87a; margin-bottom: 4px; }
+    .price-label { font-size: 12px; color: rgba(255,255,255,.5); }
+    footer { padding: 24px; text-align: center; font-size: 13px; color: #8A7A6A; }
+    footer a { color: #B85A30; text-decoration: none; }
+    .sticky-cta { display: none; position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: #B85A30; z-index: 90; }
+    .sticky-cta a { display: block; text-align: center; color: white; text-decoration: none; font-weight: 600; font-size: 15px; }
+    @media (max-width: 640px) { .sticky-cta { display: block; } body { padding-bottom: 56px; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="logo">
+    <svg width="18" height="22" viewBox="0 0 18 22" fill="none"><rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#B85A30"/><rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/><rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/><path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+    Vitrina
+  </a>
+  <a href="/panel.html" class="cta-nav">Empezar gratis →</a>
+</nav>
+
+<section class="hero">
+  <div class="badge">🍽️ Para restaurantes y bares</div>
+  <h1>Tu restaurante digital,<br><em>listo en 15 minutos</em></h1>
+  <p class="sub">Menú QR, pedidos online con MercadoPago, pantalla de cocina en tiempo real y Tano — el asistente que atiende a tus clientes.</p>
+  <div class="cta-group">
+    <a href="/panel.html" class="btn-primary">Probarlo 14 días gratis →</a>
+    <a href="/demo.html" class="btn-ghost">Ver demo 🍽️</a>
+  </div>
+</section>
+
+<div class="features">
+  <div class="feat"><div class="feat-icon">📱</div><h3>Menú QR por mesa</h3><p>Un QR único por mesa. El cliente lo escanea, ve el menú en su celular, elige y paga. En español, inglés y portugués.</p></div>
+  <div class="feat"><div class="feat-icon">🍳</div><h3>Cocina en tiempo real</h3><p>El pedido aparece en la pantalla de cocina en 2 segundos. Sin papel, sin llamados. Con alerta si algo tarda más de 20 minutos.</p></div>
+  <div class="feat"><div class="feat-icon">💬</div><h3>Tano, tu mozo IA</h3><p>Responde preguntas del menú, ingredientes y alérgenos. En 3 idiomas. Disponible mientras el local está abierto.</p></div>
+  <div class="feat"><div class="feat-icon">📅</div><h3>Reservas por WhatsApp</h3><p>Los clientes reservan mesa por WhatsApp. Confirmación automática y recordatorio 24hs antes. Vos no hacés nada.</p></div>
+  <div class="feat"><div class="feat-icon">💳</div><h3>Pagos con MercadoPago</h3><p>El cliente paga desde su celular antes de que llegue la cuenta. Sin contacto con la tarjeta, sin esperar al mozo.</p></div>
+  <div class="feat"><div class="feat-icon">📊</div><h3>Estadísticas reales</h3><p>Plato más pedido, horario pico, ticket promedio, ingresos por día. Datos de tu negocio, actualizados en tiempo real.</p></div>
+</div>
+
+<div class="divider"></div>
+
+<div class="flow">
+  <h2>¿Cómo arrancás?</h2>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><h4>Registrate con Google</h4><p>Un click, sin formularios largos.</p></div>
+    <div class="step"><div class="step-num">2</div><h4>Cargá el menú</h4><p>Con fotos, precios y categorías. O importá desde una foto del menú impreso.</p></div>
+    <div class="step"><div class="step-num">3</div><h4>Imprimí los QR</h4><p>Un QR por mesa. Los ponés y ya.</p></div>
+    <div class="step"><div class="step-num">4</div><h4>Recibís pedidos</h4><p>Los clientes piden, la cocina ve todo, vos cobrás.</p></div>
+  </div>
+</div>
+
+<div class="pricing-banner">
+  <h2>Precios claros</h2>
+  <p>Sin comisión sobre tus ventas. Precio fijo mensual en pesos al tipo de cambio oficial.</p>
+  <div class="price-cards">
+    <div class="price-card"><div class="price-val" id="p-r1">$38k</div><div class="price-label">Solo Menú · USD 27/mes</div></div>
+    <div class="price-card" style="border-color:rgba(200,168,74,.4)"><div class="price-val" id="p-r2">$55k</div><div class="price-label">Menú + WhatsApp · USD 39/mes</div></div>
+    <div class="price-card"><div class="price-val" id="p-r3">$82k</div><div class="price-label">Marketing · USD 58/mes</div></div>
+  </div>
+  <a href="/panel.html" class="btn-primary">Empezar 14 días gratis →</a>
+  <p style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.35)">Sin tarjeta · Sin contrato · Cancelás cuando querés</p>
+</div>
+
+<footer>
+  <p>© 2026 Vitrina · <a href="/">vitrinaapp.com.ar</a> · <a href="mailto:contacto@vitrinaapp.com.ar">contacto@vitrinaapp.com.ar</a></p>
+</footer>
+
+<div class="sticky-cta">
+  <a href="/panel.html">Probarlo gratis 14 días →</a>
+</div>
+
+<script>
+;(async function() {
+  try {
+    const r = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio')
+    const d = await r.json()
+    const tc = d.oficial || 1418
+    const fmt = usd => '$' + Math.round(usd * tc / 1000) + 'k'
+    const p1 = document.getElementById('p-r1'); if(p1) p1.textContent = fmt(27)
+    const p2 = document.getElementById('p-r2'); if(p2) p2.textContent = fmt(39)
+    const p3 = document.getElementById('p-r3'); if(p3) p3.textContent = fmt(58)
+  } catch {}
+})()
+</script>
+</body>
+</html>
