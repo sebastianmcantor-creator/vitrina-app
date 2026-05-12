@@ -2006,6 +2006,14 @@ input:checked + .toggle-slider:before {
           </div>
         </div>
 
+        <!-- Links de acceso rápido para el equipo -->
+        <div class="card" style="margin-top:16px" id="quick-access-card">
+          <div class="card-title">🔗 Para compartir con tu equipo</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="quick-team-links">
+            <!-- Se llena con JS -->
+          </div>
+        </div>
+
         <!-- Widget para sitio web propio -->
         <div class="card" style="margin-top:16px" id="widget-embed-card">
           <div class="card-title">🌐 Widget para tu sitio web</div>
@@ -2681,7 +2689,7 @@ input:checked + .toggle-slider:before {
               <input class="form-input" id="wa-operativo-input" type="tel"
                 placeholder="5491155556666 (número del encargado o cocina)"
                 style="max-width:380px">
-              <div class="form-hint">Recibe un mensaje cada vez que entra un pedido nuevo.</div>
+              <span class="form-hint">Recibe notificaciones de nuevos pedidos, cambios de estado y alertas urgentes. Puede ser el número del encargado o la cocina.</span>
             </div>
 
             <div class="form-field">
@@ -2689,7 +2697,7 @@ input:checked + .toggle-slider:before {
               <input class="form-input" id="wa-gestion-input" type="tel"
                 placeholder="5491155556666 (número del dueño)"
                 style="max-width:380px">
-              <div class="form-hint">Recibe alertas de Tano, vencimientos y novedades del plan.</div>
+              <span class="form-hint">Recibe resúmenes del negocio, alertas de créditos y reportes semanales. Normalmente es el número del dueño.</span>
             </div>
           </div>
 
@@ -3566,6 +3574,23 @@ function updateQuickLinks(slug) {
   document.getElementById('link-mozo').href     = base + 'mozo.html?slug=' + slug + '&mesa=1'
   updateMenuQr(slug)
   updateWidgetCode(slug)
+
+  // Links de equipo
+  const teamLinks = document.getElementById('quick-team-links')
+  if (teamLinks) {
+    teamLinks.innerHTML = [
+      { icon: '🍽️', label: 'Menú público', url: base + 'menu.html?slug=' + slug, hint: 'Compartí con clientes' },
+      { icon: '🧑‍🍳', label: 'Pantalla cocina', url: base + 'cocina.html?slug=' + slug, hint: 'Para el cocinero' },
+      { icon: '💬', label: 'Asistente IA', url: base + 'mozo.html?slug=' + slug, hint: 'Demo para clientes' },
+      { icon: '🖨️', label: 'Imprimir QRs', url: base + 'qr-print.html?slug=' + slug, hint: 'PDF para mesas' },
+    ].map(l => `
+      <div style="background:var(--cream2);border-radius:10px;padding:12px;border:1px solid var(--border)">
+        <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${l.hint}</div>
+        <a href="${l.url}" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-size:13.5px;font-weight:500">
+          <span>${l.icon}</span> ${l.label}
+        </a>
+      </div>`).join('')
+  }
 }
 
 window.copyMenuLink = function () {
