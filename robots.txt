@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /demo.html
+Allow: /terms.html
+Allow: /privacy.html
+Disallow: /panel.html
+Disallow: /maestro.html
+Disallow: /cocina.html
+Disallow: /login.html
+Disallow: /meta-setup.html
+Disallow: /qr-print.html
+Disallow: /logo-opciones.html
+
+Sitemap: https://vitrinaapp.com.ar/sitemap.xml
