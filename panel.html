@@ -2244,6 +2244,12 @@ input:checked + .toggle-slider:before {
               <button class="stats-period-btn"        data-hdays="30" onclick="setHistorialPeriod(30)">30 días</button>
               <button class="stats-period-btn"        data-hdays="90" onclick="setHistorialPeriod(90)">3 meses</button>
             </div>
+            <!-- Filtro por estado -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px" id="historial-status-filters">
+              <button class="filter-btn active" data-status="all" onclick="setHistorialStatus('all', this)">Todos</button>
+              <button class="filter-btn" data-status="delivered" onclick="setHistorialStatus('delivered', this)">Entregados</button>
+              <button class="filter-btn" data-status="cancelled" onclick="setHistorialStatus('cancelled', this)">Cancelados</button>
+            </div>
             <!-- Buscador por mesa o plato -->
             <input id="historial-search" type="search" placeholder="Buscar mesa o plato…"
               oninput="filterHistorial(this.value)"
@@ -7487,13 +7493,13 @@ function renderGettingStarted() {
   const totalMenuItems = Object.values(menuItemsMap || {}).flat().length
 
   const steps = [
-    { label: 'Negocio creado ✓',                    done: true },
-    { label: 'Descripción o tagline cargados',      done: !!(r.tagline || r.description), action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
-    { label: 'Logo o foto de portada subidos',      done: !!(r.logo_url || r.cover_url),  action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
-    { label: 'Primer plato o producto agregado',    done: totalMenuItems > 0,             action: () => switchSection('menu',  document.querySelector('[data-section="menu"]'))  },
-    { label: 'Mesa o QR generado',                  done: mesasList.length > 0,           action: () => switchSection('mesas', document.querySelector('[data-section="mesas"]')) },
-    { label: 'WhatsApp operativo configurado',      done: !!(r.whatsapp_operativo),       action: () => switchSection('config',document.querySelector('[data-section="config"]'))},
-    { label: 'Horarios cargados — Tano los muestra a los clientes', done: !!(r.opening_hours), action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
+    { label: '✅ Negocio creado — ¡empezamos!',        done: true },
+    { label: 'Poné una descripción que enganche',      done: !!(r.tagline || r.description), action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
+    { label: 'Subí el logo — tu cara visible',         done: !!(r.logo_url || r.cover_url),  action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
+    { label: 'Cargá tu primer producto o plato',       done: totalMenuItems > 0,             action: () => switchSection('menu',  document.querySelector('[data-section="menu"]'))  },
+    { label: 'Generá el QR para tu primera mesa',      done: mesasList.length > 0,           action: () => switchSection('mesas', document.querySelector('[data-section="mesas"]')) },
+    { label: 'Conectá WhatsApp para las alertas',      done: !!(r.whatsapp_operativo),       action: () => switchSection('config',document.querySelector('[data-section="config"]'))},
+    { label: 'Configurá tus horarios de apertura',     done: !!(r.opening_hours),            action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
   ]
 
   const doneCount  = steps.filter(s => s.done).length
@@ -8754,6 +8760,14 @@ window.updateReservaStatus = async function (id, status) {
 let historialData = []
 let historialDays = 30
 let historialQuery = ''
+let historialStatus = 'all'
+
+window.setHistorialStatus = function (status, btn) {
+  historialStatus = status
+  document.querySelectorAll('#historial-status-filters .filter-btn').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  applyHistorialFilter()
+}
 
 window.loadHistorial = async function () {
   if (!currentRestaurant) return
@@ -8782,6 +8796,9 @@ window.filterHistorial = function (q) {
 
 function applyHistorialFilter() {
   let data = historialData
+  if (historialStatus !== 'all') {
+    data = data.filter(o => o.status === historialStatus)
+  }
   if (historialQuery) {
     data = data.filter(o => {
       if (o.table_number != null && String(o.table_number).includes(historialQuery)) return true
