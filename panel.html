@@ -1946,7 +1946,9 @@ input:checked + .toggle-slider:before {
         <!-- Horarios de apertura -->
         <div class="card" style="margin-top:20px">
           <div class="card-title">🕐 Horarios de apertura</div>
-          <div style="font-size:13.5px;color:var(--muted);margin-bottom:16px">Se muestran en el menú digital de tus clientes.</div>
+          <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5">
+  Los horarios aparecen en el menú de tus clientes y le dicen al asistente cuándo está abierto el local. Importante: el asistente IA solo informa que está abierto cuando realmente lo está.
+</p>
           <div id="opening-hours-grid" style="display:grid;gap:8px"></div>
           <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
             <button class="btn-primary" onclick="saveOpeningHours()">Guardar horarios</button>
@@ -5208,12 +5210,19 @@ function renderPedidos() {
   setBadgeCount(list.length)
 
   if (!list.length) {
-    container.innerHTML = `
-      <div class="pedidos-empty">
-        <div class="pedidos-empty-icon">🔔</div>
-        <div class="pedidos-empty-label">Sin pedidos activos</div>
-        <div class="pedidos-empty-desc">Los nuevos pedidos aparecerán acá en tiempo real.</div>
-      </div>`
+    container.innerHTML = `<div style="text-align:center;padding:48px 24px">
+  <div style="font-size:40px;margin-bottom:12px">🔔</div>
+  <div style="font-size:15px;font-weight:500;color:var(--ink);margin-bottom:6px">Sin pedidos activos ahora</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Los pedidos nuevos aparecen acá en tiempo real.</div>
+  <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <a href="menu.html?slug=${currentRestaurant?.slug}" target="_blank" rel="noopener noreferrer" style="font-size:13px;padding:8px 16px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--ink)">
+      🍽️ Ver menú como cliente
+    </a>
+    <a href="cocina.html?slug=${currentRestaurant?.slug}" target="_blank" rel="noopener noreferrer" style="font-size:13px;padding:8px 16px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--ink)">
+      🍳 Abrir pantalla cocina
+    </a>
+  </div>
+</div>`
     return
   }
 
