@@ -1515,6 +1515,7 @@ input:checked + .toggle-slider:before {
       </button>
       <button class="nav-item" data-section="agenda" onclick="switchSection('agenda', this)">
         <span class="nav-icon">🗓️</span> Agenda
+        <span class="nav-badge" id="agenda-badge" style="display:none">0</span>
       </button>
       <button class="nav-item" data-section="pedidos" onclick="switchSection('pedidos', this)">
         <span class="nav-icon">🔔</span> Pedidos
@@ -2677,7 +2678,7 @@ input:checked + .toggle-slider:before {
 
         <!-- Configuración de Tano -->
         <div class="card">
-          <div class="card-title">🤖 Personalización de Tano</div>
+          <div class="card-title" data-tano-title>🤖 Personalización de Tano</div>
           <div style="font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.6">
             Configurá cómo se presenta Tano ante tus clientes.
           </div>
@@ -3465,6 +3466,17 @@ function fillForm(rest) {
     descEl.placeholder = placeholders[btype] || placeholders.restaurant
   }
 
+  const taglineEl = document.getElementById('f-tagline')
+  if (taglineEl) {
+    const taglinePlaceholders = {
+      restaurant: 'El sabor de siempre, en cada bocado.',
+      local:      'Los mejores productos al mejor precio.',
+      services:   'Profesionalismo y atención personalizada.',
+      ecommerce:  'Calidad garantizada, envío a todo el país.',
+    }
+    taglineEl.placeholder = taglinePlaceholders[btype] || taglinePlaceholders.restaurant
+  }
+
   document.getElementById('f-name').value        = rest.name        || ''
   document.getElementById('f-tagline').value     = rest.tagline     || ''
   document.getElementById('f-description').value = rest.description || ''
@@ -3630,6 +3642,7 @@ window.loadRestaurant = async function () {
     showSection('info')
     renderGettingStarted()
     initPedidosBadge()
+    updateAgendaBadge()
   } catch (e) {
     showToast('Error cargando restaurante: ' + e.message, 'error')
   }
@@ -3854,6 +3867,7 @@ window.switchRestaurant = async function (id) {
   fillForm(currentRestaurant)
   showSection('info')
   initPedidosBadge()
+  updateAgendaBadge()
   showToast('Cambiaste a ' + currentRestaurant.name, 'success')
 }
 
@@ -4032,6 +4046,7 @@ window.createRestaurant = async function () {
     showSection('info')
     if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
     initPedidosBadge()
+    updateAgendaBadge()
     showToast(cfg.successMsg + ' Configurá tus primeros productos para empezar.', 'success')
     // Email de bienvenida al nuevo cliente
     if (currentUser.email) {
@@ -4940,6 +4955,34 @@ function initPedidosBadge() {
     .subscribe()
 }
 
+async function updateAgendaBadge() {
+  if (!currentRestaurant) return
+  const btype = currentRestaurant.business_type || 'restaurant'
+  if (btype === 'local' || btype === 'ecommerce') return
+
+  try {
+    const today = new Date().toISOString().split('T')[0]
+    const { count } = await supabase
+      .from('appointments')
+      .select('id', { count: 'exact', head: true })
+      .eq('restaurant_id', currentRestaurant.id)
+      .gte('starts_at', today + 'T00:00:00')
+      .lte('starts_at', today + 'T23:59:59')
+      .neq('status', 'cancelled')
+      .neq('status', 'completed')
+
+    const badge = document.getElementById('agenda-badge')
+    if (badge) {
+      if (count > 0) {
+        badge.style.display = 'inline'
+        badge.textContent = count
+      } else {
+        badge.style.display = 'none'
+      }
+    }
+  } catch {}
+}
+
 function setBadgeCount(count) {
   const badge = document.getElementById('pedidos-badge')
   if (!badge) return
@@ -5254,6 +5297,20 @@ window.loadConfig = async function () {
   if (tanoTone)    tanoTone.value    = currentRestaurant.tano_tone    || 'calido'
   if (tanoWelcome) tanoWelcome.value = currentRestaurant.tano_welcome  || ''
   if (tanoLimit)   tanoLimit.value   = currentRestaurant.tano_limit_message || ''
+
+  // Actualizar título de sección Tano
+  const tanoConfigTitle = document.querySelector('.card-title[data-tano-title]')
+  if (tanoConfigTitle) {
+    const name = currentRestaurant.tano_name || 'Tano'
+    const btype = currentRestaurant.business_type || 'restaurant'
+    const btypeTitles = {
+      restaurant: `🤖 ${name} — Tu asistente`,
+      services:   `🤖 ${name} — Tu asistente de turnos`,
+      local:      `🤖 ${name} — Tu asistente de ventas`,
+      ecommerce:  `🤖 ${name} — Tu asistente de tienda`,
+    }
+    tanoConfigTitle.textContent = btypeTitles[btype] || btypeTitles.restaurant
+  }
 
   try {
     staffList = await restaurantStaff.listByRestaurant(currentRestaurant.id)
@@ -7591,6 +7648,7 @@ window.loadAgenda = async function () {
     renderServicesList()
     renderStaffList()
   }
+  updateAgendaBadge()
 }
 
 function renderAgendaDay() {
