@@ -5754,6 +5754,20 @@ window.loadAnalisis = async function () {
       }
     }
 
+    // Si tiene handle de Instagram pero no integración, sugerir conectar
+    const igIntegration = integracionesLista.find(i => i.provider === 'instagram' && i.is_active)
+    const igHandle = currentRestaurant?.instagram_handle
+    if (igHandle && !igIntegration) {
+      const igBtn = document.getElementById('btn-connect-instagram')
+      if (igBtn) {
+        igBtn.textContent = `Conectar @${igHandle}`
+        const hint = document.createElement('div')
+        hint.style.cssText = 'font-size:12px;color:var(--muted);margin-top:6px'
+        hint.textContent = `Detectamos @${igHandle} en tu perfil. Conectalo para ver métricas reales.`
+        igBtn.parentElement?.appendChild(hint)
+      }
+    }
+
     // Cargar competidores
     loadCompetitors()
   } catch (e) {
@@ -9154,6 +9168,13 @@ function buildVitiSystemPrompt() {
     ? `\n- Turnos próximos: ${vitiContext.upcomingAppointments} (${vitiContext.todayAppointments} hoy)`
     : ''
 
+  // Redes sociales del negocio
+  const socialInfo = [
+    r.instagram_handle ? `- Instagram: @${r.instagram_handle}` : '',
+    r.facebook_url     ? `- Facebook: ${r.facebook_url}` : '',
+    r.website_url      ? `- Sitio web: ${r.website_url}` : '',
+  ].filter(Boolean).join('\n')
+
   return `Sos Viti, la asistente estratégica de Vitrina para el negocio "${r.name}"${r.city ? ' (' + r.city + ')' : ''}.
 
 DATOS DEL NEGOCIO:
@@ -9163,6 +9184,7 @@ ${r.address ? '- Dirección: ' + r.address : ''}
 ${r.tagline ? '- Tagline: ' + r.tagline : ''}
 - Horarios configurados: ${r.opening_hours ? 'Sí' : 'No'}
 - Integraciones activas: ${[hasML&&'MercadoLibre', hasTN&&'Tienda Nube', hasGoogle&&'Google Business', hasInstagram&&'Instagram'].filter(Boolean).join(', ') || 'Ninguna por ahora'}${agendaInfo}
+${socialInfo}
 ${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}
 
 TU ROL:
@@ -9295,6 +9317,10 @@ async function loadVitiContext() {
     ctx.hasGoogle   = ints.some(i => i.provider === 'google_business' && i.status === 'active')
     ctx.hasInstagram = ints.some(i => i.provider === 'instagram'   && i.status === 'active')
   } catch { ctx.hasML = ctx.hasTN = ctx.hasGoogle = ctx.hasInstagram = false }
+
+  // Usar Instagram del perfil si no está conectada la integración
+  ctx.hasInstagramProfile = !!(currentRestaurant?.instagram_handle)
+  ctx.instagramHandle = currentRestaurant?.instagram_handle || null
 
   // Datos de agenda si aplica
   try {

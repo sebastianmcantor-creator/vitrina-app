@@ -360,6 +360,12 @@
       const location = [rest.address, rest.city].filter(Boolean).join(', ')
       const tone = rest.tano_tone || 'calido'
       const hoursLine = rest.opening_hours ? '\nHorarios: ' + buildHoursText(rest.opening_hours) : ''
+      const socialLine = [
+        rest.instagram_handle ? `Instagram: @${rest.instagram_handle}` : '',
+        rest.facebook_url     ? `Facebook: ${rest.facebook_url}` : '',
+        rest.website_url      ? `Web: ${rest.website_url}` : '',
+      ].filter(Boolean).join(' · ')
+      const socialPromptLine = socialLine ? '\nRedes y web: ' + socialLine : ''
 
       // Información de agenda/turnos si está configurada
       let agendaLine = ''
@@ -400,6 +406,7 @@
       return 'Sos ' + assistantName + ', el asistente digital de ' + rest.name
         + (businessDesc ? ', ' + businessDesc : '') + '.'
         + hoursLine
+        + socialPromptLine
         + ' Tu nombre es ' + assistantName + '. Sonas humano, nunca como un bot genérico.\n\n'
         + toneDesc + '\n\n'
         + (LANG_INSTRUCTION[currentLang] ? LANG_INSTRUCTION[currentLang] + '\n\n' : '')
