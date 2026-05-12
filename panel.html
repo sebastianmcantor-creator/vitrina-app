@@ -1660,7 +1660,7 @@ input:checked + .toggle-slider:before {
             </svg>
           </div>
           <div class="setup-title">¿Qué tipo de negocio tenés?</div>
-          <div class="setup-subtitle">Contanos qué tipo de negocio tenés y en 15 minutos vas a tener todo listo.</div>
+          <div class="setup-subtitle">Contanos qué tipo de negocio tenés. Adaptamos todo — el lenguaje, las funciones y el asistente IA — a tu rubro.</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px;margin-top:8px">
 
             <button onclick="selectBusinessType('restaurant')" class="biz-type-btn">
@@ -2591,7 +2591,7 @@ input:checked + .toggle-slider:before {
       <div id="section-config" class="panel-section">
         <div class="page-header">
           <div class="page-title">Configuración</div>
-          <div class="page-subtitle">Gestioná tu plan y el equipo con acceso al panel.</div>
+          <div class="page-subtitle">Plan, equipo, WhatsApp, horarios y asistente Tano. Todos los ajustes de tu negocio en un lugar.</div>
         </div>
 
         <!-- Plan actual -->
@@ -3362,7 +3362,17 @@ function renderSidebarRestaurant(rest) {
   // Color del badge de plan
   const planEl = document.getElementById('sidebar-rest-plan')
   if (planEl) {
-    const colors = { free: '#8a7e74', basico: '#5a9e6a', pro: '#b85a30', full: '#c8a84a', marketing: '#4a90d9' }
+    const colors = {
+      free: '#8a7e74',
+      menu_free: '#8a7e74',
+      basico: '#22863a', menu_basico: '#22863a',
+      pro: '#b85a30', menu_pro: '#b85a30',
+      full: '#c8963c', menu_full: '#c8963c',
+      marketing: '#4a90d9',
+      'marketing+wa': '#7b52a6',
+      combo: '#7b52a6',
+      'combo+wa': '#7b52a6',
+    }
     const planKey = (rest.plan || 'free').toLowerCase()
     planEl.style.color = colors[planKey] || '#8a7e74'
   }
@@ -9138,6 +9148,28 @@ window.showToast = function (msg, type = 'default') {
   clearTimeout(toastTimer)
   toastTimer = setTimeout(() => el.classList.remove('show'), 3200)
 }
+
+// ─────────────────────────────────────────────
+// Keyboard shortcuts
+// ─────────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  // Ctrl/Cmd + K → focus búsqueda del historial si está visible
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    const histSearch = document.getElementById('historial-search')
+    if (histSearch && document.getElementById('section-historial').classList.contains('active')) {
+      e.preventDefault()
+      histSearch.focus()
+    }
+  }
+  // Escape → cerrar modales abiertos
+  if (e.key === 'Escape') {
+    const openModal = document.querySelector('.modal-overlay.open')
+    if (openModal) {
+      const modalId = openModal.id
+      if (modalId) closeModal(modalId)
+    }
+  }
+})
 
 // ─────────────────────────────────────────────
 // Manejo de callbacks OAuth
