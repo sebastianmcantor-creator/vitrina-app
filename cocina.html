@@ -163,6 +163,19 @@
       .filter-bar { padding: 8px 12px 0; gap: 6px; }
       .filter-tab { padding: 5px 12px; font-size: 12px; }
     }
+    @media print {
+      body { background: white; color: black; }
+      .filter-bar, .header .conn-label, #btn-mute-sound { display: none !important; }
+      .boards { grid-template-columns: repeat(2, 1fr); padding: 8px; gap: 8px; }
+      .mesa-group { border: 1px solid #ccc; break-inside: avoid; }
+      .mesa-group-header { background: #f5f5f5 !important; color: black !important; }
+      .pedido-card { background: white !important; border: 1px solid #ddd !important; }
+      .estado-btn, .card-undo-btn { display: none !important; }
+      .item-qty { color: #333 !important; }
+      .item-name-cocina { color: black !important; }
+      .estado-badge { border: 1px solid #ccc; background: white !important; color: black !important; }
+      .nuevo-badge { background: #333 !important; }
+    }
   </style>
 </head>
 <body>
