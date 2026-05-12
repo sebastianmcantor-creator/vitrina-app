@@ -74,7 +74,7 @@
 
   <div class="loading-overlay" id="loader">
     <div class="loading-logo" id="loader-name">Cargando</div>
-    <div class="loading-sub">Asistente de menú</div>
+    <div class="loading-sub" id="loading-sub-text">Asistente digital</div>
     <div class="loading-bar"><div class="loading-bar-fill"></div></div>
   </div>
 
@@ -253,6 +253,29 @@
       systemPrompt = buildSystemPrompt(rest)
       buildSuggestions(rest)
 
+      // Adaptar textos al tipo de negocio
+      const subEl = document.getElementById('loading-sub-text')
+      if (subEl) {
+        const subTexts = {
+          restaurant: 'Asistente de menú',
+          local: 'Asistente de ventas',
+          services: 'Agenda y consultas',
+          ecommerce: 'Asistente de tienda',
+        }
+        subEl.textContent = subTexts[rest.business_type] || 'Asistente digital'
+      }
+
+      const inputEl = document.getElementById('chat-input')
+      if (inputEl) {
+        const placeholders = {
+          restaurant: 'Preguntame sobre el menú...',
+          local: 'Preguntame sobre productos o precios...',
+          services: 'Consultá sobre turnos o servicios...',
+          ecommerce: 'Preguntame sobre productos o envíos...',
+        }
+        inputEl.placeholder = placeholders[rest.business_type] || 'Preguntame lo que quieras...'
+      }
+
       // Si la sesión es stale, arrancar limpio igual (ya conversationHistory = [])
       if (sessionIsStale()) {
         conversationHistory = []
@@ -357,46 +380,78 @@
           ? 'Tu tono es amable y profesional. Ni muy formal ni muy informal. Emojis con moderación.'
           : /* calido */ 'Tu tono es cálido, informal y porteño. Tratás al cliente de vos, usás expresiones del Río de la Plata (che, dale, etc.). Emojis con moderación.'
 
-      return 'Sos Tano, el asistente digital de ' + rest.name
-        + (location ? ', un restaurante en ' + location : '') + '.'
+      const assistantName = rest.tano_name || (rest.business_type === 'services' ? 'el asistente' : rest.business_type === 'local' || rest.business_type === 'ecommerce' ? 'el asistente de ventas' : 'Tano')
+      const assistantRole = rest.business_type === 'services'
+        ? 'Ayudás a los clientes a conocer los servicios disponibles, los precios y los turnos. Podés informar si hay disponibilidad pero no confirmás turnos directamente — les decís que reserven por WhatsApp.'
+        : rest.business_type === 'local' || rest.business_type === 'ecommerce'
+        ? 'Ayudás a los clientes a conocer los productos disponibles, precios y cómo comprar. Sos amable, directo y conocés bien el catálogo.'
+        : null
+
+      const businessDesc = rest.business_type === 'services'
+        ? 'un negocio de servicios en ' + (location || 'la zona')
+        : rest.business_type === 'local' || rest.business_type === 'ecommerce'
+        ? 'un local en ' + (location || 'la zona')
+        : location ? 'un restaurante en ' + location : ''
+
+      const catalogSection = (!menuText || menuText.length < 10) && assistantRole
+        ? 'TIPO DE NEGOCIO: ' + (rest.business_type === 'services' ? 'Servicio de turnos/citas. ' + assistantRole : assistantRole)
+        : 'MENÚ/CATÁLOGO DISPONIBLE:\n' + menuText
+
+      return 'Sos ' + assistantName + ', el asistente digital de ' + rest.name
+        + (businessDesc ? ', ' + businessDesc : '') + '.'
         + hoursLine
-        + ' Tu nombre es Tano. Sonas humano, nunca como un bot genérico.\n\n'
+        + ' Tu nombre es ' + assistantName + '. Sonas humano, nunca como un bot genérico.\n\n'
         + toneDesc + '\n\n'
         + (LANG_INSTRUCTION[currentLang] ? LANG_INSTRUCTION[currentLang] + '\n\n' : '')
         + 'REGLAS:\n'
-        + '1. Solo respondés sobre el menú, platos, ingredientes, alérgenos, opciones dietarias y el restaurante.\n'
-        + '2. Si te preguntan algo ajeno: "Eso no te lo puedo contestar yo, pero el equipo del restaurante te ayuda con gusto."\n'
-        + '3. Nunca inventés platos ni precios. Si algo no figura, decí que consulten al personal.\n'
+        + '1. Solo respondés sobre los servicios, productos, precios y el negocio.\n'
+        + '2. Si te preguntan algo ajeno: "Eso no te lo puedo contestar yo, pero el equipo te ayuda con gusto."\n'
+        + '3. Nunca inventés servicios, productos ni precios. Si algo no figura, decí que consulten al personal.\n'
         + '4. Respuestas concisas, máximo 3-4 líneas. Si hay lista, viñetas cortas.\n\n'
         + featuredLine
         + agendaLine + '\n\n'
-        + 'MENÚ DISPONIBLE:\n' + menuText
+        + catalogSection
     }
 
     function buildSuggestions(rest) {
-      const cats = (rest.menu_categories || [])
-        .filter(c => c.is_visible)
-        .sort((a, b) => a.sort_order - b.sort_order)
-        .slice(0, 3)
+      const btype = rest.business_type || 'restaurant'
+      const menuLink = 'menu.html?slug=' + encodeURIComponent(rest.slug) + (mesa ? '&mesa=' + mesa : '')
+      const el = document.getElementById('suggestions')
 
-      const hasFeatured = (rest.menu_categories || []).some(cat =>
+      const hasFeatured = btype === 'restaurant' && (rest.menu_categories || []).some(cat =>
         (cat.menu_items || []).some(i => i.is_visible && i.is_available && i.is_featured)
       )
 
-      const menuLink = 'menu.html?slug=' + encodeURIComponent(rest.slug) + (mesa ? '&mesa=' + mesa : '')
+      let suggestions = ''
 
-      const el = document.getElementById('suggestions')
-      el.innerHTML = (hasFeatured
-        ? '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Cuáles son los platos destacados?\')">⭐ Destacados</button>'
-        : '')
-        + cats.map(cat =>
-          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué ' + cat.name.toLowerCase() + ' tienen?\')">'
-          + (cat.emoji ? cat.emoji + ' ' : '') + cat.name + '</button>'
-        ).join('')
-        + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué opciones veganas tienen?\')">Vegano</button>'
-        + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué platos son sin TACC?\')">Sin TACC</button>'
-        + '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué me recomendás?\')">Recomendaciones</button>'
-        + '<a class="suggestion-btn" href="' + menuLink + '" style="text-decoration:none;display:inline-block">📋 Ver menú completo</a>'
+      if (btype === 'restaurant') {
+        const cats = (rest.menu_categories || []).filter(c => c.is_visible).sort((a,b) => a.sort_order - b.sort_order).slice(0, 3)
+        suggestions = (hasFeatured ? '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Cuáles son los platos destacados?\')">⭐ Destacados</button>' : '') +
+          cats.map(cat => '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué ' + cat.name.toLowerCase() + ' tienen?\')">' + (cat.emoji ? cat.emoji + ' ' : '') + cat.name + '</button>').join('') +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué opciones veganas tienen?\')">Vegano</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué me recomendás?\')">Recomendaciones</button>' +
+          '<a class="suggestion-btn" href="' + menuLink + '" style="text-decoration:none;display:inline-block">📋 Ver menú completo</a>'
+      } else if (btype === 'services') {
+        suggestions =
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué servicios ofrecen?\')">💆 Ver servicios</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Tienen turnos disponibles para hoy?\')">📅 Turnos hoy</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Cuánto dura y cuánto sale un corte?\')">💈 Precios</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Cómo puedo sacar un turno?\')">✅ Sacar turno</button>'
+      } else if (btype === 'local') {
+        suggestions =
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué productos tienen?\')">🏪 Ver productos</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Tienen stock disponible?\')">📦 Stock</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Hacen envíos?\')">🚚 Envíos</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Cuáles son los precios?\')">💰 Precios</button>'
+      } else if (btype === 'ecommerce') {
+        suggestions =
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Qué productos tienen?\')">📦 Catálogo</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Publican en MercadoLibre?\')">🛒 MercadoLibre</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Cómo hago un pedido?\')">✅ Hacer pedido</button>' +
+          '<button class="suggestion-btn" onclick="window.sendSuggestion(\'¿Hacen envíos a todo el país?\')">🚚 Envíos</button>'
+      }
+
+      el.innerHTML = suggestions
     }
 
     const LANG_GREETINGS = {
