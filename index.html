@@ -462,6 +462,27 @@
       .feat-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr; }
       .chat-panel { width: calc(100vw - 48px); right: 12px; }
+      /* Pricing: una columna en mobile */
+      #pricing-rest > div > div,
+      #pricing-local > div { grid-template-columns: 1fr !important; }
+      /* Tabs de precios: stack en mobile */
+      #precios .section-inner > div:first-of-type > div { flex-direction: column; }
+      /* Business cards hero: una columna */
+      .business-cards { grid-template-columns: 1fr !important; max-width: 100% !important; }
+      /* WA cards: una columna */
+      .wa-cards { grid-template-columns: 1fr !important; }
+      /* Steps: una columna */
+      .steps { grid-template-columns: 1fr !important; }
+      /* Guarantee grid: una columna */
+      .guarantee-grid { grid-template-columns: 1fr !important; }
+      /* Numbers: 2 columnas */
+      .numbers { grid-template-columns: repeat(2, 1fr) !important; }
+      /* Hero h1 más pequeño */
+      .hero h1 { font-size: 2.2rem; }
+      /* Sección padding menor */
+      .hero { padding: 100px 20px 60px; }
+      /* Split layout: una columna */
+      .split { grid-template-columns: 1fr !important; }
     }
 
     /* ── UTILS ────────────────────────────────────────── */
