@@ -7318,7 +7318,35 @@ window.switchSection = window.switchSection  // ya existe
 window.loadAgenda = async function () {
   if (!currentRestaurant) return
 
-  // Cargar config
+  const btype = currentRestaurant.business_type || 'services'
+
+  // Local y ecommerce: no tienen agenda, tienen WhatsApp de ventas
+  if (btype === 'local' || btype === 'ecommerce') {
+    document.getElementById('agenda-setup-card').style.display = 'none'
+    document.getElementById('agenda-main').style.display = 'none'
+    document.getElementById('btn-new-appt').style.display = 'none'
+    const container = document.getElementById('section-agenda')
+    if (container) {
+      // Reemplazar el contenido con mensaje orientativo
+      const existing = container.querySelector('#agenda-no-aplica')
+      if (!existing) {
+        container.insertAdjacentHTML('beforeend', `
+          <div id="agenda-no-aplica" class="card" style="background:var(--cream2);border:1px solid var(--border);text-align:center;padding:40px 24px;margin-top:16px">
+            <div style="font-size:40px;margin-bottom:16px">📱</div>
+            <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;margin-bottom:10px">Tu canal de ventas es WhatsApp</div>
+            <p style="font-size:14px;color:var(--muted);max-width:420px;margin:0 auto 20px;line-height:1.65">
+              Para un ${btype === 'local' ? 'local o comercio' : 'vendedor online'}, el WhatsApp Business es donde los clientes te escriben para consultar y comprar. Configuralo desde <strong>Configuración → WhatsApp</strong>.
+            </p>
+            <button class="btn-primary" onclick="switchSection('config', document.querySelector('[data-section=config]'))" style="font-size:14px">
+              Configurar WhatsApp →
+            </button>
+          </div>`)
+      }
+    }
+    return
+  }
+
+  // Restaurante y servicios: cargar agenda normal
   try {
     const { data: cfg } = await supabase.from('agenda_config')
       .select('*').eq('restaurant_id', currentRestaurant.id).maybeSingle()
@@ -7337,6 +7365,15 @@ window.loadAgenda = async function () {
     document.getElementById('agenda-setup-card').style.display = 'block'
     document.getElementById('agenda-main').style.display = 'none'
     document.getElementById('btn-new-appt').style.display = 'none'
+    // Adaptar el texto del card según rubro
+    const setupTitle = btype === 'restaurant' ? 'Configurá el sistema de reservas' : 'Configurá tu agenda de turnos'
+    const setupDesc = btype === 'restaurant'
+      ? 'Contanos cuántas mesas tenés y cómo funcionan las reservas para que tus clientes puedan reservar por WhatsApp.'
+      : 'Contanos sobre tus servicios y profesionales para que los clientes puedan sacar turno por WhatsApp.'
+    const el = document.querySelector('#agenda-setup-card .card .setup-title')
+    if (el) el.textContent = setupTitle
+    const desc = document.querySelector('#agenda-setup-card .card p')
+    if (desc) desc.textContent = setupDesc
   } else {
     document.getElementById('agenda-setup-card').style.display = 'none'
     document.getElementById('agenda-main').style.display = 'block'
@@ -7420,57 +7457,224 @@ window.completeAppointment = async function (id) {
 }
 
 // ── Setup wizard ──────────────────────────────
-const SETUP_STEPS = {
-  restaurant: [
-    { title: 'Reservas — Paso 1 de 2', q: '¿Cuántas mesas o personas podés atender al mismo tiempo?', field: 'max_simultaneous', type: 'number', placeholder: 'Ej: 10 mesas', hint: 'Si tenés 10 mesas, podés tomar 10 reservas en el mismo horario.' },
-    { title: 'Reservas — Paso 2 de 2', q: '¿Con cuánta anticipación mínima pueden reservar? (horas)', field: 'min_notice_hours', type: 'number', placeholder: 'Ej: 2', hint: 'Si ponés 2, no se puede reservar con menos de 2hs de anticipación.' },
-  ],
-  local: [
-    { title: 'Turnos — Paso 1 de 2', q: '¿Cuántas personas del equipo atienden clientes?', field: 'staff_count', type: 'number', placeholder: 'Ej: 2', hint: 'Esto define cuántos turnos simultáneos puede haber.' },
-    { title: 'Turnos — Paso 2 de 2', q: '¿Cuánto dura un turno estándar? (minutos)', field: 'slot_duration_min', type: 'number', placeholder: 'Ej: 60', hint: 'Podés ajustar esto por servicio después.' },
-  ],
-  services: [
-    { title: 'Agenda — Paso 1 de 3', q: '¿Cuánto dura un turno estándar? (minutos)', field: 'slot_duration_min', type: 'number', placeholder: 'Ej: 45', hint: 'Por ejemplo, 45 min para corte de cabello.' },
-    { title: 'Agenda — Paso 2 de 3', q: '¿Cuántos profesionales o sillas tienen?', field: 'max_simultaneous', type: 'number', placeholder: 'Ej: 2', hint: 'Si tenés 2 peluqueros, pueden atender 2 clientes al mismo tiempo.' },
-    { title: 'Agenda — Paso 3 de 3', q: '¿Dejás tiempo libre entre turnos? (minutos)', field: 'buffer_min', type: 'number', placeholder: 'Ej: 10', hint: 'Para limpiar o preparar entre cliente y cliente. Podés poner 0.' },
-  ],
-  ecommerce: [
-    { title: 'Turnos — Paso 1 de 1', q: '¿Cuánto dura una consulta o entrega? (minutos)', field: 'slot_duration_min', type: 'number', placeholder: 'Ej: 30', hint: 'Tiempo estimado por cliente.' },
-  ],
+// Configuraciones de servicios con duraciones sugeridas
+const SERVICE_DURATIONS = {
+  peluqueria:  { corte: 45, coloracion: 120, keratina: 180, otros: 60 },
+  estetica:    { facial: 60, masaje: 60, depilacion: 45, otros: 60 },
+  medico:      { consulta: 30, control: 20, otros: 30 },
+  psicologo:   { sesion: 50, otros: 50 },
+  gym:         { clase: 60, evaluacion: 45, otros: 60 },
+}
+
+// Genera los pasos según el tipo de negocio y sub-tipo de servicio
+function getSetupSteps(btype, serviceSubtype) {
+  if (btype === 'restaurant') {
+    return [
+      {
+        title: 'Reservas — Tu salón',
+        render: () => `
+          <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5">Contanos sobre tu salón para configurar el sistema de reservas.</p>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">¿Cuántas mesas tiene el salón? <span>*</span></label>
+              <input class="form-input" id="sf-mesas" type="number" min="1" placeholder="Ej: 15" value="${setupData.mesas || ''}">
+              <span class="form-hint">Total de mesas disponibles para reservar.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label">¿Cuántas personas entran por mesa?</label>
+              <input class="form-input" id="sf-capacidad" type="number" min="1" placeholder="Ej: 4" value="${setupData.capacidad || ''}">
+              <span class="form-hint">Promedio. Si variás, usá el número más común.</span>
+            </div>
+          </div>`,
+        save: () => {
+          const m = document.getElementById('sf-mesas')?.value
+          if (!m || m < 1) { showToast('Ingresá la cantidad de mesas', 'error'); return false }
+          setupData.mesas = parseInt(m)
+          setupData.max_simultaneous = parseInt(m)
+          setupData.capacidad = parseInt(document.getElementById('sf-capacidad')?.value) || 4
+          return true
+        }
+      },
+      {
+        title: 'Reservas — Duración y turnos',
+        render: () => `
+          <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5">Esto define cuántas reservas simultáneas puede haber y con qué anticipación se puede reservar.</p>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">¿Cuánto dura una mesa en promedio?</label>
+              <select class="form-select" id="sf-duracion">
+                <option value="60" ${setupData.slot_duration_min==60?'selected':''}>1 hora</option>
+                <option value="90" ${setupData.slot_duration_min==90?'selected':''}>1 hora y media</option>
+                <option value="120" ${setupData.slot_duration_min==120||!setupData.slot_duration_min?'selected':''}>2 horas</option>
+                <option value="180" ${setupData.slot_duration_min==180?'selected':''}>3 horas o más</option>
+              </select>
+              <span class="form-hint">Para calcular qué mesas están libres y cuándo.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label">¿Con cuánta anticipación mínima reservan?</label>
+              <select class="form-select" id="sf-notice">
+                <option value="1">1 hora antes</option>
+                <option value="2" ${!setupData.min_notice_hours||setupData.min_notice_hours==2?'selected':''}>2 horas antes</option>
+                <option value="4">4 horas antes</option>
+                <option value="24">1 día antes</option>
+              </select>
+            </div>
+          </div>`,
+        save: () => {
+          setupData.slot_duration_min = parseInt(document.getElementById('sf-duracion')?.value) || 120
+          setupData.min_notice_hours  = parseInt(document.getElementById('sf-notice')?.value) || 2
+          return true
+        }
+      },
+    ]
+  }
+
+  if (btype === 'services') {
+    const steps = [
+      {
+        title: '¿Qué tipo de servicio ofrecés?',
+        render: () => `
+          <p style="font-size:14px;color:var(--muted);margin-bottom:16px">Esto adapta las preguntas y los servicios sugeridos.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            ${[
+              { val:'peluqueria', icon:'✂️', label:'Peluquería / Barbería' },
+              { val:'estetica',   icon:'💆', label:'Estética / Spa / Uñas' },
+              { val:'medico',     icon:'🩺', label:'Médico / Odontólogo' },
+              { val:'psicologo',  icon:'🧠', label:'Psicólogo / Terapeuta' },
+              { val:'gym',        icon:'💪', label:'Fitness / Entrenador' },
+              { val:'otro',       icon:'📋', label:'Otro servicio' },
+            ].map(o => `
+              <label style="display:flex;align-items:center;gap:10px;padding:12px;border:1.5px solid ${setupData.service_subtype===o.val?'var(--terra)':'var(--border)'};border-radius:10px;cursor:pointer;background:${setupData.service_subtype===o.val?'var(--terra-pale)':'white'}">
+                <input type="radio" name="svc-type" value="${o.val}" ${setupData.service_subtype===o.val?'checked':''} style="accent-color:var(--terra)">
+                <span style="font-size:13px;font-weight:500">${o.icon} ${o.label}</span>
+              </label>`).join('')}
+          </div>`,
+        save: () => {
+          const sel = document.querySelector('input[name="svc-type"]:checked')
+          if (!sel) { showToast('Elegí el tipo de servicio', 'error'); return false }
+          setupData.service_subtype = sel.value
+          return true
+        }
+      },
+      {
+        title: 'Tu equipo de trabajo',
+        render: () => `
+          <p style="font-size:14px;color:var(--muted);margin-bottom:16px">¿Cuántos profesionales atienden clientes simultáneamente?</p>
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">Cantidad de profesionales <span>*</span></label>
+              <input class="form-input" id="sf-staff" type="number" min="1" max="20" placeholder="Ej: 2" value="${setupData.max_simultaneous || ''}">
+              <span class="form-hint">Cada uno puede atender 1 cliente a la vez. Si solo atendés vos, poné 1.</span>
+            </div>
+            <div class="form-field">
+              <label class="form-label">¿Tienen nombres distintos que el cliente puede elegir?</label>
+              <select class="form-select" id="sf-named">
+                <option value="si">Sí — el cliente elige con quién</option>
+                <option value="no">No — cualquiera disponible</option>
+              </select>
+            </div>
+          </div>
+          ${setupData.max_simultaneous > 1 ? `<div style="margin-top:12px;padding:10px 14px;background:var(--cream2);border-radius:8px;font-size:13px;color:var(--muted)">💡 Después podés cargar los nombres de cada profesional desde la vista de configuración.</div>` : ''}`,
+        save: () => {
+          const n = document.getElementById('sf-staff')?.value
+          if (!n || n < 1) { showToast('Ingresá la cantidad de profesionales', 'error'); return false }
+          setupData.max_simultaneous = parseInt(n)
+          setupData.named_staff = document.getElementById('sf-named')?.value === 'si'
+          return true
+        }
+      },
+      {
+        title: 'Duración de los turnos',
+        render: () => {
+          const stype = setupData.service_subtype || 'otro'
+          const durationOptions = {
+            peluqueria: [{ v:30,l:'30 min — corte rápido'},{v:45,l:'45 min — corte estándar'},{v:60,l:'1 hora — corte + peinado'},{v:90,l:'1:30 hs — coloración básica'}],
+            estetica: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora — tratamiento facial'},{v:90,l:'1:30 hs — tratamiento completo'}],
+            medico: [{v:15,l:'15 min'},{v:20,l:'20 min — control'},{v:30,l:'30 min — consulta'},{v:45,l:'45 min — primera consulta'}],
+            psicologo: [{v:45,l:'45 min'},{v:50,l:'50 min — sesión estándar'},{v:60,l:'1 hora'}],
+            gym: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora — clase estándar'}],
+            otro: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora'},{v:90,l:'1:30 hs'},{v:120,l:'2 horas'}],
+          }
+          const opts = durationOptions[stype] || durationOptions.otro
+          return `
+            <p style="font-size:14px;color:var(--muted);margin-bottom:16px">¿Cuánto dura un turno estándar? Después podés agregar servicios con distintas duraciones.</p>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              ${opts.map(o => `
+                <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid ${setupData.slot_duration_min==o.v?'var(--terra)':'var(--border)'};border-radius:10px;cursor:pointer;background:${setupData.slot_duration_min==o.v?'var(--terra-pale)':'white'}">
+                  <input type="radio" name="dur-opt" value="${o.v}" ${setupData.slot_duration_min==o.v?'checked':''} style="accent-color:var(--terra)">
+                  <span style="font-size:13.5px">${o.l}</span>
+                </label>`).join('')}
+              <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer">
+                <input type="radio" name="dur-opt" value="custom" style="accent-color:var(--terra)">
+                <span style="font-size:13.5px">Otra duración:</span>
+                <input type="number" id="sf-custom-dur" min="10" max="480" step="5" placeholder="min" style="width:70px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px">
+              </label>
+            </div>
+            <div style="margin-top:14px;padding:10px 14px;background:var(--cream2);border-radius:8px;font-size:13px;color:var(--muted)">
+              ¿Dejás tiempo entre turnos para prepararte?
+              <select id="sf-buffer" style="margin-left:6px;padding:3px 8px;border:1px solid var(--border);border-radius:6px;font-size:13px">
+                <option value="0">No</option>
+                <option value="5">5 min</option>
+                <option value="10" ${!setupData.buffer_min||setupData.buffer_min==10?'selected':''}>10 min</option>
+                <option value="15">15 min</option>
+              </select>
+            </div>`
+        },
+        save: () => {
+          const sel = document.querySelector('input[name="dur-opt"]:checked')
+          if (!sel) { showToast('Elegí la duración del turno', 'error'); return false }
+          let dur = parseInt(sel.value)
+          if (sel.value === 'custom') {
+            dur = parseInt(document.getElementById('sf-custom-dur')?.value)
+            if (!dur || dur < 5) { showToast('Ingresá una duración válida', 'error'); return false }
+          }
+          setupData.slot_duration_min = dur
+          setupData.buffer_min = parseInt(document.getElementById('sf-buffer')?.value) || 0
+          return true
+        }
+      },
+    ]
+    return steps
+  }
+
+  return [] // local y ecommerce no tienen agenda
 }
 
 window.startAgendaSetup = function () {
   setupStep = 0; setupData = {}
   const btype = currentRestaurant?.business_type || 'services'
-  const steps = SETUP_STEPS[btype] || SETUP_STEPS.services
+  const steps = getSetupSteps(btype, null)
+  if (!steps.length) return
   renderSetupStep(steps, btype)
   document.getElementById('modal-agenda-setup').classList.add('open')
 }
 
 function renderSetupStep(steps, btype) {
+  if (setupStep >= steps.length) return
   const step = steps[setupStep]
-  document.getElementById('setup-step-title').textContent = step.title
+  document.getElementById('setup-step-title').textContent = step.title +
+    (steps.length > 1 ? ` (${setupStep + 1}/${steps.length})` : '')
   document.getElementById('btn-setup-back').style.display = setupStep > 0 ? 'inline' : 'none'
   document.getElementById('btn-setup-next').textContent = setupStep < steps.length - 1 ? 'Siguiente →' : '✓ Finalizar'
-
-  document.getElementById('setup-step-body').innerHTML = `
-    <div style="font-size:15px;font-weight:500;color:var(--ink);margin-bottom:12px">${step.q}</div>
-    <input class="form-input" id="setup-field-input" type="${step.type}" placeholder="${step.placeholder}" value="${setupData[step.field] || ''}">
-    <span class="form-hint" style="margin-top:6px;display:block">${step.hint}</span>
-  `
-  setTimeout(() => document.getElementById('setup-field-input')?.focus(), 80)
+  document.getElementById('setup-step-body').innerHTML = step.render()
   document.getElementById('modal-agenda-setup')._steps = steps
   document.getElementById('modal-agenda-setup')._btype = btype
 }
 
 window.agendaSetupNext = async function () {
   const modal = document.getElementById('modal-agenda-setup')
-  const steps = modal._steps
+  let steps = modal._steps
   const btype = modal._btype
   const step  = steps[setupStep]
-  const val   = document.getElementById('setup-field-input')?.value
-  if (!val) { showToast('Completá el campo antes de continuar', 'error'); return }
-  setupData[step.field] = parseInt(val) || val
+
+  // Usar la función save() del step para validar y guardar
+  if (step.save && !step.save()) return
+
+  // Para servicios: después del paso de tipo, regenerar pasos con el subtype
+  if (btype === 'services' && setupStep === 0 && setupData.service_subtype) {
+    steps = getSetupSteps(btype, setupData.service_subtype)
+    modal._steps = steps
+  }
 
   if (setupStep < steps.length - 1) {
     setupStep++
