@@ -1571,7 +1571,7 @@ input:checked + .toggle-slider:before {
      onmouseout="this.style.background='';this.style.color='rgba(255,255,255,.4)'">
     <span style="font-size:14px">💬</span> Soporte
   </a>
-  <a href="/demo.html" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;border-radius:8px;transition:background .15s"
+  <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;border-radius:8px;transition:background .15s"
      onmouseover="this.style.background='rgba(255,255,255,.05)';this.style.color='rgba(255,255,255,.7)'"
      onmouseout="this.style.background='';this.style.color='rgba(255,255,255,.4)'">
     <span style="font-size:14px">🎭</span> Ver demo
@@ -1956,10 +1956,10 @@ input:checked + .toggle-slider:before {
         <div class="card" style="margin-top:20px">
           <div class="card-title">🔗 Links rápidos</div>
           <div class="quick-links-grid" id="quick-links-grid">
-            <a class="btn-quick-link" id="link-menu" href="#" target="_blank">🍽️ Ver menú público</a>
-            <a class="btn-quick-link" id="link-qr-print" href="#" target="_blank">🖨️ Imprimir QRs</a>
-            <a class="btn-quick-link" id="link-cocina" href="#" target="_blank">🍳 Pantalla de cocina</a>
-            <a class="btn-quick-link" id="link-mozo" href="#" target="_blank">💬 Ver asistente</a>
+            <a class="btn-quick-link" id="link-menu" href="#" target="_blank" rel="noopener noreferrer">🍽️ Ver menú público</a>
+            <a class="btn-quick-link" id="link-qr-print" href="#" target="_blank" rel="noopener noreferrer">🖨️ Imprimir QRs</a>
+            <a class="btn-quick-link" id="link-cocina" href="#" target="_blank" rel="noopener noreferrer">🍳 Pantalla de cocina</a>
+            <a class="btn-quick-link" id="link-mozo" href="#" target="_blank" rel="noopener noreferrer">💬 Ver asistente</a>
             <button class="btn-quick-link" onclick="copyMenuLink()" id="btn-copy-link" style="background:var(--cream2)">
               📋 Copiar link del menú
             </button>
@@ -2053,7 +2053,7 @@ input:checked + .toggle-slider:before {
             <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
             <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
             <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
-            <a href="/demo.html" target="_blank" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
+            <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
           </div>
         </div>
       </div>
@@ -4576,7 +4576,7 @@ function renderMenu() {
         <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
         <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
         <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
-        <a href="/demo.html" target="_blank" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
+        <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
       </div>`
     return
   }
@@ -9098,10 +9098,23 @@ function renderStats(data) {
           </div>`).join('')}
       </div>
     </div>` : `
-    <div class="coming-soon" style="padding:40px 24px">
+    <div class="coming-soon" style="padding:48px 24px">
       <div class="coming-soon-icon">📊</div>
       <div class="coming-soon-label">Todo listo para recibir pedidos</div>
-      <div class="coming-soon-desc">Cuando lleguen los primeros pedidos, acá vas a ver estadísticas en tiempo real: facturación, ticket promedio y platos más vendidos.</div>
+      <div class="coming-soon-desc">Cuando lleguen los primeros pedidos vas a ver estadísticas en tiempo real: facturación, ticket promedio y platos más vendidos.</div>
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px;max-width:320px;margin-left:auto;margin-right:auto">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Para empezar a recibir pedidos:</div>
+        ${[
+          { done: true,  text: 'Crear el negocio' },
+          { done: !!(currentRestaurant?.phone || currentRestaurant?.address), text: 'Completar información del negocio' },
+          { done: Object.values(menuItemsMap || {}).flat().length > 0, text: 'Cargar el primer producto o plato' },
+          { done: mesasList.length > 0, text: 'Crear una mesa y generar el QR' },
+        ].map(step => `
+          <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:${step.done ? 'var(--muted)' : 'var(--ink)'}">
+            <span style="width:20px;height:20px;border-radius:50%;background:${step.done ? 'var(--sage)' : 'var(--border)'};color:white;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0">${step.done ? '✓' : '·'}</span>
+            <span style="${step.done ? 'text-decoration:line-through' : ''}">${step.text}</span>
+          </div>`).join('')}
+      </div>
     </div>`}
   `
 }

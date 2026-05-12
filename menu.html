@@ -44,7 +44,8 @@
     .pedidos-bar-hint { font-size: 11px; color: var(--muted); }
     .restaurant-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 500; color: var(--accent); }
     .restaurant-sub { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.04em; text-transform: uppercase; }
-    .cart-btn { background: #1a1208; color: #fdf8f4; border: none; border-radius: 24px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; }
+    .cart-btn { background: #1a1208; color: #fdf8f4; border: none; border-radius: 24px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: all 0.2s; }
+    .cart-btn.has-items { background: var(--accent); }
     .cart-count { background: var(--accent); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
 
     .cat-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; overflow-x: auto; scrollbar-width: none; }
@@ -258,7 +259,11 @@
       <button class="cart-close" onclick="toggleCart()">×</button>
     </div>
     <div class="cart-items" id="cart-items">
-      <div class="cart-empty">Tu carrito está vacío 🛒</div>
+      <div class="cart-empty" style="padding:32px 20px;text-align:center;color:var(--muted)">
+        <div style="font-size:32px;margin-bottom:8px">🛒</div>
+        <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">Todavía no elegiste nada</div>
+        <div style="font-size:13px">Agregá platos desde el menú</div>
+      </div>
     </div>
     <div class="cart-footer" id="cart-footer" style="display:none">
       <div class="cart-total"><span>Total</span><span id="cart-total">$0</span></div>
@@ -644,7 +649,10 @@
     }
 
     function updateCartCount() {
-      document.getElementById('cart-count').textContent = Object.values(cart).reduce((a, b) => a + b, 0)
+      const total = Object.values(cart).reduce((a, b) => a + b, 0)
+      document.getElementById('cart-count').textContent = total
+      const cartBtn = document.querySelector('.cart-btn')
+      if (cartBtn) cartBtn.classList.toggle('has-items', total > 0)
     }
 
     function toggleCart() {
@@ -665,7 +673,7 @@
       const footer = document.getElementById('cart-footer')
       const ids = Object.keys(cart).filter(id => cart[id] > 0)
       if (!ids.length) {
-        container.innerHTML = '<div class="cart-empty">Tu carrito está vacío 🛒</div>'
+        container.innerHTML = '<div class="cart-empty" style="padding:32px 20px;text-align:center;color:var(--muted)"><div style="font-size:32px;margin-bottom:8px">🛒</div><div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">Todavía no elegiste nada</div><div style="font-size:13px">Agregá platos desde el menú</div></div>'
         footer.style.display = 'none'
         return
       }
@@ -708,9 +716,9 @@
       document.getElementById('checkout-summary-items').innerHTML = ids.map(id => {
         const item = itemsById[id]
         const subtotal = Number(item.price) * cart[id]
-        return `<div style="display:flex;justify-content:space-between;font-size:13.5px;padding:5px 0;border-bottom:1px solid #f0e8dd">
-          <span><strong>${cart[id]}x</strong> ${item.name}</span>
-          <span style="color:#8a7a6a">${currency} ${subtotal.toLocaleString('es-AR')}</span>
+        return `<div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:13.5px;padding:5px 0;border-bottom:1px solid #f0e8dd">
+          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1"><strong>${cart[id]}x</strong> ${item.name}</span>
+          <span style="color:#8a7a6a;white-space:nowrap;flex-shrink:0">${currency} ${subtotal.toLocaleString('es-AR')}</span>
         </div>`
       }).join('')
 
