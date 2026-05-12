@@ -831,3 +831,44 @@ Diferenciador real: integración. No se vende como "marketing digital" ni "carta
 ## Monitoreo de novedades
 
 En cada sesión relevante mencionar proactivamente: nuevos modelos de IA más baratos, cambios en políticas de Meta/Google/ML/TN, nuevas APIs, herramientas de automatización, competidores nuevos en el mercado argentino.
+
+## Últimas features construidas (sesión 11/05/2026)
+
+### Sistema de Agenda y Turnos
+- Sección "🗓️ Agenda" en el panel
+- Setup wizard inteligente por tipo de negocio:
+  - local/ecommerce: redirige a WhatsApp (no tienen agenda)
+  - restaurant: preguntas de mesas, capacidad, duración, anticipación
+  - services: tipo de servicio (6 opciones) → profesionales → duración contextual
+- CRUD de turnos con calendario diario
+- Gestión de servicios y profesionales
+- Colores por profesional
+- Worker endpoints: /api/agenda/availability, /api/agenda/book, /api/agenda/send-reminders
+- Migration 022: service_types, staff_resources, appointments, agenda_config
+
+### SEO
+- sitemap.xml publicado
+- robots.txt con rutas privadas bloqueadas
+- Open Graph, Twitter Card, Schema.org en index.html
+
+### Notificaciones
+- Email de bienvenida al registrarse (con checklist de primeros pasos)
+- Email al admin en cada nuevo registro
+- Email al admin cuando trial vence sin renovar
+- Recordatorios automáticos de turno 24hs antes por WhatsApp
+
+### Informes
+- Sección "📄 Informes" en el panel
+- Informe mensual generado por Viti (Claude Haiku)
+- Exportar menú en CSV
+- Resumen diario por WhatsApp desde estadísticas
+
+### Otros
+- 404.html branded
+- Widget embebible (botón flotante + iframe)
+- Análisis de sitio web con IA (detecta TN/ML)
+- Mapa Google en competidores
+
+## Migrations pendientes de correr en Supabase
+
+022: service_types, staff_resources, appointments, agenda_config — YA CORRIDA
