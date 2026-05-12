@@ -2732,6 +2732,9 @@ input:checked + .toggle-slider:before {
                 <option value="neutro">😊 Neutro y profesional — amigable pero formal</option>
                 <option value="sofisticado">🎩 Sofisticado — elegante, para restaurants finos</option>
               </select>
+              <div id="tano-preview" style="margin-top:10px;padding:10px 14px;background:#2a2010;border-radius:10px;font-size:12.5px;color:#d4b97a;line-height:1.55;display:none">
+                Vista previa: <span id="tano-preview-text"></span>
+              </div>
               <div class="form-hint">Afecta cómo Tano se expresa en sus respuestas.</div>
             </div>
 
@@ -4605,6 +4608,10 @@ function renderMenu() {
   }
   container.innerHTML = menuCats.map(cat => {
     const items = menuItemsMap[cat.id] ?? []
+    const withoutPhoto = items.filter(i => !i.image_url).length
+    const photoWarning = withoutPhoto > 0
+      ? `<span style="font-size:11px;background:#fff8e1;color:#856404;padding:2px 7px;border-radius:8px;margin-left:6px">${withoutPhoto} sin foto</span>`
+      : `<span style="font-size:11px;background:#e8f5e9;color:#2e7d32;padding:2px 7px;border-radius:8px;margin-left:6px">✓ completa</span>`
     const itemsHtml = items.length
       ? items.map(item => {
         const noImg = !item.image_url ? '<span style="font-size:9px;background:#fff8e1;color:#856404;padding:1px 5px;border-radius:6px;margin-left:4px" title="Sin foto — la foto mejora la visibilidad">sin foto</span>' : ''
@@ -4633,7 +4640,7 @@ function renderMenu() {
       <div class="cat-block" id="cat-block-${cat.id}">
         <div class="cat-header">
           <div class="cat-emoji">${cat.emoji || '📂'}</div>
-          <div class="cat-name">${escHtml(cat.name)}</div>
+          <div class="cat-name">${escHtml(cat.name)}${items.length ? photoWarning : ''}</div>
           <div class="cat-actions">
             <button class="btn-reorder" onclick="moveCat('${cat.id}',-1)" title="Subir">↑</button>
             <button class="btn-reorder" onclick="moveCat('${cat.id}',1)"  title="Bajar">↓</button>
@@ -5435,6 +5442,26 @@ window.loadConfig = async function () {
   if (tanoTone)    tanoTone.value    = currentRestaurant.tano_tone    || 'calido'
   if (tanoWelcome) tanoWelcome.value = currentRestaurant.tano_welcome  || ''
   if (tanoLimit)   tanoLimit.value   = currentRestaurant.tano_limit_message || ''
+
+  // Preview de tono de Tano
+  const toneSelect = document.getElementById('tano-tone-select')
+  if (toneSelect) {
+    const updateTanoPreview = () => {
+      const preview = document.getElementById('tano-preview')
+      const text = document.getElementById('tano-preview-text')
+      const previews = {
+        calido: '¡Hola! Bienvenido/a 👋 ¿Qué te traigo hoy?',
+        neutro: 'Bienvenido. ¿En qué le puedo ayudar?',
+        sofisticado: 'Bienvenido a nuestra mesa. ¿Puedo orientarle en el menú de esta noche?',
+      }
+      if (preview && text) {
+        text.textContent = previews[toneSelect.value] || ''
+        preview.style.display = 'block'
+      }
+    }
+    toneSelect.addEventListener('change', updateTanoPreview)
+    updateTanoPreview()
+  }
 
   // Actualizar título de sección Tano
   const tanoConfigTitle = document.querySelector('.card-title[data-tano-title]')
