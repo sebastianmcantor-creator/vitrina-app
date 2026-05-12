@@ -1578,6 +1578,11 @@ input:checked + .toggle-slider:before {
      onmouseout="this.style.background='';this.style.color='rgba(255,255,255,.4)'">
     <span style="font-size:14px">🎭</span> Ver demo
   </a>
+  <a href="/status.html" target="_blank" rel="noopener noreferrer" style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;border-radius:8px;transition:background .15s"
+     onmouseover="this.style.background='rgba(255,255,255,.05)';this.style.color='rgba(255,255,255,.7)'"
+     onmouseout="this.style.background='';this.style.color='rgba(255,255,255,.4)'">
+    <span style="font-size:14px">🟢</span> Estado del sistema
+  </a>
 </div>
 
     <div class="sidebar-user">
@@ -5818,6 +5823,20 @@ window.loadAnalisis = async function () {
         hint.style.cssText = 'font-size:12px;color:var(--muted);margin-top:6px'
         hint.textContent = `Detectamos @${igHandle} en tu perfil. Conectalo para ver métricas reales.`
         igBtn.parentElement?.appendChild(hint)
+      }
+
+      // Preview de Instagram desde el perfil del restaurante
+      const igContent = document.getElementById('instagram-content')
+      if (igContent && igContent.innerHTML.includes('Conectá tu')) {
+        igContent.innerHTML = `
+          <div style="padding:16px;background:var(--cream2);border-radius:10px;display:flex;align-items:center;gap:14px">
+            <div style="font-size:32px">📸</div>
+            <div>
+              <div style="font-size:14px;font-weight:600">@${igHandle}</div>
+              <div style="font-size:12.5px;color:var(--muted);margin-top:2px">Perfil configurado. Conectá Instagram para ver métricas de seguidores y engagement.</div>
+              <a href="https://instagram.com/${igHandle}" target="_blank" rel="noopener noreferrer" style="font-size:12px;color:var(--terra);text-decoration:none;margin-top:6px;display:inline-block">Ver perfil en Instagram →</a>
+            </div>
+          </div>`
       }
     }
 
