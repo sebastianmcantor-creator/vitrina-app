@@ -335,11 +335,7 @@
     <span class="cart-count">0</span>
   </button>
 
-  <a href="/mozo.html?slug=casa-lucia&mesa=1" class="cart-button"
-     style="bottom:90px;background:#1a1208;color:#e8c87a;border:1px solid #3a2e1a;text-decoration:none;display:flex"
-     title="Hablar con el asistente">
-    💬 Hablar con Tano
-  </a>
+  <button onclick="toggleTanoChat()" id="tano-fab" class="cart-button" style="bottom:90px;background:#1a1208;color:#e8c87a;border:1px solid #3a2e1a;cursor:pointer;display:flex;align-items:center;gap:6px" title="Hablar con Tano">💬 Hablar con Tano</button>
 
   <div style="background:#1C1208;color:white;padding:32px 24px;text-align:center">
     <div style="font-family:'Playfair Display',serif;font-size:22px;color:#e8c87a;margin-bottom:8px">¿Te gustó el menú?</div>
@@ -369,7 +365,7 @@
           dishes: [
             {
               id: 101,
-              name: 'Tabla de Fiambres y Quesos',
+              name: 'Tabla de Fiambres y Quesos', emoji: '🧀',
               description: 'Selección de embutidos artesanales y quesos estacionados con pickles caseros, mostaza antigua y pan de campo tostado',
               price: 13500,
               image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=85&fit=crop&crop=center',
@@ -378,7 +374,7 @@
             },
             {
               id: 102,
-              name: 'Bruschetta al Pomodoro',
+              name: 'Bruschetta al Pomodoro', emoji: '🍅',
               description: 'Pan de masa madre tostado con tomates perita confitados, burrata fresca, albahaca y aceite de oliva extra virgen',
               price: 8500,
               image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=600&q=85&fit=crop&crop=center',
@@ -386,7 +382,7 @@
             },
             {
               id: 103,
-              name: 'Empanadas de Carne Cortada a Cuchillo',
+              name: 'Empanadas de Carne Cortada a Cuchillo', emoji: '🥟',
               description: 'Tres empanadas criollas rellenas de carne, huevo duro, aceitunas y cebolla caramelizada, horneadas al momento',
               price: 7500,
               image: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=600&q=85&fit=crop&crop=center',
@@ -401,7 +397,7 @@
           dishes: [
             {
               id: 201,
-              name: 'Tagliatelle al Ragú de Ossobuco',
+              name: 'Tagliatelle al Ragú de Ossobuco', emoji: '🍝',
               description: 'Pasta fresca artesanal con ragú de ossobuco cocido 6 horas, gremolata de limón y parmesano reggiano',
               price: 18500,
               image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600&q=85&fit=crop&crop=center',
@@ -410,7 +406,7 @@
             },
             {
               id: 202,
-              name: 'Risotto de Hongos Silvestres',
+              name: 'Risotto de Hongos Silvestres', emoji: '🍚',
               description: 'Arroz carnaroli cremoso con mix de hongos porcini, shiitake y portobello, manteca de trufa y parmesano',
               price: 17000,
               image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600&q=85&fit=crop&crop=center',
@@ -419,7 +415,7 @@
             },
             {
               id: 203,
-              name: 'Pollo alla Cacciatore',
+              name: 'Pollo alla Cacciatore', emoji: '🍗',
               description: 'Suprema de pollo braseada con tomates San Marzano, aceitunas negras, alcaparras y hierbas frescas, acompañada de polenta cremosa',
               price: 16500,
               image: 'https://images.unsplash.com/photo-1598511726623-d2e9996869f3?w=600&q=85&fit=crop&crop=center',
@@ -427,7 +423,7 @@
             },
             {
               id: 204,
-              name: 'Milanesa a la Napolitana',
+              name: 'Milanesa a la Napolitana', emoji: '🥩',
               description: 'Milanesa de ternera premium con salsa pomodoro casera, jamón cocido y mozzarella gratinada, con papas a la provenzal',
               price: 22000,
               image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=85&fit=crop&crop=center',
@@ -443,7 +439,7 @@
           dishes: [
             {
               id: 301,
-              name: 'Tiramisú della Casa',
+              name: 'Tiramisú della Casa', emoji: '🍰',
               description: 'Clásico tiramisú con bizcochos de soletilla remojados en café espresso, crema de mascarpone y cacao amargo en polvo',
               price: 7500,
               image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&q=85&fit=crop&crop=center',
@@ -452,7 +448,7 @@
             },
             {
               id: 302,
-              name: 'Volcán de Chocolate Belga',
+              name: 'Volcán de Chocolate Belga', emoji: '🍫',
               description: 'Bizcochuelo tibio con centro de chocolate fundido 70% cacao, helado de crema americana y frutos rojos frescos',
               price: 8000,
               image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&q=85&fit=crop&crop=center',
@@ -460,7 +456,7 @@
             },
             {
               id: 303,
-              name: 'Panna Cotta al Caramelo',
+              name: 'Panna Cotta al Caramelo', emoji: '🍮',
               description: 'Panna cotta de vainilla con caramelo salado, nueces caramelizadas y reducción de frutos rojos',
               price: 6500,
               image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&q=85&fit=crop&crop=center',
@@ -475,7 +471,7 @@
           dishes: [
             {
               id: 401,
-              name: 'Malbec Reserva',
+              name: 'Malbec Reserva', emoji: '🍷',
               description: 'Copa de Malbec de bodega boutique mendocina, crianza 12 meses en roble francés',
               price: 5500,
               image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=85&fit=crop&crop=center',
@@ -483,7 +479,7 @@
             },
             {
               id: 402,
-              name: 'Café Espresso Doble',
+              name: 'Café Espresso Doble', emoji: '☕',
               description: 'Blend de cafés de especialidad de origen único, tostado artesanalmente en Buenos Aires',
               price: 2500,
               image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=85&fit=crop&crop=center',
@@ -553,15 +549,111 @@
     }
 
     function showDishDetail(dishId) {
-      alert('En el menú real, acá se abriría un modal para agregar este plato al carrito con opciones de personalización.');
+      // Find the dish and show a brief notification
+      let dish;
+      menuData.categories.forEach(c => c.dishes.forEach(d => { if(d.id === dishId) dish = d; }));
+      if (!dish) return;
+      const btn = event.currentTarget.querySelector('.add-to-cart-btn') || event.currentTarget;
+      btn.textContent = '✓ Agregado';
+      btn.style.background = '#2e7d32';
+      setTimeout(() => { btn.textContent = '+ Agregar'; btn.style.background = ''; }, 1500);
     }
 
     function showCartDemo() {
-      alert('En el menú real, acá se abriría el carrito con los platos seleccionados y la opción de confirmar el pedido.');
+      document.getElementById('tano-fab').click();
     }
 
     // Inicializar
     renderMenu();
+  </script>
+
+
+  <!-- Chat inline de Tano -->
+  <div id="tano-chat-panel" style="display:none;position:fixed;bottom:0;right:0;width:360px;max-width:100vw;height:500px;max-height:80vh;background:#1a1208;border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(0,0,0,.4);z-index:200;flex-direction:column;overflow:hidden">
+    <div style="background:#2a2010;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #3a2e1a">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:32px;height:32px;border-radius:50%;background:#c8a84a;display:flex;align-items:center;justify-content:center;font-size:16px">🤖</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#e8c87a">Tano</div>
+          <div style="font-size:10px;color:#8a7450">Asistente de Casa Lucia</div>
+        </div>
+      </div>
+      <button onclick="toggleTanoChat()" style="background:none;border:none;color:#8a7450;cursor:pointer;font-size:22px;padding:4px;line-height:1">x</button>
+    </div>
+    <div id="tano-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none">
+      <div style="align-self:flex-start;max-width:90%">
+        <div style="background:#2a2010;color:#d4b97a;padding:10px 14px;border-radius:16px 16px 16px 4px;font-size:13.5px;border:0.5px solid #3a2e1a;line-height:1.55">Hola! Soy Tano, el asistente de Casa Lucia. Podes preguntarme sobre el menu, ingredientes o que te recomiendo para hoy. Que te traigo?</div>
+      </div>
+    </div>
+    <div style="padding:10px 14px 20px;border-top:0.5px solid #2e2410;display:flex;gap:8px">
+      <input id="tano-input" type="text" placeholder="Pregunta sobre el menu..." 
+        style="flex:1;background:#2a2010;border:0.5px solid #4a3820;border-radius:20px;padding:9px 14px;color:#e8c87a;font-family:sans-serif;font-size:13.5px;outline:none"
+        onkeydown="if(event.key==='Enter')sendTanoMsg()">
+      <button onclick="sendTanoMsg()" style="width:36px;height:36px;border-radius:50%;background:#c8a84a;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">&#9658;</button>
+    </div>
+  </div>
+
+  <script>
+    var BACKEND = 'https://vitrina-tano.vitrinaapp.workers.dev';
+    var tanoHistory = [];
+    var tanoOpen = false;
+    var tanoLoading = false;
+
+    var TANO_SYS = 'Sos Tano, asistente de Casa Lucia, restaurante italiano-porteno en Buenos Aires. Tono calido, informal, porteno (vos, che). MENU: ENTRADAS: Tabla de Fiambres $13500 (quesos, embutidos, pickles), Bruschetta $8500 Veg (pan masa madre, tomates, burrata), Empanadas Carne $7500 (3 unidades horneadas). PRINCIPALES: Tagliatelle Ragú Ossobuco $18500 DESTACADO, Risotto Hongos $17000 Veg DESTACADO, Pollo Cacciatore $16500, Milanesa Napolitana $22000 DESTACADO. POSTRES: Tiramisu $7500 DESTACADO, Volcan Chocolate $8000, Panna Cotta $6500 Sin TACC. BEBIDAS: Malbec Reserva $5500, Cafe Espresso $2500. REGLAS: solo responde sobre el menu y el restaurante. Respuestas max 3-4 lineas.';
+
+    function toggleTanoChat() {
+      var panel = document.getElementById('tano-chat-panel');
+      var fab = document.getElementById('tano-fab');
+      tanoOpen = !tanoOpen;
+      panel.style.display = tanoOpen ? 'flex' : 'none';
+      if (tanoOpen) {
+        panel.style.flexDirection = 'column';
+        setTimeout(function() { var inp = document.getElementById('tano-input'); if(inp) inp.focus(); }, 100);
+        fab.innerHTML = '&#215; Cerrar chat';
+      } else {
+        fab.innerHTML = '&#128172; Hablar con Tano';
+      }
+    }
+
+    function addTanoMsg(role, text) {
+      var msgs = document.getElementById('tano-messages');
+      var div = document.createElement('div');
+      div.style.cssText = role === 'user' ? 'align-self:flex-end;max-width:85%' : 'align-self:flex-start;max-width:92%';
+      if (role === 'user') {
+        div.innerHTML = '<div style="background:#c8a84a;color:#1a1208;padding:9px 13px;border-radius:16px 16px 4px 16px;font-size:13.5px;font-weight:500">' + text + '</div>';
+      } else {
+        div.innerHTML = '<div style="background:#2a2010;color:#d4b97a;padding:10px 14px;border-radius:16px 16px 16px 4px;font-size:13.5px;border:0.5px solid #3a2e1a;line-height:1.6">' + text.replace(/
+/g,'<br>') + '</div>';
+      }
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+      return div;
+    }
+
+    function sendTanoMsg() {
+      var input = document.getElementById('tano-input');
+      var text = input.value.trim();
+      if (!text || tanoLoading) return;
+      input.value = '';
+      tanoLoading = true;
+      addTanoMsg('user', text);
+      tanoHistory.push({ role: 'user', content: text });
+      var typing = addTanoMsg('bot', '...');
+      fetch(BACKEND + '/api/claude', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ system: TANO_SYS, messages: tanoHistory, max_tokens: 280 })
+      }).then(function(r) { return r.json(); }).then(function(data) {
+        var reply = (data.content && data.content[0] && data.content[0].text) || 'Disculpa, no pude responder. Proba de nuevo.';
+        typing.remove();
+        addTanoMsg('bot', reply);
+        tanoHistory.push({ role: 'assistant', content: reply });
+        if (tanoHistory.length > 20) tanoHistory = tanoHistory.slice(-20);
+      }).catch(function() {
+        typing.remove();
+        addTanoMsg('bot', 'Tuve un problemita. Intenta de nuevo en un momento.');
+      }).finally(function() { tanoLoading = false; });
+    }
   </script>
 
 </body>
