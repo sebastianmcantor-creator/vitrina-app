@@ -1506,7 +1506,8 @@ input:checked + .toggle-slider:before {
         <span class="nav-icon">🏪</span> Información
       </button>
       <button class="nav-item" data-section="menu" onclick="switchSection('menu', this)">
-        <span class="nav-icon">📋</span> Menú
+        <span class="nav-icon">📋</span> <span id="menu-nav-label">Menú</span>
+        <span class="nav-badge" id="menu-badge" style="display:none">0</span>
       </button>
       <button class="nav-item" data-section="mesas" onclick="switchSection('mesas', this)">
         <span class="nav-icon">🪑</span> Mesas
@@ -3729,6 +3730,12 @@ window.loadRestaurant = async function () {
     renderGettingStarted()
     initPedidosBadge()
     updateAgendaBadge()
+    // Restaurar última sección si existe
+    const lastSection = sessionStorage.getItem('vitrina_last_section')
+    if (lastSection && lastSection !== 'setup' && document.getElementById('section-' + lastSection)) {
+      const lastBtn = document.querySelector(`[data-section="${lastSection}"]`)
+      if (lastBtn) switchSection(lastSection, lastBtn)
+    }
   } catch (e) {
     showToast('Error cargando restaurante: ' + e.message, 'error')
   }
@@ -4441,6 +4448,9 @@ window.selectPresetColor = function (color) {
 // Navegación
 // ─────────────────────────────────────────────
 window.switchSection = function (name, btn) {
+  // Guardar la última sección en sessionStorage
+  sessionStorage.setItem('vitrina_last_section', name)
+
   // Fade out suave de la sección saliente
   const currentActive = document.querySelector('.panel-section.active')
   if (currentActive && name !== currentActive.id.replace('section-','')) {
@@ -4555,6 +4565,10 @@ window.loadMenu = async function () {
     })
     renderMenu()
     renderGettingStarted() // re-evaluar checklist con datos frescos del menú
+    // Actualizar badge del menú con el total de items
+    const totalItems = Object.values(menuItemsMap).flat().length
+    const badge = document.getElementById('menu-badge')
+    if (badge && totalItems > 0) { badge.textContent = totalItems; badge.style.display = 'inline' }
   } catch (e) {
     showToast('Error cargando menú: ' + e.message, 'error')
   }
@@ -4584,11 +4598,13 @@ function renderMenu() {
   container.innerHTML = menuCats.map(cat => {
     const items = menuItemsMap[cat.id] ?? []
     const itemsHtml = items.length
-      ? items.map(item => `
+      ? items.map(item => {
+        const noImg = !item.image_url ? '<span style="font-size:9px;background:#fff8e1;color:#856404;padding:1px 5px;border-radius:6px;margin-left:4px" title="Sin foto — la foto mejora la visibilidad">sin foto</span>' : ''
+        return `
         <div class="item-row ${item.is_available ? '' : 'unavailable'}" id="item-row-${item.id}">
           <div class="item-emoji">${item.emoji || '🍽️'}</div>
           <div class="item-info">
-            <div class="item-name-text">${item.is_featured ? '<span title="Plato destacado" style="margin-right:4px">⭐</span>' : ''}${escHtml(item.name)}</div>
+            <div class="item-name-text">${item.is_featured ? '<span title="Plato destacado" style="margin-right:4px">⭐</span>' : ''}${escHtml(item.name)}${noImg}</div>
             ${item.tags?.length ? `<div class="item-tags-row">${item.tags.map(t=>`<span class="item-tag">${TAGS.find(x=>x.key===t)?.label||t}</span>`).join('')}</div>` : ''}
           </div>
           <div class="item-price-text">${formatPrice(item.price)}</div>
@@ -4602,7 +4618,8 @@ function renderMenu() {
             <button class="btn-icon" onclick="openItemModal('${cat.id}','${item.id}')" title="Editar">✏️</button>
             <button class="btn-icon danger" onclick="deleteItem('${item.id}','${cat.id}')" title="Eliminar">🗑️</button>
           </div>
-        </div>`).join('')
+        </div>`
+      }).join('')
       : `<div style="padding:14px 20px;font-size:13px;color:var(--muted)">Sin platos todavía.</div>`
     return `
       <div class="cat-block" id="cat-block-${cat.id}">
