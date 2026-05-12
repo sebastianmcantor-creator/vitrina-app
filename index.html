@@ -26,13 +26,16 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-x: hidden; }
 
     body {
       font-family: 'DM Sans', sans-serif;
       color: var(--ink);
       background: var(--cream);
       overflow-x: hidden;
+      width: 100%;
       line-height: 1.6;
+      max-width: 100vw;
     }
 
     h1, h2, h3 {
@@ -834,7 +837,7 @@
           </div>
 
           <!-- Métricas -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+          <div class="plan-row" style="gap:10px;margin-bottom:16px">
             <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px">
               <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:4px">Alcance Instagram</div>
               <div style="font-size:22px;font-weight:600;font-family:'Cormorant Garamond',serif;color:white">12.840</div>
@@ -993,7 +996,7 @@
 
     <!-- RESTAURANTES -->
     <div id="pricing-rest">
-      <div style="max-width:960px;margin:0 auto;display:flex;flex-direction:column;gap:32px">
+      <div style="max-width:960px;width:100%;margin:0 auto;display:flex;flex-direction:column;gap:32px">
 
         <!-- NIVEL 1: Solo el menú -->
         <div>
@@ -1127,7 +1130,7 @@
 
     <!-- COMERCIOS Y VENDEDORES -->
     <div id="pricing-local" style="display:none">
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:720px;margin:0 auto">
+      <div class="plan-row" style="gap:20px;max-width:720px;margin:0 auto">
 
         <!-- Marketing -->
         <div class="plan-card featured" style="position:relative">
