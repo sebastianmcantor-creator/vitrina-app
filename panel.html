@@ -3701,6 +3701,19 @@ window.createRestaurant = async function () {
     if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
     initPedidosBadge()
     showToast(cfg.successMsg, 'success')
+    // Email de bienvenida al nuevo cliente
+    if (currentUser.email) {
+      fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notify/welcome-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: currentUser.email,
+          name: currentUser.user_metadata?.full_name || '',
+          businessName: currentRestaurant.name,
+          businessType: selectedBusinessType,
+        }),
+      }).catch(() => {})
+    }
     if (setupWAEnabled) {
       setTimeout(() => showToast('📱 WhatsApp Business: te contactaremos para configurar tu número dedicado.', 'success'), 1800)
     }
