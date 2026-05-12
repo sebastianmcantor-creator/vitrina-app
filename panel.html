@@ -2014,6 +2014,9 @@ input:checked + .toggle-slider:before {
               </div>
             </div>
           </div>
+          <div style="margin-top:14px;padding:12px 16px;background:var(--cream2);border-radius:10px;font-size:13px;color:var(--muted);line-height:1.6">
+            💡 <strong style="color:var(--ink)">Tip:</strong> Imprimí el QR del menú y ponelo en cada mesa. Imprimí el QR del asistente y ponelo en la caja o en la entrada para que los clientes puedan preguntar antes de sentarse.
+          </div>
         </div>
 
         <!-- Links de acceso rápido para el equipo -->
@@ -2545,8 +2548,36 @@ input:checked + .toggle-slider:before {
             </button>
           </div>
           <div id="metricool-status" style="margin-top:16px">
-            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
-              Conectá Metricool para publicar automáticamente en Instagram, Facebook y otras redes.
+            <div style="background:var(--cream2);border-radius:10px;padding:16px 18px">
+              <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:8px">¿Cómo conectar Metricool?</div>
+              <ol style="margin-left:16px;font-size:13.5px;color:var(--muted);line-height:2">
+                <li>Contratá el plan Starter en <a href="https://app.metricool.com" target="_blank" rel="noopener noreferrer" style="color:var(--terra)">app.metricool.com</a> ($25 USD/mes)</li>
+                <li>Conectá tu Instagram, Facebook y Google Business en Metricool</li>
+                <li>Ve a Panel Metricool → Settings → API → Generate token</li>
+                <li>Escribinos a <a href="mailto:contacto@vitrinaapp.com.ar?subject=Quiero activar Metricool" style="color:var(--terra)">contacto@vitrinaapp.com.ar</a> con el token y lo activamos</li>
+              </ol>
+              <div style="margin-top:12px;padding:10px 14px;background:#fff8e1;border-radius:8px;font-size:12.5px;color:#856404">
+                💡 Metricool se incluye en el plan Marketing. El costo es tuyo solo si lo contratás antes de que Vitrina lo implemente directamente.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Placeholder marketing cuando Metricool no está conectado -->
+        <div class="card" id="marketing-placeholder-card">
+          <div class="card-title">📊 Tu presencia digital en números</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px">
+            <div style="padding:14px;background:var(--cream2);border-radius:10px;text-align:center">
+              <div style="font-size:24px;font-weight:700;color:var(--terra);font-family:'Cormorant Garamond',serif" id="mkt-total-posts">—</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Publicaciones planificadas</div>
+            </div>
+            <div style="padding:14px;background:var(--cream2);border-radius:10px;text-align:center">
+              <div style="font-size:24px;font-weight:700;color:var(--terra);font-family:'Cormorant Garamond',serif" id="mkt-competitors">—</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Competidores monitoreados</div>
+            </div>
+            <div style="padding:14px;background:var(--cream2);border-radius:10px;text-align:center">
+              <div style="font-size:24px;font-weight:700;color:var(--terra);font-family:'Cormorant Garamond',serif" id="mkt-reviews">—</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Reseñas en Google</div>
             </div>
           </div>
         </div>
@@ -6440,6 +6471,22 @@ let scheduledPostsList = []
 
 window.loadMarketing = async function () {
   if (!currentRestaurant) return
+
+  // Cargar datos básicos de marketing
+  try {
+    const { data: compData } = await supabase.from('competitors')
+      .select('id', { count: 'exact', head: true })
+      .eq('restaurant_id', currentRestaurant.id)
+    const { data: postsData } = await supabase.from('content_calendar')
+      .select('id', { count: 'exact', head: true })
+      .eq('restaurant_id', currentRestaurant.id)
+      .eq('status', 'scheduled')
+
+    const cEl = document.getElementById('mkt-competitors')
+    const pEl = document.getElementById('mkt-total-posts')
+    if (cEl) cEl.textContent = compData || 0
+    if (pEl) pEl.textContent = postsData || 0
+  } catch {}
 
   try {
     const { integrations, scheduledPosts } = await import('./lib/db.js')
