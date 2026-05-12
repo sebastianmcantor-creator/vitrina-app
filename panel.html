@@ -1563,6 +1563,19 @@ input:checked + .toggle-slider:before {
       <span>Consultá a Viti</span>
     </button>
 
+    <div style="margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
+  <a href="mailto:contacto@vitrinaapp.com.ar" style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;border-radius:8px;transition:background .15s"
+     onmouseover="this.style.background='rgba(255,255,255,.05)';this.style.color='rgba(255,255,255,.7)'"
+     onmouseout="this.style.background='';this.style.color='rgba(255,255,255,.4)'">
+    <span style="font-size:14px">💬</span> Soporte
+  </a>
+  <a href="/demo.html" target="_blank" style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;border-radius:8px;transition:background .15s"
+     onmouseover="this.style.background='rgba(255,255,255,.05)';this.style.color='rgba(255,255,255,.7)'"
+     onmouseout="this.style.background='';this.style.color='rgba(255,255,255,.4)'">
+    <span style="font-size:14px">🎭</span> Ver demo
+  </a>
+</div>
+
     <div class="sidebar-user">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info">
@@ -2003,8 +2016,9 @@ input:checked + .toggle-slider:before {
         <div id="menu-body">
           <div class="menu-empty">
             <div class="menu-empty-icon">📋</div>
-            <div class="menu-empty-label">Sin categorías todavía</div>
-            <div class="menu-empty-desc">Creá la primera categoría para empezar a armar el menú.</div>
+            <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
+            <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
+            <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
           </div>
         </div>
       </div>
@@ -3946,7 +3960,7 @@ window.createRestaurant = async function () {
     showSection('info')
     if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
     initPedidosBadge()
-    showToast(cfg.successMsg, 'success')
+    showToast(cfg.successMsg + ' Configurá tus primeros productos para empezar.', 'success')
     // Email de bienvenida al nuevo cliente
     if (currentUser.email) {
       fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notify/welcome-email', {
@@ -4252,6 +4266,18 @@ window.selectPresetColor = function (color) {
 // Navegación
 // ─────────────────────────────────────────────
 window.switchSection = function (name, btn) {
+  // Actualizar título del tab del browser
+  const sectionTitles = {
+    info: 'Información', menu: 'Menú/Catálogo', mesas: 'Mesas y QR',
+    pedidos: 'Pedidos', historial: 'Historial', estadisticas: 'Estadísticas',
+    analisis: 'Análisis', marketing: 'Marketing', config: 'Configuración',
+    facturacion: 'Facturación', agenda: 'Agenda', reservas: 'Reservas',
+    campanas: 'Campañas', crm: 'Clientes', informes: 'Informes',
+    catalogo: 'Mi Catálogo', 'sales-agent': 'Agente de Ventas',
+  }
+  const restName = currentRestaurant?.name || 'Vitrina'
+  document.title = (sectionTitles[name] || name) + ' — ' + restName
+
   window.scrollTo({ top: 0, behavior: 'smooth' })
   if (!currentRestaurant && name !== 'setup') {
     showToast('Primero creá tu restaurante.', 'error')
@@ -4361,8 +4387,9 @@ function renderMenu() {
     container.innerHTML = `
       <div class="menu-empty">
         <div class="menu-empty-icon">📋</div>
-        <div class="menu-empty-label">Sin categorías todavía</div>
-        <div class="menu-empty-desc">Creá la primera categoría para empezar a armar el menú.</div>
+        <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
+        <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
+        <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
       </div>`
     return
   }
@@ -8692,8 +8719,8 @@ function renderStats(data) {
     </div>` : `
     <div class="coming-soon" style="padding:40px 24px">
       <div class="coming-soon-icon">📊</div>
-      <div class="coming-soon-label">Sin datos todavía</div>
-      <div class="coming-soon-desc">Los pedidos de los últimos 7 días aparecerán acá.</div>
+      <div class="coming-soon-label">Todo listo para recibir pedidos</div>
+      <div class="coming-soon-desc">Cuando lleguen los primeros pedidos, acá vas a ver estadísticas en tiempo real: facturación, ticket promedio y platos más vendidos.</div>
     </div>`}
   `
 }
