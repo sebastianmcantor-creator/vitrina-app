@@ -1737,8 +1737,8 @@ input:checked + .toggle-slider:before {
         <div id="getting-started-card" style="display:none"></div>
 
         <div class="page-header">
-          <div class="page-title">Información del restaurante</div>
-          <div class="page-subtitle">Datos que aparecen en tu menú público y en Vitrina.</div>
+          <div class="page-title" id="info-page-title">Información del negocio</div>
+          <div class="page-subtitle" id="info-page-subtitle">Datos que aparecen en tu catálogo público y en Vitrina.</div>
         </div>
 
         <!-- Identidad -->
@@ -1983,8 +1983,8 @@ input:checked + .toggle-slider:before {
       <div id="section-menu" class="panel-section">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <div>
-            <div class="page-title">Menú</div>
-            <div class="page-subtitle">Categorías y platos de tu restaurante</div>
+            <div class="page-title" id="menu-page-title">Menú</div>
+            <div class="page-subtitle" id="menu-page-subtitle">Categorías y platos de tu restaurante</div>
           </div>
           <button class="btn-primary" onclick="openCategoryModal()" style="flex-shrink:0;margin-top:4px">+ Nueva categoría</button>
           <button class="btn-secondary" onclick="openImportMenuModal()" style="flex-shrink:0;margin-top:4px;font-size:13px">
@@ -3320,6 +3320,21 @@ function renderSidebarRestaurant(rest) {
     planEl.style.color = colors[planKey] || '#8a7e74'
   }
   updateOpenPill(rest.is_open ?? true)
+
+  // Adaptar terminología al tipo de negocio
+  const bizTerms = {
+    restaurant: { noun: 'restaurante', menu: 'Menú', items: 'Platos', catalog: 'Menú' },
+    local:      { noun: 'local',       menu: 'Catálogo', items: 'Productos', catalog: 'Catálogo' },
+    services:   { noun: 'negocio',     menu: 'Servicios', items: 'Servicios', catalog: 'Catálogo' },
+    ecommerce:  { noun: 'tienda',      menu: 'Catálogo', items: 'Productos', catalog: 'Catálogo' },
+  }
+  const btype = rest.business_type || 'restaurant'
+  const terms = bizTerms[btype] || bizTerms.restaurant
+  window._bizTerms = terms
+
+  // Actualizar labels del nav
+  const menuNavBtn = document.querySelector('[data-section="menu"]')
+  if (menuNavBtn) menuNavBtn.innerHTML = menuNavBtn.innerHTML.replace('Menú', terms.menu)
 }
 
 function updateOpenPill(isOpen) {
@@ -3343,6 +3358,20 @@ window.quickToggleOpen = async function () {
 }
 
 function fillForm(rest) {
+  // Actualizar título de la sección según tipo de negocio
+  const btype = rest.business_type || 'restaurant'
+  const titles = {
+    restaurant: ['Información del restaurante', 'Datos que aparecen en tu menú público y en Vitrina.'],
+    local:      ['Información del local',       'Datos que aparecen en tu catálogo público y en Vitrina.'],
+    services:   ['Información del negocio',     'Datos que aparecen en tu agenda y perfil público.'],
+    ecommerce:  ['Información de la tienda',    'Datos que aparecen en tu catálogo y tienda online.'],
+  }
+  const [t, s] = titles[btype] || titles.restaurant
+  const titleEl = document.getElementById('info-page-title')
+  const subEl   = document.getElementById('info-page-subtitle')
+  if (titleEl) titleEl.textContent = t
+  if (subEl)   subEl.textContent   = s
+
   document.getElementById('f-name').value        = rest.name        || ''
   document.getElementById('f-tagline').value     = rest.tagline     || ''
   document.getElementById('f-description').value = rest.description || ''
@@ -4250,6 +4279,14 @@ const TAGS = [
 
 window.loadMenu = async function () {
   if (!currentRestaurant) return
+  if (window._bizTerms) {
+    const titleEl = document.getElementById('menu-page-title')
+    const subEl   = document.getElementById('menu-page-subtitle')
+    if (titleEl) titleEl.textContent = window._bizTerms.menu
+    if (subEl) subEl.textContent = window._bizTerms.items === 'Platos'
+      ? 'Categorías y platos de tu restaurante'
+      : 'Categorías y productos de tu negocio'
+  }
   try {
     menuCats = await menuCategories.listByRestaurant(currentRestaurant.id)
     const allItems = await menuItems.listByRestaurant(currentRestaurant.id)
