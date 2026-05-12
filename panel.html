@@ -3329,6 +3329,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       history.replaceState({}, '', '/panel.html')
       setTimeout(() => switchSection('catalogo', document.querySelector('[data-section="catalogo"]')), 500)
     }
+    if (qp.get('oauth') === 'gcal_ok') {
+      showToast('✅ Google Calendar conectado correctamente.', 'success')
+      history.replaceState({}, '', '/panel.html')
+      setTimeout(() => switchSection('agenda', document.querySelector('[data-section="agenda"]')), 500)
+    }
     if (qp.get('oauth') === 'tn_ok') {
       showToast('✅ Tienda Nube conectada correctamente.', 'success')
       history.replaceState({}, '', '/panel.html')
@@ -8162,14 +8167,17 @@ window.openStaffModal = async function () {
 
 window.connectGoogleCalendar = async function () {
   if (!currentRestaurant) return
-  // Redirige al OAuth de Google con scope de Calendar
-  const GOOGLE_CLIENT_ID = '496787959423-compute@developer.gserviceaccount.com' // placeholder
-  const redirectUri = encodeURIComponent('https://vitrinaapp.com.ar/oauth-callback.html')
-  const scope = encodeURIComponent('https://www.googleapis.com/auth/calendar')
-  const state = encodeURIComponent(JSON.stringify({ restaurant_id: currentRestaurant.id, provider: 'google_calendar' }))
-
-  // Por ahora mostrar instrucción hasta que esté configurado el client_id de Google Calendar
-  showToast('Google Calendar — próximamente. Por ahora usá la agenda de Vitrina.', 'success')
+  // Verificar si Google está disponible (chequeo rápido al health endpoint)
+  try {
+    const health = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/health')
+    const data = await health.json()
+    if (data.services?.google_places) {
+      // Google Places está configurado, intentar Calendar OAuth
+      window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/google/calendar-auth?restaurant_id=${currentRestaurant.id}`
+      return
+    }
+  } catch {}
+  showToast('Google Calendar estará disponible pronto. Por ahora usá la agenda de Vitrina.', 'success')
 }
 
 window.loadReservas = async function () {

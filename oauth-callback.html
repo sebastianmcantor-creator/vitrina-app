@@ -145,6 +145,16 @@
         return
       }
 
+      if (provider === 'google_calendar') {
+        try {
+          const workerCallback = BACKEND + '/api/google/calendar-callback?code=' + encodeURIComponent(code) + '&state=' + encodeURIComponent(state || '')
+          location.href = workerCallback
+        } catch (e) {
+          showError('Error al conectar Google Calendar: ' + e.message)
+        }
+        return
+      }
+
       if (provider === 'google') {
         try {
           const workerCallback = BACKEND + '/api/google/callback?code=' + encodeURIComponent(code)
