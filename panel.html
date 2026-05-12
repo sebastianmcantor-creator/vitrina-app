@@ -1946,10 +1946,13 @@ input:checked + .toggle-slider:before {
           <div class="quick-links-grid" id="quick-links-grid">
             <a class="btn-quick-link" id="link-menu" href="#" target="_blank">🍽️ Ver menú público</a>
             <a class="btn-quick-link" id="link-qr-print" href="#" target="_blank">🖨️ Imprimir QRs</a>
-            <a class="btn-quick-link" id="link-cocina" href="#" target="_blank">🧑‍🍳 Panel de cocina</a>
+            <a class="btn-quick-link" id="link-cocina" href="#" target="_blank">🍳 Pantalla de cocina</a>
             <a class="btn-quick-link" id="link-mozo" href="#" target="_blank">💬 Ver asistente</a>
             <button class="btn-quick-link" onclick="copyMenuLink()" id="btn-copy-link" style="background:var(--cream2)">
               📋 Copiar link del menú
+            </button>
+            <button class="btn-quick-link" onclick="shareLandingPage()" style="background:var(--cream2)">
+              📤 Compartir con cliente
             </button>
           </div>
         </div>
@@ -2654,6 +2657,10 @@ input:checked + .toggle-slider:before {
           <div class="card-title">📲 Notificaciones WhatsApp</div>
           <div style="font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.6">
             Configurá los números que reciben alertas. Se usa el formato internacional sin el +: <code style="background:var(--cream);padding:2px 6px;border-radius:4px;font-size:12px">5491155556666</code>
+          </div>
+
+          <div id="wa-setup-alert" style="display:none;padding:12px 16px;background:#e8f5e9;border:1px solid #b2dec4;border-radius:10px;margin-bottom:16px;font-size:13.5px;color:#2e7d32">
+            ✅ Solicitaste un número de WhatsApp Business propio. Cuando esté listo, cargalo aquí y se activa automáticamente. ¿Dudas? escribinos a <a href="mailto:contacto@vitrinaapp.com.ar" style="color:#2e7d32">contacto@vitrinaapp.com.ar</a>
           </div>
 
           <div style="display:grid;gap:16px">
@@ -3394,6 +3401,15 @@ function renderSidebarRestaurant(rest) {
     const planKey = (rest.plan || 'free').toLowerCase()
     planEl.style.color = colors[planKey] || '#8a7e74'
   }
+  // Badge de estado del trial junto al nombre
+  const sidebarPlan = document.getElementById('sidebar-rest-plan')
+  if (sidebarPlan && rest.trial_end) {
+    const daysLeft = Math.ceil((new Date(rest.trial_end) - Date.now()) / 86400000)
+    if (daysLeft > 0 && daysLeft <= 3) {
+      sidebarPlan.style.color = '#ef4444'
+      sidebarPlan.textContent += ' · ⚠️ ' + daysLeft + 'd'
+    }
+  }
   updateOpenPill(rest.is_open ?? true)
 
   // Adaptar terminología al tipo de negocio
@@ -3553,6 +3569,20 @@ window.copyMenuLink = function () {
   }).catch(() => {
     prompt('Copiá este link:', url)
   })
+}
+
+window.shareLandingPage = function () {
+  if (!currentRestaurant) return
+  const btype = currentRestaurant.business_type || 'restaurant'
+  const pages = {
+    restaurant: 'para-restaurantes.html',
+    services:   'para-servicios.html',
+    local:      'para-comercios.html',
+    ecommerce:  'para-comercios.html',
+  }
+  const url = 'https://vitrinaapp.com.ar/' + (pages[btype] || 'para-restaurantes.html')
+  navigator.clipboard.writeText(url).then(() => showToast('Link de presentación copiado ✓', 'success'))
+    .catch(() => prompt('Copiá este link para compartir:', url))
 }
 
 function qrUrl(data, size = 140) {
@@ -5311,6 +5341,12 @@ window.downgradePlan = function () {
 window.loadConfig = async function () {
   if (!currentRestaurant) return
   renderPlanSection()
+
+  // Mostrar alerta si quiso WhatsApp pero no está configurado
+  if (currentRestaurant.wants_whatsapp && !currentRestaurant.whatsapp_operativo) {
+    const waAlert = document.getElementById('wa-setup-alert')
+    if (waAlert) waAlert.style.display = 'block'
+  }
 
   // Pre-cargar números WhatsApp
   const waOp  = document.getElementById('wa-operativo-input')
@@ -7273,7 +7309,7 @@ function renderGettingStarted() {
     { label: 'Primer plato o producto agregado',    done: totalMenuItems > 0,             action: () => switchSection('menu',  document.querySelector('[data-section="menu"]'))  },
     { label: 'Mesa o QR generado',                  done: mesasList.length > 0,           action: () => switchSection('mesas', document.querySelector('[data-section="mesas"]')) },
     { label: 'WhatsApp operativo configurado',      done: !!(r.whatsapp_operativo),       action: () => switchSection('config',document.querySelector('[data-section="config"]'))},
-    { label: 'Horarios de apertura cargados',       done: !!(r.opening_hours),            action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
+    { label: 'Horarios cargados — Tano los muestra a los clientes', done: !!(r.opening_hours), action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
   ]
 
   const doneCount  = steps.filter(s => s.done).length
@@ -7545,7 +7581,18 @@ window.loadCRM = async function () {
       .filter(c => c.phone || c.name) // solo con datos de contacto
       .sort((a, b) => (b.lastOrder || '').localeCompare(a.lastOrder || ''))
     document.getElementById('crm-count').textContent = crmData.length + ' clientes'
-    renderCRM(crmData)
+    if (!crmData.length) {
+      document.getElementById('crm-body').innerHTML = `
+        <div style="text-align:center;padding:40px 24px">
+          <div style="font-size:40px;margin-bottom:12px">👥</div>
+          <div style="font-size:16px;font-weight:500;margin-bottom:8px">Sin clientes registrados todavía</div>
+          <p style="font-size:14px;color:var(--muted);max-width:360px;margin:0 auto;line-height:1.6">
+            Los clientes aparecen acá automáticamente cuando hacen pedidos y dejan su número de teléfono. También podés importar desde campañas de WhatsApp.
+          </p>
+        </div>`
+    } else {
+      renderCRM(crmData)
+    }
   } catch (e) {
     document.getElementById('crm-body').innerHTML =
       '<div style="padding:40px;text-align:center;color:var(--muted)">No hay datos todavía. Los clientes aparecen cuando hacen pedidos.</div>'
