@@ -443,46 +443,12 @@
     .number-label { font-size: 13px; color: var(--muted); margin-top: 6px; }
 
     /* ── RESPONSIVE ───────────────────────────────────── */
+    /* Tablet intermedio */
     @media (max-width: 900px) {
       .split { grid-template-columns: 1fr; gap: 32px; }
       .split.reverse { direction: ltr; }
       .feat-grid { grid-template-columns: 1fr 1fr; }
-      .business-cards { grid-template-columns: 1fr; max-width: 360px; }
-      .wa-cards { grid-template-columns: 1fr; }
-      .steps { grid-template-columns: 1fr; gap: 16px; }
-      .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin-left: auto; margin-right: auto; }
-      .guarantee-grid { grid-template-columns: 1fr; }
       .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
-      .numbers { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .hamburger { display: flex; }
-      .section { padding: 64px 20px; }
-      .feat-grid { grid-template-columns: 1fr; }
-      .footer-grid { grid-template-columns: 1fr; }
-      .chat-panel { width: calc(100vw - 48px); right: 12px; }
-      /* Pricing: una columna en mobile */
-      #pricing-rest > div > div,
-      #pricing-local > div { grid-template-columns: 1fr !important; }
-      /* Tabs de precios: stack en mobile */
-      #precios .section-inner > div:first-of-type > div { flex-direction: column; }
-      /* Business cards hero: una columna */
-      .business-cards { grid-template-columns: 1fr !important; max-width: 100% !important; }
-      /* WA cards: una columna */
-      .wa-cards { grid-template-columns: 1fr !important; }
-      /* Steps: una columna */
-      .steps { grid-template-columns: 1fr !important; }
-      /* Guarantee grid: una columna */
-      .guarantee-grid { grid-template-columns: 1fr !important; }
-      /* Numbers: 2 columnas */
-      .numbers { grid-template-columns: repeat(2, 1fr) !important; }
-      /* Hero h1 más pequeño */
-      .hero h1 { font-size: 2.2rem; }
-      /* Sección padding menor */
-      .hero { padding: 100px 20px 60px; }
-      /* Split layout: una columna */
-      .split { grid-template-columns: 1fr !important; }
     }
 
     /* ── UTILS ────────────────────────────────────────── */
@@ -499,9 +465,83 @@
     .tag-local      { background: #FDF3EE; color: var(--terra); }
     .tag-online     { background: #E3F2FD; color: #1565C0; }
 
+    /* Plan row — grid de precios */
+    .plan-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
     /* Fade in on scroll */
     .fade { opacity: 0; transform: translateY(20px); transition: opacity .5s ease, transform .5s ease; }
     .fade.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE COMPLETO ───────────────────────── */
+    @media (max-width: 768px) {
+      /* Precios: 1 columna */
+      .plan-row { grid-template-columns: 1fr !important; }
+
+      /* Pricing tabs: stack vertical */
+      #precios .section-inner > div[style*="justify-content:center"] > div {
+        flex-direction: column; width: 100%;
+      }
+      #precios .section-inner > div[style*="justify-content:center"] > div button {
+        width: 100%; text-align: center;
+      }
+
+      /* Business cards: 1 columna */
+      .business-cards { grid-template-columns: 1fr !important; max-width: 100% !important; }
+
+      /* WA cards: 1 columna */
+      .wa-cards { grid-template-columns: 1fr !important; }
+
+      /* Split: 1 columna */
+      .split { grid-template-columns: 1fr !important; }
+      .split.reverse { direction: ltr !important; }
+
+      /* Steps: 1 columna */
+      .steps { grid-template-columns: 1fr !important; gap: 12px; }
+
+      /* Guarantee grid: 1 columna */
+      .guarantee-grid { grid-template-columns: 1fr !important; }
+
+      /* Numbers: 2x2 */
+      .numbers { grid-template-columns: repeat(2, 1fr) !important; }
+
+      /* Feature grid: 1 columna */
+      .feat-grid { grid-template-columns: 1fr !important; }
+
+      /* Footer: 1 columna */
+      .footer-grid { grid-template-columns: 1fr !important; gap: 24px; }
+
+      /* Hero */
+      .hero { padding: 100px 20px 56px; }
+      .hero h1 { font-size: clamp(2rem, 8vw, 3rem); }
+      .hero-actions { flex-direction: column; align-items: stretch; }
+      .hero-actions a { text-align: center; }
+
+      /* Secciones */
+      .section { padding: 56px 20px; }
+      .section-title { font-size: clamp(1.7rem, 6vw, 2.4rem); }
+
+      /* Nav */
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      /* Chat */
+      .chat-panel { width: calc(100vw - 32px); right: 8px; left: 8px; }
+
+      /* Marketing dark section */
+      #marketing .split { grid-template-columns: 1fr !important; }
+      #marketing .split > div:first-child > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .plan-card { padding: 22px 18px; }
+      .wa-card { padding: 22px 20px; }
+      .hero h1 { font-size: 1.9rem; }
+      #marketing .split > div:first-child > div[style*="grid-template-columns"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -751,7 +791,7 @@
           No es un post automático genérico. Viti analiza tu negocio, tus competidores, qué funcionó el mes anterior y arma un plan de acción concreto: qué publicar, cuándo y con qué objetivo.
         </p>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:32px">
+        <div class="plan-row" style="margin-top:32px">
           <div style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:18px">
             <div style="font-size:22px;margin-bottom:8px">📊</div>
             <div style="font-size:14px;font-weight:600;color:rgba(255,255,255,.9);margin-bottom:4px">Google Business</div>
@@ -961,7 +1001,7 @@
             <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);white-space:nowrap">Solo el menú</div>
             <div style="flex:1;height:1px;background:var(--border)"></div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="plan-row">
             <div class="plan-card">
               <div class="plan-name" style="font-size:20px">Solo Menú</div>
               <div class="plan-desc">QR, pedidos, cocina y reservas</div>
@@ -1005,7 +1045,7 @@
             <div style="flex:1;height:1px;background:var(--border)"></div>
             <div style="font-size:11px;color:var(--muted);white-space:nowrap">para quien ya tiene sistema de pedidos</div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="plan-row">
             <div class="plan-card">
               <div class="plan-name" style="font-size:20px">Marketing</div>
               <div class="plan-desc">Presencia digital y redes sociales con IA</div>
@@ -1049,7 +1089,7 @@
             <div style="flex:1;height:1px;background:color-mix(in srgb, var(--terra) 20%, transparent)"></div>
             <div style="background:var(--terra-pale);color:var(--terra);font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;white-space:nowrap">Ahorrás vs contratar por separado</div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div class="plan-row">
             <div class="plan-card featured" style="position:relative">
               <div class="plan-popular">Más completo</div>
               <div class="plan-name" style="font-size:20px">Menú + Marketing</div>
