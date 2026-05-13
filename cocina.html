@@ -464,7 +464,7 @@
 
       // Si el pedido está listo, notificar al cliente por WhatsApp
       if (siguiente === 'ready') {
-        notificarPedidoListo(id, restaurantId).catch(() => {})
+        notificarPedidoListo(id, rest.id).catch(() => {})
       }
     } catch {
       if (btn) { btn.disabled = false }
