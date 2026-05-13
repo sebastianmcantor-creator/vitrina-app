@@ -12,11 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
       --terra: #C86640;
@@ -34,627 +30,1494 @@
       background: var(--cream);
       color: var(--black);
       line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
     }
 
+    /* Banner */
     .demo-banner {
       background: linear-gradient(135deg, var(--terra), var(--sand));
       color: white;
       text-align: center;
-      padding: 1rem;
-      font-size: 0.9rem;
+      padding: 0.7rem 1rem;
+      font-size: 0.8rem;
       font-weight: 500;
     }
+    .demo-banner a { color: white; text-decoration: underline; }
 
-    .demo-banner a {
+    /* Header restaurante */
+    .rest-header {
+      background: var(--brown);
       color: white;
-      text-decoration: underline;
-      font-weight: 600;
-    }
-
-    .header {
-      background: var(--white);
-      padding: 1.5rem 1rem;
+      padding: 2rem 1.5rem 1.5rem;
       text-align: center;
-      border-bottom: 1px solid var(--beige);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      position: relative;
     }
-
-    .logo-img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin: 0 auto 0.5rem;
+    .rest-header .cover-emoji {
+      font-size: 3rem;
       display: block;
-    }
-
-    .restaurant-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--terra);
-      margin-bottom: 0.3rem;
-    }
-
-    .restaurant-description {
-      font-size: 0.9rem;
-      color: var(--grey);
-    }
-
-    .featured-section {
-      background: linear-gradient(135deg, rgba(200,102,64,0.1), rgba(212,165,116,0.1));
-      padding: 2rem 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .featured-title {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: var(--terra);
-      margin-bottom: 1rem;
-      text-align: center;
-    }
-
-    .featured-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .menu-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 2rem 1rem;
-    }
-
-    .category {
-      margin-bottom: 3rem;
-    }
-
-    .category-header {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.8rem;
-      border-bottom: 2px solid var(--terra);
-    }
-
-    .category-icon {
-      font-size: 2rem;
-    }
-
-    .category-name {
-      font-family: 'Cormorant Garamond', serif;
-      font-size: 1.8rem;
-      font-weight: 700;
-      color: var(--terra);
-    }
-
-    .dishes-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .dish-card {
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-    }
-
-    .dish-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-    }
-
-    .dish-card.featured {
-      border: 2px solid var(--terra);
-    }
-
-    .dish-image {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-    }
-
-    .dish-content {
-      padding: 1.2rem;
-    }
-
-    .dish-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
       margin-bottom: 0.5rem;
     }
-
-    .dish-name {
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: var(--brown);
-      flex: 1;
+    .rest-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
-
-    .dish-price {
-      font-weight: 600;
-      font-size: 1.1rem;
-      color: var(--terra);
-      white-space: nowrap;
-      margin-left: 0.5rem;
+    .rest-header p {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-top: 0.3rem;
     }
-
-    .dish-description {
-      font-size: 0.9rem;
-      color: var(--grey);
-      margin-bottom: 0.8rem;
-      line-height: 1.5;
-    }
-
-    .dish-tags {
+    .rest-tags {
       display: flex;
       gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.8rem;
       flex-wrap: wrap;
     }
-
-    .dish-tag {
-      background: var(--beige);
-      color: var(--brown);
+    .rest-tags span {
+      background: rgba(255,255,255,0.2);
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
       font-size: 0.75rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 12px;
-      font-weight: 500;
+    }
+    .mesa-tag {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      padding: 0.4rem 1rem;
+      font-size: 0.8rem;
+      margin-top: 1rem;
+      display: inline-block;
     }
 
-    .featured-badge {
+    /* Filtros */
+    .filters {
+      background: white;
+      padding: 0.8rem 1rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      border-bottom: 1px solid #eee;
+      scrollbar-width: none;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .filters::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      background: none;
+      border: 1.5px solid #ddd;
+      border-radius: 20px;
+      padding: 0.35rem 1rem;
+      font-size: 0.8rem;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--grey);
+      transition: all 0.2s;
+    }
+    .filter-btn.active {
+      background: var(--terra);
+      border-color: var(--terra);
+      color: white;
+    }
+
+    /* Nav categorías */
+    .cat-nav {
+      background: white;
+      padding: 0.7rem 1rem;
+      display: flex;
+      gap: 0.8rem;
+      overflow-x: auto;
+      border-bottom: 1px solid #eee;
+      scrollbar-width: none;
+    }
+    .cat-nav::-webkit-scrollbar { display: none; }
+    .cat-btn {
+      background: none;
+      border: none;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--grey);
+      cursor: pointer;
+      white-space: nowrap;
+      padding: 0.2rem 0;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .cat-btn.active {
+      color: var(--terra);
+      border-bottom-color: var(--terra);
+    }
+
+    /* Menú */
+    .menu-body { padding: 0 0 150px; }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--brown);
+      padding: 1.5rem 1.2rem 0.8rem;
+      border-bottom: 1px solid var(--beige);
+    }
+
+    .menu-item {
+      background: white;
+      margin: 0.5rem 0.8rem;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      gap: 0;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .menu-item:active { transform: scale(0.98); }
+
+    .item-img {
+      width: 110px;
+      min-width: 110px;
+      height: 110px;
+      object-fit: cover;
+      display: block;
+    }
+    .item-img-fallback {
+      width: 110px;
+      min-width: 110px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      background: var(--beige);
+    }
+
+    .item-info {
+      flex: 1;
+      padding: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .item-name {
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--black);
+      line-height: 1.3;
+    }
+    .item-desc {
+      font-size: 0.78rem;
+      color: var(--grey);
+      margin-top: 0.3rem;
+      line-height: 1.4;
+    }
+    .item-badges {
+      display: flex;
+      gap: 0.3rem;
+      margin-top: 0.4rem;
+      flex-wrap: wrap;
+    }
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .badge.veg { background: #e8f5e9; color: #2e7d32; }
+    .badge.vegan { background: #f3e5f5; color: #6a1b9a; }
+    .badge.tacc { background: #e3f2fd; color: #1565c0; }
+    .badge.featured { background: #fff8e1; color: #f57f17; }
+
+    .item-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 0.6rem;
+    }
+    .item-price {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--terra);
+    }
+    .add-btn {
       background: var(--terra);
       color: white;
-      font-size: 0.75rem;
-      padding: 0.3rem 0.6rem;
-      border-radius: 12px;
-      font-weight: 600;
-    }
-
-    .cart-button {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: linear-gradient(135deg, var(--terra), var(--sand));
-      color: white;
-      padding: 1rem 2rem;
-      border-radius: 50px;
       border: none;
-      font-weight: 600;
-      font-size: 1rem;
-      box-shadow: 0 4px 20px rgba(200,102,64,0.4);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      font-size: 1.3rem;
       cursor: pointer;
-      z-index: 99;
-      transition: transform 0.3s, box-shadow 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, transform 0.1s;
+      flex-shrink: 0;
+    }
+    .add-btn:active { transform: scale(0.9); background: var(--brown); }
+
+    /* Qty controls */
+    .qty-controls {
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
-
-    .cart-button:hover {
-      transform: scale(1.05);
-      box-shadow: 0 6px 25px rgba(200,102,64,0.6);
-    }
-
-    .cart-count {
-      background: white;
-      color: var(--terra);
-      width: 24px;
-      height: 24px;
+    .qty-btn {
+      background: var(--beige);
+      color: var(--brown);
+      border: none;
       border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 1.1rem;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 0.85rem;
     }
-
-    .footer {
-      background: var(--brown);
-      color: rgba(255,255,255,0.8);
+    .qty-num {
+      font-weight: 700;
+      font-size: 0.95rem;
+      min-width: 18px;
       text-align: center;
-      padding: 2rem 1rem;
-      margin-top: 3rem;
+      color: var(--brown);
     }
 
-    .footer-text {
-      font-size: 0.9rem;
+    /* Carrito flotante */
+    .cart-fab {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--terra);
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 0.9rem 1.8rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      gap: 0.8rem;
+      box-shadow: 0 6px 20px rgba(200,102,64,0.45);
+      z-index: 100;
+      max-width: 400px;
+      width: calc(100% - 2rem);
+    }
+    .cart-fab.visible { display: flex; }
+    .cart-fab-badge {
+      background: white;
+      color: var(--terra);
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+    .cart-fab-total { margin-left: auto; font-weight: 700; }
+
+    /* Carrito drawer */
+    .cart-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .cart-overlay.open { opacity: 1; pointer-events: all; }
+
+    .cart-drawer {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      width: 100%;
+      max-width: 480px;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      z-index: 201;
+      transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .cart-drawer.open { transform: translateX(-50%) translateY(0); }
+
+    .cart-handle {
+      width: 40px;
+      height: 4px;
+      background: #ddd;
+      border-radius: 2px;
+      margin: 0.8rem auto 0;
+    }
+    .cart-header {
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-header h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .cart-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--grey);
+      padding: 0.2rem;
+    }
+    .cart-items { overflow-y: auto; flex: 1; padding: 0.5rem 0; }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      padding: 0.8rem 1.2rem;
+      gap: 0.8rem;
+      border-bottom: 1px solid #f5f5f5;
+    }
+    .cart-item-emoji {
+      font-size: 1.8rem;
+      width: 42px;
+      text-align: center;
+    }
+    .cart-item-info { flex: 1 }
+    .cart-item-name { font-size: 0.88rem; font-weight: 600; }
+    .cart-item-price { font-size: 0.82rem; color: var(--grey); }
+    .cart-item-controls { display: flex; align-items: center; gap: 0.4rem; }
+    .cart-qty-btn {
+      background: var(--beige);
+      color: var(--brown);
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    .cart-qty-num {
+      font-weight: 700;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .cart-footer {
+      padding: 1rem 1.2rem;
+      border-top: 1px solid #eee;
+    }
+    .cart-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .cart-total-label { font-size: 0.9rem; color: var(--grey); }
+    .cart-total-value { font-size: 1.3rem; font-weight: 700; color: var(--terra); }
+    .cart-order-btn {
+      width: 100%;
+      background: var(--terra);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 1rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .cart-order-btn:hover { background: var(--brown); }
+
+    /* Modal confirmación */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 2rem 1.5rem;
+      max-width: 360px;
+      width: 100%;
+      text-align: center;
+      transform: scale(0.9);
+      transition: transform 0.3s;
+    }
+    .modal-overlay.open .modal-box { transform: scale(1); }
+    .modal-emoji { font-size: 3rem; margin-bottom: 1rem; display: block; }
+    .modal-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--brown);
       margin-bottom: 0.5rem;
     }
-
-    .footer-link {
+    .modal-text { font-size: 0.9rem; color: var(--grey); margin-bottom: 1.5rem; line-height: 1.5; }
+    .modal-actions { display: flex; flex-direction: column; gap: 0.7rem; }
+    .modal-btn-primary {
+      background: var(--terra);
       color: white;
-      text-decoration: none;
+      border: none;
+      border-radius: 12px;
+      padding: 0.9rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
       font-weight: 600;
+      cursor: pointer;
+    }
+    .modal-btn-secondary {
+      background: none;
+      border: 1.5px solid #ddd;
+      border-radius: 12px;
+      padding: 0.9rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      color: var(--grey);
+      cursor: pointer;
+    }
+    /* Pedido confirmado */
+    .order-confirmed {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin: 1rem 0.8rem;
+      text-align: center;
+      display: none;
+    }
+    .order-confirmed.show { display: block; }
+    .order-confirmed .ok-emoji { font-size: 2.5rem; }
+    .order-confirmed h3 { color: #15803d; font-size: 1.1rem; margin: 0.5rem 0 0.3rem; }
+    .order-confirmed p { color: #166534; font-size: 0.85rem; }
+
+    /* Tano */
+    .tano-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 16px;
+      background: var(--brown);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 0.7rem 1.2rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(107,68,35,0.4);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .tano-fab-dot {
+      width: 8px; height: 8px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.3); }
     }
 
-    .footer-link:hover {
-      text-decoration: underline;
+    .tano-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .tano-overlay.open { opacity: 1; pointer-events: all; }
+
+    .tano-panel {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%) translateY(100%);
+      width: 100%;
+      max-width: 480px;
+      background: white;
+      border-radius: 20px 20px 0 0;
+      z-index: 201;
+      transition: transform 0.35s cubic-bezier(0.32,0.72,0,1);
+      height: 70vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .tano-panel.open { transform: translateX(-50%) translateY(0); }
+
+    .tano-header {
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      border-bottom: 1px solid #eee;
+      background: var(--brown);
+      border-radius: 20px 20px 0 0;
+      color: white;
+    }
+    .tano-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .tano-header-info { flex: 1; }
+    .tano-header-name { font-weight: 700; font-size: 1rem; }
+    .tano-header-status { font-size: 0.75rem; opacity: 0.8; }
+    .tano-close-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    @media (max-width: 768px) {
-      .dishes-grid, .featured-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .cart-button {
-        bottom: 1rem;
-        right: 1rem;
-        padding: 0.8rem 1.5rem;
-        font-size: 0.9rem;
-      }
-
-      .restaurant-name {
-        font-size: 1.5rem;
-      }
-
-      .category-name {
-        font-size: 1.5rem;
-      }
+    .tano-msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      background: #fafafa;
     }
+    .msg {
+      max-width: 82%;
+      padding: 0.7rem 1rem;
+      border-radius: 16px;
+      font-size: 0.88rem;
+      line-height: 1.5;
+    }
+    .msg.tano-msg {
+      background: white;
+      color: var(--black);
+      align-self: flex-start;
+      border-radius: 4px 16px 16px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .msg.user-msg {
+      background: var(--terra);
+      color: white;
+      align-self: flex-end;
+      border-radius: 16px 16px 4px 16px;
+    }
+    .msg.typing {
+      background: white;
+      align-self: flex-start;
+      border-radius: 4px 16px 16px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      padding: 0.9rem 1.2rem;
+    }
+    .typing-dots { display: flex; gap: 4px; align-items: center; }
+    .typing-dots span {
+      width: 6px; height: 6px;
+      background: var(--grey);
+      border-radius: 50%;
+      animation: typing 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+
+    .tano-input-area {
+      padding: 0.8rem 1rem;
+      border-top: 1px solid #eee;
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+      background: white;
+    }
+    .tano-input {
+      flex: 1;
+      border: 1.5px solid #ddd;
+      border-radius: 20px;
+      padding: 0.6rem 1rem;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      resize: none;
+      outline: none;
+      max-height: 80px;
+      line-height: 1.4;
+    }
+    .tano-input:focus { border-color: var(--terra); }
+    .tano-send-btn {
+      background: var(--terra);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 38px; height: 38px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+    }
+
+    .tano-quick-btns {
+      padding: 0.5rem 1rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      scrollbar-width: none;
+      background: #fafafa;
+    }
+    .tano-quick-btns::-webkit-scrollbar { display: none; }
+    .quick-btn {
+      background: white;
+      border: 1.5px solid var(--beige);
+      border-radius: 20px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.78rem;
+      font-family: 'Outfit', sans-serif;
+      cursor: pointer;
+      white-space: nowrap;
+      color: var(--brown);
+      font-weight: 500;
+    }
+    .quick-btn:hover { background: var(--beige); }
   </style>
 </head>
 <body>
 
-  <div class="demo-banner">
-    ✨ Demo interactiva de Vitrina — Así se ve el menú de tu negocio ·
-    <a href="/panel.html" style="font-weight:600">Creá el tuyo gratis →</a>
+<!-- Banner demo -->
+<div class="demo-banner">
+  Esta es una demo de cómo se ve el menú digital con Vitrina.
+  <a href="index.html">Quiero esto para mi restaurante →</a>
+</div>
+
+<!-- Header -->
+<div class="rest-header">
+  <span class="cover-emoji">🏡</span>
+  <h1>Casa Lucía</h1>
+  <p>Cocina casera de autor · San Telmo, CABA</p>
+  <div class="rest-tags">
+    <span>🕐 12:00 – 23:30</span>
+    <span>📍 Defensa 1234</span>
+    <span>⭐ 4.8</span>
   </div>
+  <div class="mesa-tag">📋 Mesa 5</div>
+</div>
 
-  <div class="header">
-    <img src="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=200&fit=crop" alt="Casa Lucía" class="logo-img">
-    <h1 class="restaurant-name">Casa Lucía</h1>
-    <p class="restaurant-description">Cocina italiana-porteña en el corazón de Buenos Aires</p>
-  </div>
+<!-- Filtros -->
+<div class="filters">
+  <button class="filter-btn active" onclick="setFilter('all', this)">Todos</button>
+  <button class="filter-btn" onclick="setFilter('veg', this)">🥦 Vegetariano</button>
+  <button class="filter-btn" onclick="setFilter('vegan', this)">🌱 Vegano</button>
+  <button class="filter-btn" onclick="setFilter('tacc', this)">🌾 Sin TACC</button>
+</div>
 
-  <!-- Sección de destacados -->
-  <div class="featured-section">
-    <h2 class="featured-title">⭐ Nuestros Destacados</h2>
-    <div class="featured-grid" id="featured-dishes"></div>
-  </div>
+<!-- Categorías -->
+<div class="cat-nav" id="catNav">
+  <button class="cat-btn active" onclick="scrollTo('picar')">Para picar</button>
+  <button class="cat-btn" onclick="scrollTo('pastas')">Pastas</button>
+  <button class="cat-btn" onclick="scrollTo('principales')">Principales</button>
+  <button class="cat-btn" onclick="scrollTo('postres')">Postres</button>
+  <button class="cat-btn" onclick="scrollTo('bebidas')">Bebidas</button>
+</div>
 
-  <div class="menu-container" id="menu-container">
-    <!-- Las categorías se generan con JavaScript -->
-  </div>
+<!-- Pedido confirmado -->
+<div class="order-confirmed" id="orderConfirmed">
+  <div class="ok-emoji">✅</div>
+  <h3>¡Pedido enviado a cocina!</h3>
+  <p>Tu pedido está siendo preparado. El mozo te avisa cuando esté listo.</p>
+</div>
 
-  <button class="cart-button" onclick="showCartDemo()">
-    🛒 Ver carrito
-    <span class="cart-count">0</span>
-  </button>
+<!-- Menú -->
+<div class="menu-body" id="menuBody">
 
-  <button onclick="toggleTanoChat()" id="tano-fab" class="cart-button" style="bottom:90px;background:#1a1208;color:#e8c87a;border:1px solid #3a2e1a;cursor:pointer;display:flex;align-items:center;gap:6px" title="Hablar con Tano">💬 Hablar con Tano</button>
+  <!-- Para picar -->
+  <div id="sec-picar">
+    <div class="section-title">Para picar</div>
 
-  <div style="background:#1C1208;color:white;padding:32px 24px;text-align:center">
-    <div style="font-family:'Playfair Display',serif;font-size:22px;color:#e8c87a;margin-bottom:8px">¿Te gustó el menú?</div>
-    <p style="font-size:14px;color:rgba(255,255,255,.6);margin-bottom:20px;line-height:1.6">En 15 minutos podés tener el tuyo. Sin técnicos, sin instalaciones.<br>Solo cargás tus productos y generás el QR.</p>
-    <a href="/panel.html" style="display:inline-block;background:#B85A30;color:white;padding:13px 28px;border-radius:12px;text-decoration:none;font-weight:600;font-size:15px;font-family:sans-serif">
-      Crear mi menú gratis →
-    </a>
-    <div style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.35)">14 días gratis · Sin tarjeta · Para cualquier negocio</div>
-  </div>
-
-  <div class="footer">
-    <p class="footer-text">Menú digital creado con <a href="/" class="footer-link">Vitrina</a></p>
-    <p class="footer-text" style="font-size: 0.8rem; opacity: 0.7;">
-      ¿Querés un catálogo digital como este para tu negocio?
-      <a href="/panel.html" class="footer-link">Empezá gratis</a>
-    </p>
-  </div>
-
-  <script>
-    // Datos del menú demo
-    const menuData = {
-      categories: [
-        {
-          id: 1,
-          name: 'Entradas',
-          icon: '🥗',
-          dishes: [
-            {
-              id: 101,
-              name: 'Tabla de Fiambres y Quesos', emoji: '🧀',
-              description: 'Selección de embutidos artesanales y quesos estacionados con pickles caseros, mostaza antigua y pan de campo tostado',
-              price: 13500,
-              image: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=85&fit=crop&crop=center',
-              tags: ['Para compartir'],
-              featured: true
-            },
-            {
-              id: 102,
-              name: 'Bruschetta al Pomodoro', emoji: '🍅',
-              description: 'Pan de masa madre tostado con tomates perita confitados, burrata fresca, albahaca y aceite de oliva extra virgen',
-              price: 8500,
-              image: 'https://images.unsplash.com/photo-1572695157366-5e585ab2b69f?w=600&q=85&fit=crop&crop=center',
-              tags: ['Vegetariano']
-            },
-            {
-              id: 103,
-              name: 'Empanadas de Carne Cortada a Cuchillo', emoji: '🥟',
-              description: 'Tres empanadas criollas rellenas de carne, huevo duro, aceitunas y cebolla caramelizada, horneadas al momento',
-              price: 7500,
-              image: 'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=600&q=85&fit=crop&crop=center',
-              tags: []
-            }
-          ]
-        },
-        {
-          id: 2,
-          name: 'Platos Principales',
-          icon: '🍽️',
-          dishes: [
-            {
-              id: 201,
-              name: 'Tagliatelle al Ragú de Ossobuco', emoji: '🍝',
-              description: 'Pasta fresca artesanal con ragú de ossobuco cocido 6 horas, gremolata de limón y parmesano reggiano',
-              price: 18500,
-              image: 'https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=600&q=85&fit=crop&crop=center',
-              tags: [],
-              featured: true
-            },
-            {
-              id: 202,
-              name: 'Risotto de Hongos Silvestres', emoji: '🍚',
-              description: 'Arroz carnaroli cremoso con mix de hongos porcini, shiitake y portobello, manteca de trufa y parmesano',
-              price: 17000,
-              image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=600&q=85&fit=crop&crop=center',
-              tags: ['Vegetariano'],
-              featured: false
-            },
-            {
-              id: 203,
-              name: 'Pollo alla Cacciatore', emoji: '🍗',
-              description: 'Suprema de pollo braseada con tomates San Marzano, aceitunas negras, alcaparras y hierbas frescas, acompañada de polenta cremosa',
-              price: 16500,
-              image: 'https://images.unsplash.com/photo-1598511726623-d2e9996869f3?w=600&q=85&fit=crop&crop=center',
-              tags: []
-            },
-            {
-              id: 204,
-              name: 'Milanesa a la Napolitana', emoji: '🥩',
-              description: 'Milanesa de ternera premium con salsa pomodoro casera, jamón cocido y mozzarella gratinada, con papas a la provenzal',
-              price: 22000,
-              image: 'https://images.unsplash.com/photo-1574484284002-952d92456975?w=600&q=85&fit=crop&crop=center',
-              tags: [],
-              featured: true
-            }
-          ]
-        },
-        {
-          id: 3,
-          name: 'Postres',
-          icon: '🍰',
-          dishes: [
-            {
-              id: 301,
-              name: 'Tiramisú della Casa', emoji: '🍰',
-              description: 'Clásico tiramisú con bizcochos de soletilla remojados en café espresso, crema de mascarpone y cacao amargo en polvo',
-              price: 7500,
-              image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=600&q=85&fit=crop&crop=center',
-              tags: [],
-              featured: true
-            },
-            {
-              id: 302,
-              name: 'Volcán de Chocolate Belga', emoji: '🍫',
-              description: 'Bizcochuelo tibio con centro de chocolate fundido 70% cacao, helado de crema americana y frutos rojos frescos',
-              price: 8000,
-              image: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&q=85&fit=crop&crop=center',
-              tags: []
-            },
-            {
-              id: 303,
-              name: 'Panna Cotta al Caramelo', emoji: '🍮',
-              description: 'Panna cotta de vainilla con caramelo salado, nueces caramelizadas y reducción de frutos rojos',
-              price: 6500,
-              image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&q=85&fit=crop&crop=center',
-              tags: ['Sin TACC']
-            }
-          ]
-        },
-        {
-          id: 4,
-          name: 'Bebidas',
-          icon: '🍷',
-          dishes: [
-            {
-              id: 401,
-              name: 'Malbec Reserva', emoji: '🍷',
-              description: 'Copa de Malbec de bodega boutique mendocina, crianza 12 meses en roble francés',
-              price: 5500,
-              image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=85&fit=crop&crop=center',
-              tags: []
-            },
-            {
-              id: 402,
-              name: 'Café Espresso Doble', emoji: '☕',
-              description: 'Blend de cafés de especialidad de origen único, tostado artesanalmente en Buenos Aires',
-              price: 2500,
-              image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=85&fit=crop&crop=center',
-              tags: []
-            }
-          ]
-        }
-      ]
-    };
-
-    // Renderizar menú
-    function renderMenu() {
-      const container = document.getElementById('menu-container');
-      const featuredContainer = document.getElementById('featured-dishes');
-
-      // Renderizar destacados
-      const featuredDishes = [];
-      menuData.categories.forEach(category => {
-        category.dishes.forEach(dish => {
-          if (dish.featured) {
-            featuredDishes.push(dish);
-          }
-        });
-      });
-
-      featuredContainer.innerHTML = featuredDishes.map(dish => createDishCard(dish, true)).join('');
-
-      // Renderizar categorías
-      container.innerHTML = menuData.categories.map(category => `
-        <div class="category">
-          <div class="category-header">
-            <span class="category-icon">${category.icon}</span>
-            <h2 class="category-name">${category.name}</h2>
-          </div>
-          <div class="dishes-grid">
-            ${category.dishes.map(dish => createDishCard(dish)).join('')}
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function createDishCard(dish, isInFeatured = false) {
-      const tagsHTML = dish.tags.length > 0
-        ? dish.tags.map(tag => `<span class="dish-tag">${tag}</span>`).join('')
-        : '';
-
-      const featuredBadge = dish.featured && !isInFeatured
-        ? '<span class="featured-badge">⭐ Destacado</span>'
-        : '';
-
-      return `
-        <div class="dish-card ${dish.featured ? 'featured' : ''}" onclick="showDishDetail(${dish.id})">
-          <img src="${dish.image}" alt="${dish.name}" class="dish-image">
-          <div class="dish-content">
-            <div class="dish-header">
-              <h3 class="dish-name">${dish.name}</h3>
-              <span class="dish-price">$${dish.price.toLocaleString('es-AR')}</span>
-            </div>
-            <p class="dish-description">${dish.description}</p>
-            <div class="dish-tags">
-              ${featuredBadge}
-              ${tagsHTML}
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    function showDishDetail(dishId) {
-      // Find the dish and show a brief notification
-      let dish;
-      menuData.categories.forEach(c => c.dishes.forEach(d => { if(d.id === dishId) dish = d; }));
-      if (!dish) return;
-      const btn = event.currentTarget.querySelector('.add-to-cart-btn') || event.currentTarget;
-      btn.textContent = '✓ Agregado';
-      btn.style.background = '#2e7d32';
-      setTimeout(() => { btn.textContent = '+ Agregar'; btn.style.background = ''; }, 1500);
-    }
-
-    function showCartDemo() {
-      document.getElementById('tano-fab').click();
-    }
-
-    // Inicializar
-    renderMenu();
-  </script>
-
-
-  <!-- Chat inline de Tano -->
-  <div id="tano-chat-panel" style="display:none;position:fixed;bottom:0;right:0;width:360px;max-width:100vw;height:500px;max-height:80vh;background:#1a1208;border-radius:20px 20px 0 0;box-shadow:0 -8px 32px rgba(0,0,0,.4);z-index:200;flex-direction:column;overflow:hidden">
-    <div style="background:#2a2010;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #3a2e1a">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="width:32px;height:32px;border-radius:50%;background:#c8a84a;display:flex;align-items:center;justify-content:center;font-size:16px">🤖</div>
+    <div class="menu-item" data-tags="">
+      <img class="item-img" src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=220&h=220&fit=crop" alt="Tabla de fiambres" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍖</div>
+      <div class="item-info">
         <div>
-          <div style="font-size:13px;font-weight:600;color:#e8c87a">Tano</div>
-          <div style="font-size:10px;color:#8a7450">Asistente de Casa Lucia</div>
+          <div class="item-name">Tabla de fiambres y quesos</div>
+          <div class="item-desc">Selección del día: jamón crudo, salame, queso brie y manchego. Con pan artesanal y mermelada de higos.</div>
+          <div class="item-badges"><span class="badge featured">⭐ Recomendado</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$14.500</span>
+          <div id="ctrl-picar-1"></div>
         </div>
       </div>
-      <button onclick="toggleTanoChat()" style="background:none;border:none;color:#8a7450;cursor:pointer;font-size:22px;padding:4px;line-height:1">x</button>
     </div>
-    <div id="tano-messages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;scrollbar-width:none">
-      <div style="align-self:flex-start;max-width:90%">
-        <div style="background:#2a2010;color:#d4b97a;padding:10px 14px;border-radius:16px 16px 16px 4px;font-size:13.5px;border:0.5px solid #3a2e1a;line-height:1.55">Hola! Soy Tano, el asistente de Casa Lucia. Podes preguntarme sobre el menu, ingredientes o que te recomiendo para hoy. Que te traigo?</div>
+
+    <div class="menu-item" data-tags="">
+      <img class="item-img" src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=220&h=220&fit=crop" alt="Empanadas" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🥟</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Empanadas de carne (x3)</div>
+          <div class="item-desc">Masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas. Picantes disponibles.</div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$2.800</span>
+          <div id="ctrl-picar-2"></div>
+        </div>
       </div>
     </div>
-    <div style="padding:10px 14px 20px;border-top:0.5px solid #2e2410;display:flex;gap:8px">
-      <input id="tano-input" type="text" placeholder="Pregunta sobre el menu..." 
-        style="flex:1;background:#2a2010;border:0.5px solid #4a3820;border-radius:20px;padding:9px 14px;color:#e8c87a;font-family:sans-serif;font-size:13.5px;outline:none"
-        onkeydown="if(event.key==='Enter')sendTanoMsg()">
-      <button onclick="sendTanoMsg()" style="width:36px;height:36px;border-radius:50%;background:#c8a84a;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px">&#9658;</button>
+
+    <div class="menu-item" data-tags="veg">
+      <img class="item-img" src="https://images.unsplash.com/photo-1550731538-5be0f455baf0?w=220&h=220&fit=crop" alt="Provoleta" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🧀</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Provoleta a la parrilla</div>
+          <div class="item-desc">Queso provolone fundido con orégano, ají molido y un toque de oliva. Viene con pan tostado.</div>
+          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$8.500</span>
+          <div id="ctrl-picar-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=220&h=220&fit=crop" alt="Rabas" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🦑</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Rabas fritas</div>
+          <div class="item-desc">Anillos de calamar tiernos, rebozados y fritos. Con alioli casero y limón fresco.</div>
+          <div class="item-badges"><span class="badge tacc">🌾 Sin TACC</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$9.200</span>
+          <div id="ctrl-picar-4"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script>
-    var BACKEND = 'https://vitrina-tano.vitrinaapp.workers.dev';
-    var tanoHistory = [];
-    var tanoOpen = false;
-    var tanoLoading = false;
+  <!-- Pastas -->
+  <div id="sec-pastas">
+    <div class="section-title">Pastas</div>
 
-    var TANO_SYS = 'Sos Tano, asistente de Casa Lucia, restaurante italiano-porteno en Buenos Aires. Tono calido, informal, porteno (vos, che). MENU: ENTRADAS: Tabla de Fiambres $13500 (quesos, embutidos, pickles), Bruschetta $8500 Veg (pan masa madre, tomates, burrata), Empanadas Carne $7500 (3 unidades horneadas). PRINCIPALES: Tagliatelle Ragú Ossobuco $18500 DESTACADO, Risotto Hongos $17000 Veg DESTACADO, Pollo Cacciatore $16500, Milanesa Napolitana $22000 DESTACADO. POSTRES: Tiramisu $7500 DESTACADO, Volcan Chocolate $8000, Panna Cotta $6500 Sin TACC. BEBIDAS: Malbec Reserva $5500, Cafe Espresso $2500. REGLAS: solo responde sobre el menu y el restaurante. Respuestas max 3-4 lineas.';
+    <div class="menu-item" data-tags="">
+      <img class="item-img" src="https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=220&h=220&fit=crop" alt="Penne rigate" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍝</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Penne Rigate con Ragú de Carne</div>
+          <div class="item-desc">Ragú de res cocido a fuego lento por 4 horas, penne al dente, queso parmesano y albahaca fresca.</div>
+          <div class="item-badges"><span class="badge featured">⭐ Favorito</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$16.800</span>
+          <div id="ctrl-pastas-1"></div>
+        </div>
+      </div>
+    </div>
 
-    function toggleTanoChat() {
-      var panel = document.getElementById('tano-chat-panel');
-      var fab = document.getElementById('tano-fab');
-      tanoOpen = !tanoOpen;
-      panel.style.display = tanoOpen ? 'flex' : 'none';
-      if (tanoOpen) {
-        panel.style.flexDirection = 'column';
-        setTimeout(function() { var inp = document.getElementById('tano-input'); if(inp) inp.focus(); }, 100);
-        fab.innerHTML = '&#215; Cerrar chat';
-      } else {
-        fab.innerHTML = '&#128172; Hablar con Tano';
-      }
+    <div class="menu-item" data-tags="veg">
+      <img class="item-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=220&h=220&fit=crop" alt="Ñoquis" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🫘</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Ñoquis al pesto de albahaca</div>
+          <div class="item-desc">Ñoquis de papa artesanales con pesto genovés, pistachos tostados y parmesano rallado en mesa.</div>
+          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$15.200</span>
+          <div id="ctrl-pastas-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="">
+      <img class="item-img" src="https://images.unsplash.com/photo-1612874742237-6526221588e3?w=220&h=220&fit=crop" alt="Fettuccine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍜</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Fettuccine crema y jamón</div>
+          <div class="item-desc">Pasta larga en salsa crema con jamón serrano, hongos salteados y nuez moscada. Clásico de la casa.</div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$15.900</span>
+          <div id="ctrl-pastas-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="veg">
+      <img class="item-img" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=220&h=220&fit=crop" alt="Tallarines" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍝</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Tallarines al pesto rojo</div>
+          <div class="item-desc">Tallarines artesanales con pesto de tomates secos, almendras y ricota. Toque de limón y rúcula.</div>
+          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$14.800</span>
+          <div id="ctrl-pastas-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Principales -->
+  <div id="sec-principales">
+    <div class="section-title">Principales</div>
+
+    <div class="menu-item" data-tags="">
+      <img class="item-img" src="https://images.unsplash.com/photo-1585703900468-13b7d0f9ab09?w=220&h=220&fit=crop" alt="Milanesa napolitana" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍖</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Milanesa napolitana con papas fritas</div>
+          <div class="item-desc">Milanesa de ternera con salsa de tomate, jamón y queso gratinado. Con papas fritas caseras.</div>
+          <div class="item-badges"><span class="badge featured">⭐ Clásico</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$22.500</span>
+          <div id="ctrl-principales-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1558030006-450675393462?w=220&h=220&fit=crop" alt="Bife de chorizo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🥩</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Bife de chorizo a la parrilla</div>
+          <div class="item-desc">400g de corte selecto, cocción a pedido. Acompañado de ensalada mixta y chimichurri de la casa.</div>
+          <div class="item-badges"><span class="badge tacc">🌾 Sin TACC</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$28.000</span>
+          <div id="ctrl-principales-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="">
+      <img class="item-img" src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=220&h=220&fit=crop" alt="Suprema de pollo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍗</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Suprema de pollo rellena</div>
+          <div class="item-desc">Pechuga rellena con espinaca y queso crema, salteada con manteca clarificada. Con puré rústico.</div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$18.500</span>
+          <div id="ctrl-principales-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=220&h=220&fit=crop" alt="Merluza romana" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🐟</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Merluza romana</div>
+          <div class="item-desc">Filete fresco rebozado en tempura liviana, con ensalada de rúcula, tomates cherry y aliño de limón.</div>
+          <div class="item-badges"><span class="badge tacc">🌾 Sin TACC</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$19.800</span>
+          <div id="ctrl-principales-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Postres -->
+  <div id="sec-postres">
+    <div class="section-title">Postres</div>
+
+    <div class="menu-item" data-tags="veg">
+      <img class="item-img" src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=220&h=220&fit=crop" alt="Tiramisú" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍰</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Tiramisú de la casa</div>
+          <div class="item-desc">Receta clásica con mascarpone, café espresso y cacao amargo. Se sirve en copa individual.</div>
+          <div class="item-badges">
+            <span class="badge veg">🥦 Vegetariano</span>
+            <span class="badge featured">⭐ Imperdible</span>
+          </div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$7.500</span>
+          <div id="ctrl-postres-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="veg">
+      <img class="item-img" src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=220&h=220&fit=crop" alt="Volcán de chocolate" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍫</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Volcán de chocolate</div>
+          <div class="item-desc">Corazón fundente de chocolate belga con helado de crema artesanal. 8 minutos de preparación.</div>
+          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$8.200</span>
+          <div id="ctrl-postres-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="veg tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=220&h=220&fit=crop" alt="Flan" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍮</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Flan casero con dulce de leche</div>
+          <div class="item-desc">Flan de vainilla hecho en casa, con dulce de leche repostero y crema batida.</div>
+          <div class="item-badges">
+            <span class="badge veg">🥦 Vegetariano</span>
+            <span class="badge tacc">🌾 Sin TACC</span>
+          </div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$5.800</span>
+          <div id="ctrl-postres-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="vegan tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=220&h=220&fit=crop" alt="Ensalada de frutas" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍓</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Ensalada de frutas de estación</div>
+          <div class="item-desc">Frutas frescas de temporada con miel de flores, menta y un toque de jengibre.</div>
+          <div class="item-badges">
+            <span class="badge vegan">🌱 Vegano</span>
+            <span class="badge tacc">🌾 Sin TACC</span>
+          </div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$5.200</span>
+          <div id="ctrl-postres-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bebidas -->
+  <div id="sec-bebidas">
+    <div class="section-title">Bebidas</div>
+
+    <div class="menu-item" data-tags="vegan tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=220&h=220&fit=crop" alt="Agua" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">💧</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Agua mineral</div>
+          <div class="item-desc">Con o sin gas, botella 500ml.</div>
+          <div class="item-badges">
+            <span class="badge vegan">🌱 Vegano</span>
+            <span class="badge tacc">🌾 Sin TACC</span>
+          </div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$1.800</span>
+          <div id="ctrl-bebidas-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="vegan tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=220&h=220&fit=crop" alt="Gaseosa" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🥤</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Gaseosa</div>
+          <div class="item-desc">Coca-Cola, Sprite o Fanta. Lata 350ml o botella 500ml.</div>
+          <div class="item-badges">
+            <span class="badge vegan">🌱 Vegano</span>
+            <span class="badge tacc">🌾 Sin TACC</span>
+          </div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$2.200</span>
+          <div id="ctrl-bebidas-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="vegan tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=220&h=220&fit=crop" alt="Vino por copa" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍷</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Vino por copa</div>
+          <div class="item-desc">Selección de la carta: Malbec, Torrontés o Cabernet. Preguntar variedad del día.</div>
+          <div class="item-badges">
+            <span class="badge vegan">🌱 Vegano</span>
+            <span class="badge tacc">🌾 Sin TACC</span>
+          </div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$5.500</span>
+          <div id="ctrl-bebidas-3"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu-item" data-tags="vegan tacc">
+      <img class="item-img" src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=220&h=220&fit=crop" alt="Cerveza artesanal" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="item-img-fallback" style="display:none">🍺</div>
+      <div class="item-info">
+        <div>
+          <div class="item-name">Cerveza artesanal</div>
+          <div class="item-desc">Rubia, roja o negra. Elaboración local, pinta 500ml. Consultar variedades disponibles.</div>
+          <div class="item-badges">
+            <span class="badge tacc">🌾 Sin TACC</span>
+          </div>
+        </div>
+        <div class="item-footer">
+          <span class="item-price">$4.800</span>
+          <div id="ctrl-bebidas-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /menu-body -->
+
+<!-- Carrito FAB -->
+<button class="cart-fab" id="cartFab" onclick="openCart()">
+  <span class="cart-fab-badge" id="cartBadge">0</span>
+  <span>Ver pedido</span>
+  <span class="cart-fab-total" id="cartFabTotal">$0</span>
+</button>
+
+<!-- Overlay carrito -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+
+<!-- Drawer carrito -->
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-handle"></div>
+  <div class="cart-header">
+    <h3>🛒 Tu pedido</h3>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total</span>
+      <span class="cart-total-value" id="cartTotal">$0</span>
+    </div>
+    <button class="cart-order-btn" onclick="confirmOrder()">Enviar pedido a cocina →</button>
+  </div>
+</div>
+
+<!-- Modal confirmación pedido -->
+<div class="modal-overlay" id="orderModal">
+  <div class="modal-box">
+    <span class="modal-emoji">👨‍🍳</span>
+    <div class="modal-title">¿Enviamos el pedido?</div>
+    <div class="modal-text" id="orderSummaryText">Revisá tu pedido antes de enviarlo a cocina.</div>
+    <div class="modal-actions">
+      <button class="modal-btn-primary" onclick="sendOrder()">Sí, enviar a cocina</button>
+      <button class="modal-btn-secondary" onclick="closeModal()">Volver al menú</button>
+    </div>
+  </div>
+</div>
+
+<!-- Tano FAB -->
+<button class="tano-fab" id="tanoFab" onclick="openTano()">
+  <span class="tano-fab-dot"></span>
+  Tano
+</button>
+
+<!-- Overlay Tano -->
+<div class="tano-overlay" id="tanoOverlay" onclick="closeTano()"></div>
+
+<!-- Panel Tano -->
+<div class="tano-panel" id="tanoPanel">
+  <div class="tano-header">
+    <div class="tano-avatar">🤵</div>
+    <div class="tano-header-info">
+      <div class="tano-header-name">Tano</div>
+      <div class="tano-header-status">Tu asistente del menú · En línea</div>
+    </div>
+    <button class="tano-close-btn" onclick="closeTano()">✕</button>
+  </div>
+  <div class="tano-msgs" id="tanoMsgs"></div>
+  <div class="tano-quick-btns" id="tanoQuickBtns">
+    <button class="quick-btn" onclick="sendQuick('¿Qué recomendás para hoy?')">¿Qué recomendás?</button>
+    <button class="quick-btn" onclick="sendQuick('¿Tienen opciones vegetarianas?')">Opciones vegetarianas</button>
+    <button class="quick-btn" onclick="sendQuick('¿Qué tiene el volcán de chocolate?')">Volcán de chocolate</button>
+    <button class="quick-btn" onclick="sendQuick('¿Hay platos sin TACC?')">Sin TACC</button>
+    <button class="quick-btn" onclick="sendQuick('¿Cuánto tarda la milanesa?')">Tiempo de espera</button>
+  </div>
+  <div class="tano-input-area">
+    <textarea class="tano-input" id="tanoInput" placeholder="Preguntale a Tano..." rows="1" onkeydown="tanoKeydown(event)" oninput="autoResize(this)"></textarea>
+    <button class="tano-send-btn" onclick="sendTano()">➤</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATOS DEL MENÚ
+// ============================================================
+const MENU = {
+  'picar-1': { name: 'Tabla de fiambres y quesos', price: 14500, emoji: '🍖' },
+  'picar-2': { name: 'Empanadas de carne (x3)', price: 2800, emoji: '🥟' },
+  'picar-3': { name: 'Provoleta a la parrilla', price: 8500, emoji: '🧀' },
+  'picar-4': { name: 'Rabas fritas', price: 9200, emoji: '🦑' },
+  'pastas-1': { name: 'Penne Rigate con Ragú de Carne', price: 16800, emoji: '🍝' },
+  'pastas-2': { name: 'Ñoquis al pesto de albahaca', price: 15200, emoji: '🫘' },
+  'pastas-3': { name: 'Fettuccine crema y jamón', price: 15900, emoji: '🍜' },
+  'pastas-4': { name: 'Tallarines al pesto rojo', price: 14800, emoji: '🍝' },
+  'principales-1': { name: 'Milanesa napolitana con papas fritas', price: 22500, emoji: '🍖' },
+  'principales-2': { name: 'Bife de chorizo a la parrilla', price: 28000, emoji: '🥩' },
+  'principales-3': { name: 'Suprema de pollo rellena', price: 18500, emoji: '🍗' },
+  'principales-4': { name: 'Merluza romana', price: 19800, emoji: '🐟' },
+  'postres-1': { name: 'Tiramisú de la casa', price: 7500, emoji: '🍰' },
+  'postres-2': { name: 'Volcán de chocolate', price: 8200, emoji: '🍫' },
+  'postres-3': { name: 'Flan casero con dulce de leche', price: 5800, emoji: '🍮' },
+  'postres-4': { name: 'Ensalada de frutas de estación', price: 5200, emoji: '🍓' },
+  'bebidas-1': { name: 'Agua mineral', price: 1800, emoji: '💧' },
+  'bebidas-2': { name: 'Gaseosa', price: 2200, emoji: '🥤' },
+  'bebidas-3': { name: 'Vino por copa', price: 5500, emoji: '🍷' },
+  'bebidas-4': { name: 'Cerveza artesanal', price: 4800, emoji: '🍺' }
+};
+
+// ============================================================
+// CARRITO
+// ============================================================
+let cart = {};
+
+function fmt(n) {
+  return '$' + n.toLocaleString('es-AR');
+}
+
+function getTotal() {
+  return Object.entries(cart).reduce((acc, [id, qty]) => acc + MENU[id].price * qty, 0);
+}
+
+function getCount() {
+  return Object.values(cart).reduce((a, b) => a + b, 0);
+}
+
+function renderCtrl(id) {
+  const el = document.getElementById('ctrl-' + id);
+  if (!el) return;
+  const qty = cart[id] || 0;
+  if (qty === 0) {
+    el.innerHTML = `<button class="add-btn" onclick="addItem('${id}')">+</button>`;
+  } else {
+    el.innerHTML = `
+      <div class="qty-controls">
+        <button class="qty-btn" onclick="removeItem('${id}')">−</button>
+        <span class="qty-num">${qty}</span>
+        <button class="qty-btn" onclick="addItem('${id}')">+</button>
+      </div>`;
+  }
+}
+
+function addItem(id) {
+  cart[id] = (cart[id] || 0) + 1;
+  renderCtrl(id);
+  updateCartFab();
+}
+
+function removeItem(id) {
+  if (!cart[id]) return;
+  cart[id]--;
+  if (cart[id] === 0) delete cart[id];
+  renderCtrl(id);
+  updateCartFab();
+}
+
+function updateCartFab() {
+  const count = getCount();
+  const total = getTotal();
+  const fab = document.getElementById('cartFab');
+  document.getElementById('cartBadge').textContent = count;
+  document.getElementById('cartFabTotal').textContent = fmt(total);
+  if (count > 0) fab.classList.add('visible');
+  else fab.classList.remove('visible');
+}
+
+function openCart() {
+  renderCartDrawer();
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('cartOverlay').classList.add('open');
+}
+
+function closeCart() {
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartOverlay').classList.remove('open');
+}
+
+function renderCartDrawer() {
+  const el = document.getElementById('cartItems');
+  if (getCount() === 0) {
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#999;font-size:0.9rem;">Todavía no agregaste nada 🛒</div>';
+    return;
+  }
+  el.innerHTML = Object.entries(cart).map(([id, qty]) => {
+    const item = MENU[id];
+    return `
+      <div class="cart-item">
+        <div class="cart-item-emoji">${item.emoji}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-price">${fmt(item.price)} c/u</div>
+        </div>
+        <div class="cart-item-controls">
+          <button class="cart-qty-btn" onclick="removeItem('${id}');renderCartDrawer();updateCartFab()">−</button>
+          <span class="cart-qty-num">${qty}</span>
+          <button class="cart-qty-btn" onclick="addItem('${id}');renderCartDrawer()">+</button>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('cartTotal').textContent = fmt(getTotal());
+}
+
+function confirmOrder() {
+  if (getCount() === 0) return;
+  const lines = Object.entries(cart).map(([id, qty]) => `${qty}x ${MENU[id].name}`);
+  document.getElementById('orderSummaryText').innerHTML =
+    lines.join('<br>') + `<br><br><strong>Total: ${fmt(getTotal())}</strong>`;
+  closeCart();
+  document.getElementById('orderModal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('orderModal').classList.remove('open');
+}
+
+function sendOrder() {
+  closeModal();
+  // Reset cart
+  const ids = Object.keys(cart);
+  cart = {};
+  ids.forEach(id => renderCtrl(id));
+  updateCartFab();
+  // Mostrar confirmación
+  const conf = document.getElementById('orderConfirmed');
+  conf.classList.add('show');
+  conf.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => conf.classList.remove('show'), 6000);
+}
+
+// ============================================================
+// FILTROS
+// ============================================================
+let activeFilter = 'all';
+
+function setFilter(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.menu-item').forEach(item => {
+    if (f === 'all') {
+      item.style.display = '';
+    } else {
+      const tags = item.getAttribute('data-tags') || '';
+      item.style.display = tags.includes(f) ? '' : 'none';
     }
+  });
+}
 
-    function addTanoMsg(role, text) {
-      var msgs = document.getElementById('tano-messages');
-      var div = document.createElement('div');
-      div.style.cssText = role === 'user' ? 'align-self:flex-end;max-width:85%' : 'align-self:flex-start;max-width:92%';
-      if (role === 'user') {
-        div.innerHTML = '<div style="background:#c8a84a;color:#1a1208;padding:9px 13px;border-radius:16px 16px 4px 16px;font-size:13.5px;font-weight:500">' + text + '</div>';
-      } else {
-        div.innerHTML = '<div style="background:#2a2010;color:#d4b97a;padding:10px 14px;border-radius:16px 16px 16px 4px;font-size:13.5px;border:0.5px solid #3a2e1a;line-height:1.6">' + text.replace(/
-/g,'<br>') + '</div>';
-      }
-      msgs.appendChild(div);
-      msgs.scrollTop = msgs.scrollHeight;
-      return div;
+// ============================================================
+// SCROLL A SECCIÓN
+// ============================================================
+function scrollTo(sec) {
+  const el = document.getElementById('sec-' + sec);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// ============================================================
+// TANO
+// ============================================================
+let tanoOpen = false;
+let tanoHistory = [];
+const WORKER = 'https://vitrina-tano.vitrinaapp.workers.dev';
+
+const TANO_CONTEXT = `Sos Tano, el asistente del restaurante Casa Lucía. Tu tono es cálido, informal y humano — nunca suenas a bot. Respondés solo sobre el menú y el restaurante.
+
+MENÚ COMPLETO:
+PARA PICAR:
+- Tabla de fiambres y quesos $14.500: jamón crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos. Recomendado.
+- Empanadas de carne x3 $2.800: masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas.
+- Provoleta a la parrilla $8.500: queso provolone fundido con orégano, ají molido y oliva. Pan tostado. (Vegetariano)
+- Rabas fritas $9.200: anillos de calamar, rebozados, con alioli casero y limón. (Sin TACC)
+
+PASTAS:
+- Penne Rigate con Ragú de Carne $16.800: ragú de res cocido 4 horas, parmesano y albahaca. Favorito.
+- Ñoquis al pesto de albahaca $15.200: ñoquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano)
+- Fettuccine crema y jamón $15.900: salsa crema, jamón serrano, hongos, nuez moscada.
+- Tallarines al pesto rojo $14.800: pesto de tomates secos, almendras, ricota, limón y rúcula. (Vegetariano)
+
+PRINCIPALES:
+- Milanesa napolitana con papas fritas $22.500: ternera, salsa de tomate, jamón y queso gratinado. Clásico.
+- Bife de chorizo a la parrilla $28.000: 400g, cocción a pedido, ensalada mixta y chimichurri. (Sin TACC)
+- Suprema de pollo rellena $18.500: rellena con espinaca y queso crema, manteca clarificada, puré rústico.
+- Merluza romana $19.800: filete en tempura liviana, rúcula, tomates cherry, aliño de limón. (Sin TACC)
+
+POSTRES:
+- Tiramisú de la casa $7.500: mascarpone, café espresso y cacao amargo. Imperdible. (Vegetariano)
+- Volcán de chocolate $8.200: corazón fundente, helado de crema artesanal. 8 minutos. (Vegetariano)
+- Flan casero con dulce de leche $5.800: flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC)
+- Ensalada de frutas de estación $5.200: frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC)
+
+BEBIDAS:
+- Agua mineral $1.800: con o sin gas, 500ml
+- Gaseosa $2.200: Coca-Cola, Sprite o Fanta
+- Vino por copa $5.500: Malbec, Torrontés o Cabernet según disponibilidad
+- Cerveza artesanal $4.800: rubia, roja o negra, 500ml
+
+REGLAS:
+- Si te preguntan algo fuera del menú o el restaurante, respondé con amabilidad que eso no te lo podés responder vos, pero que el equipo ayuda.
+- Respondé en español, de forma breve y amistosa.
+- No uses markdown, respondé como texto simple.`;
+
+function openTano() {
+  tanoOpen = true;
+  document.getElementById('tanoPanel').classList.add('open');
+  document.getElementById('tanoOverlay').classList.add('open');
+  if (tanoHistory.length === 0) {
+    addTanoMsg('tano', '¡Hola! Soy Tano 👋 Podés preguntarme lo que quieras del menú — ingredientes, alergias, qué recomiendo... ¡lo que necesites!');
+  }
+}
+
+function closeTano() {
+  document.getElementById('tanoPanel').classList.remove('open');
+  document.getElementById('tanoOverlay').classList.remove('open');
+  tanoOpen = false;
+}
+
+function addTanoMsg(who, text) {
+  const msgs = document.getElementById('tanoMsgs');
+  const div = document.createElement('div');
+  div.className = 'msg ' + (who === 'tano' ? 'tano-msg' : 'user-msg');
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  if (who === 'tano') tanoHistory.push({ role: 'assistant', content: text });
+  else tanoHistory.push({ role: 'user', content: text });
+}
+
+function showTyping() {
+  const msgs = document.getElementById('tanoMsgs');
+  const div = document.createElement('div');
+  div.className = 'msg typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById('typingIndicator');
+  if (t) t.remove();
+}
+
+async function sendTano() {
+  const input = document.getElementById('tanoInput');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('tanoQuickBtns').style.display = 'none';
+  addTanoMsg('user', text);
+  showTyping();
+
+  try {
+    const res = await fetch(WORKER + '/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: TANO_CONTEXT,
+        messages: tanoHistory.slice(-10).filter(m => m.role !== 'assistant' || tanoHistory.indexOf(m) > tanoHistory.length - 11)
+      })
+    });
+    removeTyping();
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.content?.[0]?.text || data.reply || 'Hmm, no pude responder ahora. Intentá de nuevo.';
+      addTanoMsg('tano', reply);
+    } else {
+      addTanoMsg('tano', 'No pude responder en este momento. Preguntale al mozo 😊');
     }
+  } catch (e) {
+    removeTyping();
+    addTanoMsg('tano', 'No pude responder en este momento. Preguntale al mozo 😊');
+  }
+}
 
-    function sendTanoMsg() {
-      var input = document.getElementById('tano-input');
-      var text = input.value.trim();
-      if (!text || tanoLoading) return;
-      input.value = '';
-      tanoLoading = true;
-      addTanoMsg('user', text);
-      tanoHistory.push({ role: 'user', content: text });
-      var typing = addTanoMsg('bot', '...');
-      fetch(BACKEND + '/api/claude', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ system: TANO_SYS, messages: tanoHistory, max_tokens: 280 })
-      }).then(function(r) { return r.json(); }).then(function(data) {
-        var reply = (data.content && data.content[0] && data.content[0].text) || 'Disculpa, no pude responder. Proba de nuevo.';
-        typing.remove();
-        addTanoMsg('bot', reply);
-        tanoHistory.push({ role: 'assistant', content: reply });
-        if (tanoHistory.length > 20) tanoHistory = tanoHistory.slice(-20);
-      }).catch(function() {
-        typing.remove();
-        addTanoMsg('bot', 'Tuve un problemita. Intenta de nuevo en un momento.');
-      }).finally(function() { tanoLoading = false; });
-    }
-  </script>
+function sendQuick(text) {
+  document.getElementById('tanoInput').value = text;
+  sendTano();
+}
 
+function tanoKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendTano();
+  }
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+
+// ============================================================
+// INICIALIZAR CONTROLES
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  Object.keys(MENU).forEach(id => renderCtrl(id));
+});
+</script>
 </body>
 </html>
