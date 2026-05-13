@@ -64,7 +64,7 @@ footer { text-align:center; padding:32px; font-size:13px; color:var(--muted); bo
     <li><strong>Cliente / Restaurante:</strong> la persona física o jurídica que contrata el servicio</li>
     <li><strong>Comensal / Usuario final:</strong> la persona que accede al menú digital del restaurante mediante QR</li>
     <li><strong>Contenido del Cliente:</strong> toda información cargada por el restaurante (menú, precios, imágenes, datos)</li>
-    <li><strong>Plan:</strong> la modalidad de suscripción contratada (Free, Pro, Full y variantes Combo)</li>
+    <li><strong>Plan:</strong> la modalidad de suscripción contratada (Free, Solo Menú, Menú + WhatsApp, Marketing, Marketing + WhatsApp, Combo, Full para restaurantes; Marketing o Marketing + WhatsApp para comercios)</li>
   </ul>
 
   <h2>2. Objeto del contrato</h2>
@@ -83,28 +83,31 @@ footer { text-align:center; padding:32px; font-size:13px; color:var(--muted); bo
 
   <h2>4. Planes y precios</h2>
 
-  <h3>4.1 Estructura de planes</h3>
+  <h3>4.1 Estructura de planes — Restaurantes</h3>
   <table>
-    <tr><th>Plan</th><th>Precio</th><th>Fee por pedido</th></tr>
+    <tr><th>Plan</th><th>Precio USD/mes</th><th>Fee por transacción</th></tr>
     <tr><td>Free</td><td>Sin costo</td><td>Sin fee</td></tr>
-    <tr><td>Menú Pro</td><td>USD 22/mes</td><td>1%</td></tr>
-    <tr><td>Menú Full</td><td>USD 35/mes</td><td>0,8%</td></tr>
-    <tr><td>Combo Pro</td><td>USD 58/mes</td><td>0,6%</td></tr>
-    <tr><td>Combo Full</td><td>USD 95/mes</td><td>0,5%</td></tr>
+    <tr><td>Solo Menú</td><td>USD 27</td><td>Sin fee</td></tr>
+    <tr><td>Menú + WhatsApp</td><td>USD 39</td><td>Sin fee</td></tr>
+    <tr><td>Marketing</td><td>USD 58</td><td>Sin fee</td></tr>
+    <tr><td>Marketing + WhatsApp</td><td>USD 68</td><td>Sin fee</td></tr>
+    <tr><td>Combo</td><td>USD 75</td><td>Sin fee</td></tr>
+    <tr><td>Full</td><td>USD 87</td><td>Sin fee</td></tr>
   </table>
+
+  <h3>4.1b Estructura de planes — Comercios y locales</h3>
+  <table>
+    <tr><th>Plan</th><th>Precio USD/mes</th><th>Fee por transacción</th></tr>
+    <tr><td>Marketing</td><td>USD 65</td><td>Sin fee</td></tr>
+    <tr><td>Marketing + WhatsApp</td><td>USD 78</td><td>Sin fee</td></tr>
+  </table>
+
+  <div class="highlight">
+    <strong>Vitrina no cobra comisión sobre las ventas ni pedidos del Cliente.</strong> El precio es fijo mensual. MercadoPago puede aplicar su propio fee por procesamiento de pagos, lo cual es ajeno a Vitrina.
+  </div>
 
   <h3>4.2 Moneda y tipo de cambio</h3>
   <p>Los precios están denominados en dólares estadounidenses (USD) y se cobran en pesos argentinos (ARS) al tipo de cambio vendedor del Banco de la Nación Argentina, actualizado todos los lunes. Ante variaciones superiores al 5% en el tipo de cambio, Vitrina notificará al Cliente con 15 días de anticipación el nuevo precio en pesos. Variaciones inferiores al 2% no generan notificación ni ajuste.</p>
-
-  <h3>4.3 Fee de transacción — escala decreciente</h3>
-  <p>El fee aplica sobre los pedidos procesados a través de la plataforma y disminuye automáticamente según la facturación mensual:</p>
-  <table>
-    <tr><th>Facturación mensual (ARS)</th><th>Fee aplicado</th></tr>
-    <tr><td>Hasta $1.000.000</td><td>Fee del plan</td></tr>
-    <tr><td>$1.000.001 a $5.000.000</td><td>0,4%</td></tr>
-    <tr><td>$5.000.001 a $10.000.000</td><td>0,25%</td></tr>
-    <tr><td>Más de $10.000.000</td><td>0,15%</td></tr>
-  </table>
 
   <h2>5. Facturación y pagos</h2>
   <p>El cobro se realiza de forma mensual anticipada mediante el procesador MercadoPago. Al suscribirse a un plan pago, el Cliente autoriza el débito automático mensual. El primer cobro se realiza al activar el plan.</p>
