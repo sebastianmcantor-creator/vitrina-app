@@ -93,6 +93,50 @@
       display: inline-block;
     }
 
+    /* Sticky wrapper — filtros + categorías quedan fijas juntas */
+    .sticky-nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* Skeleton imagen */
+    @keyframes shimmer {
+      0%   { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    .item-img-wrap {
+      width: 110px;
+      min-width: 110px;
+      height: 110px;
+      flex-shrink: 0;
+      background: linear-gradient(90deg, #f0e6d8 25%, #faf7f2 50%, #f0e6d8 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      overflow: hidden;
+    }
+    .item-img-wrap.done {
+      animation: none;
+      background: #f5e6d3;
+    }
+    .item-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: 0;
+      transition: opacity 0.5s ease;
+    }
+    .item-img-wrap img.ready {
+      opacity: 1;
+    }
+
     /* Filtros */
     .filters {
       background: white;
@@ -100,11 +144,8 @@
       display: flex;
       gap: 0.5rem;
       overflow-x: auto;
-      border-bottom: 1px solid #eee;
+      border-bottom: 1px solid #f0f0f0;
       scrollbar-width: none;
-      position: sticky;
-      top: 0;
-      z-index: 10;
     }
     .filters::-webkit-scrollbar { display: none; }
     .filter-btn {
@@ -128,7 +169,7 @@
     /* Nav categorías */
     .cat-nav {
       background: white;
-      padding: 0.7rem 1rem;
+      padding: 0.6rem 1rem;
       display: flex;
       gap: 0.8rem;
       overflow-x: auto;
@@ -736,21 +777,21 @@
   <div class="mesa-tag">📋 Mesa 5</div>
 </div>
 
-<!-- Filtros -->
-<div class="filters">
-  <button class="filter-btn active" onclick="setFilter('all', this)">Todos</button>
-  <button class="filter-btn" onclick="setFilter('veg', this)">🥦 Vegetariano</button>
-  <button class="filter-btn" onclick="setFilter('vegan', this)">🌱 Vegano</button>
-  <button class="filter-btn" onclick="setFilter('tacc', this)">🌾 Sin TACC</button>
-</div>
-
-<!-- Categorías -->
-<div class="cat-nav" id="catNav">
-  <button class="cat-btn active" onclick="goToSection('picar', this)">Para picar</button>
-  <button class="cat-btn" onclick="goToSection('pastas', this)">Pastas</button>
-  <button class="cat-btn" onclick="goToSection('principales', this)">Principales</button>
-  <button class="cat-btn" onclick="goToSection('postres', this)">Postres</button>
-  <button class="cat-btn" onclick="goToSection('bebidas', this)">Bebidas</button>
+<!-- Nav fija: filtros + categorías -->
+<div class="sticky-nav">
+  <div class="filters">
+    <button class="filter-btn active" onclick="setFilter('all', this)">Todos</button>
+    <button class="filter-btn" onclick="setFilter('veg', this)">🥦 Vegetariano</button>
+    <button class="filter-btn" onclick="setFilter('vegan', this)">🌱 Vegano</button>
+    <button class="filter-btn" onclick="setFilter('tacc', this)">🌾 Sin TACC</button>
+  </div>
+  <div class="cat-nav" id="catNav">
+    <button class="cat-btn active" onclick="goToSection('picar', this)">Para picar</button>
+    <button class="cat-btn" onclick="goToSection('pastas', this)">Pastas</button>
+    <button class="cat-btn" onclick="goToSection('principales', this)">Principales</button>
+    <button class="cat-btn" onclick="goToSection('postres', this)">Postres</button>
+    <button class="cat-btn" onclick="goToSection('bebidas', this)">Bebidas</button>
+  </div>
 </div>
 
 <!-- Pedido confirmado -->
@@ -768,8 +809,7 @@
     <div class="section-title">Para picar</div>
 
     <div class="menu-item" data-tags="">
-      <img class="item-img" src="https://images.unsplash.com/photo-1511690656952-34342bb7c2f2?w=220&h=220&fit=crop" alt="Tabla de fiambres" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍖</div>
+      <div class="item-img-wrap" id="img-picar-1" data-prompt="rustic charcuterie board with sliced cured ham, salami, brie and manchego cheese, artisan bread slices, fig jam, wooden board, restaurant menu photography">🍖</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tabla de fiambres y quesos</div>
@@ -784,8 +824,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <img class="item-img" src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=220&h=220&fit=crop" alt="Empanadas" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🥟</div>
+      <div class="item-img-wrap" id="img-picar-2" data-prompt="three golden baked Argentine beef empanadas on white plate, crispy dough, professional food photography, top view">🥟</div>
       <div class="item-info">
         <div>
           <div class="item-name">Empanadas de carne (x3)</div>
@@ -799,8 +838,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <img class="item-img" src="https://images.unsplash.com/photo-1550731538-5be0f455baf0?w=220&h=220&fit=crop" alt="Provoleta" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🧀</div>
+      <div class="item-img-wrap" id="img-picar-3" data-prompt="melted grilled provolone cheese on black cast iron pan, oregano sprinkled on top, olive oil drizzle, bread slices on side, rustic restaurant style">🧀</div>
       <div class="item-info">
         <div>
           <div class="item-name">Provoleta a la parrilla</div>
@@ -815,8 +853,7 @@
     </div>
 
     <div class="menu-item" data-tags="tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=220&h=220&fit=crop" alt="Rabas" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🦑</div>
+      <div class="item-img-wrap" id="img-picar-4" data-prompt="crispy fried calamari rings pile on white plate, served with aioli dip sauce and lemon wedge, golden batter, restaurant food photography">🦑</div>
       <div class="item-info">
         <div>
           <div class="item-name">Rabas fritas</div>
@@ -836,8 +873,7 @@
     <div class="section-title">Pastas</div>
 
     <div class="menu-item" data-tags="">
-      <img class="item-img" src="https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=220&h=220&fit=crop" alt="Penne rigate" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍝</div>
+      <div class="item-img-wrap" id="img-pastas-1" data-prompt="penne rigate pasta with rich slow-cooked beef ragu bolognese sauce, grated parmesan cheese on top, fresh basil leaves, white deep plate, Italian restaurant photography">🍝</div>
       <div class="item-info">
         <div>
           <div class="item-name">Penne Rigate con Ragú de Carne</div>
@@ -852,8 +888,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <img class="item-img" src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=220&h=220&fit=crop" alt="Ñoquis" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🫘</div>
+      <div class="item-img-wrap" id="img-pastas-2" data-prompt="potato gnocchi with vibrant green basil pesto sauce, toasted pistachios, shaved parmesan cheese, white plate, Italian restaurant close up food photography">🥔</div>
       <div class="item-info">
         <div>
           <div class="item-name">Ñoquis al pesto de albahaca</div>
@@ -868,8 +903,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <img class="item-img" src="https://images.unsplash.com/photo-1612874742237-6526221588e3?w=220&h=220&fit=crop" alt="Fettuccine" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍜</div>
+      <div class="item-img-wrap" id="img-pastas-3" data-prompt="fettuccine pasta in creamy white sauce with prosciutto ham strips, sauteed mushrooms, nutmeg, parmesan, elegant restaurant plate, warm lighting">🍜</div>
       <div class="item-info">
         <div>
           <div class="item-name">Fettuccine crema y jamón</div>
@@ -883,8 +917,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <img class="item-img" src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=220&h=220&fit=crop" alt="Tallarines" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍝</div>
+      <div class="item-img-wrap" id="img-pastas-4" data-prompt="tagliatelle pasta with red sun-dried tomato pesto sauce, toasted almonds, ricotta cheese dollops, fresh arugula leaves, lemon zest, white plate restaurant photography">🍝</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tallarines al pesto rojo</div>
@@ -904,8 +937,7 @@
     <div class="section-title">Principales</div>
 
     <div class="menu-item" data-tags="">
-      <img class="item-img" src="https://images.unsplash.com/photo-1585703900468-13b7d0f9ab09?w=220&h=220&fit=crop" alt="Milanesa napolitana" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍖</div>
+      <div class="item-img-wrap" id="img-principales-1" data-prompt="Argentine milanesa napolitana breaded veal cutlet topped with tomato sauce, melted ham and cheese, served with golden crispy french fries, restaurant plate, appetizing food photography">🥩</div>
       <div class="item-info">
         <div>
           <div class="item-name">Milanesa napolitana con papas fritas</div>
@@ -920,8 +952,7 @@
     </div>
 
     <div class="menu-item" data-tags="tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1558030006-450675393462?w=220&h=220&fit=crop" alt="Bife de chorizo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🥩</div>
+      <div class="item-img-wrap" id="img-principales-2" data-prompt="thick juicy Argentine ribeye bife de chorizo steak grilled on barbecue, perfect grill marks, served with chimichurri sauce and mixed salad, restaurant food photography">🥩</div>
       <div class="item-info">
         <div>
           <div class="item-name">Bife de chorizo a la parrilla</div>
@@ -936,8 +967,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <img class="item-img" src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=220&h=220&fit=crop" alt="Suprema de pollo" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍗</div>
+      <div class="item-img-wrap" id="img-principales-3" data-prompt="stuffed chicken breast supreme sliced open showing spinach and cream cheese filling, sauteed in clarified butter, served with rustic mashed potatoes, elegant plate restaurant photography">🍗</div>
       <div class="item-info">
         <div>
           <div class="item-name">Suprema de pollo rellena</div>
@@ -951,8 +981,7 @@
     </div>
 
     <div class="menu-item" data-tags="tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=220&h=220&fit=crop" alt="Merluza romana" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🐟</div>
+      <div class="item-img-wrap" id="img-principales-4" data-prompt="fried hake fish fillet in light tempura batter, golden crispy, on bed of arugula with cherry tomatoes and lemon wedge, white plate, Mediterranean restaurant food photography">🐟</div>
       <div class="item-info">
         <div>
           <div class="item-name">Merluza romana</div>
@@ -972,8 +1001,7 @@
     <div class="section-title">Postres</div>
 
     <div class="menu-item" data-tags="veg">
-      <img class="item-img" src="https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?w=220&h=220&fit=crop" alt="Tiramisú" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍰</div>
+      <div class="item-img-wrap" id="img-postres-1" data-prompt="classic tiramisu served in individual glass cup, layers of mascarpone cream and coffee-soaked ladyfingers, cocoa powder dusted on top, elegant dessert photography, dark background">🍰</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tiramisú de la casa</div>
@@ -991,8 +1019,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <img class="item-img" src="https://images.unsplash.com/photo-1606313564200-e75d5e30476c?w=220&h=220&fit=crop" alt="Volcán de chocolate" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍫</div>
+      <div class="item-img-wrap" id="img-postres-2" data-prompt="chocolate lava cake molten fondant cut open revealing liquid chocolate center flowing out, vanilla ice cream scoop on side, dark elegant plate, restaurant dessert photography">🍫</div>
       <div class="item-info">
         <div>
           <div class="item-name">Volcán de chocolate</div>
@@ -1007,8 +1034,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=220&h=220&fit=crop" alt="Flan" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍮</div>
+      <div class="item-img-wrap" id="img-postres-3" data-prompt="homemade vanilla flan upturned on white plate with golden caramel sauce, dulce de leche drizzled on top, whipped cream, Argentine dessert restaurant food photography">🍮</div>
       <div class="item-info">
         <div>
           <div class="item-name">Flan casero con dulce de leche</div>
@@ -1026,8 +1052,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=220&h=220&fit=crop" alt="Ensalada de frutas" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍓</div>
+      <div class="item-img-wrap" id="img-postres-4" data-prompt="colorful fresh seasonal fruit salad in elegant glass bowl, strawberries, kiwi, mango, blueberries, honey drizzle, fresh mint leaves, ginger, vibrant colors food photography">🍓</div>
       <div class="item-info">
         <div>
           <div class="item-name">Ensalada de frutas de estación</div>
@@ -1050,8 +1075,7 @@
     <div class="section-title">Bebidas</div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1548839140-29a749e1cf4d?w=220&h=220&fit=crop" alt="Agua" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">💧</div>
+      <div class="item-img-wrap" id="img-bebidas-1" data-prompt="clear sparkling mineral water bottle with condensation drops, glass with ice and lemon slice, white background, clean minimal beverage photography">💧</div>
       <div class="item-info">
         <div>
           <div class="item-name">Agua mineral</div>
@@ -1069,8 +1093,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=220&h=220&fit=crop" alt="Gaseosa" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🥤</div>
+      <div class="item-img-wrap" id="img-bebidas-2" data-prompt="cold cola Coca-Cola drink in glass with ice cubes, condensation on glass, dark bubbling soda, restaurant beverage photography, close up">🥤</div>
       <div class="item-info">
         <div>
           <div class="item-name">Gaseosa</div>
@@ -1088,8 +1111,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=220&h=220&fit=crop" alt="Vino por copa" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍷</div>
+      <div class="item-img-wrap" id="img-bebidas-3" data-prompt="elegant wine glass with deep red Malbec Argentine wine, swirling in glass, dark moody restaurant background, fine dining wine photography, bokeh lights">🍷</div>
       <div class="item-info">
         <div>
           <div class="item-name">Vino por copa</div>
@@ -1107,8 +1129,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <img class="item-img" src="https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=220&h=220&fit=crop" alt="Cerveza artesanal" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-      <div class="item-img-fallback" style="display:none">🍺</div>
+      <div class="item-img-wrap" id="img-bebidas-4" data-prompt="craft artisan beer pint glass with golden amber liquid, thick white foam head, condensation drops on glass, rustic bar background, appetizing beverage photography">🍺</div>
       <div class="item-info">
         <div>
           <div class="item-name">Cerveza artesanal</div>
@@ -1519,10 +1540,84 @@ function autoResize(el) {
 }
 
 // ============================================================
-// INICIALIZAR CONTROLES
+// GENERACIÓN DE IMÁGENES CON CLOUDFLARE AI
 // ============================================================
-document.addEventListener('DOMContentLoaded', () => {
-  Object.keys(MENU).forEach(id => renderCtrl(id));
+var generatedCache = {};
+var generatingQueue = new Set();
+
+async function generateImage(id) {
+  if (generatingQueue.has(id) || generatedCache[id]) return;
+  var wrap = document.getElementById('img-' + id);
+  if (!wrap) return;
+  var prompt = wrap.getAttribute('data-prompt');
+  if (!prompt) return;
+
+  generatingQueue.add(id);
+
+  try {
+    var res = await fetch(WORKER + '/api/cf-ai/generate-image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt, style: 'warm' })
+    });
+    if (!res.ok) return;
+    var data = await res.json();
+    if (!data.imageBase64) return;
+
+    // Insertar la imagen generada
+    generatedCache[id] = data.imageBase64;
+    wrap.innerHTML = '<img src="' + data.imageBase64 + '" alt="">';
+    wrap.classList.add('done');
+    // Fade in
+    requestAnimationFrame(function() {
+      var img = wrap.querySelector('img');
+      if (img) img.classList.add('ready');
+    });
+  } catch (e) {
+    // Si falla, mantiene el emoji
+  } finally {
+    generatingQueue.delete(id);
+  }
+}
+
+function generateSectionImages(sectionId) {
+  var section = document.getElementById('sec-' + sectionId);
+  if (!section) return;
+  section.querySelectorAll('.item-img-wrap').forEach(function(wrap) {
+    var id = wrap.id.replace('img-', '');
+    generateImage(id);
+  });
+}
+
+// ============================================================
+// INICIALIZAR CONTROLES + GENERAR IMÁGENES
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  Object.keys(MENU).forEach(function(id) { renderCtrl(id); });
+
+  // Generar la primera sección inmediatamente (visible al cargar)
+  generateSectionImages('picar');
+
+  // Las demás secciones se generan cuando entran al viewport
+  var sections = ['pastas', 'principales', 'postres', 'bebidas'];
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          var sid = entry.target.id.replace('sec-', '');
+          generateSectionImages(sid);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '200px' });
+    sections.forEach(function(sid) {
+      var el = document.getElementById('sec-' + sid);
+      if (el) observer.observe(el);
+    });
+  } else {
+    // Fallback: generar todo
+    sections.forEach(function(sid) { generateSectionImages(sid); });
+  }
 });
 </script>
 </body>
