@@ -1118,10 +1118,20 @@ html, body {
 .plan-badge.pro    { background: var(--gold-pale); color: var(--gold); }
 .plan-badge.full   { background: var(--terra-pale); color: var(--terra); }
 .plan-badge.active { background: var(--sage-pale); color: var(--sage); }
+.plan-badge.free         { background: #f5f5f5; color: #757575; }
 .plan-badge.menu-free    { background: #f5f5f5; color: #757575; }
+.plan-badge.rest-menu    { background: #e8f5e9; color: #2e7d32; }
+.plan-badge.rest-wa      { background: #e8f5e9; color: #1b5e20; }
+.plan-badge.rest-mkt     { background: #e3f2fd; color: #1565c0; }
+.plan-badge.rest-mktwa   { background: #e3f2fd; color: #0d47a1; }
+.plan-badge.rest-combo   { background: #fdf3ee; color: #b85a30; }
+.plan-badge.rest-full    { background: #fff8e1; color: #f57f17; }
+.plan-badge.local-mkt    { background: #e3f2fd; color: #1565c0; }
+.plan-badge.local-mktwa  { background: #e3f2fd; color: #0d47a1; }
+/* aliases legacy */
 .plan-badge.menu-basico  { background: #e8f5e9; color: #2e7d32; }
-.plan-badge.menu-pro     { background: #fdf3ee; color: #b85a30; }
-.plan-badge.menu-full    { background: #fff8e1; color: #f57f17; }
+.plan-badge.menu-pro     { background: #e8f5e9; color: #1b5e20; }
+.plan-badge.menu-full    { background: #fdf3ee; color: #b85a30; }
 .plan-badge.marketing    { background: #e3f2fd; color: #1565c0; }
 .plan-badge.combo        { background: #f3e5f5; color: #6a1b9a; }
 
@@ -5732,41 +5742,71 @@ window.openUpgradeModal = async function () {
   const tcData = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio').then(r => r.json()).catch(() => ({ oficial: 1410 }))
   const tc = tcData.oficial || 1410
 
-  // Definir planes disponibles
+  // Definir planes disponibles — sin fee de transacción en ningún plan
   const planes = [
     {
-      id: 'menu-basico',
-      nombre: 'Básico',
-      precioUSD: 12,
+      id: 'rest-menu',
+      nombre: 'Solo Menú',
+      precioUSD: 27,
       features: [
-        'Menú digital ilimitado',
-        'Tano ilimitado',
-        'Múltiples idiomas',
-        'Sin pedidos online',
+        'Menú QR ilimitado',
+        'Tano ilimitado · ES/EN/PT',
+        'Pedidos online + cocina',
+        'Pagos con MercadoPago',
       ],
     },
     {
-      id: 'menu-pro',
-      nombre: 'Pro',
-      precioUSD: 22,
+      id: 'rest-wa',
+      nombre: 'Menú + WhatsApp',
+      precioUSD: 39,
       features: [
-        'Todo de Básico',
-        'Pedidos online',
-        'Pantalla de cocina',
-        'Notificaciones WhatsApp',
-        'Fee 1% por transacción',
+        'Todo Solo Menú +',
+        'Número WhatsApp Business propio',
+        'Reservas por WhatsApp',
+        'Notificaciones automáticas',
+      ],
+    },
+    {
+      id: 'rest-mkt',
+      nombre: 'Marketing',
+      precioUSD: 58,
+      features: [
+        'Viti: estrategia mensual IA',
+        '30 publicaciones auto/mes',
+        'Google Business + Instagram',
+        'Análisis de competidores',
+      ],
+    },
+    {
+      id: 'rest-mktwa',
+      nombre: 'Marketing + WA',
+      precioUSD: 68,
+      features: [
+        'Todo Marketing +',
+        'Número WhatsApp Business',
+        'Consultas automáticas por WA',
+      ],
+    },
+    {
+      id: 'rest-combo',
+      nombre: 'Combo',
+      precioUSD: 75,
+      features: [
+        'Menú + Marketing juntos',
+        'Ahorrás USD 10 vs separado',
+        'Pedidos + redes + Viti',
       ],
       recommended: true,
     },
     {
-      id: 'menu-full',
+      id: 'rest-full',
       nombre: 'Full',
-      precioUSD: 35,
+      precioUSD: 87,
       features: [
-        'Todo de Pro',
-        'Hasta 3 sucursales',
-        'Fee 0.8% por transacción',
-        'Soporte prioritario',
+        'Todo incluido',
+        'Ahorrás USD 13 vs separado',
+        'WhatsApp Business incluido',
+        '$10 crédito publicidad primer mes',
       ],
     },
   ]
