@@ -746,11 +746,11 @@
 
 <!-- Categorías -->
 <div class="cat-nav" id="catNav">
-  <button class="cat-btn active" onclick="scrollTo('picar')">Para picar</button>
-  <button class="cat-btn" onclick="scrollTo('pastas')">Pastas</button>
-  <button class="cat-btn" onclick="scrollTo('principales')">Principales</button>
-  <button class="cat-btn" onclick="scrollTo('postres')">Postres</button>
-  <button class="cat-btn" onclick="scrollTo('bebidas')">Bebidas</button>
+  <button class="cat-btn active" onclick="goToSection('picar', this)">Para picar</button>
+  <button class="cat-btn" onclick="goToSection('pastas', this)">Pastas</button>
+  <button class="cat-btn" onclick="goToSection('principales', this)">Principales</button>
+  <button class="cat-btn" onclick="goToSection('postres', this)">Postres</button>
+  <button class="cat-btn" onclick="goToSection('bebidas', this)">Bebidas</button>
 </div>
 
 <!-- Pedido confirmado -->
@@ -1354,14 +1354,14 @@ let activeFilter = 'all';
 
 function setFilter(f, btn) {
   activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');
-  document.querySelectorAll('.menu-item').forEach(item => {
+  document.querySelectorAll('.menu-item').forEach(function(item) {
     if (f === 'all') {
       item.style.display = '';
     } else {
-      const tags = item.getAttribute('data-tags') || '';
-      item.style.display = tags.includes(f) ? '' : 'none';
+      var tags = item.getAttribute('data-tags') || '';
+      item.style.display = tags.split(' ').indexOf(f) !== -1 ? '' : 'none';
     }
   });
 }
@@ -1369,11 +1369,11 @@ function setFilter(f, btn) {
 // ============================================================
 // SCROLL A SECCIÓN
 // ============================================================
-function scrollTo(sec) {
-  const el = document.getElementById('sec-' + sec);
+function goToSection(sec, btn) {
+  var el = document.getElementById('sec-' + sec);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
 }
 
 // ============================================================
@@ -1383,43 +1383,30 @@ let tanoOpen = false;
 let tanoHistory = [];
 const WORKER = 'https://vitrina-tano.vitrinaapp.workers.dev';
 
-const TANO_CONTEXT = `Sos Tano, el asistente del restaurante Casa Lucía. Tu tono es cálido, informal y humano — nunca suenas a bot. Respondés solo sobre el menú y el restaurante.
+const MENU_IDS = {
+  'tabla de fiambres': 'picar-1', 'tabla fiambres': 'picar-1', 'fiambres': 'picar-1', 'fiambres y quesos': 'picar-1',
+  'empanadas': 'picar-2', 'empanada': 'picar-2',
+  'provoleta': 'picar-3',
+  'rabas': 'picar-4',
+  'penne': 'pastas-1', 'penne rigate': 'pastas-1', 'ragu': 'pastas-1', 'ragú': 'pastas-1',
+  'ñoquis': 'pastas-2', 'gnocchi': 'pastas-2',
+  'fettuccine': 'pastas-3',
+  'tallarines': 'pastas-4', 'pesto rojo': 'pastas-4',
+  'milanesa': 'principales-1', 'napolitana': 'principales-1',
+  'bife': 'principales-2', 'bife de chorizo': 'principales-2',
+  'suprema': 'principales-3', 'pollo': 'principales-3',
+  'merluza': 'principales-4',
+  'tiramisu': 'postres-1', 'tiramisú': 'postres-1',
+  'volcan': 'postres-2', 'volcán': 'postres-2', 'chocolate': 'postres-2',
+  'flan': 'postres-3', 'dulce de leche': 'postres-3',
+  'ensalada de frutas': 'postres-4', 'frutas': 'postres-4',
+  'agua': 'bebidas-1',
+  'gaseosa': 'bebidas-2', 'coca': 'bebidas-2',
+  'vino': 'bebidas-3',
+  'cerveza': 'bebidas-4'
+};
 
-MENÚ COMPLETO:
-PARA PICAR:
-- Tabla de fiambres y quesos $14.500: jamón crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos. Recomendado.
-- Empanadas de carne x3 $2.800: masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas.
-- Provoleta a la parrilla $8.500: queso provolone fundido con orégano, ají molido y oliva. Pan tostado. (Vegetariano)
-- Rabas fritas $9.200: anillos de calamar, rebozados, con alioli casero y limón. (Sin TACC)
-
-PASTAS:
-- Penne Rigate con Ragú de Carne $16.800: ragú de res cocido 4 horas, parmesano y albahaca. Favorito.
-- Ñoquis al pesto de albahaca $15.200: ñoquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano)
-- Fettuccine crema y jamón $15.900: salsa crema, jamón serrano, hongos, nuez moscada.
-- Tallarines al pesto rojo $14.800: pesto de tomates secos, almendras, ricota, limón y rúcula. (Vegetariano)
-
-PRINCIPALES:
-- Milanesa napolitana con papas fritas $22.500: ternera, salsa de tomate, jamón y queso gratinado. Clásico.
-- Bife de chorizo a la parrilla $28.000: 400g, cocción a pedido, ensalada mixta y chimichurri. (Sin TACC)
-- Suprema de pollo rellena $18.500: rellena con espinaca y queso crema, manteca clarificada, puré rústico.
-- Merluza romana $19.800: filete en tempura liviana, rúcula, tomates cherry, aliño de limón. (Sin TACC)
-
-POSTRES:
-- Tiramisú de la casa $7.500: mascarpone, café espresso y cacao amargo. Imperdible. (Vegetariano)
-- Volcán de chocolate $8.200: corazón fundente, helado de crema artesanal. 8 minutos. (Vegetariano)
-- Flan casero con dulce de leche $5.800: flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC)
-- Ensalada de frutas de estación $5.200: frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC)
-
-BEBIDAS:
-- Agua mineral $1.800: con o sin gas, 500ml
-- Gaseosa $2.200: Coca-Cola, Sprite o Fanta
-- Vino por copa $5.500: Malbec, Torrontés o Cabernet según disponibilidad
-- Cerveza artesanal $4.800: rubia, roja o negra, 500ml
-
-REGLAS:
-- Si te preguntan algo fuera del menú o el restaurante, respondé con amabilidad que eso no te lo podés responder vos, pero que el equipo ayuda.
-- Respondé en español, de forma breve y amistosa.
-- No uses markdown, respondé como texto simple.`;
+const TANO_CONTEXT = 'Sos Tano, el asistente del restaurante Casa Lucía. Tu tono es calido, informal y humano — nunca suenas a bot. Respondés solo sobre el menu y el restaurante.\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar, rebozados, con alioli casero y limon. (Sin TACC)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. Favorito.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. Clasico.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. (Sin TACC)\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. (Sin TACC)\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. 8 minutos. (Vegetariano)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml\n\nREGLAS IMPORTANTES:\n1. Cuando el cliente quiera pedir o agregar algo al carrito, respondé con el formato exacto: [AGREGAR:ID:CANTIDAD] y luego tu respuesta normal. Ejemplo: si quiere 2 milanesas, respondé "[AGREGAR:principales-1:2] Listo, anote 2 milanesas con papas! Te las mando a cocina cuando confirmes el pedido." Usa SOLO los IDs de la lista. Si quiere varios platos en el mismo mensaje, pone multiples [AGREGAR:ID:QTY].\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "pedí X", "anotatelo", "anotalo" o cualquier intencion de pedir — SIEMPRE usa el formato [AGREGAR:ID:QTY].\n3. Si no está seguro del ID exacto, usa el más parecido.\n4. Si te preguntan algo fuera del menu o el restaurante, respondé con amabilidad que eso no te lo podés responder vos.\n5. Respondé en español, tono informal y calido. Sin markdown. Texto simple.';
 
 function openTano() {
   tanoOpen = true;
@@ -1463,8 +1450,8 @@ function removeTyping() {
 }
 
 async function sendTano() {
-  const input = document.getElementById('tanoInput');
-  const text = input.value.trim();
+  var input = document.getElementById('tanoInput');
+  var text = input.value.trim();
   if (!text) return;
   input.value = '';
   input.style.height = 'auto';
@@ -1473,19 +1460,38 @@ async function sendTano() {
   showTyping();
 
   try {
-    const res = await fetch(WORKER + '/api/claude', {
+    // Build messages: alternate user/assistant, last 10
+    var msgs = tanoHistory.slice(-10);
+    var res = await fetch(WORKER + '/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        system: TANO_CONTEXT,
-        messages: tanoHistory.slice(-10).filter(m => m.role !== 'assistant' || tanoHistory.indexOf(m) > tanoHistory.length - 11)
-      })
+      body: JSON.stringify({ system: TANO_CONTEXT, messages: msgs })
     });
     removeTyping();
     if (res.ok) {
-      const data = await res.json();
-      const reply = data.content?.[0]?.text || data.reply || 'Hmm, no pude responder ahora. Intentá de nuevo.';
-      addTanoMsg('tano', reply);
+      var data = await res.json();
+      var reply = (data.content && data.content[0] && data.content[0].text) || data.reply || 'Hmm, no pude responder ahora. Intentá de nuevo.';
+      // Parsear comandos de carrito [AGREGAR:id:qty]
+      var added = [];
+      var cleanReply = reply.replace(/\[AGREGAR:([^:\]]+):(\d+)\]/g, function(_, id, qty) {
+        var n = parseInt(qty, 10);
+        if (MENU[id]) {
+          for (var i = 0; i < n; i++) addItem(id);
+          added.push(n + 'x ' + MENU[id].name);
+        }
+        return '';
+      }).trim();
+      addTanoMsg('tano', cleanReply);
+      if (added.length > 0) {
+        // Mostrar chip de confirmación en el chat
+        var msgs2 = document.getElementById('tanoMsgs');
+        var chip = document.createElement('div');
+        chip.style.cssText = 'background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:0.5rem 0.8rem;font-size:0.78rem;color:#15803d;align-self:flex-start;max-width:85%';
+        chip.innerHTML = '🛒 Agregado al pedido: ' + added.join(', ');
+        msgs2.appendChild(chip);
+        msgs2.scrollTop = msgs2.scrollHeight;
+        updateCartFab();
+      }
     } else {
       addTanoMsg('tano', 'No pude responder en este momento. Preguntale al mozo 😊');
     }
