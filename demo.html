@@ -852,13 +852,13 @@
       </div>
     </div>
 
-    <div class="menu-item" data-tags="tacc">
+    <div class="menu-item" data-tags="">
       <div class="item-img-wrap" id="img-picar-4" data-prompt="crispy fried calamari rings pile on white plate, served with aioli dip sauce and lemon wedge, golden batter, restaurant food photography">🦑</div>
       <div class="item-info">
         <div>
           <div class="item-name">Rabas fritas</div>
           <div class="item-desc">Anillos de calamar tiernos, rebozados y fritos. Con alioli casero y limón fresco.</div>
-          <div class="item-badges"><span class="badge tacc">🌾 Sin TACC</span></div>
+          <div class="item-badges"></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$9.200</span>
@@ -1560,21 +1560,33 @@ async function generateImage(id) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prompt: prompt, style: 'warm' })
     });
-    if (!res.ok) return;
-    var data = await res.json();
-    if (!data.imageBase64) return;
+    if (!res.ok) { generatingQueue.delete(id); return; }
 
-    // Insertar la imagen generada
-    generatedCache[id] = data.imageBase64;
-    wrap.innerHTML = '<img src="' + data.imageBase64 + '" alt="">';
-    wrap.classList.add('done');
-    // Fade in
-    requestAnimationFrame(function() {
-      var img = wrap.querySelector('img');
-      if (img) img.classList.add('ready');
-    });
+    var data = await res.json();
+    var b64 = data && data.imageBase64;
+    if (!b64 || b64.length < 100) { generatingQueue.delete(id); return; }
+
+    // Guardar y mostrar con fade in
+    generatedCache[id] = b64;
+    var emoji = wrap.textContent || '';
+
+    var img = new Image();
+    img.onload = function() {
+      wrap.innerHTML = '';
+      wrap.appendChild(img);
+      wrap.classList.add('done');
+      requestAnimationFrame(function() { img.classList.add('ready'); });
+    };
+    img.onerror = function() {
+      // Si el base64 es inválido, deja el emoji
+      wrap.textContent = emoji;
+    };
+    img.className = '';
+    img.alt = '';
+    img.src = b64;
+
   } catch (e) {
-    // Si falla, mantiene el emoji
+    // Mantiene el emoji si hay error de red
   } finally {
     generatingQueue.delete(id);
   }
