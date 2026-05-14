@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Logo Vitrina — Export</title></head>
+<body style="background:#111;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;gap:20px">
+<canvas id="c" width="1024" height="1024" style="width:256px;height:256px;border-radius:12px"></canvas>
+<button onclick="dl()" style="background:#B85A30;color:white;border:none;padding:12px 28px;border-radius:8px;font-size:16px;cursor:pointer;font-family:sans-serif">⬇ Descargar PNG 1024x1024</button>
+<script>
+const c = document.getElementById('c')
+const ctx = c.getContext('2d')
+const W = 1024
+
+// Fondo
+ctx.fillStyle = '#1C1208'
+ctx.fillRect(0, 0, W, W)
+
+// Arco / vitrina
+const cx = W/2, cy = W/2 - 40
+const arcW = 340, arcH = 320, archTop = cy - arcH/2
+
+// Sombra suave
+ctx.shadowColor = 'rgba(200,102,64,0.4)'
+ctx.shadowBlur = 60
+
+// Marco del arco
+ctx.beginPath()
+ctx.moveTo(cx - arcW/2, cy + arcH/2)
+ctx.lineTo(cx - arcW/2, archTop + arcW/2)
+ctx.arc(cx, archTop + arcW/2, arcW/2, Math.PI, 0)
+ctx.lineTo(cx + arcW/2, cy + arcH/2)
+ctx.strokeStyle = '#C86640'
+ctx.lineWidth = 28
+ctx.stroke()
+
+// Línea base del arco
+ctx.beginPath()
+ctx.moveTo(cx - arcW/2 - 14, cy + arcH/2)
+ctx.lineTo(cx + arcW/2 + 14, cy + arcH/2)
+ctx.strokeStyle = '#C86640'
+ctx.lineWidth = 28
+ctx.stroke()
+
+ctx.shadowBlur = 0
+
+// V grande dentro del arco
+ctx.font = 'bold 320px Georgia, serif'
+ctx.fillStyle = '#E8C87A'
+ctx.textAlign = 'center'
+ctx.textBaseline = 'middle'
+ctx.fillText('V', cx, cy + 20)
+
+// Punto dorado arriba del arco
+ctx.beginPath()
+ctx.arc(cx, archTop + arcW/2 - arcW/2 - 36, 22, 0, Math.PI * 2)
+ctx.fillStyle = '#E8C87A'
+ctx.fill()
+
+// Texto "vitrina" abajo
+ctx.font = '500 72px Georgia, serif'
+ctx.fillStyle = '#E8C87A'
+ctx.letterSpacing = '8px'
+ctx.textAlign = 'center'
+ctx.textBaseline = 'middle'
+ctx.fillText('vitrina', cx, cy + arcH/2 + 80)
+
+function dl() {
+  const a = document.createElement('a')
+  a.download = 'vitrina-logo-1024.png'
+  a.href = c.toDataURL('image/png')
+  a.click()
+}
+</script>
+</body>
+</html>
