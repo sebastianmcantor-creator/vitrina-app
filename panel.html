@@ -5742,28 +5742,18 @@ window.openUpgradeModal = async function () {
   const tcData = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio').then(r => r.json()).catch(() => ({ oficial: 1410 }))
   const tc = tcData.oficial || 1410
 
-  // Definir planes disponibles — sin fee de transacción en ningún plan
+  // Definir planes — WhatsApp incluido en todos, sin fee de transacción
   const planes = [
     {
       id: 'rest-menu',
       nombre: 'Solo Menú',
       precioUSD: 27,
       features: [
-        'Menú QR ilimitado',
-        'Tano ilimitado · ES/EN/PT',
-        'Pedidos online + cocina',
+        'Menú QR ilimitado · ES/EN/PT',
+        'Tano ilimitado + agrega al carrito',
+        'Pedidos online + cocina en tiempo real',
         'Pagos con MercadoPago',
-      ],
-    },
-    {
-      id: 'rest-wa',
-      nombre: 'Menú + WhatsApp',
-      precioUSD: 39,
-      features: [
-        'Todo Solo Menú +',
-        'Número WhatsApp Business propio',
-        'Reservas por WhatsApp',
-        'Notificaciones automáticas',
+        '✅ WhatsApp Business incluido',
       ],
     },
     {
@@ -5773,18 +5763,10 @@ window.openUpgradeModal = async function () {
       features: [
         'Viti: estrategia mensual IA',
         '30 publicaciones auto/mes',
-        'Google Business + Instagram',
-        'Análisis de competidores',
-      ],
-    },
-    {
-      id: 'rest-mktwa',
-      nombre: 'Marketing + WA',
-      precioUSD: 68,
-      features: [
-        'Todo Marketing +',
-        'Número WhatsApp Business',
-        'Consultas automáticas por WA',
+        'Google · Instagram · Facebook',
+        'Viti responde reseñas automáticamente',
+        'Análisis de competidores · Informe PDF',
+        '✅ WhatsApp Business incluido',
       ],
     },
     {
@@ -5792,22 +5774,14 @@ window.openUpgradeModal = async function () {
       nombre: 'Combo',
       precioUSD: 75,
       features: [
-        'Menú + Marketing juntos',
-        'Ahorrás USD 10 vs separado',
-        'Pedidos + redes + Viti',
+        'Todo Solo Menú +',
+        'Todo Marketing +',
+        'Tano + Viti trabajando juntos',
+        'Panel unificado operaciones + marketing',
+        '✅ WhatsApp Business incluido',
+        'Ahorrás USD 10 vs contratar separado',
       ],
       recommended: true,
-    },
-    {
-      id: 'rest-full',
-      nombre: 'Full',
-      precioUSD: 87,
-      features: [
-        'Todo incluido',
-        'Ahorrás USD 13 vs separado',
-        'WhatsApp Business incluido',
-        '$10 crédito publicidad primer mes',
-      ],
     },
   ]
 

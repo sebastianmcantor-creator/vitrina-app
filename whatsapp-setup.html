@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configurar WhatsApp Business — Vitrina</title>
+  <meta name="description" content="Guía paso a paso para conectar tu número de WhatsApp Business a Vitrina.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1C1612; --terra: #B85A30; --cream: #F7F2EA;
+      --white: #FDFAF6; --muted: #8A7E74; --border: #DDD5C8;
+      --green: #2D7D46; --green-pale: #E8F5EE;
+      --warn: #92500A; --warn-pale: #FEF3E2;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Outfit', sans-serif; background: var(--white); color: var(--ink); line-height: 1.7; }
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 5%; border-bottom: 1px solid var(--border); background: var(--white); position: sticky; top: 0; z-index: 10; }
+    .nav-logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink); text-decoration: none; }
+    .nav-back { font-size: 13px; color: var(--muted); text-decoration: none; }
+    .nav-back:hover { color: var(--terra); }
+    .container { max-width: 760px; margin: 0 auto; padding: 60px 24px 100px; }
+    .doc-tag { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--terra); margin-bottom: 12px; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 600; margin-bottom: 12px; line-height: 1.1; }
+    .lead { font-size: 16px; color: #4A3828; margin-bottom: 40px; line-height: 1.7; }
+    .warning-box {
+      background: var(--warn-pale); border: 1.5px solid #F0A060;
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 40px;
+    }
+    .warning-box .w-title { font-weight: 600; color: var(--warn); font-size: 15px; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .warning-box p { font-size: 14px; color: var(--warn); line-height: 1.6; }
+    .info-box {
+      background: var(--green-pale); border: 1.5px solid #A8D5B5;
+      border-radius: 12px; padding: 20px 24px; margin-bottom: 40px;
+    }
+    .info-box p { font-size: 14px; color: var(--green); line-height: 1.6; }
+    .step-list { display: flex; flex-direction: column; gap: 0; }
+    .step {
+      display: flex; gap: 20px; padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      width: 40px; height: 40px; min-width: 40px;
+      background: var(--terra); color: white;
+      border-radius: 50%; display: flex; align-items: center;
+      justify-content: center; font-weight: 700; font-size: 16px;
+      margin-top: 2px;
+    }
+    .step-content { flex: 1; }
+    .step-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; margin-bottom: 10px; }
+    .step-body { font-size: 14.5px; color: #4A3828; line-height: 1.7; }
+    .step-body p { margin-bottom: 10px; }
+    .step-body ul { margin: 10px 0 10px 20px; }
+    .step-body li { margin-bottom: 6px; }
+    .step-body strong { color: var(--ink); font-weight: 600; }
+    .step-body a { color: var(--terra); }
+    .visual-box {
+      background: var(--cream); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 20px; margin-top: 14px;
+      font-size: 13.5px; color: var(--muted); line-height: 1.6;
+    }
+    .visual-box .label { font-weight: 600; color: var(--ink); margin-bottom: 6px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+    .code-line {
+      background: #1C1612; color: #E8C87A; padding: 10px 16px;
+      border-radius: 8px; font-family: monospace; font-size: 13px;
+      margin-top: 10px; display: block;
+    }
+    .badge-done { background: var(--green-pale); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: 8px; vertical-align: middle; }
+    .divider { height: 1px; background: var(--border); margin: 40px 0; }
+    h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; margin-bottom: 16px; }
+    .faq-item { margin-bottom: 24px; }
+    .faq-q { font-weight: 600; font-size: 15px; margin-bottom: 6px; }
+    .faq-a { font-size: 14px; color: #4A3828; line-height: 1.6; }
+    .cta-box { background: var(--terra); color: white; border-radius: 16px; padding: 32px; text-align: center; margin-top: 48px; }
+    .cta-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; margin-bottom: 10px; }
+    .cta-box p { font-size: 14px; opacity: .85; margin-bottom: 20px; }
+    .cta-btn { background: white; color: var(--terra); padding: 12px 28px; border-radius: 10px; text-decoration: none; font-weight: 600; font-size: 15px; display: inline-block; }
+    footer { text-align: center; padding: 32px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--border); }
+    @media (max-width: 600px) { .step { flex-direction: column; gap: 12px; } .step-num { width: 32px; height: 32px; min-width: 32px; font-size: 14px; } }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">🪟 Vitrina</a>
+  <a href="/" class="nav-back">← Volver al inicio</a>
+</nav>
+
+<div class="container">
+  <div class="doc-tag">Guía de configuración</div>
+  <h1>Conectar tu WhatsApp Business</h1>
+  <p class="lead">Todos los planes pagos de Vitrina incluyen WhatsApp Business. Usás tu propio número — las primeras 1.000 conversaciones por mes son gratuitas con Meta. Esta guía te lleva paso a paso.</p>
+
+  <div class="warning-box">
+    <div class="w-title">⚠️ Importante antes de empezar</div>
+    <p><strong>El número que conectés a la API queda bloqueado para uso como WhatsApp normal.</strong> No vas a poder usarlo en el celular ni en WhatsApp Web. Va a funcionar exclusivamente como número de tu negocio integrado a Vitrina.<br><br>
+    Por eso recomendamos usar un número nuevo y exclusivo para el negocio — no tu número personal. Un chip prepago cuesta $2.000-3.000 ARS y tarda 5 minutos en activarse.</p>
+  </div>
+
+  <div class="info-box">
+    <p>💡 <strong>Sobre los costos:</strong> Meta te da las primeras 1.000 conversaciones por mes gratis. Si tu restaurante las supera, Meta te factura directamente en tu cuenta de Meta Business (~USD 0,05-0,08 por conversación adicional). Vitrina no interviene en ese cobro ni cobra margen sobre él.</p>
+  </div>
+
+  <div class="step-list">
+
+    <!-- PASO 1 -->
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <div class="step-title">Elegí el número a usar</div>
+        <div class="step-body">
+          <p>Tenés dos opciones:</p>
+          <ul>
+            <li><strong>Opción A (recomendada):</strong> Comprá un chip nuevo exclusivo para el negocio. Cualquier operadora. Activalo con una llamada o SMS y listo.</li>
+            <li><strong>Opción B:</strong> Usá un número que ya tengas pero que no uses para WhatsApp personal. Si ese número ya está en WhatsApp normal, Meta va a pedirte que lo des de baja de WhatsApp antes de continuar.</li>
+          </ul>
+          <div class="visual-box">
+            <div class="label">¿Tenés número en WhatsApp normal?</div>
+            Abrí WhatsApp → Configuración → Cuenta → Eliminar cuenta. Esto desvincula el número de WhatsApp. Tus conversaciones anteriores se borran del teléfono pero el número queda libre para conectar a la API.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <div class="step-title">Creá una cuenta en Meta Business</div>
+        <div class="step-body">
+          <p>Si ya tenés cuenta de Facebook, entrá a <a href="https://business.facebook.com" target="_blank">business.facebook.com</a> e iniciá sesión. Si no tenés, creá una.</p>
+          <p>Vas a necesitar crear un <strong>Portfolio Comercial</strong> con el nombre de tu negocio. Es gratis y tarda 2 minutos.</p>
+          <div class="visual-box">
+            <div class="label">Dónde hacerlo</div>
+            business.facebook.com → Crear Portfolio → poné el nombre de tu restaurante → guardá
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 3 -->
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <div class="step-title">Verificá tu negocio con AFIP (opcional pero recomendado)</div>
+        <div class="step-body">
+          <p>La verificación le da más credibilidad a tu cuenta y desbloquea límites más altos de mensajes. Para hacerla necesitás:</p>
+          <ul>
+            <li>Constancia de inscripción AFIP (la bajás de <a href="https://www.afip.gob.ar" target="_blank">afip.gob.ar</a> en 2 minutos)</li>
+            <li>Foto o PDF del documento</li>
+          </ul>
+          <p>Meta la revisa en 3-7 días hábiles. Podés avanzar sin verificar y hacerlo después.</p>
+          <div class="visual-box">
+            <div class="label">Dónde hacerlo</div>
+            business.facebook.com → Configuración → Centro de seguridad → Verificación del negocio → Iniciar verificación
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 4 -->
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <div class="step-title">Agregá WhatsApp a tu cuenta de Meta</div>
+        <div class="step-body">
+          <p>Dentro de Meta Business, agregás el número de WhatsApp:</p>
+          <ul>
+            <li>Andá a <strong>Configuración → Cuentas de WhatsApp → Agregar número</strong></li>
+            <li>Ingresá el número con código de país: <code>+54 9 11 XXXX XXXX</code></li>
+            <li>Meta te manda un código de verificación por SMS o llamada</li>
+            <li>Ingresás el código y el número queda registrado</li>
+          </ul>
+          <div class="visual-box">
+            <div class="label">Nombre del perfil de negocio</div>
+            Te va a pedir el nombre que va a aparecer cuando el restaurante mande mensajes. Poné el nombre de tu restaurante — por ejemplo: <strong>"La Panera Rosa"</strong>. Este nombre lo ven tus clientes cuando reciben mensajes.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 5 -->
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <div class="step-title">Obtenés el Token de acceso permanente</div>
+        <div class="step-body">
+          <p>Para conectar el número a Vitrina necesitás un token de acceso. Seguí estos pasos:</p>
+          <ul>
+            <li>Andá a <a href="https://developers.facebook.com" target="_blank">developers.facebook.com</a></li>
+            <li>En el Panel de tu app → WhatsApp → Configuración de la API</li>
+            <li>Copiá el <strong>Token de acceso temporal</strong> (dura 24hs) o generá uno permanente desde el Administrador del Sistema</li>
+            <li>Copiá también el <strong>Phone Number ID</strong> que aparece ahí</li>
+          </ul>
+          <div class="visual-box">
+            <div class="label">Token permanente (recomendado)</div>
+            Meta Business → Configuración → Usuarios del sistema → Agregar → Rol: Administrador → Agregar activos (la cuenta de WhatsApp) → Generar token → seleccioná permisos: <code>whatsapp_business_messaging</code> y <code>whatsapp_business_management</code>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASO 6 -->
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <div class="step-title">Conectás el número en el panel de Vitrina</div>
+        <div class="step-body">
+          <p>Con el token y el Phone Number ID en mano, entrás al panel de Vitrina:</p>
+          <ul>
+            <li>Panel → Configuración → WhatsApp Business → Conectar</li>
+            <li>Pegás el <strong>Phone Number ID</strong></li>
+            <li>Pegás el <strong>Token de acceso</strong></li>
+            <li>Vitrina verifica la conexión y te confirma que todo funciona</li>
+          </ul>
+          <p>A partir de ese momento, las notificaciones de pedidos, reservas y confirmaciones salen con el nombre de tu restaurante.</p>
+          <div class="visual-box">
+            <div class="label">¿Cuánto tarda el setup completo?</div>
+            30-45 minutos si tenés el chip listo y la constancia de AFIP. La verificación de negocio con Meta toma 3-7 días pero no bloquea el funcionamiento básico — podés empezar a usar WhatsApp antes de que esté verificado.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="divider"></div>
+
+  <h2>Preguntas frecuentes</h2>
+
+  <div class="faq-item">
+    <div class="faq-q">¿Puedo usar el mismo número que ya tengo para mi negocio?</div>
+    <div class="faq-a">Sí, pero ese número tiene que dejar de usarse como WhatsApp normal (celular o Web). Muchos restaurantes compran un chip nuevo para evitar perder sus conversaciones actuales.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">¿Qué pasa si supero las 1.000 conversaciones gratis?</div>
+    <div class="faq-a">Meta te cobra directamente en tu cuenta de Meta Business, a la tarjeta que tengas registrada ahí. El costo es aproximadamente USD 0,05-0,08 por conversación adicional. Vitrina no interviene en ese cobro.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">¿Mis clientes ven el número o ven el nombre del restaurante?</div>
+    <div class="faq-a">Ven el nombre de perfil que configuraste en Meta — por ejemplo "La Panera Rosa". El número queda en segundo plano. Si tenés el negocio verificado, también aparece la palomita azul de verificación.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">¿Puedo seguir viendo los mensajes de mis clientes?</div>
+    <div class="faq-a">Sí, desde el panel de Vitrina vas a ver el historial de conversaciones. No vas a poder responder manualmente (es una API, no una app de chat), pero Vitrina puede configurar respuestas automáticas para preguntas frecuentes.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">¿Qué pasa si me doy de baja de Vitrina?</div>
+    <div class="faq-a">El número sigue siendo tuyo. Lo podés desconectar de Vitrina y volver a usarlo como WhatsApp normal, o conectarlo a otra plataforma. No hay lock-in.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">¿Necesito la verificación de negocio con AFIP para empezar?</div>
+    <div class="faq-a">No. Podés empezar sin verificar y hacerlo después. La verificación desbloquea límites más altos (más de 1.000 conversaciones iniciales) y agrega la palomita de verificación al perfil.</div>
+  </div>
+
+  <div class="cta-box">
+    <h3>¿Listo para conectar?</h3>
+    <p>Una vez que tengas el token y el Phone Number ID, entrás al panel y lo configurás en minutos.</p>
+    <a href="/panel.html" class="cta-btn">Ir al panel →</a>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 Vitrina · <a href="/" style="color:var(--terra)">vitrinaapp.com.ar</a> · <a href="mailto:contacto@vitrinaapp.com.ar" style="color:var(--terra)">contacto@vitrinaapp.com.ar</a>
+</footer>
+
+</body>
+</html>
