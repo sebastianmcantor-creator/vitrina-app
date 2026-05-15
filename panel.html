@@ -3626,6 +3626,24 @@ function renderSidebarRestaurant(rest) {
   const terms = bizTerms[btype] || bizTerms.restaurant
   window._bizTerms = terms
 
+  // Actualizar label del sidebar (RESTAURANTE / SERVICIOS / etc.)
+  const sidebarLabel = document.querySelector('.sidebar-rest-label span:first-child')
+  if (sidebarLabel) {
+    const sidebarLabels = { restaurant: 'Restaurante', local: 'Local', services: 'Servicios', ecommerce: 'Tienda' }
+    sidebarLabel.textContent = sidebarLabels[btype] || 'Negocio'
+  }
+
+  // Actualizar "Restaurante abierto" en Información
+  const openToggleLabel = document.querySelector('.toggle-label')
+  if (openToggleLabel && openToggleLabel.textContent.includes('Restaurante')) {
+    const openLabels = { restaurant: 'Restaurante abierto', local: 'Local abierto', services: 'Negocio abierto', ecommerce: 'Tienda activa' }
+    openToggleLabel.textContent = openLabels[btype] || 'Negocio abierto'
+  }
+
+  // Toast de estado
+  const toastLabels = { restaurant: 'Restaurante', local: 'Local', services: 'Negocio', ecommerce: 'Tienda' }
+  window._bizNoun = toastLabels[btype] || 'Negocio'
+
   // Actualizar labels del nav
   const menuNavBtn = document.querySelector('[data-section="menu"]')
   if (menuNavBtn) menuNavBtn.innerHTML = menuNavBtn.innerHTML.replace('Menú', terms.menu)
@@ -3669,7 +3687,8 @@ window.quickToggleOpen = async function () {
     currentRestaurant = await restaurants.update(currentRestaurant.id, { is_open: newVal })
     updateOpenPill(newVal)
     document.getElementById('f-is-open').checked = newVal
-    showToast(newVal ? '🟢 Restaurante abierto' : '🔴 Restaurante cerrado', 'success')
+    const noun = window._bizNoun || 'Negocio'
+    showToast(newVal ? `🟢 ${noun} abierto` : `🔴 ${noun} cerrado`, 'success')
   } catch (e) {
     showToast('Error: ' + e.message, 'error')
   }
