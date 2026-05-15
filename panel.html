@@ -1471,6 +1471,65 @@ input:checked + .toggle-slider:before {
   /* Agenda responsive */
   #agenda-config-view > div { grid-template-columns: 1fr !important; }
 }
+
+/* ── PUBLICACIONES ─────────────────────────────────────────── */
+.pub-tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+.pub-tab { padding: 7px 16px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; background: none; font-family: inherit; transition: all .15s; }
+.pub-tab.active { background: var(--terra); border-color: var(--terra); color: white; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-top: 12px; }
+.cal-header { text-align: center; font-size: 11px; font-weight: 700; color: var(--muted); padding: 6px 0; text-transform: uppercase; letter-spacing: .04em; }
+.cal-day { min-height: 80px; border: 1px solid var(--border); border-radius: 8px; padding: 6px; position: relative; cursor: pointer; transition: border-color .15s; }
+.cal-day:hover { border-color: var(--terra); }
+.cal-day.today { border-color: var(--terra); background: var(--terra-pale); }
+.cal-day.other-month { opacity: .35; }
+.cal-day-num { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+.cal-day.today .cal-day-num { color: var(--terra); }
+.cal-post-dot { background: var(--terra); border-radius: 4px; padding: 2px 5px; font-size: 10px; color: white; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
+.cal-post-dot.scheduled { background: #3b82f6; }
+.cal-post-dot.published { background: var(--green); }
+.cal-post-dot.failed { background: #ef4444; }
+.post-list { display: flex; flex-direction: column; gap: 12px; }
+.post-item { display: flex; gap: 14px; align-items: flex-start; padding: 14px; border: 1px solid var(--border); border-radius: 12px; transition: border-color .15s; }
+.post-item:hover { border-color: var(--terra); }
+.post-item-img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--cream2); display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.post-item-body { flex: 1; min-width: 0; }
+.post-item-caption { font-size: 13.5px; color: var(--ink); margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.post-item-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.post-status { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.post-status.scheduled { background: #dbeafe; color: #1d4ed8; }
+.post-status.published { background: #dcfce7; color: #15803d; }
+.post-status.failed { background: #fee2e2; color: #dc2626; }
+.post-status.draft { background: #f3f4f6; color: #6b7280; }
+.post-platforms { display: flex; gap: 4px; }
+.post-platform { font-size: 13px; }
+
+/* Modal nueva publicación */
+.post-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 500; display: none; align-items: center; justify-content: center; padding: 16px; }
+.post-modal-overlay.open { display: flex; }
+.post-modal { background: white; border-radius: 20px; width: 100%; max-width: 680px; max-height: 90vh; overflow-y: auto; }
+.post-modal-header { padding: 20px 24px 0; display: flex; justify-content: space-between; align-items: center; }
+.post-modal-header h3 { font-size: 18px; font-weight: 600; }
+.post-modal-body { padding: 20px 24px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.post-modal-preview { background: #111; border-radius: 14px; overflow: hidden; position: relative; min-height: 200px; display: flex; flex-direction: column; }
+.preview-header { padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+.preview-avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--terra); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: white; flex-shrink: 0; }
+.preview-username { font-size: 12px; font-weight: 600; color: white; }
+.preview-image { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #222; }
+.preview-caption { padding: 10px 12px; font-size: 11px; color: rgba(255,255,255,.75); line-height: 1.4; }
+.post-form-field { margin-bottom: 14px; }
+.post-form-label { font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: .04em; }
+.post-form-textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 14px; resize: vertical; min-height: 100px; outline: none; transition: border-color .15s; box-sizing: border-box; }
+.post-form-textarea:focus { border-color: var(--terra); }
+.post-form-input { width: 100%; border: 1.5px solid var(--border); border-radius: 10px; padding: 10px 12px; font-family: inherit; font-size: 14px; outline: none; transition: border-color .15s; box-sizing: border-box; }
+.post-form-input:focus { border-color: var(--terra); }
+.platform-toggle { display: flex; gap: 8px; }
+.platform-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; background: none; font-family: inherit; transition: all .15s; }
+.platform-btn.active { border-color: var(--terra); background: var(--terra-pale); color: var(--terra); }
+.post-modal-footer { padding: 0 24px 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid var(--border); padding-top: 16px; }
+.image-upload-zone { border: 2px dashed var(--border); border-radius: 10px; padding: 20px; text-align: center; cursor: pointer; transition: border-color .15s; font-size: 13px; color: var(--muted); }
+.image-upload-zone:hover { border-color: var(--terra); color: var(--terra); }
+.image-preview-thumb { width: 100%; border-radius: 8px; object-fit: cover; max-height: 160px; display: none; }
+@media (max-width: 600px) { .post-modal-body { grid-template-columns: 1fr; } .calendar-grid { grid-template-columns: repeat(7,1fr); gap: 2px; } .cal-day { min-height: 50px; } }
 </style>
 </head>
 <body>
@@ -2656,6 +2715,45 @@ input:checked + .toggle-slider:before {
           </div>
           <div id="templates-list" style="margin-top:16px">
             <!-- Se llena con JS -->
+          </div>
+        </div>
+
+        <!-- ─── PUBLICACIONES / CALENDARIO ─────────────────────── -->
+        <div class="card" id="card-publicaciones" style="margin-top:20px">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <span>📅 Calendario de publicaciones</span>
+            <button class="btn-primary" style="font-size:13px;padding:8px 16px" onclick="openNewPostModal()">+ Nueva publicación</button>
+          </div>
+
+          <div class="pub-tabs" style="margin-top:16px">
+            <button class="pub-tab active" onclick="setPubView('calendario',this)">📅 Calendario</button>
+            <button class="pub-tab" onclick="setPubView('lista',this)">📋 Lista</button>
+          </div>
+
+          <!-- Vista calendario -->
+          <div id="pub-view-calendario">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+              <button onclick="calPrevMonth()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:18px">&#8249;</button>
+              <div id="cal-month-label" style="font-size:16px;font-weight:600"></div>
+              <button onclick="calNextMonth()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:18px">&#8250;</button>
+            </div>
+            <div class="calendar-grid">
+              <div class="cal-header">Dom</div>
+              <div class="cal-header">Lun</div>
+              <div class="cal-header">Mar</div>
+              <div class="cal-header">Mié</div>
+              <div class="cal-header">Jue</div>
+              <div class="cal-header">Vie</div>
+              <div class="cal-header">Sáb</div>
+            </div>
+            <div class="calendar-grid" id="cal-days-grid" style="margin-top:0"></div>
+          </div>
+
+          <!-- Vista lista -->
+          <div id="pub-view-lista" style="display:none">
+            <div id="pub-list-container">
+              <div style="text-align:center;color:var(--muted);padding:40px 20px;font-size:14px">Cargando publicaciones...</div>
+            </div>
           </div>
         </div>
 
@@ -6554,6 +6652,9 @@ window.loadMarketing = async function () {
     console.error('Error cargando marketing:', e)
     showToast('Error cargando sección de marketing', 'error')
   }
+
+  // Cargar publicaciones sociales (siempre, independiente de Metricool)
+  loadPublicaciones()
 }
 
 window.connectMetricool = function () {
@@ -9769,6 +9870,285 @@ document.addEventListener('keydown', e => {
     window.history.replaceState({}, '', 'panel.html')
   }
 })()
+
+// ══════════════════════════════════════════════════════
+// PUBLICACIONES / CALENDARIO
+// ══════════════════════════════════════════════════════
+var pubPosts = []
+var calCurrentDate = new Date()
+var selectedPlatforms = ['instagram', 'facebook']
+var uploadedImageUrl = null
+
+async function loadPublicaciones() {
+  if (!currentRestaurant) return
+  try {
+    const res = await fetch(WORKER_URL + '/api/social/posts?restaurant_id=' + currentRestaurant.id)
+    if (res.ok) {
+      const data = await res.json()
+      pubPosts = data.posts || []
+    }
+  } catch (e) {}
+  renderCalendar()
+  renderPostList()
+}
+
+function setPubView(view, btn) {
+  document.querySelectorAll('.pub-tab').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  document.getElementById('pub-view-calendario').style.display = view === 'calendario' ? '' : 'none'
+  document.getElementById('pub-view-lista').style.display = view === 'lista' ? '' : 'none'
+}
+window.setPubView = setPubView
+
+// ── CALENDARIO ─────────────────────────────────────────
+function renderCalendar() {
+  var year = calCurrentDate.getFullYear()
+  var month = calCurrentDate.getMonth()
+  var meses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+  var labelEl = document.getElementById('cal-month-label')
+  if (labelEl) labelEl.textContent = meses[month] + ' ' + year
+
+  var grid = document.getElementById('cal-days-grid')
+  if (!grid) return
+  grid.innerHTML = ''
+
+  var firstDay = new Date(year, month, 1).getDay()
+  var daysInMonth = new Date(year, month + 1, 0).getDate()
+  var daysInPrevMonth = new Date(year, month, 0).getDate()
+  var today = new Date()
+
+  // Días del mes anterior
+  for (var i = firstDay - 1; i >= 0; i--) {
+    var d = document.createElement('div')
+    d.className = 'cal-day other-month'
+    d.innerHTML = '<div class="cal-day-num">' + (daysInPrevMonth - i) + '</div>'
+    grid.appendChild(d)
+  }
+
+  // Días del mes actual
+  for (var day = 1; day <= daysInMonth; day++) {
+    var date = new Date(year, month, day)
+    var isToday = date.toDateString() === today.toDateString()
+    var d = document.createElement('div')
+    d.className = 'cal-day' + (isToday ? ' today' : '')
+    d.innerHTML = '<div class="cal-day-num">' + day + '</div>'
+
+    // Posts de este día
+    var dayPosts = pubPosts.filter(function(p) {
+      var pd = new Date(p.scheduled_at || p.created_at)
+      return pd.getFullYear() === year && pd.getMonth() === month && pd.getDate() === day
+    })
+    dayPosts.forEach(function(p) {
+      var dot = document.createElement('div')
+      dot.className = 'cal-post-dot ' + p.status
+      dot.textContent = (p.platforms || []).map(function(pl) { return pl === 'instagram' ? '📸' : '📘' }).join('') + ' ' + (p.caption || '').substring(0, 20)
+      dot.title = p.caption
+      dot.addEventListener('click', function(e) { e.stopPropagation() })
+      d.appendChild(dot)
+    })
+
+    // Click en día vacío → abrir modal con esa fecha
+    ;(function(clickDay) {
+      d.addEventListener('click', function() {
+        var dateStr = year + '-' + String(month+1).padStart(2,'0') + '-' + String(clickDay).padStart(2,'0')
+        document.getElementById('post-date').value = dateStr
+        openNewPostModal()
+      })
+    }(day))
+
+    grid.appendChild(d)
+  }
+
+  // Rellenar el resto
+  var total = firstDay + daysInMonth
+  var remaining = total % 7 === 0 ? 0 : 7 - (total % 7)
+  for (var r = 1; r <= remaining; r++) {
+    var d2 = document.createElement('div')
+    d2.className = 'cal-day other-month'
+    d2.innerHTML = '<div class="cal-day-num">' + r + '</div>'
+    grid.appendChild(d2)
+  }
+}
+
+function calPrevMonth() {
+  calCurrentDate.setMonth(calCurrentDate.getMonth() - 1)
+  renderCalendar()
+}
+function calNextMonth() {
+  calCurrentDate.setMonth(calCurrentDate.getMonth() + 1)
+  renderCalendar()
+}
+window.calPrevMonth = calPrevMonth
+window.calNextMonth = calNextMonth
+
+// ── LISTA ───────────────────────────────────────────────
+function renderPostList() {
+  var container = document.getElementById('pub-list-container')
+  if (!container) return
+  if (pubPosts.length === 0) {
+    container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px 20px;font-size:14px">Sin publicaciones todavía.<br><br><button onclick="openNewPostModal()" style="background:var(--terra);color:white;border:none;border-radius:10px;padding:10px 20px;font-size:14px;cursor:pointer;font-family:inherit">+ Crear primera publicación</button></div>'
+    return
+  }
+  var sorted = pubPosts.slice().sort(function(a,b) { return new Date(b.scheduled_at||b.created_at) - new Date(a.scheduled_at||a.created_at) })
+  container.innerHTML = '<div class="post-list">' + sorted.map(function(p) {
+    var dateStr = p.scheduled_at ? new Date(p.scheduled_at).toLocaleString('es-AR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' }) : 'Sin fecha'
+    var statusLabel = { draft:'Borrador', scheduled:'Programado', publishing:'Publicando', published:'Publicado', failed:'Error', cancelled:'Cancelado' }[p.status] || p.status
+    var platforms = (p.platforms || []).map(function(pl) { return pl === 'instagram' ? '📸' : '📘' }).join(' ')
+    return '<div class="post-item">' +
+      '<div class="post-item-img">' + (p.image_url ? '<img src="' + p.image_url + '" style="width:56px;height:56px;border-radius:8px;object-fit:cover">' : '🖼️') + '</div>' +
+      '<div class="post-item-body">' +
+        '<div class="post-item-caption">' + escHtml(p.caption || '') + '</div>' +
+        '<div class="post-item-meta">' +
+          '<span class="post-status ' + p.status + '">' + statusLabel + '</span>' +
+          '<span class="post-platforms">' + platforms + '</span>' +
+          '<span style="font-size:12px;color:var(--muted)">' + dateStr + '</span>' +
+        '</div>' +
+        (p.error_msg ? '<div style="font-size:11px;color:#ef4444;margin-top:4px">' + escHtml(p.error_msg) + '</div>' : '') +
+      '</div>' +
+      (p.status === 'scheduled' ? '<button onclick="cancelPost(\'' + p.id + '\')" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);padding:4px" title="Cancelar">🗑️</button>' : '') +
+    '</div>'
+  }).join('') + '</div>'
+}
+
+async function cancelPost(postId) {
+  if (!confirm('¿Cancelar esta publicación programada?')) return
+  await fetch(WORKER_URL + '/api/social/posts/' + postId, { method: 'DELETE' })
+  await loadPublicaciones()
+}
+window.cancelPost = cancelPost
+
+// ── MODAL NUEVA PUBLICACIÓN ─────────────────────────────
+function openNewPostModal() {
+  document.getElementById('post-modal-overlay').classList.add('open')
+  // Fecha mínima = hoy
+  var today = new Date().toISOString().split('T')[0]
+  document.getElementById('post-date').min = today
+
+  // Nombre del restaurante en preview
+  if (currentRestaurant) {
+    var initials = (currentRestaurant.name || 'R').substring(0, 1).toUpperCase()
+    document.getElementById('prev-avatar').textContent = initials
+    document.getElementById('prev-username').textContent = (currentRestaurant.instagram_handle || currentRestaurant.name || 'tu_restaurante').replace('@','')
+  }
+  updatePreview()
+}
+
+function closeNewPostModal() {
+  document.getElementById('post-modal-overlay').classList.remove('open')
+  document.getElementById('post-caption').value = ''
+  document.getElementById('img-url-input').value = ''
+  document.getElementById('post-date').value = ''
+  document.getElementById('post-time').value = '12:00'
+  document.getElementById('caption-chars').textContent = '0'
+  uploadedImageUrl = null
+  document.getElementById('img-upload-zone').style.display = ''
+  document.getElementById('img-preview-thumb').style.display = 'none'
+  // Resetear plataformas
+  selectedPlatforms = ['instagram', 'facebook']
+  document.getElementById('ptf-instagram').classList.add('active')
+  document.getElementById('ptf-facebook').classList.add('active')
+  updatePreview()
+}
+window.openNewPostModal = openNewPostModal
+window.closeNewPostModal = closeNewPostModal
+
+function updatePreview() {
+  var caption = document.getElementById('post-caption').value
+  var imgUrl = uploadedImageUrl || document.getElementById('img-url-input').value.trim()
+  document.getElementById('caption-chars').textContent = caption.length
+
+  var previewImg = document.getElementById('preview-image')
+  var noImg = document.getElementById('preview-no-img')
+  if (imgUrl) {
+    previewImg.src = imgUrl
+    previewImg.style.display = 'block'
+    noImg.style.display = 'none'
+  } else {
+    previewImg.style.display = 'none'
+    noImg.style.display = 'flex'
+  }
+  document.getElementById('preview-caption-text').textContent = caption || 'Tu texto aparecerá acá...'
+}
+window.updatePreview = updatePreview
+
+function togglePlatform(platform, btn) {
+  btn.classList.toggle('active')
+  var idx = selectedPlatforms.indexOf(platform)
+  if (idx >= 0) selectedPlatforms.splice(idx, 1)
+  else selectedPlatforms.push(platform)
+}
+window.togglePlatform = togglePlatform
+
+async function handleImageUpload(input) {
+  var file = input.files[0]
+  if (!file) return
+  // FileReader para preview local; en producción subir a Supabase Storage y usar URL pública
+  var reader = new FileReader()
+  reader.onload = function(e) {
+    uploadedImageUrl = e.target.result
+    document.getElementById('img-upload-zone').style.display = 'none'
+    var thumb = document.getElementById('img-preview-thumb')
+    thumb.src = e.target.result
+    thumb.style.display = 'block'
+    updatePreview()
+  }
+  reader.readAsDataURL(file)
+}
+window.handleImageUpload = handleImageUpload
+
+async function submitPost(schedule) {
+  if (!currentRestaurant) return
+  var caption = document.getElementById('post-caption').value.trim()
+  if (!caption) { alert('Escribí el texto del post'); return }
+  if (selectedPlatforms.length === 0) { alert('Seleccioná al menos una plataforma'); return }
+
+  var imageUrl = uploadedImageUrl || document.getElementById('img-url-input').value.trim() || null
+  var date = document.getElementById('post-date').value
+  var time = document.getElementById('post-time').value || '12:00'
+  var scheduledAt = null
+
+  if (schedule) {
+    if (!date) { alert('Elegí una fecha para programar'); return }
+    scheduledAt = new Date(date + 'T' + time + ':00').toISOString()
+  }
+
+  var btnId = schedule ? 'btn-schedule-post' : 'btn-publish-now'
+  var btn = document.getElementById(btnId)
+  var originalText = btn.textContent
+  btn.textContent = schedule ? '⏳ Programando...' : '⏳ Publicando...'
+  btn.disabled = true
+
+  try {
+    var res = await fetch(WORKER_URL + '/api/social/schedule-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        restaurantId: currentRestaurant.id,
+        caption,
+        imageUrl,
+        platforms: selectedPlatforms,
+        scheduledAt,
+      })
+    })
+    var data = await res.json()
+    if (data.ok) {
+      closeNewPostModal()
+      await loadPublicaciones()
+      var msg = schedule
+        ? '✅ Publicación programada para ' + new Date(scheduledAt).toLocaleString('es-AR')
+        : '✅ Publicación enviada' + (data.igPostId || data.fbPostId ? '' : ' (puede demorar unos minutos)')
+      showToast(msg, 'success')
+    } else {
+      alert('Error: ' + (data.error || JSON.stringify(data)))
+    }
+  } catch (e) {
+    alert('Error de conexión: ' + e.message)
+  } finally {
+    btn.textContent = originalText
+    btn.disabled = false
+  }
+}
+window.submitPost = submitPost
 </script>
 
 <!-- Modal setup de agenda -->
@@ -9784,6 +10164,76 @@ document.addEventListener('keydown', e => {
     <div class="modal-footer">
       <button class="btn-secondary" id="btn-setup-back" style="display:none" onclick="agendaSetupBack()">← Atrás</button>
       <button class="btn-primary" id="btn-setup-next" onclick="agendaSetupNext()">Siguiente →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal nueva publicación -->
+<div class="post-modal-overlay" id="post-modal-overlay">
+  <div class="post-modal">
+    <div class="post-modal-header">
+      <h3>Nueva publicación</h3>
+      <button onclick="closeNewPostModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">&#x2715;</button>
+    </div>
+    <div class="post-modal-body">
+      <!-- Formulario -->
+      <div>
+        <div class="post-form-field">
+          <label class="post-form-label">Plataformas</label>
+          <div class="platform-toggle">
+            <button class="platform-btn active" id="ptf-instagram" onclick="togglePlatform('instagram',this)">📸 Instagram</button>
+            <button class="platform-btn active" id="ptf-facebook" onclick="togglePlatform('facebook',this)">📘 Facebook</button>
+          </div>
+        </div>
+        <div class="post-form-field">
+          <label class="post-form-label">Imagen</label>
+          <div class="image-upload-zone" id="img-upload-zone" onclick="document.getElementById('img-file-input').click()">
+            📷 Hacé clic para subir una imagen<br>
+            <span style="font-size:11px">JPG, PNG · Máx 8MB</span>
+          </div>
+          <img id="img-preview-thumb" class="image-preview-thumb" alt="">
+          <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
+          <input type="text" id="img-url-input" class="post-form-input" placeholder="O pegá una URL de imagen..." style="margin-top:8px" oninput="updatePreview()">
+        </div>
+        <div class="post-form-field">
+          <label class="post-form-label">Texto del post</label>
+          <textarea class="post-form-textarea" id="post-caption" placeholder="Escribí el texto de tu publicación... Incluí hashtags y emojis 🎉" oninput="updatePreview()"></textarea>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px"><span id="caption-chars">0</span>/2200 caracteres</div>
+        </div>
+        <div class="post-form-field">
+          <label class="post-form-label">Programar para</label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <input type="date" class="post-form-input" id="post-date" min="">
+            <input type="time" class="post-form-input" id="post-time" value="12:00">
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">Dejá la fecha vacía para publicar ahora mismo</div>
+        </div>
+      </div>
+      <!-- Preview -->
+      <div>
+        <div class="post-form-label">Vista previa</div>
+        <div class="post-modal-preview">
+          <div class="preview-header">
+            <div class="preview-avatar" id="prev-avatar">R</div>
+            <div>
+              <div class="preview-username" id="prev-username">tu_restaurante</div>
+              <div style="font-size:10px;color:rgba(255,255,255,.4)">Patrocinado</div>
+            </div>
+          </div>
+          <img id="preview-image" class="preview-image" src="" alt="" style="display:none">
+          <div id="preview-no-img" style="width:100%;aspect-ratio:1;background:#1a1a1a;display:flex;align-items:center;justify-content:center;font-size:40px">🖼️</div>
+          <div class="preview-caption" id="preview-caption-text">Tu texto aparecerá acá...</div>
+          <div style="padding:6px 12px 10px;display:flex;gap:12px;font-size:18px">❤️ 💬 📤</div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted);line-height:1.5">
+          La vista previa es aproximada. El aspecto final puede variar según la plataforma.
+        </div>
+      </div>
+    </div>
+    <div class="post-modal-footer">
+      <button onclick="closeNewPostModal()" class="btn-secondary">Cancelar</button>
+      <button onclick="submitPost(false)" class="btn-secondary" id="btn-publish-now">⚡ Publicar ahora</button>
+      <button onclick="submitPost(true)" class="btn-primary" id="btn-schedule-post">📅 Programar</button>
     </div>
   </div>
 </div>
