@@ -2456,6 +2456,21 @@ input:checked + .toggle-slider:before {
           </div>
         </div>
 
+        <!-- Facebook -->
+        <div class="card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>📘 Facebook</span>
+            <button id="btn-connect-facebook" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectFacebook()">
+              Conectar página
+            </button>
+          </div>
+          <div id="facebook-content" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
+              Conectá tu página de Facebook para ver métricas, publicar contenido y que Viti responda comentarios automáticamente.
+            </div>
+          </div>
+        </div>
+
         <!-- Competidores -->
         <div class="card">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
@@ -3471,20 +3486,22 @@ function renderSidebarRestaurant(rest) {
   el.style.display = 'block'
   document.getElementById('sidebar-rest-name').textContent = rest.name
   document.getElementById('sidebar-rest-plan').textContent =
-    ({ free: 'Plan Free', starter: 'Plan Starter', pro: 'Plan Pro', full: 'Plan Full' })[rest.plan] ?? (rest.plan ?? 'Plan Free')
+    ({
+      free: 'Plan Free', 'menu-free': 'Plan Free',
+      'rest-menu': 'Solo Menú', 'menu-basico': 'Solo Menú', 'menu-pro': 'Solo Menú', 'menu-full': 'Solo Menú',
+      'rest-mkt': 'Marketing', marketing: 'Marketing',
+      'rest-combo': 'Combo', combo: 'Combo',
+      'local-mkt': 'Marketing',
+      pro: 'Solo Menú', full: 'Solo Menú', starter: 'Solo Menú',
+    })[rest.plan] ?? (rest.plan ?? 'Plan Free')
   // Color del badge de plan
   const planEl = document.getElementById('sidebar-rest-plan')
   if (planEl) {
     const colors = {
-      free: '#8a7e74',
-      menu_free: '#8a7e74',
-      basico: '#22863a', menu_basico: '#22863a',
-      pro: '#b85a30', menu_pro: '#b85a30',
-      full: '#c8963c', menu_full: '#c8963c',
-      marketing: '#4a90d9',
-      'marketing+wa': '#7b52a6',
-      combo: '#7b52a6',
-      'combo+wa': '#7b52a6',
+      free: '#8a7e74', 'menu-free': '#8a7e74',
+      'rest-menu': '#22863a', 'menu-basico': '#22863a', 'menu-pro': '#22863a', 'menu-full': '#22863a', pro: '#22863a', full: '#22863a',
+      'rest-mkt': '#4a90d9', marketing: '#4a90d9', 'local-mkt': '#4a90d9',
+      'rest-combo': '#b85a30', combo: '#b85a30',
     }
     const planKey = (rest.plan || 'free').toLowerCase()
     planEl.style.color = colors[planKey] || '#8a7e74'
@@ -5347,15 +5364,25 @@ const ROLE_LABELS = { cook: 'Cocinero', waiter: 'Mozo', manager: 'Gerente', owne
 const WORKER_URL = 'https://vitrina-tano.vitrinaapp.workers.dev'
 
 const PLAN_INFO = {
-  free:  { nombre: 'Free',      precioUSD: 0,   precioARS: 0,     descripcion: 'Hasta 45 platos · 75 msgs Tano/mes · Sin pedidos' },
-  pro:   { nombre: 'Menú Pro',  precioUSD: 22,  precioARS: 9020,  descripcion: 'Pedidos · Cocina · Pagos MP · Analytics básico' },
-  full:  { nombre: 'Menú Full', precioUSD: 35,  precioARS: 14350, descripcion: 'Todo Pro + Fotos IA · Analytics completo · Viti 30 consultas' },
+  'free':       { nombre: 'Free',       precioUSD: 0,  descripcion: 'Hasta 45 platos · 75 msgs Tano/mes · Sin pedidos' },
+  'rest-menu':  { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado · WhatsApp' },
+  'rest-mkt':   { nombre: 'Marketing',  precioUSD: 58, descripcion: 'Viti · Redes · Google · Competidores · Informe PDF · WhatsApp' },
+  'rest-combo': { nombre: 'Combo',      precioUSD: 75, descripcion: 'Todo Solo Menú + Todo Marketing · Ahorrás USD 10 · WhatsApp' },
+  'local-mkt':  { nombre: 'Marketing',  precioUSD: 65, descripcion: 'Catálogo · ML · TN · Viti · Redes · WhatsApp' },
+  // aliases legacy
+  'pro':        { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado' },
+  'full':       { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado' },
+  'menu-basico':{ nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Tano ilimitado · Múltiples idiomas' },
+  'menu-pro':   { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado' },
+  'menu-full':  { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado' },
 }
 
 const PLAN_FEATURES = {
-  free:  ['75 mensajes Tano por mes', 'Hasta 45 platos', 'Menú en múltiples idiomas', { no: 'Pedidos online' }, { no: 'Pantalla de cocina' }, { no: 'Pagos integrados' }],
-  pro:   ['Tano ilimitado', 'Pedidos en tiempo real', 'Pantalla de cocina', 'Pagos con MercadoPago', 'Analytics básico', { no: 'Fotos IA del menú' }],
-  full:  ['Tano ilimitado', 'Pedidos en tiempo real', 'Pantalla de cocina', 'Pagos con MercadoPago', 'Analytics completo + Excel', '60 créditos fotos IA + 5/mes', 'Viti: 30 consultas/mes (pronto)'],
+  'free':       ['75 mensajes Tano por mes', 'Hasta 45 platos', 'Menú en múltiples idiomas', { no: 'Pedidos online' }, { no: 'Pantalla de cocina' }, { no: 'WhatsApp Business' }],
+  'rest-menu':  ['Tano ilimitado · ES/EN/PT', 'Pedidos en tiempo real', 'Pantalla de cocina', 'Pagos con MercadoPago', 'Fotos de platos con IA', 'WhatsApp Business incluido'],
+  'rest-mkt':   ['Viti: estrategia mensual IA', '30 publicaciones auto/mes', 'Google Business + Instagram + Facebook', 'Análisis de 5 competidores', 'Informe PDF mensual', 'WhatsApp Business incluido'],
+  'rest-combo': ['Todo Solo Menú +', 'Todo Marketing +', 'Tano + Viti trabajando juntos', 'Panel unificado operaciones + marketing', 'WhatsApp Business incluido'],
+  'local-mkt':  ['Catálogo QR ilimitado', 'MercadoLibre: publicaciones y stock automático', 'Tienda Nube: sincronización bidireccional', 'Viti: estrategia y análisis', '30 publicaciones auto/mes', 'WhatsApp Business incluido'],
 }
 
 function renderPlanSection() {
@@ -5739,51 +5766,36 @@ window.openUpgradeModal = async function () {
   openModal('modal-upgrade')
 
   // Obtener tipo de cambio actualizado
-  const tcData = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio').then(r => r.json()).catch(() => ({ oficial: 1410 }))
-  const tc = tcData.oficial || 1410
+  const tcData = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio').then(r => r.json()).catch(() => ({ oficial: 1418 }))
+  const tc = tcData.oficial || 1418
 
-  // Definir planes — WhatsApp incluido en todos, sin fee de transacción
-  const planes = [
+  // Planes según tipo de negocio
+  const btype = currentRestaurant?.business_type || 'restaurant'
+  const isLocal = btype === 'local' || btype === 'ecommerce' || btype === 'services'
+
+  const planesRestaurante = [
     {
-      id: 'rest-menu',
-      nombre: 'Solo Menú',
-      precioUSD: 27,
-      features: [
-        'Menú QR ilimitado · ES/EN/PT',
-        'Tano ilimitado + agrega al carrito',
-        'Pedidos online + cocina en tiempo real',
-        'Pagos con MercadoPago',
-        '✅ WhatsApp Business incluido',
-      ],
+      id: 'rest-menu', nombre: 'Solo Menú', precioUSD: 27,
+      features: ['Menú QR ilimitado · ES/EN/PT', 'Tano ilimitado + agrega al carrito', 'Pedidos online + cocina en tiempo real', 'Pagos con MercadoPago', '✅ WhatsApp Business incluido'],
     },
     {
-      id: 'rest-mkt',
-      nombre: 'Marketing',
-      precioUSD: 58,
-      features: [
-        'Viti: estrategia mensual IA',
-        '30 publicaciones auto/mes',
-        'Google · Instagram · Facebook',
-        'Viti responde reseñas automáticamente',
-        'Análisis de competidores · Informe PDF',
-        '✅ WhatsApp Business incluido',
-      ],
+      id: 'rest-mkt', nombre: 'Marketing', precioUSD: 58,
+      features: ['Viti: estrategia mensual IA', '30 publicaciones auto/mes', 'Google · Instagram · Facebook', 'Viti responde reseñas automáticamente', 'Análisis de competidores · Informe PDF', '✅ WhatsApp Business incluido'],
     },
     {
-      id: 'rest-combo',
-      nombre: 'Combo',
-      precioUSD: 75,
-      features: [
-        'Todo Solo Menú +',
-        'Todo Marketing +',
-        'Tano + Viti trabajando juntos',
-        'Panel unificado operaciones + marketing',
-        '✅ WhatsApp Business incluido',
-        'Ahorrás USD 10 vs contratar separado',
-      ],
-      recommended: true,
+      id: 'rest-combo', nombre: 'Combo', precioUSD: 75, recommended: true,
+      features: ['Todo Solo Menú +', 'Todo Marketing +', 'Tano + Viti trabajando juntos', 'Panel unificado operaciones + marketing', '✅ WhatsApp Business incluido', 'Ahorrás USD 10 vs contratar separado'],
     },
   ]
+
+  const planesLocal = [
+    {
+      id: 'local-mkt', nombre: 'Marketing', precioUSD: 65, recommended: true,
+      features: ['Catálogo QR ilimitado', 'MercadoLibre: publicaciones y stock automático', 'Tienda Nube: sincronización bidireccional', 'Viti: estrategia, análisis y competidores ML', '30 publicaciones auto/mes en redes', '✅ WhatsApp Business incluido'],
+    },
+  ]
+
+  const planes = isLocal ? planesLocal : planesRestaurante
 
   const grid = document.getElementById('upgrade-plans-grid')
   grid.innerHTML = planes.map(plan => {
@@ -6044,8 +6056,12 @@ window.connectGoogleBusiness = function () {
 
 window.connectInstagram = function () {
   if (!currentRestaurant) return
-  // Abrir ventana de OAuth
   window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/instagram/auth?restaurant_id=${currentRestaurant.id}`
+}
+
+window.connectFacebook = function () {
+  if (!currentRestaurant) return
+  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/facebook/auth?restaurant_id=${currentRestaurant.id}`
 }
 
 // ─── ML / TN ─────────────────────────────────────────────────────────────────
