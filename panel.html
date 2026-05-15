@@ -1768,68 +1768,42 @@ input:checked + .toggle-slider:before {
           </div>
         </div>
 
-        <!-- PASO 2: Formulario adaptado al rubro -->
+        <!-- PASO 2: Solo el nombre — todo lo demás después -->
         <div id="setup-step-form" class="setup-screen" style="display:none">
           <div class="setup-icon" id="setup-biz-icon">🏪</div>
-          <div class="setup-title" id="setup-biz-title">Creá tu negocio</div>
-          <div class="setup-subtitle" id="setup-biz-subtitle">Completá la información básica para empezar.</div>
-          <div style="width:100%; max-width:480px">
+          <div class="setup-title" id="setup-biz-title">¿Cómo se llama?</div>
+          <div class="setup-subtitle" id="setup-biz-subtitle">Con eso alcanza para arrancar. El resto lo completás después.</div>
+          <div style="width:100%; max-width:420px">
             <div class="card" style="text-align:left">
               <div class="form-grid full">
                 <div class="form-field">
                   <label class="form-label" id="setup-name-label">Nombre del negocio <span>*</span></label>
-                  <input type="text" class="form-input" id="setup-name" placeholder="Mi negocio" oninput="autoSlug()">
+                  <input type="text" class="form-input" id="setup-name" placeholder="Ej: La Panera Rosa" oninput="autoSlug()" autofocus style="font-size:16px;padding:14px">
                 </div>
                 <div class="form-field">
-                  <label class="form-label">URL pública <span>*</span></label>
+                  <label class="form-label" style="color:var(--muted);font-size:11px">Tu link público</label>
                   <div class="slug-preview">
                     <span class="slug-prefix">vitrinaapp.com.ar/</span>
                     <input type="text" class="slug-input" id="setup-slug" placeholder="mi-negocio" oninput="checkSlug()">
                     <span class="slug-status" id="setup-slug-status"></span>
                   </div>
-                  <span class="form-hint">Solo letras minúsculas, números y guiones.</span>
-                </div>
-                <div class="form-field">
-                  <label class="form-label">Ciudad</label>
-                  <input type="text" class="form-input" id="setup-city" placeholder="Buenos Aires">
-                </div>
-                <div class="form-field">
-                  <label class="form-label">Teléfono</label>
-                  <input type="text" class="form-input" id="setup-phone" placeholder="+54 11 1234-5678">
-                </div>
-                <div class="form-field">
-                  <label class="form-label">Sitio web actual <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
-                  <input type="url" class="form-input" id="setup-website" placeholder="https://www.tulocal.com.ar">
-                  <span class="form-hint">Si tenés web propia, generamos un botón para vincularla con tu catálogo de Vitrina.</span>
+                  <span class="form-hint">Se genera automático. Podés cambiarlo.</span>
                 </div>
               </div>
 
-              <!-- WhatsApp Business option -->
-              <div id="setup-wa-option" style="margin-top:16px;border:1.5px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .15s"
-                onclick="toggleSetupWA()" class="setup-wa-card">
-                <div style="display:flex;align-items:flex-start;gap:12px">
-                  <div style="font-size:24px;flex-shrink:0">📱</div>
-                  <div style="flex:1">
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
-                      <div style="font-size:14px;font-weight:600;color:var(--ink)" id="setup-wa-title">Agregar número de WhatsApp Business</div>
-                      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-                        <span style="font-size:11px;font-weight:600;color:var(--green)">✅ Incluido</span>
-                        <div id="setup-wa-toggle" style="width:36px;height:20px;border-radius:20px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0">
-                          <div style="position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:white;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div style="font-size:12.5px;color:var(--muted);line-height:1.5" id="setup-wa-desc">Un número con el nombre de tu negocio para que los clientes te escriban directamente.</div>
-                  </div>
-                </div>
-              </div>
-              <div id="setup-wa-enabled" style="display:none;margin-top:8px;padding:10px 14px;background:var(--terra-pale);border-radius:10px;font-size:13px;color:var(--terra-dark);line-height:1.5" id="setup-wa-note"></div>
+              <!-- Campos ocultos que se necesitan internamente pero no molestan al usuario -->
+              <input type="hidden" id="setup-city" value="">
+              <input type="hidden" id="setup-phone" value="">
+              <input type="hidden" id="setup-website" value="">
 
               <div class="actions" style="margin-top:20px;gap:10px">
-                <button class="btn-secondary" onclick="backToTypeSelector()" style="flex-shrink:0">← Cambiar rubro</button>
-                <button class="btn-primary" style="flex:1" id="btn-create-rest" onclick="createRestaurant()">
-                  Crear mi negocio
+                <button class="btn-secondary" onclick="backToTypeSelector()" style="flex-shrink:0">← Volver</button>
+                <button class="btn-primary" style="flex:1;padding:14px;font-size:16px" id="btn-create-rest" onclick="createRestaurant()">
+                  Crear mi negocio →
                 </button>
+              </div>
+              <div style="text-align:center;margin-top:12px;font-size:12px;color:var(--muted)">
+                14 días gratis · Sin tarjeta · Cancelás cuando querés
               </div>
             </div>
           </div>
@@ -1856,10 +1830,7 @@ input:checked + .toggle-slider:before {
               <label class="form-label">Nombre <span>*</span></label>
               <input type="text" class="form-input" id="f-name" placeholder="Casa Lucía">
             </div>
-            <div class="form-field col-2">
-              <label class="form-label">Tagline</label>
-              <input type="text" class="form-input" id="f-tagline" placeholder="El sabor de siempre, en cada bocado.">
-            </div>
+            <input type="hidden" id="f-tagline" value="">
             <div class="form-field col-2">
               <label class="form-label">Descripción</label>
               <textarea class="form-textarea" id="f-description" placeholder="Contá de qué se trata tu negocio…"></textarea>
