@@ -58,7 +58,10 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
   <style>
     :root {
@@ -596,6 +599,172 @@
         grid-template-columns: 1fr !important;
       }
     }
+
+    /* ═══════════════════════════════════════════════
+       PREMIUM REDESIGN — v2
+    ═══════════════════════════════════════════════ */
+
+    /* ── TIPOGRAFÍA ──────────────────────────────── */
+    body, button, input, select, textarea {
+      font-family: 'Plus Jakarta Sans', 'DM Sans', sans-serif;
+    }
+
+    /* ── NAVBAR ──────────────────────────────────── */
+    .nav {
+      transition: background .35s, border-color .35s, box-shadow .35s;
+    }
+    .nav.nav-dark {
+      background: rgba(12,10,8,.92) !important;
+      border-bottom-color: rgba(255,255,255,.08) !important;
+      box-shadow: 0 4px 32px rgba(0,0,0,.35) !important;
+    }
+    .nav.nav-dark .nav-links a { color: rgba(255,255,255,.7); }
+    .nav.nav-dark .nav-links a:hover { background: rgba(255,255,255,.08); color: #fff; }
+    .nav.nav-dark .logo-text { color: #E8C87A !important; }
+    .nav.nav-dark .nav-cta { background: #E8C87A; color: #1C1208; box-shadow: 0 2px 12px rgba(232,200,122,.3); }
+    .nav.nav-dark .nav-cta:hover { background: #d4ae5a; }
+
+    /* ── HERO OSCURO ─────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #0c0a08 0%, #12101e 55%, #0c0a08 100%) !important;
+      padding: 148px 24px 110px !important;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 120px;
+      background: linear-gradient(to bottom, transparent, var(--cream));
+      z-index: 2; pointer-events: none;
+    }
+    .hero-bg-img { opacity: 0.03 !important; mix-blend-mode: screen; }
+    .hero::before {
+      background: radial-gradient(ellipse 80% 60% at 50% 30%, rgba(184,90,48,.12) 0%, transparent 70%) !important;
+    }
+    /* Partículas decorativas */
+    .hero-glow {
+      position: absolute; inset: 0; z-index: 1; pointer-events: none;
+      background:
+        radial-gradient(circle 600px at 20% 50%, rgba(184,90,48,.06) 0%, transparent 70%),
+        radial-gradient(circle 400px at 80% 20%, rgba(26,26,46,.8) 0%, transparent 60%);
+    }
+
+    .hero-eyebrow {
+      background: rgba(184,90,48,.15) !important;
+      color: #e8a870 !important;
+      border: 1px solid rgba(184,90,48,.35) !important;
+    }
+    .hero h1 {
+      font-size: clamp(3rem, 7vw, 5.2rem) !important;
+      color: #ffffff !important;
+      letter-spacing: -.02em;
+      line-height: 1.08 !important;
+    }
+    .hero h1 em { color: #E8C87A !important; }
+    .hero .hero-sub {
+      color: rgba(255,255,255,.65) !important;
+      font-size: clamp(1rem, 2vw, 1.18rem) !important;
+    }
+    .hero .hero-sub strong { color: rgba(255,255,255,.9); }
+    .hero .btn-primary-lg {
+      padding: 16px 38px !important;
+      font-size: 17px !important;
+      border-radius: 14px !important;
+      box-shadow: 0 6px 28px rgba(184,90,48,.4) !important;
+      transition: all .25s !important;
+    }
+    .hero .btn-primary-lg:hover {
+      transform: translateY(-3px) !important;
+      box-shadow: 0 12px 36px rgba(184,90,48,.5) !important;
+    }
+    .hero .btn-ghost {
+      padding: 16px 32px !important;
+      font-size: 15px !important;
+      border-radius: 14px !important;
+      border-color: rgba(255,255,255,.25) !important;
+      color: rgba(255,255,255,.8) !important;
+      background: rgba(255,255,255,.04) !important;
+    }
+    .hero .btn-ghost:hover {
+      background: rgba(255,255,255,.1) !important;
+      border-color: rgba(255,255,255,.5) !important;
+      color: #fff !important;
+      transform: translateY(-2px) !important;
+    }
+    .hero .biz-card {
+      background: rgba(255,255,255,.05) !important;
+      border-color: rgba(255,255,255,.1) !important;
+      color: #fff !important;
+      backdrop-filter: blur(12px);
+    }
+    .hero .biz-card:hover {
+      background: rgba(255,255,255,.1) !important;
+      border-color: rgba(184,90,48,.5) !important;
+      box-shadow: 0 12px 40px rgba(184,90,48,.18) !important;
+    }
+    .hero .biz-label { color: #fff !important; }
+    .hero .biz-desc  { color: rgba(255,255,255,.55) !important; }
+    .hero .biz-arrow { color: #E8C87A !important; }
+    @media (max-width: 768px) {
+      .hero h1 { font-size: clamp(2.2rem, 9vw, 3.5rem) !important; }
+      .hero::after { display: none; }
+    }
+
+    /* ── FEAT CARDS GLASSMORPHISM ─────────────────── */
+    .feat-card {
+      background: rgba(28,18,8,.04) !important;
+      border: 1px solid rgba(28,18,8,.08) !important;
+      box-shadow: 0 2px 16px rgba(28,18,8,.05);
+      backdrop-filter: blur(8px);
+      transition: transform .2s, box-shadow .2s, border-color .2s;
+    }
+    .feat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(184,90,48,.1);
+      border-color: rgba(184,90,48,.25) !important;
+    }
+    .feat-card-icon { font-size: 32px !important; }
+
+    /* ── PLAN CARD COMBO GLOW ────────────────────── */
+    .plan-card.featured {
+      background:
+        linear-gradient(var(--white), var(--white)) padding-box,
+        linear-gradient(135deg, #B85A30 0%, #E8C87A 40%, #c87050 70%, #B85A30 100%) border-box !important;
+      border: 2px solid transparent !important;
+      box-shadow:
+        0 0 0 1px rgba(184,90,48,.15),
+        0 0 40px rgba(184,90,48,.2),
+        0 16px 48px rgba(0,0,0,.1) !important;
+      transform: scale(1.025);
+    }
+    .plan-card.featured:hover { transform: scale(1.03) translateY(-2px); }
+    @media (max-width: 768px) {
+      .plan-card.featured { transform: none; }
+      .plan-card.featured:hover { transform: translateY(-2px); }
+    }
+
+    /* ── NÚMEROS — animación de conteo ──────────── */
+    .number-val {
+      font-size: 52px !important;
+      transition: color .3s;
+    }
+    .numbers-section .numbers > div {
+      padding: 24px 12px;
+      border-radius: 16px;
+      transition: background .2s;
+    }
+    .numbers-section .numbers > div:hover {
+      background: rgba(184,90,48,.06);
+    }
+
+    /* ── SECTION FADE INIT (GSAP) ────────────────── */
+    .gsap-fade { opacity: 0; will-change: opacity, transform; }
+
+    /* ── PLAN ROW 3 COLUMNAS ─────────────────────── */
+    #pricing-rest .plan-row { grid-template-columns: repeat(3, 1fr) !important; }
+    @media (max-width: 900px) {
+      #pricing-rest .plan-row { grid-template-columns: 1fr !important; }
+    }
   </style>
 </head>
 <body>
@@ -648,22 +817,23 @@
 <!-- ── HERO ──────────────────────────────────────────────── -->
 <section class="hero">
   <div class="hero-bg-img"></div>
-  <div class="hero-eyebrow">
+  <div class="hero-glow"></div>
+  <div class="hero-eyebrow" id="hero-eyebrow" style="opacity:0">
     🇦🇷 Para comercios argentinos · 14 días gratis · Sin tarjeta
   </div>
 
-  <h1 class="fade">Tu negocio, <em>siempre abierto</em><br>aunque no estés</h1>
+  <h1 id="hero-title" style="opacity:0">Tu negocio, <em>siempre abierto</em><br>aunque no estés</h1>
 
-    <p class="hero-sub fade">
-      Catálogo digital con QR, sistema de pedidos, asistente IA, MercadoLibre, Tienda Nube y WhatsApp Business. Todo en un solo panel, desde <strong>USD 27/mes</strong>.
-    </p>
+  <p class="hero-sub" id="hero-sub" style="opacity:0">
+    Catálogo digital con QR, sistema de pedidos, asistente IA, MercadoLibre, Tienda Nube y WhatsApp Business. Todo en un solo panel, desde <strong>USD 27/mes</strong>.
+  </p>
 
-  <div class="hero-actions fade">
+  <div class="hero-actions" id="hero-actions" style="opacity:0">
     <a href="/panel.html" class="btn-primary-lg">Crear mi cuenta gratis</a>
     <a href="/demo.html" class="btn-ghost">Ver demo →</a>
   </div>
 
-  <div class="business-cards fade">
+  <div class="business-cards" id="hero-cards" style="opacity:0">
     <a href="#restaurantes" class="biz-card">
       <span class="biz-icon">🍽️</span>
       <span class="biz-label">Restaurante / Bar</span>
@@ -1009,9 +1179,9 @@
 </section>
 
 <!-- ── NÚMEROS ─────────────────────────────────────────────── -->
-<section class="section bg-white" style="padding:60px 24px">
+<section class="section bg-white numbers-section" style="padding:60px 24px">
   <div class="section-inner centered">
-    <div class="numbers fade">
+    <div class="numbers" id="numbers-grid">
       <div>
         <div class="number-val">14</div>
         <div class="number-label">días de prueba, sin tarjeta</div>
@@ -1567,6 +1737,176 @@ function showPricing(type) {
     document.querySelectorAll('.p-local-mkt').forEach(el => el.textContent = fmt(65))
   } catch {}
 })()
+</script>
+
+<!-- ══════════════════════════════════════════════════
+     GSAP ANIMATIONS — Premium Redesign v2
+══════════════════════════════════════════════════ -->
+<script>
+(function() {
+  if (typeof gsap === 'undefined') return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ── NAVBAR dark on scroll ─────────────────────── */
+  const nav = document.getElementById('nav');
+  ScrollTrigger.create({
+    start: 80,
+    end: 99999,
+    onToggle: self => nav.classList.toggle('nav-dark', self.isActive),
+  });
+
+  /* ── HERO entrance ─────────────────────────────── */
+  var heroTl = gsap.timeline({ delay: 0.15 });
+  heroTl
+    .to('#hero-eyebrow', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+        fromVars: { opacity: 0, y: 24 } })
+    .fromTo('#hero-title',
+        { opacity: 0, y: 54 },
+        { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }, '-=0.35')
+    .fromTo('#hero-sub',
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '-=0.5')
+    .fromTo('#hero-actions',
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' }, '-=0.45')
+    .fromTo('#hero-cards .biz-card',
+        { opacity: 0, y: 32 },
+        { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out', stagger: 0.1 }, '-=0.3');
+
+  /* ── GSAP fromTo helper for eyebrow ─────────────── */
+  gsap.set('#hero-eyebrow', { y: 24 });
+  gsap.set('#hero-title',   { y: 54 });
+  gsap.set('#hero-sub',     { y: 30 });
+  gsap.set('#hero-actions', { y: 24 });
+  gsap.set('#hero-cards .biz-card', { y: 32 });
+
+  /* ── SECTION TITLES fade-up ──────────────────────── */
+  document.querySelectorAll('.section-title, .section-eyebrow').forEach(function(el) {
+    gsap.fromTo(el,
+      { opacity: 0, y: 28 },
+      { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── FEAT CARDS staggered ────────────────────────── */
+  document.querySelectorAll('.feat-grid').forEach(function(grid) {
+    var cards = grid.querySelectorAll('.feat-card');
+    gsap.fromTo(cards,
+      { opacity: 0, y: 44 },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.1,
+        scrollTrigger: { trigger: grid, start: 'top 82%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── STEPS staggered ─────────────────────────────── */
+  document.querySelectorAll('.steps').forEach(function(steps) {
+    var items = steps.querySelectorAll('.step');
+    gsap.fromTo(items,
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.12,
+        scrollTrigger: { trigger: steps, start: 'top 82%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── PLAN CARDS ──────────────────────────────────── */
+  document.querySelectorAll('.plan-card').forEach(function(card) {
+    gsap.fromTo(card,
+      { opacity: 0, y: 36 },
+      { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out',
+        scrollTrigger: { trigger: card, start: 'top 86%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── GUARANTEE CARDS ─────────────────────────────── */
+  document.querySelectorAll('.guarantee-card').forEach(function(card, i) {
+    gsap.fromTo(card,
+      { opacity: 0, y: 32 },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: i * 0.08,
+        scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── BIZ CARDS en otras secciones ───────────────── */
+  document.querySelectorAll('.biz-card').forEach(function(card) {
+    if (card.closest('#hero-cards')) return; // ya animado
+    gsap.fromTo(card,
+      { opacity: 0, y: 28 },
+      { opacity: 1, y: 0, duration: 0.55, ease: 'power2.out',
+        scrollTrigger: { trigger: card, start: 'top 88%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── NÚMEROS — count-up ──────────────────────────── */
+  var numbersGrid = document.getElementById('numbers-grid');
+  if (numbersGrid) {
+    gsap.fromTo(numbersGrid,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out',
+        scrollTrigger: { trigger: numbersGrid, start: 'top 85%', toggleActions: 'play none none none',
+          onEnter: function() {
+            // Animar el conteo de números
+            var vals = numbersGrid.querySelectorAll('.number-val');
+            vals.forEach(function(el) {
+              var text = el.textContent.trim();
+              var num = parseFloat(text.replace(/[^0-9.]/g, ''));
+              var suffix = text.replace(/[0-9.]/g, '');
+              if (isNaN(num) || text === '∞' || text === '24/7') {
+                gsap.fromTo(el, { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.6, ease: 'back.out(1.5)' });
+                return;
+              }
+              var obj = { val: 0 };
+              gsap.to(obj, {
+                val: num, duration: 1.8, ease: 'power2.out',
+                onUpdate: function() {
+                  el.textContent = (num % 1 === 0 ? Math.round(obj.val) : obj.val.toFixed(1)) + suffix;
+                }
+              });
+            });
+          }
+        }
+      });
+  }
+
+  /* ── SPLIT sections fade-in ──────────────────────── */
+  document.querySelectorAll('.split > div').forEach(function(col, i) {
+    gsap.fromTo(col,
+      { opacity: 0, x: i % 2 === 0 ? -32 : 32 },
+      { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out',
+        scrollTrigger: { trigger: col, start: 'top 82%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── PRICING BANNER ──────────────────────────────── */
+  var pricingBanner = document.querySelector('.pricing-banner, #precios .section-inner > p');
+  if (pricingBanner) {
+    gsap.fromTo(pricingBanner,
+      { opacity: 0, y: 20 },
+      { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+        scrollTrigger: { trigger: pricingBanner, start: 'top 90%', toggleActions: 'play none none none' }
+      });
+  }
+
+  /* ── WA CARDS ────────────────────────────────────── */
+  document.querySelectorAll('.wa-card').forEach(function(card, i) {
+    gsap.fromTo(card,
+      { opacity: 0, y: 36 },
+      { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out', delay: i * 0.1,
+        scrollTrigger: { trigger: card, start: 'top 84%', toggleActions: 'play none none none' }
+      });
+  });
+
+  /* ── CTA FINAL ───────────────────────────────────── */
+  var ctaFinal = document.querySelector('.cta-final');
+  if (ctaFinal) {
+    gsap.fromTo(ctaFinal.children,
+      { opacity: 0, y: 30 },
+      { opacity: 1, y: 0, duration: 0.7, ease: 'power2.out', stagger: 0.12,
+        scrollTrigger: { trigger: ctaFinal, start: 'top 82%', toggleActions: 'play none none none' }
+      });
+  }
+
+})();
 </script>
 </body>
 </html>
