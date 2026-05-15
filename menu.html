@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-  <title>Menú</title>
+  <title>Cargando...</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
@@ -405,15 +405,90 @@
       document.getElementById('rest-name').textContent = rest.name
       const sub = [rest.tagline, rest.address].filter(Boolean).join(' · ')
       document.getElementById('rest-sub').textContent = sub || rest.city || ''
-      document.getElementById('mozo-fab').href = 'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? '')
 
-      // Mostrar FAB de reserva si el restaurante tiene WhatsApp de gestión
+      // ── Adaptar terminología según tipo de negocio ──────────────────────────
+      const btype = rest.business_type || 'restaurant'
+      const bizUI = {
+        restaurant: {
+          cartBtn:      '🛒 Mi pedido',
+          searchPh:     'Buscar en el menú...',
+          mozoFab:      '💬 Consultá al mozo',
+          mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
+          reservaMsg:   `Hola! Quisiera reservar una mesa en ${rest.name}. ¿Tienen disponibilidad?`,
+          reservaLabel: '📅 Reservar',
+          pageTitle:    rest.name + ' — Menú',
+          ogTitle:      rest.name + ' — Menú Digital',
+          ogDesc:       `Menú digital de ${rest.name}. Pedí online sin esperar.`,
+          showDietBar:  true,
+        },
+        services: {
+          cartBtn:      '📋 Mi consulta',
+          searchPh:     'Buscar servicios...',
+          mozoFab:      '💬 Consultá al asistente',
+          mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
+          reservaMsg:   `Hola! Quisiera reservar un turno en ${rest.name}. ¿Tienen disponibilidad?`,
+          reservaLabel: '📅 Reservar turno',
+          pageTitle:    rest.name + ' — Servicios',
+          ogTitle:      rest.name + ' — Reservá tu turno',
+          ogDesc:       `Servicios de ${rest.name}. Reservá tu turno online.`,
+          showDietBar:  false,
+        },
+        local: {
+          cartBtn:      '🛍️ Mi carrito',
+          searchPh:     'Buscar productos...',
+          mozoFab:      '💬 Consultá al asistente',
+          mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
+          reservaMsg:   `Hola! Tengo una consulta sobre productos de ${rest.name}.`,
+          reservaLabel: '💬 Consultar',
+          pageTitle:    rest.name + ' — Catálogo',
+          ogTitle:      rest.name + ' — Catálogo Digital',
+          ogDesc:       `Catálogo de productos de ${rest.name}.`,
+          showDietBar:  false,
+        },
+        ecommerce: {
+          cartBtn:      '🛍️ Mi carrito',
+          searchPh:     'Buscar productos...',
+          mozoFab:      '💬 Consultá al asistente',
+          mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
+          reservaMsg:   `Hola! Tengo una consulta sobre un producto de ${rest.name}.`,
+          reservaLabel: '💬 Consultar',
+          pageTitle:    rest.name + ' — Tienda',
+          ogTitle:      rest.name + ' — Tienda Online',
+          ogDesc:       `Tienda de ${rest.name}. Comprá online.`,
+          showDietBar:  false,
+        },
+      }
+      const ui = bizUI[btype] || bizUI.restaurant
+
+      // Aplicar
+      document.title = ui.pageTitle
+      const cartBtn = document.querySelector('.cart-btn')
+      if (cartBtn) {
+        const countEl = cartBtn.querySelector('.cart-count')
+        cartBtn.innerHTML = ui.cartBtn + ' '
+        if (countEl) cartBtn.appendChild(countEl)
+      }
+      const searchInput = document.getElementById('menu-search')
+      if (searchInput) searchInput.placeholder = ui.searchPh
+
+      const mozoFab = document.getElementById('mozo-fab')
+      if (mozoFab) {
+        mozoFab.href = ui.mozoHref
+        mozoFab.innerHTML = ui.mozoFab
+      }
+
+      // Barra de filtros de dieta — solo para restaurantes
+      const dietBar = document.getElementById('diet-filter-bar')
+      // No ocultar acá, se maneja después del buildMenu
+
+      // Mostrar FAB de reserva / WhatsApp si tiene número
       if (rest.whatsapp_gestion || rest.whatsapp_operativo) {
         const reservaFab = document.getElementById('reserva-fab')
         if (reservaFab) {
           const phone = (rest.whatsapp_gestion || rest.whatsapp_operativo).replace(/[^0-9]/g, '')
-          const msg = encodeURIComponent(`Hola! Quisiera reservar una mesa en ${rest.name}. ¿Tienen disponibilidad?`)
+          const msg = encodeURIComponent(ui.reservaMsg)
           reservaFab.href = `https://wa.me/${phone}?text=${msg}`
+          reservaFab.innerHTML = ui.reservaLabel
           reservaFab.style.display = 'flex'
           reservaFab.style.alignItems = 'center'
           reservaFab.style.gap = '6px'
@@ -442,6 +517,12 @@
       }
 
       buildMenu()
+
+      // Ocultar filtros de dieta para negocios que no son de comida
+      if (!ui.showDietBar) {
+        const dietBar = document.getElementById('diet-filter-bar')
+        if (dietBar) dietBar.style.display = 'none'
+      }
 
       // Restaurar filtro de dieta si había uno activo
       const savedFilter = sessionStorage.getItem('vitrina_diet_' + slug)
@@ -570,7 +651,20 @@
       }))
       document.getElementById('content').innerHTML = sectionsHtml.join('')
 
-      Object.keys(itemsById).forEach(renderCtrl)
+      // Estado vacío adaptado al tipo de negocio
+      if (sectionsHtml.length === 0) {
+        const emptyLabels = {
+          restaurant: { emoji: '🍽️', title: 'Menú en preparación', desc: 'Próximamente vas a poder ver los platos y hacer tu pedido.' },
+          services:   { emoji: '✂️', title: 'Servicios próximamente', desc: 'Estamos cargando los servicios disponibles. Volvé en unos minutos.' },
+          local:      { emoji: '🛍️', title: 'Catálogo en preparación', desc: 'Estamos cargando los productos. Volvé pronto.' },
+          ecommerce:  { emoji: '📦', title: 'Tienda en preparación', desc: 'Estamos cargando los productos. Volvé pronto.' },
+        }
+        const el = emptyLabels[btype] || emptyLabels.restaurant
+        document.getElementById('content').innerHTML = `<div style="text-align:center;padding:80px 24px;color:var(--muted)"><div style="font-size:56px;margin-bottom:16px">${el.emoji}</div><div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:8px">${el.title}</div><div style="font-size:14px;line-height:1.6">${el.desc}</div></div>`
+      } else {
+        document.getElementById('content').innerHTML = sectionsHtml.join('')
+        Object.keys(itemsById).forEach(renderCtrl)
+      }
     }
 
     function itemCardHtml(item, idx = 0) {
