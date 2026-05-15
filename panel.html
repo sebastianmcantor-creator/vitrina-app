@@ -1993,7 +1993,7 @@ input:checked + .toggle-slider:before {
         <div class="card" style="margin-top:20px">
           <div class="card-title">🕐 Horarios de apertura</div>
           <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5">
-  <span id="hours-desc-text">Los horarios aparecen en el menú de tus clientes y le dicen al asistente cuándo está abierto el local. Importante: el asistente IA solo informa que está abierto cuando realmente lo está.</span>
+  <span id="hours-desc-text">Los horarios aparecen en tu perfil público y le dicen al asistente cuándo podés atender. El asistente solo informa que estás disponible cuando realmente lo estás.</span>
 </p>
           <div id="opening-hours-grid" style="display:grid;gap:8px"></div>
           <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
@@ -4278,14 +4278,28 @@ function normalizeHourSlots(h) {
   return [h] // formato viejo → array
 }
 
+function renderSlot(dayIdx, slotIdx, o, c, canRemove) {
+  return `<div class="hours-slot-row" id="hours-slot-${dayIdx}-${slotIdx}" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <input class="hours-time" type="time" id="hours-open-${dayIdx}-${slotIdx}" value="${o}">
+    <span style="font-size:13px;color:var(--muted)">a</span>
+    <input class="hours-time" type="time" id="hours-close-${dayIdx}-${slotIdx}" value="${c}">
+    ${canRemove ? `<button onclick="removeHoursSlot(${dayIdx},${slotIdx})" style="font-size:11px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--muted);font-family:inherit" title="Quitar turno">✕</button>` : ''}
+  </div>`
+}
+
 function renderOpeningHours(hours) {
   const container = document.getElementById('opening-hours-grid')
   if (!container) return
+  const btype = currentRestaurant?.business_type || 'restaurant'
+  const openLabel = btype === 'services' ? 'Con turnos' : 'Abierto'
+  const closedLabel = btype === 'services' ? 'Sin turnos' : 'Cerrado'
+  const addLabel = btype === 'services' ? '+ Agregar turno' : '+ Agregar turno'
+
   container.innerHTML = DAYS.map((day, i) => {
     const slots = normalizeHourSlots(hours?.[i])
-    const isOpen = !!slots
-    const s0 = slots?.[0] || { o: '09:00', c: '22:00' }
-    const s1 = slots?.[1] || null
+    const isOpen = !!slots && slots.length > 0
+    const slotList = isOpen ? slots : [{ o: '09:00', c: '17:00' }]
+
     return `
       <div class="hours-row" id="hours-row-${i}">
         <div class="hours-day">${day}</div>
@@ -4293,27 +4307,17 @@ function renderOpeningHours(hours) {
           <label class="hours-toggle" style="align-self:flex-start">
             <input type="checkbox" ${isOpen ? 'checked' : ''}
               onchange="toggleHoursDay(${i}, this.checked)">
-            <span id="hours-label-${i}">${isOpen ? 'Abierto' : 'Cerrado'}</span>
+            <span id="hours-label-${i}">${isOpen ? openLabel : closedLabel}</span>
           </label>
           <div id="hours-slots-${i}" style="display:${isOpen ? 'flex' : 'none'};flex-direction:column;gap:6px;width:100%">
-            <!-- Slot 1 -->
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-              <input class="hours-time" type="time" id="hours-open-${i}-0" value="${s0.o}">
-              <span style="font-size:13px;color:var(--muted)">a</span>
-              <input class="hours-time" type="time" id="hours-close-${i}-0" value="${s0.c}">
-              <button id="btn-add-slot-${i}" onclick="addHoursSlot(${i})"
-                style="font-size:11px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--terra);font-family:'DM Sans',sans-serif;display:${s1 ? 'none' : 'inline'}"
-                title="Agregar 2° turno (horario cortado)">+ 2° turno</button>
+            <div id="hours-slot-list-${i}">
+              ${slotList.map((s, si) => renderSlot(i, si, s.o, s.c, slotList.length > 1)).join('')}
             </div>
-            <!-- Slot 2 (opcional) -->
-            <div id="hours-slot2-${i}" style="display:${s1 ? 'flex' : 'none'};align-items:center;gap:8px;flex-wrap:wrap">
-              <input class="hours-time" type="time" id="hours-open-${i}-1" value="${s1?.o || '18:00'}">
-              <span style="font-size:13px;color:var(--muted)">a</span>
-              <input class="hours-time" type="time" id="hours-close-${i}-1" value="${s1?.c || '23:00'}">
-              <button onclick="removeHoursSlot(${i})"
-                style="font-size:11px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif"
-                title="Quitar 2° turno">✕</button>
-            </div>
+            <button onclick="addHoursSlot(${i})"
+              style="font-size:12px;padding:5px 12px;background:none;border:1.5px dashed var(--border);border-radius:8px;cursor:pointer;color:var(--terra);font-family:inherit;width:fit-content;transition:border-color .15s"
+              onmouseover="this.style.borderColor='var(--terra)'" onmouseout="this.style.borderColor='var(--border)'">
+              ${addLabel}
+            </button>
             <div id="hours-error-${i}" style="font-size:11px;color:var(--bad);display:none"></div>
           </div>
         </div>
@@ -4324,31 +4328,50 @@ function renderOpeningHours(hours) {
 window.toggleHoursDay = function (day, isOpen) {
   const el    = document.getElementById('hours-slots-' + day)
   const label = document.getElementById('hours-label-' + day)
+  const btype = currentRestaurant?.business_type || 'restaurant'
   if (el) el.style.display = isOpen ? 'flex' : 'none'
-  if (label) label.textContent = isOpen ? 'Abierto' : 'Cerrado'
+  if (label) label.textContent = isOpen
+    ? (btype === 'services' ? 'Con turnos' : 'Abierto')
+    : (btype === 'services' ? 'Sin turnos' : 'Cerrado')
 }
 
-window.addHoursSlot = function (day) {
-  const slot2  = document.getElementById('hours-slot2-' + day)
-  const btnAdd = document.getElementById('btn-add-slot-' + day)
-  // Precargar el 2° turno 3h después del cierre del 1°
-  const close1 = document.getElementById('hours-close-' + day + '-0')?.value || '15:00'
-  const [hh, mm] = close1.split(':').map(Number)
-  const start2 = String((hh + 1) % 24).padStart(2, '0') + ':' + String(mm).padStart(2, '0')
-  const end2   = String((hh + 4) % 24).padStart(2, '0') + ':' + String(mm).padStart(2, '0')
-  const open2  = document.getElementById('hours-open-' + day + '-1')
-  const close2 = document.getElementById('hours-close-' + day + '-1')
-  if (open2) open2.value = start2
-  if (close2) close2.value = end2
-  if (slot2) slot2.style.display = 'flex'
-  if (btnAdd) btnAdd.style.display = 'none'
+window.addHoursSlot = function (dayIdx) {
+  const listEl = document.getElementById('hours-slot-list-' + dayIdx)
+  if (!listEl) return
+  const existing = listEl.querySelectorAll('.hours-slot-row')
+  const newIdx = existing.length
+  // Sugerir hora 1h después del último cierre
+  const lastClose = document.getElementById('hours-close-' + dayIdx + '-' + (newIdx - 1))?.value || '17:00'
+  const [hh, mm] = lastClose.split(':').map(Number)
+  const newOpen  = String((hh + 1) % 24).padStart(2, '0') + ':00'
+  const newClose = String((hh + 3) % 24).padStart(2, '0') + ':00'
+  listEl.insertAdjacentHTML('beforeend', renderSlot(dayIdx, newIdx, newOpen, newClose, true))
+  // Agregar botón de borrar al primer slot si ahora hay más de uno
+  if (newIdx === 1) {
+    const firstSlot = document.getElementById('hours-slot-' + dayIdx + '-0')
+    if (firstSlot && !firstSlot.querySelector('button')) {
+      firstSlot.insertAdjacentHTML('beforeend', `<button onclick="removeHoursSlot(${dayIdx},0)" style="font-size:11px;padding:4px 10px;background:var(--cream2);border:1px solid var(--border);border-radius:8px;cursor:pointer;color:var(--muted);font-family:inherit" title="Quitar turno">✕</button>`)
+    }
+  }
 }
 
-window.removeHoursSlot = function (day) {
-  const slot2  = document.getElementById('hours-slot2-' + day)
-  const btnAdd = document.getElementById('btn-add-slot-' + day)
-  if (slot2) slot2.style.display = 'none'
-  if (btnAdd) btnAdd.style.display = 'inline'
+window.removeHoursSlot = function (dayIdx, slotIdx) {
+  const row = document.getElementById('hours-slot-' + dayIdx + '-' + slotIdx)
+  if (row) row.remove()
+  // Re-numerar los slots restantes
+  const listEl = document.getElementById('hours-slot-list-' + dayIdx)
+  if (!listEl) return
+  const rows = listEl.querySelectorAll('.hours-slot-row')
+  rows.forEach((r, newIdx) => {
+    r.id = 'hours-slot-' + dayIdx + '-' + newIdx
+    const openInput  = r.querySelector('input[type="time"]:first-of-type')
+    const closeInput = r.querySelector('input[type="time"]:last-of-type')
+    if (openInput)  openInput.id  = 'hours-open-'  + dayIdx + '-' + newIdx
+    if (closeInput) closeInput.id = 'hours-close-' + dayIdx + '-' + newIdx
+    // Si solo queda uno, ocultar el botón de borrar
+    const btn = r.querySelector('button')
+    if (btn && rows.length === 1) btn.remove()
+  })
 }
 
 function timeToMin(t) {
@@ -4367,32 +4390,29 @@ window.saveOpeningHours = async function () {
     if (errEl) errEl.style.display = 'none'
     if (!chk?.checked) return
 
-    const o0 = document.getElementById(`hours-open-${i}-0`)?.value  || '09:00'
-    const c0 = document.getElementById(`hours-close-${i}-0`)?.value || '22:00'
+    // Leer todos los slots dinámicos del día
+    const listEl = document.getElementById('hours-slot-list-' + i)
+    const slotRows = listEl ? listEl.querySelectorAll('.hours-slot-row') : []
+    const daySlots = []
+    let prevCloseMin = -1
 
-    const slot2Visible = document.getElementById(`hours-slot2-${i}`)?.style.display !== 'none'
-    const o1 = document.getElementById(`hours-open-${i}-1`)?.value  || ''
-    const c1 = document.getElementById(`hours-close-${i}-1`)?.value || ''
+    slotRows.forEach((row, si) => {
+      const o = document.getElementById('hours-open-' + i + '-' + si)?.value || '09:00'
+      const c = document.getElementById('hours-close-' + i + '-' + si)?.value || '17:00'
+      const oMin = timeToMin(o)
+      const cMin = timeToMin(c)
 
-    if (slot2Visible && o1 && c1) {
-      // Validar que no se superpongan
-      const c0min = timeToMin(c0)
-      const o1min = timeToMin(o1)
-      const c1min = timeToMin(c1)
-
-      if (o1min <= c0min) {
-        if (errEl) { errEl.textContent = 'El 2° turno debe comenzar después del cierre del 1° (' + c0 + ')'; errEl.style.display = 'block' }
+      if (si > 0 && oMin <= prevCloseMin) {
+        if (errEl) { errEl.textContent = 'El turno ' + (si + 1) + ' debe comenzar después del turno anterior'; errEl.style.display = 'block' }
         hasError = true
         return
       }
-      if (c1min <= o1min && c1min > 60) { // tolerar cierres después de medianoche
-        if (errEl) { errEl.textContent = 'El horario de cierre del 2° turno no es válido'; errEl.style.display = 'block' }
-        hasError = true
-        return
-      }
-      hours[i] = [{ o: o0, c: c0 }, { o: o1, c: c1 }]
-    } else {
-      hours[i] = [{ o: o0, c: c0 }]
+      prevCloseMin = cMin
+      daySlots.push({ o, c })
+    })
+
+    if (daySlots.length > 0 && !hasError) {
+      hours[i] = daySlots
     }
   })
 
