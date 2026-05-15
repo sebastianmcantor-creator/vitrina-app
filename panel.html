@@ -3624,23 +3624,27 @@ function renderSidebarRestaurant(rest) {
   const agendaBtn   = document.querySelector('[data-section="agenda"]')
   const catalogoBtn = document.querySelector('[data-section="catalogo"]')
   const mesasBtn    = document.querySelector('[data-section="mesas"]')
+  const verDemoBtn  = document.querySelector('a[href="/demo.html"]')
 
   if (btype === 'local' || btype === 'ecommerce') {
     if (reservasBtn) reservasBtn.style.display = 'none'
     if (agendaBtn)   agendaBtn.style.display   = 'none'
     if (catalogoBtn) catalogoBtn.style.display = 'flex'
     if (mesasBtn)    mesasBtn.style.display    = 'none'
+    if (verDemoBtn)  verDemoBtn.style.display  = 'none'
   } else if (btype === 'services') {
     if (reservasBtn) reservasBtn.style.display = 'none'
     if (agendaBtn)   agendaBtn.style.display   = 'flex'
     if (catalogoBtn) catalogoBtn.style.display = 'none'
     if (mesasBtn)    mesasBtn.style.display    = 'none'
+    if (verDemoBtn)  { verDemoBtn.href = '/demo-servicios.html'; verDemoBtn.title = 'Ver demo de servicios' }
   } else {
     // Restaurant: todo visible
     if (reservasBtn) reservasBtn.style.display = 'flex'
     if (agendaBtn)   agendaBtn.style.display   = 'flex'
     if (catalogoBtn) catalogoBtn.style.display = 'none'
     if (mesasBtn)    mesasBtn.style.display    = 'flex'
+    if (verDemoBtn)  { verDemoBtn.href = '/demo.html'; verDemoBtn.style.display = '' }
   }
 
   // Marcar campos de dirección como opcionales para servicios online y ecommerce
@@ -7636,17 +7640,54 @@ function renderGettingStarted() {
   }
 
   const r = currentRestaurant
+  const btype2 = r.business_type || 'restaurant'
   const totalMenuItems = Object.values(menuItemsMap || {}).flat().length
+  const goInfo   = () => switchSection('info',   document.querySelector('[data-section="info"]'))
+  const goMenu   = () => switchSection('menu',   document.querySelector('[data-section="menu"]'))
+  const goMesas  = () => switchSection('mesas',  document.querySelector('[data-section="mesas"]'))
+  const goConfig = () => switchSection('config', document.querySelector('[data-section="config"]'))
+  const goAgenda = () => switchSection('agenda', document.querySelector('[data-section="agenda"]'))
+  const goMkt    = () => switchSection('marketing', document.querySelector('[data-section="marketing"]'))
 
-  const steps = [
-    { label: '✅ Negocio creado — ¡empezamos!',        done: true },
-    { label: 'Poné una descripción que enganche',      done: !!(r.tagline || r.description), action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
-    { label: 'Subí el logo — tu cara visible',         done: !!(r.logo_url || r.cover_url),  action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
-    { label: 'Cargá tu primer producto o plato',       done: totalMenuItems > 0,             action: () => switchSection('menu',  document.querySelector('[data-section="menu"]'))  },
-    { label: 'Generá el QR para tu primera mesa',      done: mesasList.length > 0,           action: () => switchSection('mesas', document.querySelector('[data-section="mesas"]')) },
-    { label: 'Conectá WhatsApp para las alertas',      done: !!(r.whatsapp_operativo),       action: () => switchSection('config',document.querySelector('[data-section="config"]'))},
-    { label: 'Configurá tus horarios de apertura',     done: !!(r.opening_hours),            action: () => switchSection('info',  document.querySelector('[data-section="info"]'))  },
-  ]
+  const stepsByType = {
+    restaurant: [
+      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: 'Subí el logo de tu restaurante',           done: !!(r.logo_url || r.cover_url),  action: goInfo   },
+      { label: 'Agregá una descripción',                   done: !!(r.description),              action: goInfo   },
+      { label: 'Cargá tu primer plato',                    done: totalMenuItems > 0,             action: goMenu   },
+      { label: 'Generá el QR para las mesas',             done: mesasList.length > 0,           action: goMesas  },
+      { label: 'Conectá WhatsApp para pedidos',            done: !!(r.whatsapp_operativo),       action: goConfig },
+      { label: 'Configurá tus horarios de atención',       done: !!(r.opening_hours),            action: goInfo   },
+    ],
+    services: [
+      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: 'Subí tu logo',                             done: !!(r.logo_url || r.cover_url),  action: goInfo   },
+      { label: 'Agregá una descripción de tus servicios',  done: !!(r.description),              action: goInfo   },
+      { label: 'Cargá tu primer servicio con precio',      done: totalMenuItems > 0,             action: goMenu   },
+      { label: 'Configurá tu agenda de turnos',            done: !!(r.opening_hours),            action: goAgenda },
+      { label: 'Conectá WhatsApp para reservas',           done: !!(r.whatsapp_operativo),       action: goConfig },
+      { label: 'Conectá Instagram para tu marketing',      done: !!(r.instagram_handle),         action: goMkt    },
+    ],
+    local: [
+      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: 'Subí tu logo',                             done: !!(r.logo_url || r.cover_url),  action: goInfo   },
+      { label: 'Agregá una descripción',                   done: !!(r.description),              action: goInfo   },
+      { label: 'Cargá tu primer producto',                 done: totalMenuItems > 0,             action: goMenu   },
+      { label: 'Conectá WhatsApp para consultas',          done: !!(r.whatsapp_operativo),       action: goConfig },
+      { label: 'Conectá MercadoLibre',                     done: false,                          action: goMkt    },
+      { label: 'Conectá Instagram',                        done: !!(r.instagram_handle),         action: goMkt    },
+    ],
+    ecommerce: [
+      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: 'Subí tu logo',                             done: !!(r.logo_url || r.cover_url),  action: goInfo   },
+      { label: 'Conectá MercadoLibre',                     done: false,                          action: goMkt    },
+      { label: 'Conectá Tienda Nube',                      done: false,                          action: goMkt    },
+      { label: 'Conectá WhatsApp para ventas',             done: !!(r.whatsapp_operativo),       action: goConfig },
+      { label: 'Conectá Instagram',                        done: !!(r.instagram_handle),         action: goMkt    },
+    ],
+  }
+
+  const steps = stepsByType[btype2] || stepsByType.restaurant
 
   const doneCount  = steps.filter(s => s.done).length
   const totalCount = steps.length
