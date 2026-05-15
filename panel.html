@@ -1953,7 +1953,7 @@ input:checked + .toggle-slider:before {
               <span class="color-hex" id="color-hex">#B85A30</span>
             </div>
             <div class="color-presets" style="margin-top:10px" id="color-presets"></div>
-            <span class="form-hint">Se usa en botones y acentos del menú público.</span>
+            <span class="form-hint" id="color-hint">Se usa en botones y acentos del menú público.</span>
           </div>
         </div>
 
@@ -1962,8 +1962,8 @@ input:checked + .toggle-slider:before {
           <div class="card-title">🔘 Estado</div>
           <div class="toggle-row">
             <div class="toggle-info">
-              <div class="toggle-label">Restaurante abierto</div>
-              <div class="toggle-desc">Cuando está desactivado, el menú muestra "Cerrado" a los clientes.</div>
+              <div class="toggle-label" id="toggle-label-open">Restaurante abierto</div>
+              <div class="toggle-desc" id="toggle-desc-open">Cuando está desactivado, el menú muestra "Cerrado" a los clientes.</div>
             </div>
             <label class="toggle">
               <input type="checkbox" id="f-is-open" checked>
@@ -1973,7 +1973,7 @@ input:checked + .toggle-slider:before {
           <div class="toggle-row">
             <div class="toggle-info">
               <div class="toggle-label">Perfil activo</div>
-              <div class="toggle-desc">Desactivar oculta el restaurante de todos los canales públicos.</div>
+              <div class="toggle-desc" id="toggle-desc-active">Desactivar oculta el restaurante de todos los canales públicos.</div>
             </div>
             <label class="toggle">
               <input type="checkbox" id="f-is-active" checked>
@@ -1993,7 +1993,7 @@ input:checked + .toggle-slider:before {
         <div class="card" style="margin-top:20px">
           <div class="card-title">🕐 Horarios de apertura</div>
           <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5">
-  Los horarios aparecen en el menú de tus clientes y le dicen al asistente cuándo está abierto el local. Importante: el asistente IA solo informa que está abierto cuando realmente lo está.
+  <span id="hours-desc-text">Los horarios aparecen en el menú de tus clientes y le dicen al asistente cuándo está abierto el local. Importante: el asistente IA solo informa que está abierto cuando realmente lo está.</span>
 </p>
           <div id="opening-hours-grid" style="display:grid;gap:8px"></div>
           <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
@@ -2021,7 +2021,7 @@ input:checked + .toggle-slider:before {
 
         <!-- QR del menú -->
         <div class="card" style="margin-top:20px" id="menu-qr-card">
-          <div class="card-title">📲 QR del menú</div>
+          <div class="card-title" id="menu-qr-card-title">📲 QR del menú</div>
           <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
             <div id="menu-qr-wrap" style="text-align:center">
               <img id="menu-qr-img" src="" alt="QR menú"
@@ -2070,17 +2070,17 @@ input:checked + .toggle-slider:before {
         <!-- Widget para sitio web propio -->
         <div class="card" style="margin-top:16px" id="widget-embed-card">
           <div class="card-title">🌐 Widget para tu sitio web</div>
-          <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5">
+          <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5" id="widget-embed-desc">
             Pegá este código en tu web para que los visitantes puedan ver el menú o hacer un pedido directamente desde tu sitio.
           </p>
           <div style="display:flex;flex-direction:column;gap:10px">
             <div>
-              <label class="form-label">Botón flotante "Ver menú"</label>
+              <label class="form-label" id="widget-btn-label">Botón flotante "Ver menú"</label>
               <div style="background:var(--cream2);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:var(--ink);word-break:break-all;border:1px solid var(--border)" id="widget-code-btn"></div>
               <button class="btn-secondary" onclick="copiarWidget('btn')" style="font-size:12px;padding:5px 12px;margin-top:6px">📋 Copiar</button>
             </div>
             <div>
-              <label class="form-label">iframe embebido (menú completo)</label>
+              <label class="form-label" id="widget-iframe-label">iframe embebido (menú completo)</label>
               <div style="background:var(--cream2);border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:var(--ink);word-break:break-all;border:1px solid var(--border)" id="widget-code-iframe"></div>
               <button class="btn-secondary" onclick="copiarWidget('iframe')" style="font-size:12px;padding:5px 12px;margin-top:6px">📋 Copiar</button>
             </div>
@@ -2093,7 +2093,7 @@ input:checked + .toggle-slider:before {
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
           <div>
             <div class="page-title" id="menu-page-title">Menú</div>
-            <div class="page-subtitle" id="menu-page-subtitle">Categorías y platos de tu restaurante</div>
+            <div class="page-subtitle" id="menu-page-subtitle">Categorías e ítems de tu negocio</div>
           </div>
           <button class="btn-primary" onclick="openCategoryModal()" style="flex-shrink:0;margin-top:4px">+ Nueva categoría</button>
           <div style="display:flex;gap:6px;flex-shrink:0;margin-top:4px">
@@ -2112,7 +2112,7 @@ input:checked + .toggle-slider:before {
           <div class="menu-empty">
             <div class="menu-empty-icon">📋</div>
             <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
-            <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
+            <div class="menu-empty-desc" id="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
             <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
             <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
           </div>
@@ -2291,7 +2291,7 @@ input:checked + .toggle-slider:before {
               <button class="filter-btn" data-status="cancelled" onclick="setHistorialStatus('cancelled', this)">Cancelados</button>
             </div>
             <!-- Buscador por mesa o plato -->
-            <input id="historial-search" type="search" placeholder="Buscar mesa o plato…"
+            <input id="historial-search" type="search" placeholder="Buscar pedido…"
               oninput="filterHistorial(this.value)"
               style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);
                      background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;
@@ -2418,7 +2418,7 @@ input:checked + .toggle-slider:before {
       </button>
     </div>
     <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6">
-      Viti genera un resumen del mes con estadísticas, platos más vendidos, horario pico y recomendaciones para el mes siguiente.
+      <span id="informe-desc-text">Viti genera un resumen del mes con estadísticas, platos más vendidos, horario pico y recomendaciones para el mes siguiente.</span>
     </p>
     <div id="informe-result" style="display:none"></div>
   </div>
@@ -2443,7 +2443,7 @@ input:checked + .toggle-slider:before {
         📊 Pedidos en CSV
       </button>
       <button class="btn-secondary" onclick="exportMenuCSV()" id="btn-export-menu" style="font-size:13px">
-        🍽️ Menú en CSV
+        <span id="btn-export-menu-label">🍽️ Menú en CSV</span>
       </button>
     </div>
     <span class="form-hint" style="margin-top:10px;display:block">Los archivos CSV se abren directamente en Excel o Google Sheets.</span>
@@ -2767,7 +2767,7 @@ input:checked + .toggle-slider:before {
       <div id="section-config" class="panel-section">
         <div class="page-header">
           <div class="page-title">Configuración</div>
-          <div class="page-subtitle">Plan, equipo, WhatsApp, horarios y asistente Tano. Todos los ajustes de tu negocio en un lugar.</div>
+          <div class="page-subtitle" id="config-page-subtitle">Plan, equipo, WhatsApp, horarios y asistente. Todos los ajustes de tu negocio en un lugar.</div>
         </div>
 
         <!-- Plan actual -->
@@ -2781,7 +2781,7 @@ input:checked + .toggle-slider:before {
           <!-- Uso de Tano (solo plan free) -->
           <div id="tano-usage-block" style="display:none;margin-top:16px;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <span style="font-size:13.5px;font-weight:500;color:var(--ink)">🤖 Tano este mes</span>
+              <span style="font-size:13.5px;font-weight:500;color:var(--ink)" id="tano-usage-label">🤖 Asistente IA este mes</span>
               <span id="tano-usage-text" style="font-size:13px;color:var(--muted)">— / 75</span>
             </div>
             <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden">
@@ -2808,9 +2808,9 @@ input:checked + .toggle-slider:before {
               type="email" placeholder="email@colaborador.com"
               style="flex:1;min-width:200px">
             <select class="form-select" id="staff-role-select" style="flex:0 0 140px">
-              <option value="cook">Cocinero</option>
-              <option value="waiter">Mozo</option>
-              <option value="manager">Gerente</option>
+              <option value="cook" id="staff-role-cook">Cocinero</option>
+              <option value="waiter" id="staff-role-waiter">Operativo</option>
+              <option value="manager" id="staff-role-manager">Gerente</option>
             </select>
             <button class="btn-primary" id="btn-add-staff" onclick="addStaffMember()" style="flex-shrink:0">
               + Agregar
@@ -2836,9 +2836,9 @@ input:checked + .toggle-slider:before {
             <div class="form-field">
               <label class="form-label">📦 Canal operativo — pedidos nuevos</label>
               <input class="form-input" id="wa-operativo-input" type="tel"
-                placeholder="5491155556666 (número del encargado o cocina)"
+                placeholder="5491155556666 (número del encargado)"
                 style="max-width:380px">
-              <span class="form-hint">Recibe notificaciones de nuevos pedidos, cambios de estado y alertas urgentes. Puede ser el número del encargado o la cocina.</span>
+              <span class="form-hint" id="wa-operativo-hint">Recibe notificaciones de nuevos pedidos, cambios de estado y alertas urgentes. Puede ser el número del encargado o la cocina.</span>
             </div>
 
             <div class="form-field">
@@ -2858,9 +2858,9 @@ input:checked + .toggle-slider:before {
 
         <!-- Configuración de Tano -->
         <div class="card">
-          <div class="card-title" data-tano-title>🤖 Personalización de Tano</div>
-          <div style="font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.6">
-            Configurá cómo se presenta Tano ante tus clientes.
+          <div class="card-title" id="tano-card-title" data-tano-title>🤖 Personalización del Asistente IA</div>
+          <div style="font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.6" id="tano-card-desc">
+            Configurá cómo se presenta el asistente ante tus clientes.
           </div>
 
           <div style="display:grid;gap:18px">
@@ -2869,31 +2869,31 @@ input:checked + .toggle-slider:before {
               <select class="form-select" id="tano-tone-select" style="max-width:280px">
                 <option value="calido">🤗 Cálido e informal — cercano, como un amigo</option>
                 <option value="neutro">😊 Neutro y profesional — amigable pero formal</option>
-                <option value="sofisticado">🎩 Sofisticado — elegante, para restaurants finos</option>
+                <option value="sofisticado" id="tone-opt-sofisticado">🎩 Sofisticado — elegante, para negocios exclusivos</option>
               </select>
               <div id="tano-preview" style="margin-top:10px;padding:10px 14px;background:#2a2010;border-radius:10px;font-size:12.5px;color:#d4b97a;line-height:1.55;display:none">
                 Vista previa: <span id="tano-preview-text"></span>
               </div>
-              <div class="form-hint">Afecta cómo Tano se expresa en sus respuestas.</div>
+              <div class="form-hint" id="tano-tone-hint">Afecta cómo el asistente se expresa en sus respuestas.</div>
             </div>
 
             <div class="form-field">
               <label class="form-label">Mensaje de bienvenida (opcional)</label>
               <textarea class="form-textarea" id="tano-welcome-input" rows="2"
-                placeholder="Ej: ¡Hola! Soy Tano, el asistente de Casa Lucía. ¿En qué te ayudo hoy? 😊"></textarea>
-              <div class="form-hint">Si no lo completás, Tano usa su saludo estándar.</div>
+                placeholder="Ej: ¡Hola! Soy el asistente de Casa Lucía. ¿En qué te ayudo hoy? 😊"></textarea>
+              <div class="form-hint" id="tano-welcome-hint">Si no lo completás, el asistente usa su saludo estándar.</div>
             </div>
 
             <div class="form-field">
-              <label class="form-label">Mensaje cuando Tano llega al límite (plan free)</label>
+              <label class="form-label" id="tano-limit-label">Mensaje cuando el asistente llega al límite (plan free)</label>
               <textarea class="form-textarea" id="tano-limit-input" rows="2"
                 placeholder="Ej: Por ahora no puedo responder más preguntas este mes. ¡El equipo te atiende con gusto!"></textarea>
-              <div class="form-hint">Aparece cuando Tano agota sus 75 respuestas mensuales.</div>
+              <div class="form-hint" id="tano-limit-hint">Aparece cuando el asistente agota sus 75 respuestas mensuales.</div>
             </div>
           </div>
 
           <div style="margin-top:20px;display:flex;align-items:center;gap:12px">
-            <button class="btn-primary" onclick="saveTanoConfig()">Guardar configuración de Tano</button>
+            <button class="btn-primary" onclick="saveTanoConfig()" id="tano-save-btn">Guardar configuración del asistente</button>
             <span id="tano-config-status" style="font-size:13px;color:var(--muted)"></span>
           </div>
         </div>
@@ -3039,7 +3039,7 @@ input:checked + .toggle-slider:before {
           <!-- Uso de Tano (solo plan free o si hay límite) -->
           <div id="fact-tano-usage" style="display:none;margin-bottom:20px;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-              <span style="font-size:13.5px;font-weight:500;color:var(--ink)">🤖 Tano este mes</span>
+              <span style="font-size:13.5px;font-weight:500;color:var(--ink)" id="fact-tano-label">🤖 Asistente IA este mes</span>
               <span id="fact-tano-text">— / 75</span>
             </div>
             <div style="background:var(--border);border-radius:6px;height:6px;overflow:hidden">
@@ -3183,12 +3183,12 @@ input:checked + .toggle-slider:before {
 <div class="modal-overlay" id="modal-import-menu" onclick="if(event.target===this)closeModal('modal-import-menu')">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title">📸 Importar menú desde foto</div>
+      <div class="modal-title" id="modal-import-title">📸 Importar menú desde foto</div>
       <button class="modal-close" onclick="closeModal('modal-import-menu')">✕</button>
     </div>
     <div class="modal-body">
       <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-        Subí una foto de tu lista de precios, pizarrón o menú impreso. Vitrina detecta los platos y precios automáticamente con IA.
+        <span id="import-menu-desc">Subí una foto de tu lista de precios, pizarrón o menú impreso. Vitrina detecta los ítems y precios automáticamente con IA.</span>
       </p>
       <div style="border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer" onclick="document.getElementById('import-menu-file').click()">
         <div style="font-size:32px;margin-bottom:8px">📷</div>
@@ -3198,10 +3198,10 @@ input:checked + .toggle-slider:before {
       </div>
       <div id="import-menu-status" style="display:none;margin-top:16px"></div>
       <div id="import-menu-results" style="margin-top:16px;display:none">
-        <div class="card-title" style="margin-bottom:10px">Platos detectados</div>
+        <div class="card-title" style="margin-bottom:10px" id="import-detected-title">Ítems detectados</div>
         <div id="import-menu-items"></div>
         <button class="btn-primary" onclick="confirmImportMenu()" id="btn-confirm-import" style="margin-top:12px;width:100%">
-          ✓ Importar todos los platos
+          <span id="btn-confirm-import-label">✓ Importar todos los ítems</span>
         </button>
       </div>
     </div>
@@ -3238,7 +3238,7 @@ input:checked + .toggle-slider:before {
         <label class="form-label">URL de imagen</label>
         <div style="display:flex;gap:8px;align-items:flex-start">
           <input class="form-input" id="item-image-url" placeholder="https://... (opcional)" style="flex:1">
-          <button class="btn-secondary" onclick="generateImageAI()" id="btn-generate-image" title="Generar foto con IA desde el nombre del plato" style="padding:8px 12px;font-size:12px;white-space:nowrap">
+          <button class="btn-secondary" onclick="generateImageAI()" id="btn-generate-image" title="Generar foto con IA" style="padding:8px 12px;font-size:12px;white-space:nowrap">
             🤖 Generar
           </button>
           <label class="btn-secondary" style="cursor:pointer;font-size:12px;padding:8px 12px;white-space:nowrap" title="Subir foto desde el dispositivo">
@@ -3254,7 +3254,7 @@ input:checked + .toggle-slider:before {
             <button class="btn-secondary" onclick="document.getElementById('item-image-preview-wrap').style.display='none'" style="font-size:12px;padding:5px 12px;color:var(--muted)">✕</button>
           </div>
         </div>
-        <span class="form-hint">Imagen que se muestra en el menú público. Usá 🤖 para generar una foto profesional con IA desde el nombre del plato.</span>
+        <span class="form-hint" id="item-image-hint">Imagen que se muestra en el menú público. Usá 🤖 para generar una foto profesional con IA.</span>
       </div>
       <div class="form-field">
         <label class="form-label">Etiquetas</label>
@@ -3263,9 +3263,9 @@ input:checked + .toggle-slider:before {
       <div style="margin-top:14px">
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none">
           <input type="checkbox" id="item-featured" style="accent-color:var(--gold);width:16px;height:16px;cursor:pointer">
-          <span style="font-size:13.5px;font-weight:500;color:var(--ink)">⭐ Plato destacado</span>
+          <span style="font-size:13.5px;font-weight:500;color:var(--ink)" id="item-featured-label">⭐ Destacado</span>
         </label>
-        <div class="form-hint" style="margin-left:26px">Aparece en la sección "Destacados" al tope del menú público.</div>
+        <div class="form-hint" style="margin-left:26px" id="item-featured-hint">Aparece en la sección "Destacados" al tope del menú público.</div>
       </div>
       <!-- Historial de precios (solo en edición) -->
       <div id="price-history-block" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
@@ -3391,7 +3391,7 @@ input:checked + .toggle-slider:before {
           <option value="menu_del_dia">Menú del día</option>
           <option value="evento">Evento</option>
           <option value="tips">Tips y consejos</option>
-          <option value="historia">Historia del restaurante</option>
+          <option value="historia" id="template-cat-historia">Historia del negocio</option>
         </select>
       </div>
 
@@ -3708,6 +3708,277 @@ function renderSidebarRestaurant(rest) {
   }
   const topbarName = document.getElementById('topbar-rest-name')
   if (topbarName) topbarName.textContent = rest.name
+
+  // ── Terminología completa por tipo de negocio ──────────────────────────────
+  const isRestaurant = btype === 'restaurant'
+  const isServices   = btype === 'services'
+  const isLocal      = btype === 'local'
+  const isEcommerce  = btype === 'ecommerce'
+  const isCatalog    = isLocal || isEcommerce
+  const hasOrders    = true  // todos tienen pedidos
+  const asistenteName = isRestaurant ? 'Tano' : 'Asistente IA'
+
+  // Toggle "abierto/cerrado"
+  const toggleLabelOpen = document.getElementById('toggle-label-open')
+  const toggleDescOpen  = document.getElementById('toggle-desc-open')
+  const toggleDescActive = document.getElementById('toggle-desc-active')
+  if (toggleLabelOpen) {
+    const openLabels = { restaurant: 'Restaurante abierto', local: 'Local abierto', services: 'Negocio abierto', ecommerce: 'Tienda activa' }
+    toggleLabelOpen.textContent = openLabels[btype] || 'Negocio abierto'
+  }
+  if (toggleDescOpen) {
+    const descLabels = {
+      restaurant: 'Cuando está desactivado, el menú muestra "Cerrado" a los clientes.',
+      local:      'Cuando está desactivado, el catálogo muestra "Cerrado" a los clientes.',
+      services:   'Cuando está desactivado, el perfil muestra "Sin turnos disponibles" a los clientes.',
+      ecommerce:  'Cuando está desactivado, la tienda no acepta pedidos nuevos.',
+    }
+    toggleDescOpen.textContent = descLabels[btype] || descLabels.restaurant
+  }
+  if (toggleDescActive) {
+    const activeDescs = {
+      restaurant: 'Desactivar oculta el restaurante de todos los canales públicos.',
+      local:      'Desactivar oculta el local de todos los canales públicos.',
+      services:   'Desactivar oculta el negocio de todos los canales públicos.',
+      ecommerce:  'Desactivar oculta la tienda de todos los canales públicos.',
+    }
+    toggleDescActive.textContent = activeDescs[btype] || activeDescs.restaurant
+  }
+
+  // Descripción de horarios
+  const hoursDescText = document.getElementById('hours-desc-text')
+  if (hoursDescText) {
+    const hoursDescs = {
+      restaurant: 'Los horarios aparecen en el menú de tus clientes y le dicen al asistente cuándo está abierto el local. Importante: el asistente IA solo informa que está abierto cuando realmente lo está.',
+      local:      'Los horarios aparecen en tu catálogo y le dicen al asistente cuándo está abierto el local. El asistente IA solo informa que está abierto cuando realmente lo está.',
+      services:   'Los horarios de atención aparecen en tu perfil público y determinan cuándo los clientes pueden reservar turnos.',
+      ecommerce:  'Los horarios opcionales aparecen en tu tienda para informar cuándo respondés consultas.',
+    }
+    hoursDescText.textContent = hoursDescs[btype] || hoursDescs.restaurant
+  }
+
+  // Subtítulo del menú/catálogo
+  const menuPageSubtitle = document.getElementById('menu-page-subtitle')
+  if (menuPageSubtitle) {
+    const subtitles = {
+      restaurant: 'Categorías y platos de tu restaurante',
+      local:      'Categorías y productos de tu catálogo',
+      services:   'Servicios que ofrecés a tus clientes',
+      ecommerce:  'Categorías y productos de tu tienda',
+    }
+    menuPageSubtitle.textContent = subtitles[btype] || subtitles.restaurant
+  }
+
+  // Texto vacío del menú
+  const menuEmptyDesc = document.getElementById('menu-empty-desc')
+  if (menuEmptyDesc) {
+    const emptyDescs = {
+      restaurant: 'Creá la primera categoría y agregá tus platos. También podés importar desde una foto de tu menú actual.',
+      local:      'Creá la primera categoría y agregá tus productos. También podés importar desde una foto de tu lista de precios.',
+      services:   'Creá la primera categoría y agregá los servicios que ofrecés.',
+      ecommerce:  'Creá la primera categoría y agregá tus productos. También podés importar desde una foto de tu catálogo.',
+    }
+    menuEmptyDesc.textContent = emptyDescs[btype] || emptyDescs.restaurant
+  }
+
+  // Buscador historial placeholder
+  const historialSearch = document.getElementById('historial-search')
+  if (historialSearch) {
+    const placeholders = {
+      restaurant: 'Buscar mesa o plato…',
+      local:      'Buscar pedido o producto…',
+      services:   'Buscar turno o servicio…',
+      ecommerce:  'Buscar pedido o producto…',
+    }
+    historialSearch.placeholder = placeholders[btype] || placeholders.restaurant
+  }
+
+  // Informe mensual: descripción
+  const informeDescText = document.getElementById('informe-desc-text')
+  if (informeDescText) {
+    const informeDescs = {
+      restaurant: 'Viti genera un resumen del mes con estadísticas, platos más vendidos, horario pico y recomendaciones para el mes siguiente.',
+      local:      'Viti genera un resumen del mes con estadísticas, productos más vendidos, horario pico y recomendaciones para el mes siguiente.',
+      services:   'Viti genera un resumen del mes con estadísticas, servicios más solicitados, horario pico y recomendaciones para el mes siguiente.',
+      ecommerce:  'Viti genera un resumen del mes con estadísticas, productos más vendidos y recomendaciones para el mes siguiente.',
+    }
+    informeDescText.textContent = informeDescs[btype] || informeDescs.restaurant
+  }
+
+  // Botón exportar menú CSV
+  const btnExportMenuLabel = document.getElementById('btn-export-menu-label')
+  if (btnExportMenuLabel) {
+    const exportLabels = {
+      restaurant: '🍽️ Menú en CSV',
+      local:      '🛍️ Catálogo en CSV',
+      services:   '✂️ Servicios en CSV',
+      ecommerce:  '📦 Catálogo en CSV',
+    }
+    btnExportMenuLabel.textContent = exportLabels[btype] || exportLabels.restaurant
+  }
+
+  // Configuración: subtítulo
+  const configSubtitle = document.getElementById('config-page-subtitle')
+  if (configSubtitle) {
+    const configSubs = {
+      restaurant: 'Plan, equipo, WhatsApp, horarios y Tano. Todos los ajustes de tu negocio en un lugar.',
+      local:      'Plan, equipo, WhatsApp, horarios y asistente. Todos los ajustes de tu local en un lugar.',
+      services:   'Plan, equipo, WhatsApp, horarios y asistente. Todos los ajustes de tu negocio en un lugar.',
+      ecommerce:  'Plan, equipo, WhatsApp y asistente. Todos los ajustes de tu tienda en un lugar.',
+    }
+    configSubtitle.textContent = configSubs[btype] || configSubs.restaurant
+  }
+
+  // Bloque de uso del asistente (Tano / Asistente IA)
+  const tanoUsageLabel = document.getElementById('tano-usage-label')
+  if (tanoUsageLabel) tanoUsageLabel.textContent = `🤖 ${asistenteName} este mes`
+  const factTanoLabel = document.getElementById('fact-tano-label')
+  if (factTanoLabel) factTanoLabel.textContent = `🤖 ${asistenteName} este mes`
+
+  // Roles de equipo según tipo
+  const staffRoleCook = document.getElementById('staff-role-cook')
+  const staffRoleWaiter = document.getElementById('staff-role-waiter')
+  if (staffRoleCook) {
+    staffRoleCook.textContent = isRestaurant ? 'Cocinero' : 'Operativo'
+  }
+  if (staffRoleWaiter) {
+    staffRoleWaiter.textContent = isRestaurant ? 'Mozo' : 'Colaborador'
+  }
+
+  // WA operativo hint: cocina
+  const waOperativoHint = document.getElementById('wa-operativo-hint')
+  if (waOperativoHint) {
+    const waHints = {
+      restaurant: 'Recibe notificaciones de nuevos pedidos, cambios de estado y alertas urgentes. Puede ser el número del encargado o la cocina.',
+      local:      'Recibe notificaciones de nuevos pedidos, cambios de estado y alertas urgentes. Puede ser el número del encargado.',
+      services:   'Recibe notificaciones de nuevos turnos, cambios y cancelaciones. Puede ser el número del profesional a cargo.',
+      ecommerce:  'Recibe notificaciones de nuevos pedidos y cambios de estado. Puede ser el número del encargado de despacho.',
+    }
+    waOperativoHint.textContent = waHints[btype] || waHints.restaurant
+  }
+
+  // Card de configuración del asistente (Tano o Asistente IA)
+  const tanoCardTitle = document.getElementById('tano-card-title')
+  const tanoCardDesc  = document.getElementById('tano-card-desc')
+  const tanoToneHint  = document.getElementById('tano-tone-hint')
+  const tanoWelcomeHint = document.getElementById('tano-welcome-hint')
+  const tanoLimitLabel  = document.getElementById('tano-limit-label')
+  const tanoLimitHint   = document.getElementById('tano-limit-hint')
+  const tanoSaveBtn     = document.getElementById('tano-save-btn')
+  if (tanoCardTitle) tanoCardTitle.textContent = `🤖 Personalización de ${asistenteName}`
+  if (tanoCardDesc)  tanoCardDesc.textContent  = `Configurá cómo se presenta ${asistenteName} ante tus clientes.`
+  if (tanoToneHint)  tanoToneHint.textContent  = `Afecta cómo ${asistenteName} se expresa en sus respuestas.`
+  if (tanoWelcomeHint) tanoWelcomeHint.textContent = `Si no lo completás, ${asistenteName} usa su saludo estándar.`
+  if (tanoLimitLabel) tanoLimitLabel.textContent = `Mensaje cuando ${asistenteName} llega al límite (plan free)`
+  if (tanoLimitHint)  tanoLimitHint.textContent  = `Aparece cuando ${asistenteName} agota sus 75 respuestas mensuales.`
+  if (tanoSaveBtn)    tanoSaveBtn.textContent    = `Guardar configuración de ${asistenteName === 'Tano' ? 'Tano' : 'asistente'}`
+
+  // QR card title
+  const menuQrCardTitle = document.getElementById('menu-qr-card-title')
+  if (menuQrCardTitle) {
+    const qrTitles = { restaurant: '📲 QR del menú', local: '📲 QR del catálogo', services: '📲 QR de tu negocio', ecommerce: '📲 QR del catálogo' }
+    menuQrCardTitle.textContent = qrTitles[btype] || qrTitles.restaurant
+  }
+
+  // Widget embed: textos
+  const widgetEmbedDesc = document.getElementById('widget-embed-desc')
+  const widgetBtnLabel  = document.getElementById('widget-btn-label')
+  const widgetIframeLabel = document.getElementById('widget-iframe-label')
+  if (widgetEmbedDesc) {
+    const wDescs = {
+      restaurant: 'Pegá este código en tu web para que los visitantes puedan ver el menú o hacer un pedido directamente desde tu sitio.',
+      local:      'Pegá este código en tu web para que los visitantes vean tu catálogo directamente desde tu sitio.',
+      services:   'Pegá este código en tu web para que los visitantes vean tus servicios y reserven turno desde tu sitio.',
+      ecommerce:  'Pegá este código en tu web para que los visitantes vean tu catálogo directamente desde tu sitio.',
+    }
+    widgetEmbedDesc.textContent = wDescs[btype] || wDescs.restaurant
+  }
+  if (widgetBtnLabel) {
+    const wBtnLabels = { restaurant: 'Botón flotante "Ver menú"', local: 'Botón flotante "Ver catálogo"', services: 'Botón flotante "Ver servicios"', ecommerce: 'Botón flotante "Ver catálogo"' }
+    widgetBtnLabel.textContent = wBtnLabels[btype] || wBtnLabels.restaurant
+  }
+  if (widgetIframeLabel) {
+    const wIframeLabels = { restaurant: 'iframe embebido (menú completo)', local: 'iframe embebido (catálogo completo)', services: 'iframe embebido (servicios completos)', ecommerce: 'iframe embebido (catálogo completo)' }
+    widgetIframeLabel.textContent = wIframeLabels[btype] || wIframeLabels.restaurant
+  }
+
+  // Color hint
+  const colorHint = document.getElementById('color-hint')
+  if (colorHint) {
+    const colorHints = { restaurant: 'Se usa en botones y acentos del menú público.', local: 'Se usa en botones y acentos del catálogo público.', services: 'Se usa en botones y acentos del perfil público.', ecommerce: 'Se usa en botones y acentos de la tienda pública.' }
+    colorHint.textContent = colorHints[btype] || colorHints.restaurant
+  }
+
+  // Modal importar: título, descripción, botón, ítems detectados
+  const modalImportTitle     = document.getElementById('modal-import-title')
+  const importMenuDesc       = document.getElementById('import-menu-desc')
+  const importDetectedTitle  = document.getElementById('import-detected-title')
+  const btnConfirmImportLabel = document.getElementById('btn-confirm-import-label')
+  if (modalImportTitle) {
+    const importTitles = { restaurant: '📸 Importar menú desde foto', local: '📸 Importar catálogo desde foto', services: '📸 Importar servicios desde foto', ecommerce: '📸 Importar catálogo desde foto' }
+    modalImportTitle.textContent = importTitles[btype] || importTitles.restaurant
+  }
+  if (importMenuDesc) {
+    const importDescs = {
+      restaurant: 'Subí una foto de tu lista de precios, pizarrón o menú impreso. Vitrina detecta los platos y precios automáticamente con IA.',
+      local:      'Subí una foto de tu lista de precios o catálogo impreso. Vitrina detecta los productos y precios automáticamente con IA.',
+      services:   'Subí una foto de tu lista de servicios o pizarrón. Vitrina detecta los servicios y precios automáticamente con IA.',
+      ecommerce:  'Subí una foto de tu catálogo o lista de precios. Vitrina detecta los productos y precios automáticamente con IA.',
+    }
+    importMenuDesc.textContent = importDescs[btype] || importDescs.restaurant
+  }
+  if (importDetectedTitle) {
+    const detectedTitles = { restaurant: 'Platos detectados', local: 'Productos detectados', services: 'Servicios detectados', ecommerce: 'Productos detectados' }
+    importDetectedTitle.textContent = detectedTitles[btype] || detectedTitles.restaurant
+  }
+  if (btnConfirmImportLabel) {
+    const confirmLabels = { restaurant: '✓ Importar todos los platos', local: '✓ Importar todos los productos', services: '✓ Importar todos los servicios', ecommerce: '✓ Importar todos los productos' }
+    btnConfirmImportLabel.textContent = confirmLabels[btype] || confirmLabels.restaurant
+  }
+
+  // Modal item: "Nuevo plato" / "Nuevo ítem"
+  // Solo cambiamos el título base; en edición openItemModal ya lo reemplaza
+  const modalItemTitleEl = document.getElementById('modal-item-title')
+  if (modalItemTitleEl && (modalItemTitleEl.textContent === 'Nuevo plato' || modalItemTitleEl.textContent === 'Nuevo ítem' || modalItemTitleEl.textContent === 'Nuevo producto' || modalItemTitleEl.textContent === 'Nuevo servicio')) {
+    const itemTitles = { restaurant: 'Nuevo plato', local: 'Nuevo producto', services: 'Nuevo servicio', ecommerce: 'Nuevo producto' }
+    modalItemTitleEl.textContent = itemTitles[btype] || itemTitles.restaurant
+  }
+  // Guardar en variable global para que openItemModal lo use
+  window._newItemLabel  = ({ restaurant: 'Nuevo plato',    local: 'Nuevo producto',    services: 'Nuevo servicio',    ecommerce: 'Nuevo producto'    })[btype] || 'Nuevo ítem'
+  window._editItemLabel = ({ restaurant: 'Editar plato',   local: 'Editar producto',   services: 'Editar servicio',   ecommerce: 'Editar producto'   })[btype] || 'Editar ítem'
+  window._addItemLabel  = ({ restaurant: 'Agregar plato',  local: 'Agregar producto',  services: 'Agregar servicio',  ecommerce: 'Agregar producto'  })[btype] || 'Agregar ítem'
+
+  // Hint de imagen del item
+  const itemImageHint = document.getElementById('item-image-hint')
+  if (itemImageHint) {
+    const imgHints = {
+      restaurant: 'Imagen que se muestra en el menú público. Usá 🤖 para generar una foto profesional con IA.',
+      local:      'Imagen del producto en tu catálogo público. Usá 🤖 para generar una foto profesional con IA.',
+      services:   'Imagen del servicio en tu perfil público. Usá 🤖 para generar una foto profesional con IA.',
+      ecommerce:  'Imagen del producto en tu tienda. Usá 🤖 para generar una foto profesional con IA.',
+    }
+    itemImageHint.textContent = imgHints[btype] || imgHints.restaurant
+  }
+
+  // Label "Plato destacado"
+  const itemFeaturedLabel = document.getElementById('item-featured-label')
+  const itemFeaturedHint  = document.getElementById('item-featured-hint')
+  if (itemFeaturedLabel) {
+    const featLabels = { restaurant: '⭐ Plato destacado', local: '⭐ Producto destacado', services: '⭐ Servicio destacado', ecommerce: '⭐ Producto destacado' }
+    itemFeaturedLabel.textContent = featLabels[btype] || featLabels.restaurant
+  }
+  if (itemFeaturedHint) {
+    const featHints = {
+      restaurant: 'Aparece en la sección "Destacados" al tope del menú público.',
+      local:      'Aparece en la sección "Destacados" al tope del catálogo público.',
+      services:   'Aparece en la sección "Destacados" al tope del perfil de servicios.',
+      ecommerce:  'Aparece en la sección "Destacados" al tope de la tienda.',
+    }
+    itemFeaturedHint.textContent = featHints[btype] || featHints.restaurant
+  }
+
+  // updateQuickLinks genera los team links con terminología de restaurante — regenerarlos si ya hay slug
+  if (rest.slug) updateQuickLinks(rest.slug)
 }
 
 function updateOpenPill(isOpen) {
@@ -3807,6 +4078,9 @@ function fillForm(rest) {
 
 function updateQuickLinks(slug) {
   const base = 'https://vitrinaapp.com.ar/'
+  const btype = (currentRestaurant && currentRestaurant.business_type) || 'restaurant'
+  const isRestaurant = btype === 'restaurant'
+
   document.getElementById('link-menu').href     = base + 'menu.html?slug=' + slug
   document.getElementById('link-qr-print').href = base + 'qr-print.html?slug=' + slug
   document.getElementById('link-cocina').href   = base + 'cocina.html?slug=' + slug
@@ -3814,15 +4088,24 @@ function updateQuickLinks(slug) {
   updateMenuQr(slug)
   updateWidgetCode(slug)
 
-  // Links de equipo
+  // Links de equipo — adaptados por tipo de negocio
   const teamLinks = document.getElementById('quick-team-links')
   if (teamLinks) {
-    teamLinks.innerHTML = [
-      { icon: '🍽️', label: 'Menú público', url: base + 'menu.html?slug=' + slug, hint: 'Compartí con clientes' },
-      { icon: '🧑‍🍳', label: 'Pantalla cocina', url: base + 'cocina.html?slug=' + slug, hint: 'Para el cocinero' },
-      { icon: '💬', label: 'Asistente IA', url: base + 'mozo.html?slug=' + slug, hint: 'Demo para clientes' },
-      { icon: '🖨️', label: 'Imprimir QRs', url: base + 'qr-print.html?slug=' + slug, hint: 'PDF para mesas' },
-    ].map(l => `
+    const menuLabel  = { restaurant: 'Menú público', local: 'Catálogo público', services: 'Página pública', ecommerce: 'Catálogo público' }[btype] || 'Menú público'
+    const menuIcon   = { restaurant: '🍽️', local: '🛍️', services: '🗂️', ecommerce: '📦' }[btype] || '🍽️'
+    const mozoLabel  = { restaurant: 'Asistente Tano', local: 'Asistente IA', services: 'Asistente IA', ecommerce: 'Asistente IA' }[btype] || 'Asistente IA'
+    const qrLabel    = { restaurant: 'Imprimir QRs (mesas)', local: 'Imprimir QR', services: 'Imprimir QR', ecommerce: 'Imprimir QR' }[btype] || 'Imprimir QRs'
+    const qrHint     = { restaurant: 'PDF para mesas', local: 'QR del catálogo', services: 'QR del negocio', ecommerce: 'QR del catálogo' }[btype] || 'PDF para mesas'
+
+    const links = [
+      { icon: menuIcon, label: menuLabel, url: base + 'menu.html?slug=' + slug, hint: 'Compartí con clientes' },
+      { icon: '💬', label: mozoLabel, url: base + 'mozo.html?slug=' + slug, hint: 'Demo para clientes' },
+      { icon: '🖨️', label: qrLabel, url: base + 'qr-print.html?slug=' + slug, hint: qrHint },
+    ]
+    if (isRestaurant) {
+      links.splice(1, 0, { icon: '🧑‍🍳', label: 'Pantalla cocina', url: base + 'cocina.html?slug=' + slug, hint: 'Para el cocinero' })
+    }
+    teamLinks.innerHTML = links.map(l => `
       <div style="background:var(--cream2);border-radius:10px;padding:12px;border:1px solid var(--border)">
         <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">${l.hint}</div>
         <a href="${l.url}" target="_blank" style="display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-size:13.5px;font-weight:500">
@@ -3835,13 +4118,15 @@ function updateQuickLinks(slug) {
 window.copyMenuLink = function () {
   if (!currentRestaurant) return
   const url = 'https://vitrinaapp.com.ar/menu.html?slug=' + currentRestaurant.slug
+  const btype = currentRestaurant.business_type || 'restaurant'
+  const origLabel = { restaurant: '📋 Copiar link del menú', local: '📋 Copiar link del catálogo', services: '📋 Copiar link del negocio', ecommerce: '📋 Copiar link del catálogo' }[btype] || '📋 Copiar link'
   navigator.clipboard.writeText(url).then(() => {
     const btn = document.getElementById('btn-copy-link')
     if (btn) {
-      btn.textContent = '✓ ¡Link copiado!'
+      btn.innerHTML = '✓ ¡Link copiado!'
       btn.style.background = 'var(--cream2)'
       btn.style.color = 'var(--sage)'
-      setTimeout(() => { btn.textContent = '📋 Copiar link del menú'; btn.style.color = '' }, 2000)
+      setTimeout(() => { btn.innerHTML = origLabel; btn.style.color = '' }, 2000)
     }
     showToast('Link copiado al portapapeles ✓', 'success')
   }).catch(() => {
@@ -3883,10 +4168,13 @@ function updateMenuQr(slug) {
 function updateWidgetCode(slug) {
   const base = 'https://vitrinaapp.com.ar/'
   const menuUrl = base + 'menu.html?slug=' + slug
+  const btype = (currentRestaurant && currentRestaurant.business_type) || 'restaurant'
+  const btnText    = { restaurant: '🍽️ Ver menú', local: '🛍️ Ver catálogo', services: '🗂️ Ver servicios', ecommerce: '📦 Ver catálogo' }[btype] || '🍽️ Ver menú'
+  const iframeTitle = { restaurant: 'Menú', local: 'Catálogo', services: 'Servicios', ecommerce: 'Catálogo' }[btype] || 'Menú'
 
-  const btnCode = `<a href="${menuUrl}" target="_blank" style="position:fixed;bottom:24px;right:24px;background:#B85A30;color:white;padding:12px 20px;border-radius:30px;font-family:sans-serif;font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px rgba(184,90,48,.4);z-index:9999">🍽️ Ver menú</a>`
+  const btnCode = `<a href="${menuUrl}" target="_blank" style="position:fixed;bottom:24px;right:24px;background:#B85A30;color:white;padding:12px 20px;border-radius:30px;font-family:sans-serif;font-size:14px;font-weight:600;text-decoration:none;box-shadow:0 4px 16px rgba(184,90,48,.4);z-index:9999">${btnText}</a>`
 
-  const iframeCode = `<iframe src="${menuUrl}" width="100%" height="600" frameborder="0" style="border-radius:12px;border:1px solid #e8ddd0" title="Menú ${slug}"></iframe>`
+  const iframeCode = `<iframe src="${menuUrl}" width="100%" height="600" frameborder="0" style="border-radius:12px;border:1px solid #e8ddd0" title="${iframeTitle} ${slug}"></iframe>`
 
   const btnEl = document.getElementById('widget-code-btn')
   const iframeEl = document.getElementById('widget-code-iframe')
@@ -4791,9 +5079,7 @@ window.loadMenu = async function () {
     const titleEl = document.getElementById('menu-page-title')
     const subEl   = document.getElementById('menu-page-subtitle')
     if (titleEl) titleEl.textContent = window._bizTerms.menu
-    if (subEl) subEl.textContent = window._bizTerms.items === 'Platos'
-      ? 'Categorías y platos de tu restaurante'
-      : 'Categorías y productos de tu negocio'
+    // No sobreescribir el subtítulo — ya fue actualizado por renderSidebarRestaurant con la lógica completa
   }
   try {
     menuCats = await menuCategories.listByRestaurant(currentRestaurant.id)
@@ -4829,7 +5115,7 @@ function renderMenu() {
       <div class="menu-empty">
         <div class="menu-empty-icon">📋</div>
         <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
-        <div class="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
+        <div class="menu-empty-desc">${document.getElementById('menu-empty-desc')?.textContent || 'Creá la primera categoría y agregá tus ítems.'}</div>
         <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
         <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
       </div>`
@@ -4848,7 +5134,7 @@ function renderMenu() {
         <div class="item-row ${item.is_available ? '' : 'unavailable'}" id="item-row-${item.id}">
           <div class="item-emoji">${item.emoji || '🍽️'}</div>
           <div class="item-info">
-            <div class="item-name-text">${item.is_featured ? '<span title="Plato destacado" style="margin-right:4px">⭐</span>' : ''}${escHtml(item.name)}${noImg}</div>
+            <div class="item-name-text">${item.is_featured ? `<span title="${window._newItemLabel?.replace('Nuevo','') || ' ítem'} destacado" style="margin-right:4px">⭐</span>` : ''}${escHtml(item.name)}${noImg}</div>
             ${item.tags?.length ? `<div class="item-tags-row">${item.tags.map(t=>`<span class="item-tag">${TAGS.find(x=>x.key===t)?.label||t}</span>`).join('')}</div>` : ''}
           </div>
           <div class="item-price-text">${formatPrice(item.price)}</div>
@@ -4864,7 +5150,7 @@ function renderMenu() {
           </div>
         </div>`
       }).join('')
-      : `<div style="padding:14px 20px;font-size:13px;color:var(--muted)">Sin platos todavía.</div>`
+      : `<div style="padding:14px 20px;font-size:13px;color:var(--muted)">Sin ${window._addItemLabel ? window._addItemLabel.toLowerCase().replace('agregar ','')+'s' : 'ítems'} todavía.</div>`
     return `
       <div class="cat-block" id="cat-block-${cat.id}">
         <div class="cat-header">
@@ -4879,7 +5165,7 @@ function renderMenu() {
         </div>
         <div class="items-list">${itemsHtml}</div>
         <div class="cat-footer">
-          <button class="btn-add-item" onclick="openItemModal('${cat.id}')">+ Agregar plato</button>
+          <button class="btn-add-item" onclick="openItemModal('${cat.id}')">+ ${window._addItemLabel || 'Agregar plato'}</button>
         </div>
       </div>`
   }).join('')
@@ -4983,7 +5269,7 @@ const SELECTED_TAGS = new Set()
 window.openItemModal = function (catId, itemId = null) {
   editingItemCatId = catId
   editingItem = itemId ? Object.values(menuItemsMap).flat().find(i => i.id === itemId) : null
-  document.getElementById('modal-item-title').textContent = editingItem ? 'Editar plato' : 'Nuevo plato'
+  document.getElementById('modal-item-title').textContent = editingItem ? (window._editItemLabel || 'Editar plato') : (window._newItemLabel || 'Nuevo plato')
   document.getElementById('item-name').value      = editingItem?.name        || ''
   document.getElementById('item-price').value     = editingItem?.price       ?? ''
   document.getElementById('item-emoji').value     = editingItem?.emoji       || ''
@@ -5304,7 +5590,8 @@ function initPedidosBadge() {
     }, async payload => {
       playPanelSound()
       const mesa = payload.new?.table_number
-      showToast('🔔 Nuevo pedido' + (mesa ? ' — Mesa ' + mesa : ''), 'default')
+      const mesaLabel = (currentRestaurant?.business_type||'restaurant')==='restaurant'?'Mesa':'Pedido'
+      showToast('🔔 Nuevo pedido' + (mesa ? ' — ' + mesaLabel + ' ' + mesa : ''), 'default')
       try { setBadgeCount((await orders.listActive(currentRestaurant.id)).length) } catch {}
     })
     .on('postgres_changes', {
@@ -5458,11 +5745,11 @@ function renderPedidos() {
   <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Los pedidos nuevos aparecen acá en tiempo real.</div>
   <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
     <a href="menu.html?slug=${currentRestaurant?.slug}" target="_blank" rel="noopener noreferrer" style="font-size:13px;padding:8px 16px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--ink)">
-      🍽️ Ver menú como cliente
+      ${(() => { const bt = currentRestaurant?.business_type || 'restaurant'; return bt==='restaurant'?'🍽️ Ver menú como cliente':bt==='services'?'🗂️ Ver servicios públicos':'🛍️ Ver catálogo como cliente' })()}
     </a>
-    <a href="cocina.html?slug=${currentRestaurant?.slug}" target="_blank" rel="noopener noreferrer" style="font-size:13px;padding:8px 16px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--ink)">
+    ${(currentRestaurant?.business_type||'restaurant')==='restaurant' ? `<a href="cocina.html?slug=${currentRestaurant?.slug}" target="_blank" rel="noopener noreferrer" style="font-size:13px;padding:8px 16px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--ink)">
       🍳 Abrir pantalla cocina
-    </a>
+    </a>` : ''}
   </div>
 </div>`
     return
@@ -5475,7 +5762,7 @@ function renderPedidos() {
     return `
       <div class="pedido-card">
         <div class="pedido-card-header">
-          <div class="pedido-mesa">Mesa ${o.table_number}</div>
+          <div class="pedido-mesa">${(currentRestaurant?.business_type||'restaurant')==='restaurant'?'Mesa':'Pedido'} ${o.table_number}</div>
           <div class="pedido-hora">${formatHora(o.created_at)} · ${formatElapsedPedido(o.created_at)}</div>
           <span class="pedido-status-badge status-${o.status ?? 'pending'}">${STATUS_LABELS[o.status] ?? o.status}</span>
         </div>
@@ -5556,7 +5843,10 @@ function renderPlanSection() {
   // Mensaje de estado
   const msg = document.getElementById('plan-status-msg')
   if (plan === 'free') {
-    msg.textContent = 'Estás en el plan gratuito. Upgradear desbloquea pedidos, cocina y pagos.'
+    const _bt = currentRestaurant?.business_type||'restaurant'
+    msg.textContent = _bt==='restaurant'
+      ? 'Estás en el plan gratuito. Upgradear desbloquea pedidos, cocina y pagos.'
+      : 'Estás en el plan gratuito. Upgradear desbloquea pedidos, asistente ilimitado y pagos.'
   } else if (status === 'active') {
     msg.textContent = `Plan activo · Se renueva automáticamente cada mes vía MercadoPago.`
   } else if (status === 'cancelled' || status === 'paused') {
@@ -5575,7 +5865,8 @@ function renderPlanSection() {
     document.getElementById('tano-usage-bar').style.background = pct >= 90 ? 'var(--terra)' : pct >= 60 ? 'var(--gold)' : 'var(--sage)'
     const hint = document.getElementById('tano-usage-hint')
     if (count >= 75) {
-      hint.innerHTML = '<span style="color:var(--terra)">Límite alcanzado. Tano no responde hasta el próximo mes o hasta que upgrades.</span>'
+      const _an = (currentRestaurant?.business_type||'restaurant')==='restaurant'?'Tano':'el asistente'
+      hint.innerHTML = `<span style="color:var(--terra)">Límite alcanzado. ${_an.charAt(0).toUpperCase()+_an.slice(1)} no responde hasta el próximo mes o hasta que upgrades.</span>`
     } else if (count >= 60) {
       hint.innerHTML = `<span style="color:var(--gold)">Quedan ${75-count} respuestas este mes.</span>`
     } else {
@@ -5589,9 +5880,18 @@ function renderPlanSection() {
   // Tarjetas de planes
   const grid = document.getElementById('plan-cards-grid')
   const planesAMostrar = ['free', 'pro', 'full']
+  const _btype = currentRestaurant?.business_type || 'restaurant'
+  const _asist = _btype === 'restaurant' ? 'Tano' : 'Asistente IA'
   grid.innerHTML = planesAMostrar.map(pid => {
     const info = PLAN_INFO[pid]
-    const feats = PLAN_FEATURES[pid]
+    const feats = (PLAN_FEATURES[pid] || []).map(f => {
+      if (typeof f === 'string') {
+        let txt = f.replace(/Tano/g, _asist).replace(/platos/g, _btype==='restaurant'?'platos':'ítems')
+        if (_btype !== 'restaurant') txt = txt.replace(/Pantalla de cocina/g, 'Panel de pedidos').replace(/cocina/g, 'gestión')
+        return txt
+      }
+      return f
+    })
     const isCurrent = plan === pid
     const isFeatured = pid === 'pro'
     const classes = ['plan-card', isCurrent ? 'current' : '', isFeatured && !isCurrent ? 'featured' : ''].filter(Boolean).join(' ')
@@ -5705,8 +6005,9 @@ window.loadConfig = async function () {
   // Actualizar título de sección Tano
   const tanoConfigTitle = document.querySelector('.card-title[data-tano-title]')
   if (tanoConfigTitle) {
-    const name = currentRestaurant.tano_name || 'Tano'
     const btype = currentRestaurant.business_type || 'restaurant'
+    const defaultName = btype === 'restaurant' ? 'Tano' : 'Asistente IA'
+    const name = currentRestaurant.tano_name || defaultName
     const btypeTitles = {
       restaurant: `🤖 ${name} — Tu asistente`,
       services:   `🤖 ${name} — Tu asistente de turnos`,
@@ -5830,11 +6131,14 @@ window.loadFacturacion = async function () {
 
   // Renderizar features del plan
   const featuresEl = document.getElementById('fact-features')
+  const _facBtype = currentRestaurant?.business_type || 'restaurant'
+  const _facAsist = _facBtype === 'restaurant' ? 'Tano' : 'Asistente IA'
+  const _facItems = _facBtype === 'restaurant' ? 'Platos en el menú' : (_facBtype === 'services' ? 'Servicios en el catálogo' : 'Productos en el catálogo')
   const features = [
-    { label: 'Platos en el menú', value: limits.maxPlatos === -1 ? 'Ilimitados' : `Hasta ${limits.maxPlatos}` },
-    { label: 'Mensajes de Tano', value: limits.tanoLimit === -1 ? 'Ilimitados' : `${limits.tanoLimit}/mes` },
+    { label: _facItems, value: limits.maxPlatos === -1 ? 'Ilimitados' : `Hasta ${limits.maxPlatos}` },
+    { label: `Mensajes de ${_facAsist}`, value: limits.tanoLimit === -1 ? 'Ilimitados' : `${limits.tanoLimit}/mes` },
     { label: 'Pedidos online', value: limits.pedidos ? '✓ Incluido' : '✗ No incluido' },
-    { label: 'Pantalla de cocina', value: limits.cocina ? '✓ Incluido' : '✗ No incluido' },
+    { label: _facBtype === 'restaurant' ? 'Pantalla de cocina' : 'Panel de pedidos', value: limits.cocina ? '✓ Incluido' : '✗ No incluido' },
     { label: 'Pagos online', value: limits.pagos ? '✓ Incluido' : '✗ No incluido' },
     { label: 'Sucursales', value: limits.maxSucursales },
   ]
@@ -5933,7 +6237,7 @@ window.openUpgradeModal = async function () {
   const planesRestaurante = [
     {
       id: 'rest-menu', nombre: 'Solo Menú', precioUSD: 27,
-      features: ['Menú QR ilimitado · ES/EN/PT', 'Tano ilimitado + agrega al carrito', 'Pedidos online + cocina en tiempo real', 'Pagos con MercadoPago', '✅ WhatsApp Business incluido'],
+      features: ['Menú QR ilimitado · ES/EN/PT', 'Asistente Tano ilimitado + agrega al carrito', 'Pedidos online + pantalla de cocina', 'Pagos con MercadoPago', '✅ WhatsApp Business incluido'],
     },
     {
       id: 'rest-mkt', nombre: 'Marketing', precioUSD: 58,
@@ -5941,7 +6245,7 @@ window.openUpgradeModal = async function () {
     },
     {
       id: 'rest-combo', nombre: 'Combo', precioUSD: 75, recommended: true,
-      features: ['Todo Solo Menú +', 'Todo Marketing +', 'Tano + Viti trabajando juntos', 'Panel unificado operaciones + marketing', '✅ WhatsApp Business incluido', 'Ahorrás USD 10 vs contratar separado'],
+      features: ['Todo Solo Menú +', 'Todo Marketing +', 'Asistente IA + Viti trabajando juntos', 'Panel unificado operaciones + marketing', '✅ WhatsApp Business incluido', 'Ahorrás USD 10 vs contratar separado'],
     },
   ]
 
@@ -7593,7 +7897,11 @@ window.searchRestaurants = async function () {
 window.confirmCancelPlan = async function () {
   if (!currentRestaurant) return
 
-  if (!confirm('¿Estás seguro que querés cancelar tu suscripción?\n\nPerderás acceso a:\n• Pedidos online\n• Pantalla de cocina\n• Tano ilimitado\n\nTu plan volverá a Free al finalizar el período actual.')) {
+  const _btyp = currentRestaurant.business_type || 'restaurant'
+  const _cancelMsg = _btyp === 'restaurant'
+    ? '¿Estás seguro que querés cancelar tu suscripción?\n\nPerderás acceso a:\n• Pedidos online\n• Pantalla de cocina\n• Tano ilimitado\n\nTu plan volverá a Free al finalizar el período actual.'
+    : '¿Estás seguro que querés cancelar tu suscripción?\n\nPerderás acceso a:\n• Pedidos online\n• Asistente IA ilimitado\n• Funciones avanzadas\n\nTu plan volverá a Free al finalizar el período actual.'
+  if (!confirm(_cancelMsg)) {
     return
   }
 
@@ -7660,7 +7968,8 @@ window.saveTanoConfig = async function () {
     })
     Object.assign(currentRestaurant, { tano_tone: tone, tano_welcome: welcome, tano_limit_message: limit })
     if (status) { status.textContent = '✓ Guardado'; status.style.color = 'var(--success)' }
-    showToast('Configuración de Tano guardada ✓', 'success')
+    const _tanoName = (currentRestaurant?.business_type||'restaurant')==='restaurant' ? 'Tano' : 'asistente'
+    showToast(`Configuración de ${_tanoName} guardada ✓`, 'success')
     setTimeout(() => { if (status) status.textContent = '' }, 3000)
   } catch (e) {
     if (status) { status.textContent = 'Error: ' + e.message; status.style.color = 'var(--error)' }
@@ -9044,7 +9353,9 @@ window.exportHistorialCSV = function () {
     })
   }
   if (!data.length) { showToast('Sin datos para exportar.', 'error'); return }
-  const rows = [['ID', 'Fecha', 'Mesa', 'Estado', 'Total ARS', 'Platos']]
+  const mesaColLabel = (currentRestaurant?.business_type||'restaurant')==='restaurant' ? 'Mesa' : 'Pedido nro'
+  const itemsColLabel = (currentRestaurant?.business_type||'restaurant')==='restaurant' ? 'Platos' : 'Ítems'
+  const rows = [['ID', 'Fecha', mesaColLabel, 'Estado', 'Total ARS', itemsColLabel]]
   data.forEach(o => {
     const items = (o.order_items || []).map(i => i.quantity + '× ' + i.name).join(' | ')
     rows.push([
@@ -9101,7 +9412,7 @@ function renderHistorial(data) {
             <span style="font-size:18px;flex-shrink:0">${statusIcon[o.status] ?? '•'}</span>
             <div style="flex:1;min-width:0">
               <div style="font-size:14px;font-weight:500">
-                ${o.table_number != null ? 'Mesa ' + o.table_number : 'Sin mesa'}
+                ${o.table_number != null ? ((currentRestaurant?.business_type||'restaurant')==='restaurant'?'Mesa ':'Pedido ') + o.table_number : 'Sin número'}
                 ${o.customer_name ? `<span style="font-size:12px;color:var(--sage);font-weight:400;margin-left:6px">· ${escHtml(o.customer_name)}</span>` : ''}
                 <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:6px">
                   ${new Date(o.created_at).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'})}
