@@ -1022,9 +1022,14 @@
 <!-- ── SOCIAL PROOF ───────────────────────────────────────── -->
 <section id="social-proof" style="background:#0a0a0f; padding: 80px 24px; border-bottom: 1px solid rgba(255,255,255,0.06)">
   <div style="max-width:960px; margin:0 auto; text-align:center">
-    <div id="counter-wrap" style="margin-bottom:16px">
-      <div class="counter-big">Más de <span id="counter-negocios">0</span> negocios digitalizados</div>
-      <div class="counter-sub">y creciendo en Argentina</div>
+    <div style="text-align:center;margin-bottom:40px">
+      <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:12px">Estado del proyecto</div>
+      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;color:#ffffff;line-height:1.2">Empezamos en 2026</div>
+      <div style="font-size:16px;color:rgba(255,255,255,.6);margin-top:8px">Sumando comercios cada semana en Argentina 🇦🇷</div>
+    </div>
+
+    <div style="text-align:center;margin-bottom:20px">
+      <span style="display:inline-block;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.45)">Ejemplos ilustrativos · Testimonios reales próximamente</span>
     </div>
 
     <div class="testimonial-grid" id="testimonials">
@@ -1832,11 +1837,11 @@
     </div>
     <div class="footer-col">
       <h5>Producto</h5>
-      <a href="#restaurantes">Para restaurantes</a>
-      <a href="#comercios">Para comercios</a>
-      <a href="/para-restaurantes.html">Para restaurantes</a>
-      <a href="/para-servicios.html">Para peluquerías</a>
-      <a href="/para-comercios.html">Para comercios</a>
+      <a href="#restaurantes">Cómo lo usan los restaurantes</a>
+      <a href="#comercios">Cómo lo usan los comercios</a>
+      <a href="/para-restaurantes.html">Solución para restaurantes</a>
+      <a href="/para-servicios.html">Solución para peluquerías</a>
+      <a href="/para-comercios.html">Solución para comercios</a>
       <a href="#whatsapp">WhatsApp Business</a>
       <a href="#precios">Precios</a>
       <a href="/demo.html">Demo interactiva</a>
@@ -1856,7 +1861,7 @@
   </div>
   <div style="display:flex; gap:16px; justify-content:center; margin:24px 0 0; padding-top:24px; border-top:1px solid rgba(255,255,255,0.08); flex-wrap:wrap">
     <a href="https://instagram.com/vitrinaapp" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5); text-decoration:none; font-size:14px; transition:color .15s" onmouseover="this.style.color='#E8C87A'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">📷 Instagram</a>
-    <a href="https://wa.me/5491100000000" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5); text-decoration:none; font-size:14px; transition:color .15s" onmouseover="this.style.color='#E8C87A'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">💬 WhatsApp</a>
+    <a href="mailto:contacto@vitrinaapp.com.ar" style="color:rgba(255,255,255,0.5); text-decoration:none; font-size:14px; transition:color .15s" onmouseover="this.style.color='#E8C87A'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">✉️ Escribinos →</a>
     <a href="https://linkedin.com/company/vitrinaapp" target="_blank" rel="noopener" style="color:rgba(255,255,255,0.5); text-decoration:none; font-size:14px; transition:color .15s" onmouseover="this.style.color='#E8C87A'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">💼 LinkedIn</a>
   </div>
   <div class="footer-bottom">
@@ -2157,26 +2162,7 @@ function showPricing(type) {
       });
   });
 
-  /* ── SOCIAL PROOF — counter + testimonials ──────── */
-  var counterEl = document.getElementById('counter-negocios');
-  var counterWrap = document.getElementById('counter-wrap');
-  if (counterEl && counterWrap) {
-    ScrollTrigger.create({
-      trigger: counterWrap,
-      start: 'top 85%',
-      once: true,
-      onEnter: function() {
-        var obj = { val: 0 };
-        gsap.to(obj, {
-          val: 120, duration: 2.2, ease: 'power2.out',
-          onUpdate: function() { counterEl.textContent = Math.round(obj.val); }
-        });
-        gsap.fromTo(counterWrap,
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' });
-      }
-    });
-  }
+  /* ── SOCIAL PROOF — testimonials ──────── */
   var testimonials = document.querySelectorAll('#testimonials .testimonial-card');
   if (testimonials.length) {
     gsap.fromTo(testimonials,
