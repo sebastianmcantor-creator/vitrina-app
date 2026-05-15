@@ -1936,7 +1936,7 @@ input:checked + .toggle-slider:before {
             <div class="form-field col-2">
               <label class="form-label">Sitio web propio <span style="font-weight:400;color:var(--muted)">(opcional)</span></label>
               <div style="display:flex;gap:8px;align-items:center">
-                <input type="url" class="form-input" id="f-website" placeholder="https://www.tunegocio.com.ar" style="flex:1">
+                <input type="text" class="form-input" id="f-website" placeholder="vitrinaapp.com.ar" style="flex:1" onblur="if(this.value&&!this.value.startsWith('http'))this.value='https://'+this.value">
                 <button class="btn-secondary" onclick="analyzeWebsite()" id="btn-analyze-web" style="padding:8px 14px;font-size:13px;white-space:nowrap;flex-shrink:0">
                   🔍 Analizar
                 </button>
@@ -3652,22 +3652,44 @@ function renderSidebarRestaurant(rest) {
   const reservasBtn = document.querySelector('[data-section="reservas"]')
   const agendaBtn   = document.querySelector('[data-section="agenda"]')
   const catalogoBtn = document.querySelector('[data-section="catalogo"]')
+  const mesasBtn    = document.querySelector('[data-section="mesas"]')
 
   if (btype === 'local' || btype === 'ecommerce') {
-    // No tienen reservas ni agenda, sí catálogo
     if (reservasBtn) reservasBtn.style.display = 'none'
     if (agendaBtn)   agendaBtn.style.display   = 'none'
     if (catalogoBtn) catalogoBtn.style.display = 'flex'
+    if (mesasBtn)    mesasBtn.style.display    = 'none'
   } else if (btype === 'services') {
-    // Solo agenda (no reservas simples), no catálogo
     if (reservasBtn) reservasBtn.style.display = 'none'
     if (agendaBtn)   agendaBtn.style.display   = 'flex'
     if (catalogoBtn) catalogoBtn.style.display = 'none'
+    if (mesasBtn)    mesasBtn.style.display    = 'none'
   } else {
-    // Restaurant: reservas + agenda + no catálogo
+    // Restaurant: todo visible
     if (reservasBtn) reservasBtn.style.display = 'flex'
     if (agendaBtn)   agendaBtn.style.display   = 'flex'
     if (catalogoBtn) catalogoBtn.style.display = 'none'
+    if (mesasBtn)    mesasBtn.style.display    = 'flex'
+  }
+
+  // Marcar campos de dirección como opcionales para servicios online y ecommerce
+  const cityField    = document.getElementById('f-city')
+  const addressField = document.getElementById('f-address')
+  const addressWrap  = addressField?.closest('.form-field')
+  if (btype === 'services' || btype === 'ecommerce') {
+    if (addressWrap) {
+      const lbl = addressWrap.querySelector('.form-label')
+      if (lbl && !lbl.innerHTML.includes('opcional')) {
+        lbl.innerHTML = lbl.innerHTML + ' <span style="font-weight:400;color:var(--muted)">(opcional)</span>'
+      }
+    }
+    if (cityField) {
+      const cityWrap = cityField.closest('.form-field')
+      const lbl = cityWrap?.querySelector('.form-label')
+      if (lbl && !lbl.innerHTML.includes('opcional')) {
+        lbl.innerHTML = lbl.innerHTML + ' <span style="font-weight:400;color:var(--muted)">(opcional)</span>'
+      }
+    }
   }
   const topbarName = document.getElementById('topbar-rest-name')
   if (topbarName) topbarName.textContent = rest.name
@@ -4447,8 +4469,11 @@ window.saveRestaurant = async function () {
 // Análisis de sitio web
 // ─────────────────────────────────────────────
 window.analyzeWebsite = async function () {
-  const url = document.getElementById('f-website').value.trim()
+  let url = document.getElementById('f-website').value.trim()
   if (!url) { showToast('Ingresá la URL de tu sitio web primero', 'error'); return }
+  // Auto-completar protocolo si falta
+  if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url
+  document.getElementById('f-website').value = url
 
   const btn    = document.getElementById('btn-analyze-web')
   const result = document.getElementById('website-analysis-result')
