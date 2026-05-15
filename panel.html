@@ -3647,6 +3647,46 @@ function renderSidebarRestaurant(rest) {
     if (verDemoBtn)  { verDemoBtn.href = '/demo.html'; verDemoBtn.style.display = '' }
   }
 
+  // Adaptar Links Rápidos y QR según tipo de negocio
+  const linkMenu     = document.getElementById('link-menu')
+  const linkCocina   = document.getElementById('link-cocina')
+  const btnCopyLink  = document.getElementById('btn-copy-link')
+  const menuQrTitle  = document.querySelector('#menu-qr-card .card-title')
+  const menuQrLabel  = document.querySelector('#menu-qr-wrap div[style*="font-size:11px"]')
+  const mozoQrLabel  = document.querySelector('#mozo-qr-wrap div[style*="font-size:11px"]')
+  const mesaQrBlock  = document.querySelector('#menu-qr-card div[style*="min-width:180px"]')
+  const qrTip        = document.querySelector('#menu-qr-card div[style*="padding:12px 16px"]')
+
+  if (btype === 'services') {
+    if (linkMenu)    { linkMenu.innerHTML = '🗂️ Ver página pública' }
+    if (linkCocina)  linkCocina.style.display = 'none'
+    if (btnCopyLink) btnCopyLink.innerHTML = '📋 Copiar link del negocio'
+    if (menuQrTitle) menuQrTitle.textContent = '📲 QR de tu negocio'
+    if (menuQrLabel) menuQrLabel.textContent = 'Página pública'
+    if (mozoQrLabel) mozoQrLabel.textContent = 'Asistente IA'
+    if (mesaQrBlock) mesaQrBlock.style.display = 'none'
+    if (qrTip)       qrTip.innerHTML = '💡 <strong style="color:var(--ink)">Tip:</strong> Compartí este QR con tus clientes para que vean tus servicios y reserven turno directamente desde el celular.'
+  } else if (btype === 'local' || btype === 'ecommerce') {
+    if (linkMenu)    { linkMenu.innerHTML = '🛍️ Ver catálogo público' }
+    if (linkCocina)  linkCocina.style.display = 'none'
+    if (btnCopyLink) btnCopyLink.innerHTML = '📋 Copiar link del catálogo'
+    if (menuQrTitle) menuQrTitle.textContent = '📲 QR de tu catálogo'
+    if (menuQrLabel) menuQrLabel.textContent = 'Catálogo público'
+    if (mozoQrLabel) mozoQrLabel.textContent = 'Asistente IA'
+    if (mesaQrBlock) mesaQrBlock.style.display = 'none'
+    if (qrTip)       qrTip.innerHTML = '💡 <strong style="color:var(--ink)">Tip:</strong> Colocá este QR en tu local o compartilo por WhatsApp para que los clientes vean tus productos.'
+  } else {
+    // Restaurante: todo con labels originales
+    if (linkMenu)    linkMenu.innerHTML = '🍽️ Ver menú público'
+    if (linkCocina)  linkCocina.style.display = ''
+    if (btnCopyLink) btnCopyLink.innerHTML = '📋 Copiar link del menú'
+    if (menuQrTitle) menuQrTitle.textContent = '📲 QR del menú'
+    if (menuQrLabel) menuQrLabel.textContent = 'Menú público'
+    if (mozoQrLabel) mozoQrLabel.textContent = 'Asistente Tano'
+    if (mesaQrBlock) mesaQrBlock.style.display = ''
+    if (qrTip)       qrTip.innerHTML = '💡 <strong style="color:var(--ink)">Tip:</strong> Imprimí el QR del menú y ponelo en cada mesa. Imprimí el QR del asistente y ponelo en la caja o en la entrada para que los clientes puedan preguntar antes de sentarse.'
+  }
+
   // Marcar campos de dirección como opcionales para servicios online y ecommerce
   const cityField    = document.getElementById('f-city')
   const addressField = document.getElementById('f-address')
