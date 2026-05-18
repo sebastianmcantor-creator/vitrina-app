@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cargando...</title>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#E8521A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Vitrina">
   <link rel="stylesheet" href="lib/vitrina-tokens.css">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -543,6 +548,9 @@
       }
 
       buildMenu()
+      loadCart()
+      updateCartCount()
+      syncTanoFab()
 
       // Ocultar filtros de dieta para negocios que no son de comida
       if (!ui.showDietBar) {
@@ -760,11 +768,33 @@
           + '</div>'
     }
 
+    // ─── Cart localStorage ─────────────────────────────────────────────────────
+    function cartKey() { return 'vt_cart_' + (slug || 'demo') + '_' + (mesa || '0') }
+    function saveCart() {
+      localStorage.setItem(cartKey(), JSON.stringify(cart))
+      localStorage.setItem(cartKey() + '_ts', Date.now())
+    }
+    function loadCart() {
+      const ts = Number(localStorage.getItem(cartKey() + '_ts') || 0)
+      if (Date.now() - ts > 4 * 60 * 60 * 1000) { localStorage.removeItem(cartKey()); return }
+      try { const s = localStorage.getItem(cartKey()); if (s) cart = JSON.parse(s) } catch {}
+    }
+    function clearCartStorage() {
+      localStorage.removeItem(cartKey()); localStorage.removeItem(cartKey() + '_ts')
+    }
+    function syncTanoFab() {
+      const count = Object.values(cart).reduce((a,b) => a+b, 0)
+      const fab = document.getElementById('mozo-fab')
+      if (fab) fab.style.display = count > 0 ? 'none' : ''
+    }
+
     // ─── Cart ──────────────────────────────────────────────────────────────────
     function addItem(id) {
       cart[id] = (cart[id] || 0) + 1
       renderCtrl(id)
       updateCartCount()
+      saveCart()
+      syncTanoFab()
       // Animate cart badge
       const badge = document.getElementById('cart-count')
       if (badge) {
@@ -792,6 +822,8 @@
       if (!cart[id]) delete cart[id]
       renderCtrl(id)
       updateCartCount()
+      saveCart()
+      syncTanoFab()
       if (document.getElementById('cart-drawer').classList.contains('open')) renderCartItems()
     }
 
@@ -1007,7 +1039,9 @@
         const cartSnapshot = { ...cart }
         closeCart()
         cart = {}
+        clearCartStorage()
         updateCartCount()
+        syncTanoFab()
         updatePedidosBar()
         abrirOverlayEstado()
 
@@ -1427,6 +1461,13 @@ CATEGORIES: ${JSON.stringify(catNames)}`
     }
 
     init()
+
+    // PWA — registrar service worker después de 2 visitas
+    if ('serviceWorker' in navigator) {
+      const visits = Number(localStorage.getItem('vt_pwa_visits') || 0) + 1
+      localStorage.setItem('vt_pwa_visits', visits)
+      if (visits >= 2) navigator.serviceWorker.register('/sw.js').catch(() => {})
+    }
   </script>
 </body>
 </html>

@@ -166,6 +166,22 @@
       .filter-bar { padding: 8px 12px 0; gap: 6px; }
       .filter-tab { padding: 5px 12px; font-size: 12px; }
     }
+    /* Cronómetro semáforo */
+    .pedido-timer {
+      font-size: 20px; font-weight: 700; font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.02em; padding: 8px 16px;
+      border-top: 1px solid #2a2a2a;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .pedido-timer.green  { color: #44cc66; background: rgba(68,204,102,0.06); }
+    .pedido-timer.yellow { color: #e8a844; background: rgba(232,168,68,0.08); }
+    .pedido-timer.red    { color: #e84444; background: rgba(232,68,68,0.08); }
+    .pedido-timer.red-pulse {
+      color: #e84444; background: rgba(232,68,68,0.12);
+      animation: timerPulse 1s ease-in-out infinite;
+    }
+    @keyframes timerPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
     @media print {
       body { background: white; color: black; }
       .filter-bar, .header .conn-label, #btn-mute-sound { display: none !important; }
@@ -293,6 +309,7 @@
     show('main-view')
     await fetchPedidos()
     suscribirRealtime()
+    requestWakeLock()
 
     // Restaurar estado del botón de sonido
     ;(function initSoundBtn() {
@@ -325,6 +342,20 @@
         show('login-screen')
       }
     }
+  })
+
+  // Wake Lock — pantalla no se duerme en cocina
+  async function requestWakeLock() {
+    if (!('wakeLock' in navigator)) return
+    try {
+      window._wakeLock = await navigator.wakeLock.request('screen')
+      window._wakeLock.addEventListener('release', () => {
+        setTimeout(requestWakeLock, 1000)
+      })
+    } catch (e) { /* navegador rechazó, no es crítico */ }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') requestWakeLock()
   })
 
   window.addEventListener('beforeunload', () => {
@@ -452,26 +483,46 @@
     return '✓ Marcar entregado'
   }
 
+  const _pendingConfirm = {}
+
   async function cambiarEstado(id) {
     const pedido = pedidos[id]
     if (!pedido || pedido.status === 'delivered') return
     const anterior = pedido.status
     const siguiente = siguienteEstado(anterior)
+    const cardId = 'card-' + id.replace(/-/g,'_')
+    const btn = document.querySelector('#' + cardId + ' .estado-btn')
 
-    const btn = document.querySelector('#card-' + id.replace(/-/g,'_') + ' .estado-btn')
-    if (btn) { btn.disabled = true }
+    // Doble tap para confirmar "Listo" — evita falsos positivos
+    if (siguiente === 'ready' && !_pendingConfirm[id]) {
+      _pendingConfirm[id] = true
+      if (btn) {
+        btn.textContent = '✓ ¿Confirmar listo?'
+        btn.style.background = '#22aa44'
+        btn.style.color = 'white'
+        btn.style.animation = 'pulse .4s ease-in-out 2'
+      }
+      setTimeout(() => {
+        if (_pendingConfirm[id]) {
+          delete _pendingConfirm[id]
+          renderAll()
+        }
+      }, 2500)
+      return
+    }
+    delete _pendingConfirm[id]
+
+    if (btn) btn.disabled = true
 
     try {
       const updated = await orders.updateStatus(id, siguiente)
       pedidos[id] = { ...pedido, ...updated }
       historial[id] = anterior
-
-      // Si el pedido está listo, notificar al cliente por WhatsApp
       if (siguiente === 'ready') {
         notificarPedidoListo(id, rest.id).catch(() => {})
       }
     } catch {
-      if (btn) { btn.disabled = false }
+      if (btn) btn.disabled = false
       return
     }
     renderAll()
@@ -664,6 +715,15 @@
               + (canUndo ? '<button class="card-undo-btn" data-id="' + p.id + '" onclick="deshacerEnCard(this.dataset.id)" title="Deshacer">&#8617;</button>' : '')
               + '</div>'
             : '')
+          + (isDone ? '' : (() => {
+              const totalSec = Math.floor((Date.now() - new Date(p.created_at).getTime()) / 1000)
+              const minElapsed = Math.floor(totalSec / 60)
+              const mm = String(Math.floor(totalSec / 60)).padStart(2, '0')
+              const ss = String(totalSec % 60).padStart(2, '0')
+              const tc = minElapsed >= 15 ? 'red-pulse' : minElapsed >= 10 ? 'red' : minElapsed >= 5 ? 'yellow' : 'green'
+              const te = minElapsed >= 15 ? '🔴' : minElapsed >= 10 ? '🟠' : minElapsed >= 5 ? '🟡' : '🟢'
+              return '<div class="pedido-timer ' + tc + '" data-created="' + p.created_at + '">' + te + ' <span class="timer-display">' + mm + ':' + ss + '</span></div>'
+            })())
           + '</div>'
       }).join('')
 
@@ -681,6 +741,24 @@
     }).join('')
 
     startElapsedTimer()
+    startTimers()
+  }
+
+  function startTimers() {
+    if (window._timerInterval) clearInterval(window._timerInterval)
+    window._timerInterval = setInterval(() => {
+      document.querySelectorAll('.pedido-timer[data-created]').forEach(el => {
+        const created = new Date(el.getAttribute('data-created'))
+        const totalSec = Math.floor((Date.now() - created.getTime()) / 1000)
+        const mm = String(Math.floor(totalSec / 60)).padStart(2, '0')
+        const ss = String(totalSec % 60).padStart(2, '0')
+        const minElapsed = Math.floor(totalSec / 60)
+        const display = el.querySelector('.timer-display')
+        if (display) display.textContent = mm + ':' + ss
+        const tc = minElapsed >= 15 ? 'red-pulse' : minElapsed >= 10 ? 'red' : minElapsed >= 5 ? 'yellow' : 'green'
+        el.className = 'pedido-timer ' + tc
+      })
+    }, 1000)
   }
 
   function esc(s) {
