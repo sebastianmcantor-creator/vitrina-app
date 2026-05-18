@@ -4608,14 +4608,17 @@ window.selectBusinessType = function (type) {
   document.getElementById('setup-slug').placeholder = cfg.slugPlaceholder
   document.getElementById('btn-create-rest').textContent = cfg.btnText
 
-  // Adaptar card de WhatsApp al rubro
-  document.getElementById('setup-wa-title').textContent = cfg.waTitle
-  document.getElementById('setup-wa-desc').textContent = cfg.waDesc
-
-  // Reset WA toggle
-  const card = document.getElementById('setup-wa-option')
-  card.classList.remove('active')
-  document.getElementById('setup-wa-enabled').style.display = 'none'
+  // Adaptar card de WhatsApp al rubro (elementos opcionales — pueden no existir)
+  const waTitle = document.getElementById('setup-wa-title')
+  if (waTitle) waTitle.textContent = cfg.waTitle
+  const waDesc = document.getElementById('setup-wa-desc')
+  if (waDesc) waDesc.textContent = cfg.waDesc
+  const waCard = document.getElementById('setup-wa-option')
+  if (waCard) {
+    waCard.classList.remove('active')
+    const waEnabled = document.getElementById('setup-wa-enabled')
+    if (waEnabled) waEnabled.style.display = 'none'
+  }
 
   document.getElementById('setup-step-type').style.display = 'none'
   document.getElementById('setup-step-form').style.display = 'flex'
