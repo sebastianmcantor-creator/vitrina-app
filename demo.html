@@ -8,9 +8,10 @@
   <meta property="og:title" content="Demo Menú Digital — Vitrina">
   <meta property="og:description" content="Así se ve el menú digital de tu restaurante con Vitrina. Probalo gratis.">
   <meta property="og:url" content="https://vitrinaapp.com.ar/demo.html">
+  <link rel="stylesheet" href="lib/vitrina-tokens.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -152,7 +153,8 @@
       background: none;
       border: 1.5px solid #ddd;
       border-radius: 20px;
-      padding: 0.35rem 1rem;
+      padding: 0 1rem;
+      min-height: 44px;
       font-size: 0.8rem;
       font-family: 'Outfit', sans-serif;
       cursor: pointer;
@@ -285,13 +287,15 @@
       color: var(--terra);
     }
     .add-btn {
-      background: var(--terra);
+      min-width: 88px;
+      min-height: 48px;
+      padding: 0 16px;
+      background: var(--terra,#E8521A);
       color: white;
       border: none;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      font-size: 1.3rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -299,7 +303,7 @@
       transition: background 0.2s, transform 0.1s;
       flex-shrink: 0;
     }
-    .add-btn:active { transform: scale(0.9); background: var(--brown); }
+    .add-btn:active { transform: scale(0.98); background: var(--brown); }
 
     /* Qty controls */
     .qty-controls {
@@ -720,6 +724,7 @@
       line-height: 1.4;
     }
     .tano-input:focus { border-color: var(--terra); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .tano-send-btn {
       background: var(--terra);
       color: white;
@@ -780,10 +785,10 @@
 <!-- Nav fija: filtros + categorías -->
 <div class="sticky-nav">
   <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('all', this)">Todos</button>
-    <button class="filter-btn" onclick="setFilter('veg', this)">🥦 Vegetariano</button>
-    <button class="filter-btn" onclick="setFilter('vegan', this)">🌱 Vegano</button>
-    <button class="filter-btn" onclick="setFilter('tacc', this)">🌾 Sin TACC</button>
+    <button class="filter-btn active" onclick="setFilter('all', this)" aria-pressed="true">Todos</button>
+    <button class="filter-btn" onclick="setFilter('veg', this)" aria-pressed="false">🥦 Vegetariano</button>
+    <button class="filter-btn" onclick="setFilter('vegan', this)" aria-pressed="false">🌱 Vegano</button>
+    <button class="filter-btn" onclick="setFilter('tacc', this)" aria-pressed="false">🌾 Sin TACC</button>
   </div>
   <div class="cat-nav" id="catNav">
     <button class="cat-btn active" onclick="goToSection('picar', this)">Para picar</button>
@@ -1179,11 +1184,11 @@
 <div class="modal-overlay" id="orderModal">
   <div class="modal-box">
     <span class="modal-emoji">👨‍🍳</span>
-    <div class="modal-title">¿Enviamos el pedido?</div>
-    <div class="modal-text" id="orderSummaryText">Revisá tu pedido antes de enviarlo a cocina.</div>
+    <div class="modal-title">¿Mandamos el pedido a cocina?</div>
+    <div class="modal-text" id="orderSummaryText">Una vez enviado, no se puede modificar.</div>
     <div class="modal-actions">
-      <button class="modal-btn-primary" onclick="sendOrder()">Sí, enviar a cocina</button>
-      <button class="modal-btn-secondary" onclick="closeModal()">Volver al menú</button>
+      <button class="modal-btn-primary" onclick="sendOrder()">Mandar a cocina</button>
+      <button class="modal-btn-secondary" onclick="closeModal()">Revisar antes</button>
     </div>
   </div>
 </div>
@@ -1205,7 +1210,7 @@
       <div class="tano-header-name">Tano</div>
       <div class="tano-header-status">Tu asistente del menú · En línea</div>
     </div>
-    <button class="tano-close-btn" onclick="closeTano()">✕</button>
+    <button class="tano-close-btn" onclick="closeTano()" aria-label="Cerrar chat con Tano">✕</button>
   </div>
   <div class="tano-msgs" id="tanoMsgs"></div>
   <div class="tano-quick-btns" id="tanoQuickBtns">
@@ -1216,8 +1221,9 @@
     <button class="quick-btn" onclick="sendQuick('¿Cuánto tarda la milanesa?')">Tiempo de espera</button>
   </div>
   <div class="tano-input-area">
+    <label class="sr-only" for="tanoInput">Escribile a Tano</label>
     <textarea class="tano-input" id="tanoInput" placeholder="Preguntale a Tano..." rows="1" onkeydown="tanoKeydown(event)" oninput="autoResize(this)"></textarea>
-    <button class="tano-send-btn" onclick="sendTano()">➤</button>
+    <button class="tano-send-btn" onclick="sendTano()" aria-label="Enviar mensaje">➤</button>
   </div>
 </div>
 
@@ -1269,12 +1275,13 @@ function renderCtrl(id) {
   const el = document.getElementById('ctrl-' + id);
   if (!el) return;
   const qty = cart[id] || 0;
+  const itemName = (MENU[id] && MENU[id].name) ? MENU[id].name : id;
   if (qty === 0) {
-    el.innerHTML = `<button class="add-btn" onclick="addItem('${id}')">+</button>`;
+    el.innerHTML = `<button class="add-btn" onclick="addItem('${id}')" aria-label="Agregar ${itemName} al pedido">Agregar</button>`;
   } else {
     el.innerHTML = `
       <div class="qty-controls">
-        <button class="qty-btn" onclick="removeItem('${id}')">−</button>
+        <button class="qty-btn" onclick="removeItem('${id}')" aria-label="Quitar uno de ${itemName}">−</button>
         <span class="qty-num">${qty}</span>
         <button class="qty-btn" onclick="addItem('${id}')">+</button>
       </div>`;
@@ -1305,10 +1312,37 @@ function updateCartFab() {
   else fab.classList.remove('visible');
 }
 
+function openWithFocusTrap(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const focusable = el.querySelectorAll(
+    'button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+  );
+  if (!focusable.length) return;
+  const first = focusable[0];
+  const last = focusable[focusable.length - 1];
+  el.setAttribute('aria-modal', 'true');
+  el.setAttribute('role', 'dialog');
+  first.focus();
+  function trap(e) {
+    if (e.key === 'Tab') {
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    }
+  }
+  if (el._removeTrap) el._removeTrap();
+  el.addEventListener('keydown', trap);
+  el._removeTrap = () => el.removeEventListener('keydown', trap);
+}
+
 function openCart() {
   renderCartDrawer();
   document.getElementById('cartDrawer').classList.add('open');
   document.getElementById('cartOverlay').classList.add('open');
+  setTimeout(() => openWithFocusTrap('cartDrawer'), 50);
 }
 
 function closeCart() {
@@ -1319,7 +1353,7 @@ function closeCart() {
 function renderCartDrawer() {
   const el = document.getElementById('cartItems');
   if (getCount() === 0) {
-    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#999;font-size:0.9rem;">Todavía no agregaste nada 🛒</div>';
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#999;font-size:0.9rem;">Tu pedido está vacío 🛒</div>';
     return;
   }
   el.innerHTML = Object.entries(cart).map(([id, qty]) => {
@@ -1348,6 +1382,7 @@ function confirmOrder() {
     lines.join('<br>') + `<br><br><strong>Total: ${fmt(getTotal())}</strong>`;
   closeCart();
   document.getElementById('orderModal').classList.add('open');
+  setTimeout(() => openWithFocusTrap('orderModal'), 50);
 }
 
 function closeModal() {
@@ -1375,8 +1410,12 @@ let activeFilter = 'all';
 
 function setFilter(f, btn) {
   activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+    b.setAttribute('aria-pressed', 'false');
+  });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
   document.querySelectorAll('.menu-item').forEach(function(item) {
     if (f === 'all') {
       item.style.display = '';

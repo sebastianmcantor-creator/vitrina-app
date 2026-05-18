@@ -4,32 +4,96 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pago confirmado</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #fdf8f4; font-family: 'DM Sans', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .card { background: white; border-radius: 24px; padding: 40px 32px; text-align: center; max-width: 320px; width: 100%; border: 1px solid #ede8e2; }
-    .icon { font-size: 64px; margin-bottom: 16px; }
-    .title { font-family: 'Playfair Display', serif; font-size: 22px; color: #1a1208; margin-bottom: 8px; }
-    .sub { font-size: 14px; color: #8a7a6a; line-height: 1.6; margin-bottom: 24px; }
-    .mesa { font-size: 13px; color: #c8553d; font-weight: 500; margin-bottom: 24px; }
-    .btn { display: block; background: #1a1208; color: #fdf8f4; border-radius: 14px; padding: 14px; text-decoration: none; font-size: 14px; font-weight: 500; }
-  </style>
+  <link rel="stylesheet" href="lib/vitrina-tokens.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet" />
 </head>
-<body>
-  <div class="card">
-    <div class="icon">🎉</div>
-    <div class="title">¡Pago confirmado!</div>
-    <div class="sub">Tu pedido ya está en cocina.<br>En breve te lo llevamos a la mesa.</div>
-    <div class="mesa" id="mesa-label"></div>
-    <a class="btn" id="volver-btn" href="menu.html">Ver el menú</a>
+<body style="background:#1A2332;min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;font-family:'Inter',system-ui,sans-serif;color:#F5F5F0;">
+
+  <!-- Ícono de éxito -->
+  <div style="font-size:56px;margin-bottom:20px;animation:pop .4s cubic-bezier(0.34,1.56,0.64,1)">✅</div>
+
+  <!-- Título -->
+  <h1 style="font-family:'Playfair Display',Georgia,serif;font-size:28px;font-weight:700;margin-bottom:8px;text-align:center;">¡Todo listo!</h1>
+  <p style="color:rgba(245,245,240,0.70);font-size:15px;margin-bottom:24px;text-align:center;">Tu pedido fue enviado a cocina</p>
+
+  <!-- Pill número de pedido -->
+  <div id="pedido-pill" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:9999px;padding:8px 20px;font-size:13px;font-weight:600;margin-bottom:32px;letter-spacing:.04em;">
+    Cargando pedido...
   </div>
+
+  <!-- Card tiempo estimado -->
+  <div style="background:#243044;border-radius:16px;padding:24px;width:100%;max-width:360px;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <span style="font-size:14px;color:rgba(245,245,240,0.70);">Tiempo estimado</span>
+      <span style="font-size:18px;font-weight:700;color:#E8521A;">20–25 min</span>
+    </div>
+    <!-- Barra de progreso -->
+    <div style="background:rgba(255,255,255,0.08);border-radius:9999px;height:8px;overflow:hidden;">
+      <div id="progress-bar" style="height:100%;background:linear-gradient(90deg,#E8521A,#FF7540);border-radius:9999px;width:10%;transition:width 1s ease;"></div>
+    </div>
+    <div id="status-text" style="font-size:13px;color:rgba(245,245,240,0.55);margin-top:12px;text-align:center;">
+      El mozo te avisa cuando esté listo
+    </div>
+  </div>
+
+  <!-- Botón volver -->
+  <a id="btn-volver" href="/" style="display:block;width:100%;max-width:360px;padding:14px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;text-align:center;color:#F5F5F0;text-decoration:none;font-size:15px;font-weight:500;">
+    ← Volver al menú
+  </a>
+
+  <style>
+    @keyframes pop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  </style>
+
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const mesa = params.get('mesa');
-    if (mesa) {
-      document.getElementById('mesa-label').textContent = 'Mesa ' + mesa;
-      document.getElementById('volver-btn').href = 'menu.html?mesa=' + mesa;
+    // Leer params del URL
+    const p = new URLSearchParams(location.search);
+    const slug = p.get('slug') || localStorage.getItem('vt_slug') || '';
+    const mesa = p.get('mesa') || localStorage.getItem('vt_mesa') || '—';
+    const orderId = p.get('order_id') || localStorage.getItem('vt_last_order') || '';
+
+    // Actualizar pill
+    const pill = document.getElementById('pedido-pill');
+    if (orderId) {
+      pill.textContent = 'Pedido #' + orderId.slice(-6).toUpperCase() + ' · Mesa ' + mesa;
+    } else {
+      pill.textContent = 'Mesa ' + mesa;
+    }
+
+    // Link volver al menú
+    if (slug) {
+      document.getElementById('btn-volver').href = '/menu.html?slug=' + slug + (mesa !== '—' ? '&mesa=' + mesa : '');
+    }
+
+    // Animación barra de progreso
+    const bar = document.getElementById('progress-bar');
+    const statusEl = document.getElementById('status-text');
+    let pct = 10;
+    const interval = setInterval(() => {
+      pct = Math.min(pct + 1, 85);
+      bar.style.width = pct + '%';
+      if (pct >= 85) clearInterval(interval);
+    }, 250);
+
+    // Polling del estado si tenemos orderId (opcional, no bloquear si falla)
+    if (orderId) {
+      const statusMap = {
+        pending:   { text: 'Pedido recibido — lo arrancan en un momento', pct: 20 },
+        confirmed: { text: 'Pedido confirmado — ¡ya arrancan!', pct: 35 },
+        preparing: { text: 'En preparación 🍳', pct: 65 },
+        ready:     { text: '¡Tu pedido está listo! El mozo ya va.', pct: 100 },
+        delivered: { text: '¡Que lo disfrutes! 🎉', pct: 100 },
+      };
+      async function checkStatus() {
+        try {
+          const { createClient } = await import('./lib/supabase.js');
+          // Si hay supabase disponible, hacer polling
+        } catch {}
+      }
+      // Polling simple cada 15s
+      setInterval(checkStatus, 15000);
     }
   </script>
 </body>

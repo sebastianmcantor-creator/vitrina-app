@@ -4587,6 +4587,19 @@ window.selectBusinessType = function (type) {
   setupWAEnabled = false
   const cfg = BIZ_CONFIG[type]
 
+  // Estado visual: resaltar botón seleccionado
+  document.querySelectorAll('.biz-type-btn').forEach(btn => {
+    btn.style.border = ''
+    btn.style.background = ''
+  })
+  const allBtns = document.querySelectorAll('.biz-type-btn')
+  const typeOrder = ['restaurant', 'local', 'services', 'ecommerce']
+  const idx = typeOrder.indexOf(type)
+  if (idx !== -1 && allBtns[idx]) {
+    allBtns[idx].style.border = '2px solid #E8521A'
+    allBtns[idx].style.background = 'rgba(232,82,26,0.08)'
+  }
+
   document.getElementById('setup-biz-icon').textContent = cfg.icon
   document.getElementById('setup-biz-title').textContent = cfg.title
   document.getElementById('setup-biz-subtitle').textContent = cfg.subtitle

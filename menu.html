@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cargando...</title>
+  <link rel="stylesheet" href="lib/vitrina-tokens.css">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
       --bg: #fdf8f4;
@@ -31,7 +33,7 @@
     .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 18px 20px 14px; position: sticky; top: 0; z-index: 100; }
     .header-top { display: flex; justify-content: space-between; align-items: flex-start; }
     .lang-switcher { display: flex; gap: 4px; margin-top: 8px; }
-    .lang-btn { background: none; border: 1px solid var(--border); border-radius: 16px; padding: 3px 10px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all .15s; }
+    .lang-btn { background: none; border: 1px solid var(--border); border-radius: 16px; padding: 3px 10px; min-width:44px; min-height:44px; font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all .15s; }
     .lang-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
     .lang-btn:hover:not(.active) { border-color: var(--accent); color: var(--accent); }
     .translating-overlay { position: fixed; inset: 0; background: rgba(255,255,255,.7); z-index: 500; display: none; align-items: center; justify-content: center; flex-direction: column; gap: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; color: var(--muted); backdrop-filter: blur(4px); }
@@ -53,13 +55,14 @@
     .search-bar { padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
     .diet-filter-bar { padding: 8px 16px 0; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
     .diet-filter-bar::-webkit-scrollbar { display: none; }
-    .diet-btn { flex-shrink: 0; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; color: var(--muted); transition: all 0.15s; }
+    .diet-btn { flex-shrink: 0; min-height:44px; padding: 0 16px; border-radius: 20px; font-size: 12px; font-weight: 500; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); font-family: 'DM Sans', sans-serif; color: var(--muted); transition: all 0.15s; }
     .diet-btn.active-veg { background: var(--tag-veg); border-color: var(--tag-veg-text); color: var(--tag-veg-text); }
     .diet-btn.active-vegan { background: var(--tag-vegan); border-color: var(--tag-vegan-text); color: var(--tag-vegan-text); }
     .diet-btn.active-celiac { background: var(--tag-celiac); border-color: var(--tag-celiac-text); color: var(--tag-celiac-text); }
     .diet-btn.active-popular { background: #fce4ec; border-color: #c62828; color: #c62828; }
     .search-input { width: 100%; padding: 8px 14px; border: 1px solid var(--border); border-radius: 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--bg); outline: none; transition: border-color .15s; }
     .search-input:focus { border-color: var(--accent); }
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .search-empty { padding: 60px 20px; text-align: center; color: var(--muted); font-size: 15px; }
     .cat-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
     .cat-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
@@ -88,7 +91,7 @@
     .tag-new { background: #e8eaf6; color: #283593; }
     .item-bottom { display: flex; align-items: center; justify-content: space-between; }
     .item-price { font-size: 15px; font-weight: 500; }
-    .add-btn { background: var(--accent); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; }
+    .add-btn { min-width:88px; min-height:48px; padding:0 16px; background:var(--accent,#E8521A); color:white; border:none; border-radius:10px; font-weight:600; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
     .qty-control { display: flex; align-items: center; gap: 8px; }
     .qty-btn { background: var(--border); border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); }
     .qty-num { font-size: 15px; font-weight: 500; min-width: 20px; text-align: center; }
@@ -219,9 +222,9 @@
         </button>
       </div>
       <div class="lang-switcher" id="lang-switcher" style="display:none">
-        <button class="lang-btn active" id="lang-es" onclick="switchLang('es')">ES</button>
-        <button class="lang-btn" id="lang-en" onclick="switchLang('en')">EN</button>
-        <button class="lang-btn" id="lang-pt" onclick="switchLang('pt')">PT</button>
+        <button class="lang-btn active" id="lang-es" onclick="switchLang('es')" aria-label="Cambiar idioma a Español">ES</button>
+        <button class="lang-btn" id="lang-en" onclick="switchLang('en')" aria-label="Cambiar idioma a Inglés">EN</button>
+        <button class="lang-btn" id="lang-pt" onclick="switchLang('pt')" aria-label="Cambiar idioma a Portugués">PT</button>
       </div>
     </div>
 
@@ -236,13 +239,14 @@
       <span class="pedidos-bar-hint">Tocá para ver →</span>
     </div>
     <div class="search-bar" id="search-bar" style="display:none">
+  <label class="sr-only" for="menu-search">Buscar en el menú</label>
   <input class="search-input" id="menu-search" type="search" placeholder="Buscar en el menú..." oninput="searchMenu(this.value)">
 </div>
 <div class="diet-filter-bar" id="diet-filter-bar" style="display:none">
-  <button class="diet-btn" id="df-veg"     onclick="toggleDietFilter('veg')">🌿 Vegetariano</button>
-  <button class="diet-btn" id="df-vegan"   onclick="toggleDietFilter('vegan')">🌱 Vegano</button>
-  <button class="diet-btn" id="df-celiac"  onclick="toggleDietFilter('celiac')">🌾 Sin TACC</button>
-  <button class="diet-btn" id="df-popular" onclick="toggleDietFilter('popular')">🔥 Populares</button>
+  <button class="diet-btn" id="df-veg"     onclick="toggleDietFilter('veg')"     aria-pressed="false">🌿 Vegetariano</button>
+  <button class="diet-btn" id="df-vegan"   onclick="toggleDietFilter('vegan')"   aria-pressed="false">🌱 Vegano</button>
+  <button class="diet-btn" id="df-celiac"  onclick="toggleDietFilter('celiac')"  aria-pressed="false">🌾 Sin TACC</button>
+  <button class="diet-btn" id="df-popular" onclick="toggleDietFilter('popular')" aria-pressed="false">🔥 Los más pedidos</button>
 </div>
     <nav class="cat-nav" id="cat-nav"></nav>
     <div class="content" id="content"></div>
@@ -253,21 +257,23 @@
     <div class="cart-handle"></div>
     <div class="cart-header">
       <div class="cart-title">Tu pedido</div>
-      <button class="cart-close" onclick="toggleCart()">×</button>
+      <button class="cart-close" onclick="toggleCart()" aria-label="Cerrar carrito">×</button>
     </div>
     <div class="cart-items" id="cart-items">
       <div class="cart-empty" style="padding:32px 20px;text-align:center;color:var(--muted)">
         <div style="font-size:32px;margin-bottom:8px">🛒</div>
-        <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">Todavía no elegiste nada</div>
-        <div style="font-size:13px">Agregá platos desde el menú</div>
+        <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">Tu pedido está vacío</div>
+        <div style="font-size:13px">Elegí lo que se te antoje y lo ves acá</div>
       </div>
     </div>
     <div class="cart-footer" id="cart-footer" style="display:none">
       <div class="cart-total"><span>Total</span><span id="cart-total">$0</span></div>
       <div class="mesa-warning" id="mesa-warning">⚠️ No se detectó número de mesa. Pedí al mozo que te escanee el QR correcto.</div>
       <div style="margin-bottom:10px">
+        <label class="sr-only" for="cliente-email">Tu email (opcional) para recibir confirmación</label>
         <input type="email" id="cliente-email" placeholder="Tu email (opcional) para recibir confirmación"
           style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--surface);outline:none;margin-bottom:8px">
+        <label class="sr-only" for="cliente-telefono">Tu teléfono (opcional) para avisarte cuando esté listo</label>
         <input type="tel" id="cliente-telefono" placeholder="Tu teléfono (opcional) para avisarte cuando esté listo"
           style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--surface);outline:none">
         <div style="font-size:11px;color:var(--muted);margin-top:4px;padding:0 4px">📱 Te avisamos por WhatsApp cuando tu pedido esté listo</div>
@@ -279,20 +285,22 @@
   <!-- Checkout summary modal -->
   <div class="confirm-overlay" id="checkout-summary-overlay">
     <div class="confirm-box" style="max-width:380px">
-      <div class="confirm-heading">Confirmá tu pedido</div>
+      <div class="confirm-heading">¿Mandamos el pedido a cocina?</div>
       <div class="confirm-mesa-label" id="checkout-mesa-label">Mesa —</div>
+      <div style="font-size:12px;color:#8a7a6a;margin-bottom:12px;">Una vez enviado, no se puede modificar.</div>
       <div id="checkout-summary-items" style="overflow-y:auto;max-height:200px;margin-bottom:14px;border:1px solid var(--border, #ede8e2);border-radius:10px;padding:10px 12px"></div>
       <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:600;color:#1a1208;margin-bottom:16px;padding:0 2px">
         <span>Total</span>
         <span id="checkout-total">$0</span>
       </div>
+      <label class="sr-only" for="checkout-nombre">Tu nombre (opcional)</label>
       <input type="text" id="checkout-nombre" placeholder="Tu nombre (opcional)"
         style="width:100%;padding:10px 14px;border:1px solid var(--border,#ede8e2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;margin-bottom:10px;background:#fff;outline:none;box-sizing:border-box">
       <button class="checkout-btn" id="btn-confirm-order" onclick="checkout()" style="margin-bottom:8px">
-        ✓ Confirmar pedido
+        ✓ Mandar a cocina
       </button>
       <button class="confirm-close" onclick="document.getElementById('checkout-summary-overlay').classList.remove('open')" style="width:100%;text-align:center">
-        Volver al carrito
+        Revisar antes
       </button>
     </div>
   </div>
@@ -310,11 +318,11 @@
         <div style="font-size:11px;color:#8a7a6a;text-align:center;margin-bottom:10px">Abrís WhatsApp con tu pedido ya escrito — tocás Enviar y listo</div>
       </div>
       <button class="confirm-close" onclick="cerrarOverlay()">Cerrar</button>
-      <button onclick="resetSesion()" style="margin-top:8px;width:100%;padding:8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:#8a7a6a;cursor:pointer;text-decoration:underline">No son mis pedidos — empezar de cero</button>
+      <button onclick="resetSesion()" style="margin-top:8px;width:100%;padding:8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:#8a7a6a;cursor:pointer;text-decoration:underline">No son míos — empezar de nuevo</button>
     </div>
   </div>
 
-  <a class="mozo-fab" id="mozo-fab" href="mozo.html">💬 Consultá al mozo</a>
+  <a class="mozo-fab" id="mozo-fab" href="mozo.html">Preguntale a Tano</a>
   <a id="reserva-fab" href="#" style="display:none;position:fixed;bottom:80px;left:16px;background:#2e7d32;color:white;border-radius:50px;padding:10px 16px;font-size:13px;font-weight:500;text-decoration:none;box-shadow:0 4px 16px rgba(34,170,68,.35);font-family:'DM Sans',sans-serif;transition:all .2s;z-index:50"
     onmouseover="this.style.background='#1b5e20'" onmouseout="this.style.background='#2e7d32'">
     📅 Reservar
@@ -334,7 +342,25 @@
     }
 
     const params = new URLSearchParams(location.search)
-    const slug = params.get('slug')
+    const _slug = params.get('slug') || params.get('restaurant')
+    if (!_slug) {
+      document.body.style.cssText =
+        'min-height:100dvh;display:flex;flex-direction:column;align-items:center;' +
+        'justify-content:center;padding:24px;text-align:center;' +
+        'background:#1A2332;color:#F5F5F0;font-family:system-ui,sans-serif;'
+      document.body.innerHTML = `
+        <p style="font-size:18px;font-weight:600;margin-bottom:12px;">
+          Este link no está activo.
+        </p>
+        <p style="color:rgba(245,245,240,0.70);font-size:15px;line-height:1.5;">
+          Pedile al restaurante el código QR actualizado y escanealo de nuevo.
+        </p>
+        <a href="/" style="margin-top:24px;color:#FF7540;font-size:14px;">
+          Crear mi propio menú →
+        </a>`
+      throw new Error('Sin slug — deteniendo ejecución')
+    }
+    const slug = _slug
     const mesa = params.get('mesa') !== null ? Number(params.get('mesa')) : null
 
     let rest = null
@@ -724,12 +750,13 @@
       const item = itemsById[id]
       if (!item?.is_available) { el.innerHTML = ''; return }
       const qty = cart[id] || 0
+      const itemName = item.name || ''
       el.innerHTML = qty === 0
-        ? '<button class="add-btn" onclick="addItem(\'' + id + '\')">+</button>'
+        ? '<button class="add-btn" onclick="addItem(\'' + id + '\')" aria-label="Agregar ' + itemName.replace(/'/g, '&#39;') + ' al pedido">Agregar</button>'
         : '<div class="qty-control">'
-          + '<button class="qty-btn" onclick="removeItem(\'' + id + '\')">−</button>'
+          + '<button class="qty-btn" onclick="removeItem(\'' + id + '\')" aria-label="Quitar uno de ' + itemName.replace(/'/g, '&#39;') + '">−</button>'
           + '<span class="qty-num">' + qty + '</span>'
-          + '<button class="qty-btn" onclick="addItem(\'' + id + '\')">+</button>'
+          + '<button class="qty-btn" onclick="addItem(\'' + id + '\')" aria-label="Agregar otro de ' + itemName.replace(/'/g, '&#39;') + '">+</button>'
           + '</div>'
     }
 
@@ -775,12 +802,43 @@
       if (cartBtn) cartBtn.classList.toggle('has-items', total > 0)
     }
 
+    function openWithFocusTrap(elementId) {
+      const el = document.getElementById(elementId)
+      if (!el) return
+      const focusable = el.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusable.length) return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      el.setAttribute('aria-modal', 'true')
+      el.setAttribute('role', 'dialog')
+      first.focus()
+      function trap(e) {
+        if (e.key === 'Tab') {
+          if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault(); last.focus()
+          } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault(); first.focus()
+          }
+        }
+      }
+      if (el._removeTrap) el._removeTrap()
+      el.addEventListener('keydown', trap)
+      el._removeTrap = () => el.removeEventListener('keydown', trap)
+    }
+
     function toggleCart() {
       const drawer = document.getElementById('cart-drawer')
       const open = drawer.classList.contains('open')
       if (!open) renderCartItems()
       document.getElementById('cart-overlay').classList.toggle('open', !open)
       drawer.classList.toggle('open', !open)
+      if (!open) {
+        setTimeout(() => openWithFocusTrap('cart-drawer'), 50)
+      } else {
+        if (drawer._removeTrap) drawer._removeTrap()
+      }
     }
 
     function closeCart() {
@@ -843,7 +901,7 @@
       }).join('')
 
       document.getElementById('checkout-summary-overlay').classList.add('open')
-      setTimeout(() => document.getElementById('checkout-nombre').focus(), 80)
+      setTimeout(() => openWithFocusTrap('checkout-summary-overlay'), 80)
     }
 
     async function checkout() {
@@ -968,7 +1026,7 @@
         alert('Error al enviar el pedido. Intentá de nuevo.')
       } finally {
         const confirmBtn = document.getElementById('btn-confirm-order')
-        if (confirmBtn) { confirmBtn.textContent = '✓ Confirmar pedido'; confirmBtn.disabled = false }
+        if (confirmBtn) { confirmBtn.textContent = '✓ Mandar a cocina'; confirmBtn.disabled = false }
         const mainBtn = document.getElementById('checkout-btn')
         if (mainBtn) { mainBtn.disabled = false }
       }
@@ -1159,15 +1217,23 @@
     window.toggleDietFilter = function (tag) {
       if (activeDietFilter === tag) {
         activeDietFilter = null
-        document.getElementById('df-' + tag)?.classList.remove(DIET_ACTIVE_CLASS[tag])
+        const btnOff = document.getElementById('df-' + tag)
+        btnOff?.classList.remove(DIET_ACTIVE_CLASS[tag])
+        btnOff?.setAttribute('aria-pressed', 'false')
         // Persistir en sessionStorage
         sessionStorage.removeItem('vitrina_diet_' + slug)
         buildMenu()
         return
       }
-      if (activeDietFilter) document.getElementById('df-' + activeDietFilter)?.classList.remove(DIET_ACTIVE_CLASS[activeDietFilter])
+      if (activeDietFilter) {
+        const prevBtn = document.getElementById('df-' + activeDietFilter)
+        prevBtn?.classList.remove(DIET_ACTIVE_CLASS[activeDietFilter])
+        prevBtn?.setAttribute('aria-pressed', 'false')
+      }
       activeDietFilter = tag
-      document.getElementById('df-' + tag)?.classList.add(DIET_ACTIVE_CLASS[tag])
+      const btnOn = document.getElementById('df-' + tag)
+      btnOn?.classList.add(DIET_ACTIVE_CLASS[tag])
+      btnOn?.setAttribute('aria-pressed', 'true')
       // Persistir en sessionStorage
       sessionStorage.setItem('vitrina_diet_' + slug, activeDietFilter)
       applyDietFilter(tag)

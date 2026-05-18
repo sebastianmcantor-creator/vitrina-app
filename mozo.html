@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Asistente</title>
+  <link rel="stylesheet" href="lib/vitrina-tokens.css">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; background: #1a1208; font-family: 'DM Sans', sans-serif; overflow: hidden; }
@@ -64,6 +66,7 @@
 
     #error-screen { position: fixed; inset: 0; background: #1a1208; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: #8a7450; font-size: 14px; text-align: center; padding: 20px; }
 
+    .sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
     .lang-switcher { display: flex; gap: 4px; margin-top: 6px; }
     .lang-btn { background: transparent; border: 0.5px solid #3a2e1a; color: #5a4a2a; font-size: 11px; font-family: 'DM Sans', sans-serif; padding: 3px 8px; border-radius: 6px; cursor: pointer; transition: all .15s; letter-spacing: .03em; }
     .lang-btn.active { background: #2a2010; border-color: #c8a84a; color: #c8a84a; }
@@ -97,16 +100,16 @@
                  border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;
                  font-family:'DM Sans',sans-serif;transition:color .2s">🔄</button>
         <div class="lang-switcher" id="lang-switcher">
-          <button class="lang-btn active" data-lang="es" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
-          <button class="lang-btn" data-lang="pt" onclick="setLang('pt')">PT</button>
+          <button class="lang-btn active" data-lang="es" onclick="setLang('es')" aria-label="Cambiar idioma a Español">ES</button>
+          <button class="lang-btn" data-lang="en" onclick="setLang('en')" aria-label="Cambiar idioma a Inglés">EN</button>
+          <button class="lang-btn" data-lang="pt" onclick="setLang('pt')" aria-label="Cambiar idioma a Portugués">PT</button>
         </div>
       </div>
     </div>
 
     <div class="messages" id="messages">
       <div class="msg typing" id="typing">
-        <div class="msg-label" style="opacity:0.6">Tano está escribiendo</div>
+        <div class="msg-label" style="opacity:0.6">Tano está pensando...</div>
         <div class="msg-bubble">
           <div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
@@ -128,8 +131,9 @@
     </div>
 
     <div class="input-area">
-      <input class="chat-input" id="chat-input" type="text" placeholder="Preguntame lo que quieras..." />
-      <button class="send-btn" onclick="sendMessage()">
+      <label class="sr-only" for="chat-input">Escribile a Tano</label>
+      <input class="chat-input" id="chat-input" type="text" placeholder="Escribile a Tano..." />
+      <button class="send-btn" onclick="sendMessage()" aria-label="Enviar mensaje">
         <svg viewBox="0 0 24 24" fill="none" stroke="#1a1208" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="22" y1="2" x2="11" y2="13"></line>
           <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -197,7 +201,7 @@
     })()
 
     async function init() {
-      if (!slug) { showError('URL inválida — falta el parámetro slug.'); return }
+      if (!slug) { showError('Hmm, algo salió mal con este link. Pedile al mozo el QR de tu mesa y escanealo de nuevo.'); return }
 
       let rest
       try {
