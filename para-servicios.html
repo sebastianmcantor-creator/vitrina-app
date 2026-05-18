@@ -120,8 +120,9 @@
   <h2>Un solo plan para servicios</h2>
   <p>Marketing digital + agenda de turnos + WhatsApp Business. Sin comisiones sobre tus ventas.</p>
   <div style="background:rgba(255,255,255,.08);border:1px solid rgba(200,168,74,.3);border-radius:14px;padding:20px 28px;display:inline-block;margin-bottom:24px">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#e8c87a" id="p-svc">$92k</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px">Marketing + WhatsApp · USD 78/mes · TC oficial</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#e8c87a" id="p-svc">$82k</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px">Marketing · USD 58/mes · TC oficial</div>
+    <div style="font-size:12px;color:rgba(200,168,74,.7);margin-top:6px">✅ WhatsApp Business incluido</div>
   </div>
   <br>
   <a href="/panel.html" class="btn-primary">Empezar 14 días gratis →</a>
@@ -143,7 +144,7 @@
     const d = await r.json()
     const tc = d.oficial || 1418
     const el = document.getElementById('p-svc')
-    if(el) el.textContent = '$' + Math.round(78 * tc / 1000) + 'k'
+    if(el) el.textContent = '$' + Math.round(58 * tc / 1000) + 'k'
   } catch {}
 })()
 </script>
