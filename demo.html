@@ -785,10 +785,10 @@
 <!-- Nav fija: filtros + categorías -->
 <div class="sticky-nav">
   <div class="filters">
-    <button class="filter-btn active" onclick="setFilter('all', this)" aria-pressed="true">Todos</button>
-    <button class="filter-btn" onclick="setFilter('veg', this)" aria-pressed="false">🥦 Vegetariano</button>
-    <button class="filter-btn" onclick="setFilter('vegan', this)" aria-pressed="false">🌱 Vegano</button>
-    <button class="filter-btn" onclick="setFilter('tacc', this)" aria-pressed="false">🌾 Sin TACC</button>
+    <button class="filter-btn active" id="df-all" onclick="clearFilters()" aria-pressed="true">Todos</button>
+    <button class="filter-btn" id="df-veg"   onclick="toggleFilter('veg',  this)" aria-pressed="false">🥦 Vegetariano</button>
+    <button class="filter-btn" id="df-vegan" onclick="toggleFilter('vegan',this)" aria-pressed="false">🌱 Vegano</button>
+    <button class="filter-btn" id="df-tacc"  onclick="toggleFilter('tacc', this)" aria-pressed="false">🌾 Sin TACC</button>
   </div>
   <div class="cat-nav" id="catNav">
     <button class="cat-btn active" onclick="goToSection('picar', this)">Para picar</button>
@@ -1413,26 +1413,52 @@ function sendOrder() {
 }
 
 // ============================================================
-// FILTROS
+// FILTROS — multi-select con lógica AND
 // ============================================================
-let activeFilter = 'all';
+var activeFilters = new Set();
 
-function setFilter(f, btn) {
-  activeFilter = f;
+function filterItems() {
+  var allBtn = document.getElementById('df-all');
+  var noFilters = activeFilters.size === 0;
+  if (allBtn) {
+    allBtn.classList.toggle('active', noFilters);
+    allBtn.setAttribute('aria-pressed', noFilters ? 'true' : 'false');
+  }
+  document.querySelectorAll('.menu-item').forEach(function(item) {
+    if (noFilters) {
+      item.style.display = '';
+      return;
+    }
+    var tags = (item.getAttribute('data-tags') || '').split(' ').filter(Boolean);
+    // AND: el ítem debe tener TODOS los filtros activos
+    var matches = true;
+    activeFilters.forEach(function(f) {
+      if (tags.indexOf(f) === -1) matches = false;
+    });
+    item.style.display = matches ? '' : 'none';
+  });
+}
+
+function toggleFilter(type, btn) {
+  if (activeFilters.has(type)) {
+    activeFilters.delete(type);
+    btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
+  } else {
+    activeFilters.add(type);
+    btn.classList.add('active');
+    btn.setAttribute('aria-pressed', 'true');
+  }
+  filterItems();
+}
+
+function clearFilters() {
+  activeFilters.clear();
   document.querySelectorAll('.filter-btn').forEach(function(b) {
     b.classList.remove('active');
     b.setAttribute('aria-pressed', 'false');
   });
-  btn.classList.add('active');
-  btn.setAttribute('aria-pressed', 'true');
-  document.querySelectorAll('.menu-item').forEach(function(item) {
-    if (f === 'all') {
-      item.style.display = '';
-    } else {
-      var tags = item.getAttribute('data-tags') || '';
-      item.style.display = tags.split(' ').indexOf(f) !== -1 ? '' : 'none';
-    }
-  });
+  filterItems();
 }
 
 // ============================================================

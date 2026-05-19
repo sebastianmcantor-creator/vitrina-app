@@ -559,10 +559,14 @@
       }
 
       // Restaurar filtro de dieta si había uno activo
-      const savedFilter = sessionStorage.getItem('vitrina_diet_' + slug)
-      if (savedFilter) {
-        const btn = document.getElementById('df-' + savedFilter)
-        if (btn) toggleDietFilter(savedFilter)
+      // Restaurar filtros guardados (ahora es array JSON)
+      const savedFilters = sessionStorage.getItem('vitrina_diet_' + slug)
+      if (savedFilters) {
+        try {
+          const arr = JSON.parse(savedFilters)
+          if (Array.isArray(arr)) arr.forEach(f => { if (document.getElementById('df-' + f)) toggleDietFilter(f) })
+          else if (typeof savedFilters === 'string') { if (document.getElementById('df-' + savedFilters)) toggleDietFilter(savedFilters) }
+        } catch { /* ignorar si el formato es inválido */ }
       }
 
       document.getElementById('search-bar').style.display = 'block'
@@ -1223,7 +1227,7 @@
       const nav = document.getElementById('cat-nav')
       if (!q.trim()) {
         // Restaurar vista normal
-        activeDietFilter = null; document.querySelectorAll('.diet-btn').forEach(b => { b.className = 'diet-btn' })
+        activeDietFilters.clear(); document.querySelectorAll('.diet-btn').forEach(b => { b.className = 'diet-btn'; b.setAttribute('aria-pressed','false') })
         buildMenu()
         nav.style.display = 'flex'
         return
@@ -1244,47 +1248,48 @@
       Object.keys(itemsById).forEach(renderCtrl)
     }
 
-    // ─── Filtros por dieta ────────────────────────────────────────────────────
-    let activeDietFilter = null
+    // ─── Filtros por dieta — multi-select con lógica AND ─────────────────────
+    const activeDietFilters = new Set()
     const DIET_ACTIVE_CLASS = { veg: 'active-veg', vegan: 'active-vegan', celiac: 'active-celiac', popular: 'active-popular' }
 
     window.toggleDietFilter = function (tag) {
-      if (activeDietFilter === tag) {
-        activeDietFilter = null
-        const btnOff = document.getElementById('df-' + tag)
-        btnOff?.classList.remove(DIET_ACTIVE_CLASS[tag])
-        btnOff?.setAttribute('aria-pressed', 'false')
-        // Persistir en sessionStorage
+      if (activeDietFilters.has(tag)) {
+        activeDietFilters.delete(tag)
+        document.getElementById('df-' + tag)?.classList.remove(DIET_ACTIVE_CLASS[tag])
+        document.getElementById('df-' + tag)?.setAttribute('aria-pressed', 'false')
+      } else {
+        activeDietFilters.add(tag)
+        document.getElementById('df-' + tag)?.classList.add(DIET_ACTIVE_CLASS[tag])
+        document.getElementById('df-' + tag)?.setAttribute('aria-pressed', 'true')
+      }
+      // Persistir en sessionStorage (array JSON)
+      if (activeDietFilters.size > 0) {
+        sessionStorage.setItem('vitrina_diet_' + slug, JSON.stringify([...activeDietFilters]))
+      } else {
         sessionStorage.removeItem('vitrina_diet_' + slug)
-        buildMenu()
-        return
       }
-      if (activeDietFilter) {
-        const prevBtn = document.getElementById('df-' + activeDietFilter)
-        prevBtn?.classList.remove(DIET_ACTIVE_CLASS[activeDietFilter])
-        prevBtn?.setAttribute('aria-pressed', 'false')
-      }
-      activeDietFilter = tag
-      const btnOn = document.getElementById('df-' + tag)
-      btnOn?.classList.add(DIET_ACTIVE_CLASS[tag])
-      btnOn?.setAttribute('aria-pressed', 'true')
-      // Persistir en sessionStorage
-      sessionStorage.setItem('vitrina_diet_' + slug, activeDietFilter)
-      applyDietFilter(tag)
+      applyDietFilter()
     }
 
-    function applyDietFilter(tag) {
+    function applyDietFilter() {
       const content = document.getElementById('content')
-      const results = Object.values(itemsById).filter(item =>
-        item.is_visible && item.is_available &&
-        (item.tags || []).includes(tag)
-      )
+      if (activeDietFilters.size === 0) { buildMenu(); return }
+
+      const results = Object.values(itemsById).filter(item => {
+        if (!item.is_visible || !item.is_available) return false
+        const itemTags = item.tags || []
+        // AND: el ítem debe tener TODOS los filtros activos
+        return [...activeDietFilters].every(f => itemTags.includes(f))
+      })
+
       if (!results.length) {
-        content.innerHTML = '<div class="search-empty">No encontramos platos con ese filtro 🌿</div>'
+        content.innerHTML = '<div class="search-empty">No encontramos platos con esa combinación de filtros 🌿</div>'
         return
       }
-      const TAG_NAMES = { veg: 'Vegetarianos', vegan: 'Veganos', celiac: 'Sin TACC', popular: 'Populares' }
-      content.innerHTML = '<div class="category-section"><div class="category-title" style="color:var(--muted);font-size:14px">' + results.length + ' platos ' + (TAG_NAMES[tag] || '') + '</div>' + results.map((item, i) => itemCardHtml(item, i)).join('') + '</div>'
+      const filterNames = [...activeDietFilters].map(f =>
+        ({ veg: 'Vegetarianos', vegan: 'Veganos', celiac: 'Sin TACC', popular: 'Populares' })[f] || f
+      ).join(' + ')
+      content.innerHTML = '<div class="category-section"><div class="category-title" style="color:var(--muted);font-size:14px">' + results.length + ' plato' + (results.length !== 1 ? 's' : '') + ' · ' + filterNames + '</div>' + results.map((item, i) => itemCardHtml(item, i)).join('') + '</div>'
       Object.keys(itemsById).forEach(renderCtrl)
     }
 
