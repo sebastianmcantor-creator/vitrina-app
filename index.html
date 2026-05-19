@@ -1525,8 +1525,9 @@
           <div class="plan-card">
             <div class="plan-name" style="font-size:20px">Marketing</div>
             <div class="plan-desc">Presencia digital, redes y WhatsApp</div>
-            <div class="plan-price" style="font-size:32px"><span class="p-rest-mkt">$82.244</span></div>
-            <div class="plan-tc">USD 58/mes · TC oficial</div>
+            <div class="plan-price" style="font-size:32px"><span class="p-rest-mkt">$80.826</span></div>
+            <div class="plan-tc">USD 57/mes · TC oficial</div>
+            <div style="display:inline-flex;align-items:center;gap:5px;background:#fff8e1;color:#92400e;border:1px solid #fcd34d;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;margin-top:6px">🎁 Primer mes: $10 USD en créditos</div>
             <ul class="plan-features" style="margin-top:12px">
               <li>Viti: estrategia mensual personalizada</li>
               <li>30 publicaciones automáticas/mes</li>
@@ -1544,8 +1545,9 @@
             <div class="plan-popular">Más elegido</div>
             <div class="plan-name" style="font-size:20px">Combo</div>
             <div class="plan-desc">Todo junto — menú + marketing + WhatsApp</div>
-            <div class="plan-price" style="font-size:32px"><span class="p-rest-combo">$106.350</span></div>
-            <div class="plan-tc">USD 75/mes · <span style="color:var(--green);font-weight:600">Ahorrás USD 10</span></div>
+            <div class="plan-price" style="font-size:32px"><span class="p-rest-combo">$99.260</span></div>
+            <div class="plan-tc">USD 70/mes · <span style="color:var(--green);font-weight:600">Ahorrás USD 14 vs contratar por separado</span></div>
+            <div style="display:inline-flex;align-items:center;gap:5px;background:#fff8e1;color:#92400e;border:1px solid #fcd34d;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;margin-top:6px">🎁 Primer mes: $10 USD en créditos</div>
             <ul class="plan-features" style="margin-top:12px">
               <li>Todo Solo Menú +</li>
               <li>Todo Marketing +</li>
@@ -1569,8 +1571,9 @@
           <div class="plan-popular">Plan único</div>
           <div class="plan-name">Marketing</div>
           <div class="plan-desc">Catálogo, ML, TN, redes, IA y WhatsApp</div>
-          <div class="plan-price"><span class="p-local-mkt">$92.170</span></div>
-          <div class="plan-tc">USD 65 · TC oficial hoy</div>
+          <div class="plan-price"><span class="p-local-mkt">$87.916</span></div>
+          <div class="plan-tc">USD 62/mes · TC oficial</div>
+          <div style="display:inline-flex;align-items:center;gap:5px;background:#fff8e1;color:#92400e;border:1px solid #fcd34d;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;margin-top:6px;margin-bottom:8px">🎁 Primer mes: $10 USD en créditos</div>
           <ul class="plan-features">
             <li>Catálogo QR ilimitado</li>
             <li>MercadoLibre: publicaciones, preguntas, stock automático</li>
@@ -1944,10 +1947,10 @@ function showPricing(type) {
     const fmt = usd => '$' + Math.round(usd * tc).toLocaleString('es-AR')
     // Restaurantes
     document.querySelectorAll('.p-rest-menu').forEach(el => el.textContent = fmt(27))
-    document.querySelectorAll('.p-rest-mkt').forEach(el => el.textContent = fmt(58))
-    document.querySelectorAll('.p-rest-combo').forEach(el => el.textContent = fmt(75))
-    // Comercios
-    document.querySelectorAll('.p-local-mkt').forEach(el => el.textContent = fmt(65))
+    document.querySelectorAll('.p-rest-mkt').forEach(el => el.textContent = fmt(57))
+    document.querySelectorAll('.p-rest-combo').forEach(el => el.textContent = fmt(70))
+    // Comercios / Servicios / Locales
+    document.querySelectorAll('.p-local-mkt').forEach(el => el.textContent = fmt(62))
   } catch {}
 })()
 </script>

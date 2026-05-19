@@ -127,9 +127,10 @@
   <h2>Un plan con todo incluido</h2>
   <p>ML + TN + catálogo QR + marketing en redes + Viti ilimitado.<br>Sin comisiones sobre tus ventas.</p>
   <div style="background:rgba(255,255,255,.08);border:1px solid rgba(200,168,74,.3);border-radius:14px;padding:20px 28px;display:inline-block;margin-bottom:24px;text-align:center">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#e8c87a" id="p-c1">$92k</div>
-    <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px">Marketing · USD 65/mes · TC oficial</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:600;color:#e8c87a" id="p-c1">$88k</div>
+    <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:4px">Marketing · USD 62/mes · TC oficial</div>
     <div style="font-size:12px;color:rgba(200,168,74,.7);margin-top:6px">✅ WhatsApp Business incluido</div>
+    <div style="font-size:12px;color:#fcd34d;margin-top:4px">🎁 Primer mes: $10 USD en créditos</div>
   </div>
   <br>
   <a href="/panel.html" class="btn-primary">Empezar 14 días gratis →</a>
@@ -151,7 +152,7 @@
     const d = await r.json()
     const tc = d.oficial || 1418
     const fmt = usd => '$' + Math.round(usd * tc / 1000) + 'k'
-    const p1 = document.getElementById('p-c1'); if(p1) p1.textContent = fmt(65)
+    const p1 = document.getElementById('p-c1'); if(p1) p1.textContent = fmt(62)
   } catch {}
 })()
 </script>
