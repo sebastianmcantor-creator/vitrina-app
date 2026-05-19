@@ -298,6 +298,16 @@
         <span>Total</span>
         <span id="checkout-total">$0</span>
       </div>
+      <!-- Campo de mesa si no se detectó automáticamente -->
+      <div id="mesa-input-wrap" style="display:none;margin-bottom:12px;background:#fff8e1;border:1px solid #ffc107;border-radius:10px;padding:12px 14px">
+        <label style="font-size:13px;font-weight:600;color:#856404;display:block;margin-bottom:8px">⚠️ ¿En qué mesa estás?</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="number" id="mesa-manual-input" placeholder="Nº de mesa" min="1"
+            style="flex:1;padding:9px 12px;border:1.5px solid #ffc107;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:14px;outline:none;box-sizing:border-box"
+            oninput="updateMesaManual(this.value)">
+          <span style="font-size:12px;color:#856404">requerido</span>
+        </div>
+      </div>
       <label class="sr-only" for="checkout-nombre">Tu nombre (opcional)</label>
       <input type="text" id="checkout-nombre" placeholder="Tu nombre (opcional)"
         style="width:100%;padding:10px 14px;border:1px solid var(--border,#ede8e2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:13px;margin-bottom:10px;background:#fff;outline:none;box-sizing:border-box">
@@ -918,6 +928,19 @@
     }
 
     // ─── Checkout ──────────────────────────────────────────────────────────────
+    let mesaManual = null // mesa ingresada manualmente cuando no se detectó por URL
+
+    window.updateMesaManual = function(val) {
+      const n = parseInt(val, 10)
+      mesaManual = (!isNaN(n) && n > 0) ? n : null
+      const btn = document.getElementById('btn-confirm-order')
+      if (btn) btn.disabled = !mesaManual
+    }
+
+    function mesaEfectiva() {
+      return mesa != null ? mesa : mesaManual
+    }
+
     function showCheckoutSummary() {
       const ids = Object.keys(cart).filter(id => cart[id] > 0)
       if (!ids.length) return
@@ -925,7 +948,14 @@
       const total = ids.reduce((s, id) => s + Number(itemsById[id].price) * cart[id], 0)
       const currency = rest.currency || 'ARS'
 
-      document.getElementById('checkout-mesa-label').textContent = mesa != null ? 'Mesa ' + mesa : 'Para llevar'
+      // Mostrar/ocultar campo de mesa manual
+      const mesaInputWrap = document.getElementById('mesa-input-wrap')
+      const confirmBtn = document.getElementById('btn-confirm-order')
+      const noMesa = mesa === null || isNaN(mesa)
+      if (mesaInputWrap) mesaInputWrap.style.display = noMesa ? 'block' : 'none'
+      if (confirmBtn) confirmBtn.disabled = noMesa && !mesaManual
+
+      document.getElementById('checkout-mesa-label').textContent = mesaEfectiva() != null ? 'Mesa ' + mesaEfectiva() : '— sin mesa detectada'
       document.getElementById('checkout-total').textContent = currency + ' ' + total.toLocaleString('es-AR')
       document.getElementById('checkout-summary-items').innerHTML = ids.map(id => {
         const item = itemsById[id]
@@ -958,7 +988,8 @@
       const checkoutBtn = document.getElementById('checkout-btn')
       if (checkoutBtn) { checkoutBtn.disabled = true }
       try {
-        const session = mesa != null ? await orderSessions.getOrCreate(rest.id, mesa) : null
+        const mesaFinal = mesaEfectiva()
+        const session = mesaFinal != null ? await orderSessions.getOrCreate(rest.id, mesaFinal) : null
         const total = ids.reduce((s, id) => s + Number(itemsById[id].price) * cart[id], 0)
 
         // Capturar teléfono del cliente (opcional)
@@ -982,7 +1013,7 @@
         const order = await orders.create({
           restaurant_id: rest.id,
           session_id: session?.id ?? null,
-          table_number: mesa ?? null,
+          table_number: mesaFinal ?? null,
           total,
           customer_phone: customerPhone || null,
           customer_name: customerName,
