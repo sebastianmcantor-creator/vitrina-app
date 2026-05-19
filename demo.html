@@ -1283,15 +1283,22 @@ function renderCtrl(id) {
       <div class="qty-controls">
         <button class="qty-btn" onclick="removeItem('${id}')" aria-label="Quitar uno de ${itemName}">−</button>
         <span class="qty-num">${qty}</span>
-        <button class="qty-btn" onclick="addItem('${id}')">+</button>
+        <button class="qty-btn" onclick="addItem('${id}')" aria-label="Agregar otro ${itemName}">+</button>
       </div>`;
   }
+}
+
+function syncTanoFab() {
+  var count = getCount();
+  var fab = document.getElementById('tanoFab');
+  if (fab) fab.style.display = count > 0 ? 'none' : '';
 }
 
 function addItem(id) {
   cart[id] = (cart[id] || 0) + 1;
   renderCtrl(id);
   updateCartFab();
+  syncTanoFab();
 }
 
 function removeItem(id) {
@@ -1300,6 +1307,7 @@ function removeItem(id) {
   if (cart[id] === 0) delete cart[id];
   renderCtrl(id);
   updateCartFab();
+  syncTanoFab();
 }
 
 function updateCartFab() {
@@ -1396,6 +1404,7 @@ function sendOrder() {
   cart = {};
   ids.forEach(id => renderCtrl(id));
   updateCartFab();
+  syncTanoFab();
   // Mostrar confirmación
   const conf = document.getElementById('orderConfirmed');
   conf.classList.add('show');
@@ -1442,29 +1451,6 @@ function goToSection(sec, btn) {
 let tanoOpen = false;
 let tanoHistory = [];
 const WORKER = 'https://vitrina-tano.vitrinaapp.workers.dev';
-
-const MENU_IDS = {
-  'tabla de fiambres': 'picar-1', 'tabla fiambres': 'picar-1', 'fiambres': 'picar-1', 'fiambres y quesos': 'picar-1',
-  'empanadas': 'picar-2', 'empanada': 'picar-2',
-  'provoleta': 'picar-3',
-  'rabas': 'picar-4',
-  'penne': 'pastas-1', 'penne rigate': 'pastas-1', 'ragu': 'pastas-1', 'ragú': 'pastas-1',
-  'ñoquis': 'pastas-2', 'gnocchi': 'pastas-2',
-  'fettuccine': 'pastas-3',
-  'tallarines': 'pastas-4', 'pesto rojo': 'pastas-4',
-  'milanesa': 'principales-1', 'napolitana': 'principales-1',
-  'bife': 'principales-2', 'bife de chorizo': 'principales-2',
-  'suprema': 'principales-3', 'pollo': 'principales-3',
-  'merluza': 'principales-4',
-  'tiramisu': 'postres-1', 'tiramisú': 'postres-1',
-  'volcan': 'postres-2', 'volcán': 'postres-2', 'chocolate': 'postres-2',
-  'flan': 'postres-3', 'dulce de leche': 'postres-3',
-  'ensalada de frutas': 'postres-4', 'frutas': 'postres-4',
-  'agua': 'bebidas-1',
-  'gaseosa': 'bebidas-2', 'coca': 'bebidas-2',
-  'vino': 'bebidas-3',
-  'cerveza': 'bebidas-4'
-};
 
 const TANO_CONTEXT = 'Sos Tano, el asistente del restaurante Casa Lucía. Tu tono es calido, informal y humano — nunca suenas a bot. Respondés solo sobre el menu y el restaurante.\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar, rebozados, con alioli casero y limon. (Sin TACC)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. Favorito.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. Clasico.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. (Sin TACC)\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. (Sin TACC)\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. 8 minutos. (Vegetariano)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml\n\nREGLAS IMPORTANTES:\n1. Cuando el cliente quiera pedir o agregar algo al carrito, respondé con el formato exacto: [AGREGAR:ID:CANTIDAD] y luego tu respuesta normal. Ejemplo: si quiere 2 milanesas, respondé "[AGREGAR:principales-1:2] Listo, anote 2 milanesas con papas! Te las mando a cocina cuando confirmes el pedido." Usa SOLO los IDs de la lista. Si quiere varios platos en el mismo mensaje, pone multiples [AGREGAR:ID:QTY].\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "pedí X", "anotatelo", "anotalo" o cualquier intencion de pedir — SIEMPRE usa el formato [AGREGAR:ID:QTY].\n3. Si no está seguro del ID exacto, usa el más parecido.\n4. Si te preguntan algo fuera del menu o el restaurante, respondé con amabilidad que eso no te lo podés responder vos.\n5. Respondé en español, tono informal y calido. Sin markdown. Texto simple.';
 
