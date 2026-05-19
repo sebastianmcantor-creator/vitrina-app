@@ -1608,6 +1608,9 @@ input:checked + .toggle-slider:before {
       <button class="nav-item" data-section="marketing" onclick="switchSection('marketing', this)">
         <span class="nav-icon">📱</span> Marketing
       </button>
+      <button class="nav-item" data-section="delivery" onclick="switchSection('delivery', this)">
+        <span class="nav-icon">🏍️</span> Delivery
+      </button>
       <button class="nav-item" data-section="sales-agent" onclick="switchSection('sales-agent', this)">
         <span class="nav-icon">🤖</span> Agente de Ventas
       </button>
@@ -2805,6 +2808,155 @@ input:checked + .toggle-slider:before {
           </div>
         </div>
       </div>
+
+<!-- ══ SECCIÓN: Delivery ══ -->
+<div id="section-delivery" class="panel-section">
+  <div class="page-header">
+    <div class="page-title">Delivery externo</div>
+    <div class="page-subtitle">Cargá tus datos de Rappi y PedidosYa para que Viti incluya el costo real de cada canal en su análisis.</div>
+  </div>
+
+  <!-- Cards de plataformas -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+
+    <!-- RAPPI -->
+    <div class="card" id="delivery-card-rappi">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#FF441A;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🏍️</div>
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink)">Rappi</div>
+          <div style="font-size:12px;color:var(--muted)" id="rappi-last-update">Sin datos cargados</div>
+        </div>
+        <div style="margin-left:auto">
+          <span id="rappi-status-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:#fee2e2;color:#dc2626;font-weight:600">Sin datos</span>
+        </div>
+      </div>
+      <div id="rappi-summary" style="display:none;margin-bottom:12px;padding:10px 12px;background:var(--cream2);border-radius:8px;font-size:13px;color:var(--ink)"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <label class="btn-secondary" style="cursor:pointer;font-size:12px;padding:6px 12px;display:inline-flex;align-items:center;gap:5px">
+          📷 Subir captura
+          <input type="file" accept="image/*,.pdf" onchange="uploadDeliveryScreenshot('rappi', this)" style="display:none">
+        </label>
+        <button class="btn-secondary" onclick="openDeliveryManualForm('rappi')" style="font-size:12px;padding:6px 12px">
+          ✏️ Ingresar datos
+        </button>
+      </div>
+    </div>
+
+    <!-- PEDIDOSYA -->
+    <div class="card" id="delivery-card-pedidosya">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:40px;height:40px;border-radius:10px;background:#FA3458;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">🛵</div>
+        <div>
+          <div style="font-size:15px;font-weight:600;color:var(--ink)">PedidosYa</div>
+          <div style="font-size:12px;color:var(--muted)" id="pedidosya-last-update">Sin datos cargados</div>
+        </div>
+        <div style="margin-left:auto">
+          <span id="pedidosya-status-badge" style="font-size:11px;padding:3px 10px;border-radius:20px;background:#fee2e2;color:#dc2626;font-weight:600">Sin datos</span>
+        </div>
+      </div>
+      <div id="pedidosya-summary" style="display:none;margin-bottom:12px;padding:10px 12px;background:var(--cream2);border-radius:8px;font-size:13px;color:var(--ink)"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <label class="btn-secondary" style="cursor:pointer;font-size:12px;padding:6px 12px;display:inline-flex;align-items:center;gap:5px">
+          📷 Subir captura
+          <input type="file" accept="image/*,.pdf" onchange="uploadDeliveryScreenshot('pedidosya', this)" style="display:none">
+        </label>
+        <button class="btn-secondary" onclick="openDeliveryManualForm('pedidosya')" style="font-size:12px;padding:6px 12px">
+          ✏️ Ingresar datos
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Info de costos comparativos -->
+  <div class="card" id="delivery-comparison-card" style="display:none">
+    <div class="card-title">📊 Comparativa de canales</div>
+    <div id="delivery-comparison-content" style="font-size:13.5px;color:var(--muted);line-height:1.6">
+      Cargá datos de al menos una plataforma para ver la comparativa.
+    </div>
+  </div>
+
+</div>
+
+<!-- Modal: formulario manual delivery -->
+<div class="modal-overlay" id="modal-delivery-manual" onclick="if(event.target===this)closeModal('modal-delivery-manual')">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="delivery-modal-title">Datos de Rappi</div>
+      <button class="modal-close" onclick="closeModal('modal-delivery-manual')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="delivery-platform-input">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-field">
+          <label class="form-label">Período desde</label>
+          <input type="date" class="form-input" id="del-period-start">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Período hasta</label>
+          <input type="date" class="form-input" id="del-period-end">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Ventas brutas (ARS)</label>
+          <input type="number" class="form-input" id="del-gross-sales" placeholder="0">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Cantidad de pedidos</label>
+          <input type="number" class="form-input" id="del-order-count" placeholder="0">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Comisión (%)</label>
+          <input type="number" class="form-input" id="del-commission-pct" placeholder="25" step="0.1">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Monto comisión (ARS)</label>
+          <input type="number" class="form-input" id="del-commission-amount" placeholder="0">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Costo publicidad/Ads (ARS)</label>
+          <input type="number" class="form-input" id="del-ads-cost" placeholder="0">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Pedidos cancelados</label>
+          <input type="number" class="form-input" id="del-cancelled" placeholder="0">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Calificación (sobre 5)</label>
+          <input type="number" class="form-input" id="del-rating" placeholder="4.8" step="0.1" min="0" max="5">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Tiempo entrega prom. (min)</label>
+          <input type="number" class="form-input" id="del-delivery-time" placeholder="35">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-delivery-manual')">Cancelar</button>
+      <button class="btn-primary" onclick="saveDeliveryManual()">Guardar datos</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: revisar datos extraídos por IA -->
+<div class="modal-overlay" id="modal-delivery-review" onclick="if(event.target===this)closeModal('modal-delivery-review')">
+  <div class="modal-box" style="max-width:560px">
+    <div class="modal-header">
+      <div class="modal-title">Revisá los datos extraídos</div>
+      <button class="modal-close" onclick="closeModal('modal-delivery-review')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5">
+        Claude extrajo los siguientes datos de tu captura. Verificá que sean correctos antes de guardar — podés editarlos.
+      </p>
+      <div id="delivery-review-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-delivery-review')">Cancelar</button>
+      <button class="btn-primary" onclick="confirmDeliveryExtracted()">Guardar datos</button>
+    </div>
+  </div>
+</div>
 
       <div id="section-config" class="panel-section">
         <div class="page-header">
@@ -5117,7 +5269,7 @@ window.switchSection = function (name, btn) {
     analisis: 'Análisis', marketing: 'Marketing', config: 'Configuración',
     facturacion: 'Facturación', agenda: 'Agenda', reservas: 'Reservas',
     campanas: 'Campañas', crm: 'Clientes', informes: 'Informes',
-    catalogo: 'Mi Catálogo', 'sales-agent': 'Agente de Ventas',
+    catalogo: 'Mi Catálogo', 'sales-agent': 'Agente de Ventas', delivery: 'Delivery',
   }
   const restName = currentRestaurant?.name || 'Vitrina'
   document.title = (sectionTitles[name] || name) + ' — ' + restName
@@ -5145,6 +5297,7 @@ window.switchSection = function (name, btn) {
   if (name === 'catalogo')     loadCatalogo()
   if (name === 'marketing')    loadMarketing()
   if (name === 'sales-agent')  loadSalesAgent()
+  if (name === 'delivery')     loadDeliveryMetrics()
   if (name === 'config')       loadConfig()
   if (name === 'facturacion')  loadFacturacion()
   if (name !== 'pedidos')      detachPedidosRealtime()
@@ -10226,6 +10379,21 @@ function buildVitiSystemPrompt() {
     marginsSection = '\n\nMÁRGENES DEL CATÁLOGO:\n' + marginData
   }
 
+  // Datos de delivery
+  let deliverySection = ''
+  const deliveryPlatforms = ['rappi', 'pedidosya'].filter(p => deliveryData[p])
+  if (deliveryPlatforms.length > 0) {
+    const rows = deliveryPlatforms.map(platform => {
+      const d = deliveryData[platform]
+      const name = platform === 'rappi' ? 'Rappi' : 'PedidosYa'
+      const costPerOrder = d.order_count > 0 ? (((d.commission_amount || 0) + (d.ads_cost || 0)) / d.order_count).toFixed(0) : null
+      const netMargin = d.gross_sales && d.commission_amount ? (100 - (d.commission_amount / d.gross_sales * 100)).toFixed(1) : null
+      return `${name}: ${d.order_count || '?'} pedidos, comisión ${d.commission_pct || '?'}%${costPerOrder ? ', costo/pedido $' + costPerOrder : ''}${netMargin ? ', margen neto ~' + netMargin + '%' : ''}${d.rating ? ', rating ' + d.rating : ''}`
+    }).join('\n  ')
+    deliverySection = '\n\nDATA DELIVERY (último período cargado):\n  ' + rows
+    deliverySection += '\n  COMPARATIVA DE CANALES: Cuando el dueño pregunte sobre delivery, analizar costo real por pedido en cada canal vs Vitrina propio y sugerir mix óptimo según márgenes.'
+  }
+
   return `Sos Viti, el asistente estratégico de Vitrina para "${r.name}"${r.city ? ' (' + r.city + ')' : ''}.
 Viti no tiene género. Hablás en primera persona, directo y sin adornos — como el socio de marketing del dueño, no como un bot.
 
@@ -10236,7 +10404,7 @@ ${r.address ? '- Dirección: ' + r.address : ''}
 - Horarios configurados: ${r.opening_hours ? 'Sí' : 'No'}
 - Integraciones activas: ${[hasML&&'MercadoLibre', hasTN&&'Tienda Nube', hasGoogle&&'Google Business', hasInstagram&&'Instagram'].filter(Boolean).join(', ') || 'Ninguna aún'}${agendaInfo}
 ${socialInfo}
-${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}${marginsSection}
+${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}${marginsSection}${deliverySection}
 
 TU ROL Y CAPACIDADES:
 - Asesorás sobre estrategia digital, marketing, gestión de catálogo, precios y análisis competitivo.
@@ -10996,6 +11164,210 @@ window.importCatalogCSV = async function (input) {
     showToast(`✅ ${ok} productos importados correctamente`, 'success')
   }
   loadMenu()
+}
+
+// ══════════════════════════════════════════════════════
+// DELIVERY — Rappi y PedidosYa
+// ══════════════════════════════════════════════════════
+let deliveryData = { rappi: null, pedidosya: null }
+let _deliveryExtractedData = null
+let _deliveryExtractPlatform = null
+
+async function loadDeliveryMetrics() {
+  if (!currentRestaurant) return
+  try {
+    const { data } = await supabase
+      .from('delivery_metrics')
+      .select('*')
+      .eq('restaurant_id', currentRestaurant.id)
+      .order('created_at', { ascending: false })
+      .limit(10)
+    if (!data) return
+    // Tomar el más reciente por plataforma
+    ;['rappi', 'pedidosya'].forEach(platform => {
+      const latest = data.find(d => d.platform === platform)
+      if (latest) {
+        deliveryData[platform] = latest
+        updateDeliveryCard(platform, latest)
+      }
+    })
+    updateDeliveryComparison()
+  } catch {}
+}
+
+function updateDeliveryCard(platform, metric) {
+  const lastUpdate = document.getElementById(platform + '-last-update')
+  const badge = document.getElementById(platform + '-status-badge')
+  const summary = document.getElementById(platform + '-summary')
+
+  const days = Math.floor((Date.now() - new Date(metric.created_at)) / 86400000)
+  const daysText = days === 0 ? 'hoy' : days === 1 ? 'ayer' : 'hace ' + days + ' días'
+
+  if (lastUpdate) lastUpdate.textContent = 'Actualizado ' + daysText
+  if (badge) { badge.textContent = 'Datos cargados'; badge.style.background = '#dcfce7'; badge.style.color = '#15803d' }
+  if (summary) {
+    const lines = []
+    if (metric.gross_sales) lines.push('Ventas: $' + Number(metric.gross_sales).toLocaleString('es-AR'))
+    if (metric.order_count) lines.push(metric.order_count + ' pedidos')
+    if (metric.commission_pct) lines.push('Comisión: ' + metric.commission_pct + '%')
+    if (metric.rating) lines.push('Rating: ' + metric.rating + '⭐')
+    summary.textContent = lines.join(' · ')
+    summary.style.display = 'block'
+  }
+}
+
+function updateDeliveryComparison() {
+  const card = document.getElementById('delivery-comparison-card')
+  const content = document.getElementById('delivery-comparison-content')
+  if (!card || !content) return
+  const platforms = ['rappi', 'pedidosya'].filter(p => deliveryData[p])
+  if (!platforms.length) return
+  card.style.display = 'block'
+
+  const rows = platforms.map(platform => {
+    const d = deliveryData[platform]
+    const name = platform === 'rappi' ? 'Rappi' : 'PedidosYa'
+    const costPerOrder = d.order_count > 0
+      ? (((d.commission_amount || 0) + (d.ads_cost || 0)) / d.order_count).toFixed(0)
+      : null
+    const margin = d.gross_sales && d.commission_amount
+      ? (100 - (d.commission_amount / d.gross_sales * 100)).toFixed(1)
+      : null
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="font-weight:600">${name}</div>
+      <div style="display:flex;gap:16px;font-size:13px;color:var(--muted)">
+        ${d.order_count ? '<span>' + d.order_count + ' pedidos</span>' : ''}
+        ${d.commission_pct ? '<span>Comisión ' + d.commission_pct + '%</span>' : ''}
+        ${margin ? '<span style="color:var(--terra)">Margen neto ~' + margin + '%</span>' : ''}
+        ${costPerOrder ? '<span>Costo/pedido $' + costPerOrder + '</span>' : ''}
+      </div>
+    </div>`
+  }).join('')
+  content.innerHTML = rows || '<span style="color:var(--muted)">Cargá datos de al menos una plataforma.</span>'
+}
+
+// Subida de screenshot
+window.uploadDeliveryScreenshot = async function (platform, input) {
+  if (!input.files || !input.files[0] || !currentRestaurant) return
+  const file = input.files[0]
+  if (file.size > 10 * 1024 * 1024) { showToast('La imagen debe ser menor a 10MB', 'error'); input.value = ''; return }
+
+  showToast('Analizando captura con IA...', 'success')
+  input.value = ''
+
+  try {
+    // Convertir a base64
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.onload = e => resolve(e.target.result)
+      reader.onerror = reject
+      reader.readAsDataURL(file)
+    })
+
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/delivery/extract-screenshot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBase64: base64, platform }),
+    })
+
+    if (!res.ok) throw new Error('Error al procesar la imagen')
+    const result = await res.json()
+    if (!result.ok || !result.data) throw new Error('No se pudo extraer datos')
+
+    // Mostrar modal de revisión
+    _deliveryExtractedData = { ...result.data, source: 'screenshot', platform }
+    _deliveryExtractPlatform = platform
+    openDeliveryReviewModal(platform, result.data)
+
+  } catch (e) {
+    showToast('Error: ' + e.message + ' — intentá con el formulario manual', 'error')
+  }
+}
+
+function openDeliveryReviewModal(platform, data) {
+  const fields = [
+    { key: 'period_start', label: 'Período desde', type: 'date' },
+    { key: 'period_end', label: 'Período hasta', type: 'date' },
+    { key: 'gross_sales', label: 'Ventas brutas', type: 'number' },
+    { key: 'order_count', label: 'Cantidad de pedidos', type: 'number' },
+    { key: 'commission_pct', label: 'Comisión (%)', type: 'number' },
+    { key: 'commission_amount', label: 'Monto comisión', type: 'number' },
+    { key: 'ads_cost', label: 'Costo publicidad', type: 'number' },
+    { key: 'cancelled_orders', label: 'Pedidos cancelados', type: 'number' },
+    { key: 'rating', label: 'Calificación', type: 'number' },
+    { key: 'avg_delivery_time', label: 'Tiempo entrega (min)', type: 'number' },
+  ]
+
+  const container = document.getElementById('delivery-review-fields')
+  if (!container) return
+  container.innerHTML = fields.map(f => `
+    <div class="form-field">
+      <label class="form-label" style="font-size:11px">${f.label}</label>
+      <input type="${f.type}" class="form-input" id="review-${f.key}"
+        value="${data[f.key] != null ? data[f.key] : ''}"
+        placeholder="${data[f.key] == null ? 'No detectado' : ''}">
+    </div>`).join('')
+
+  openModal('modal-delivery-review')
+}
+
+window.confirmDeliveryExtracted = async function () {
+  if (!_deliveryExtractedData || !currentRestaurant) return
+  const fields = ['period_start','period_end','gross_sales','order_count','commission_pct','commission_amount','ads_cost','cancelled_orders','rating','avg_delivery_time']
+  const updated = { ..._deliveryExtractedData }
+  fields.forEach(key => {
+    const el = document.getElementById('review-' + key)
+    if (el && el.value !== '') updated[key] = key.includes('count') || key.includes('orders') || key.includes('time') ? parseInt(el.value) : parseFloat(el.value)
+    else updated[key] = null
+  })
+  await saveDeliveryMetric(updated)
+  closeModal('modal-delivery-review')
+}
+
+window.openDeliveryManualForm = function (platform) {
+  document.getElementById('delivery-platform-input').value = platform
+  document.getElementById('delivery-modal-title').textContent = 'Datos de ' + (platform === 'rappi' ? 'Rappi' : 'PedidosYa')
+  // Pre-llenar si hay datos existentes
+  const existing = deliveryData[platform]
+  const fields = { 'del-period-start': existing?.period_start, 'del-period-end': existing?.period_end, 'del-gross-sales': existing?.gross_sales, 'del-order-count': existing?.order_count, 'del-commission-pct': existing?.commission_pct, 'del-commission-amount': existing?.commission_amount, 'del-ads-cost': existing?.ads_cost, 'del-cancelled': existing?.cancelled_orders, 'del-rating': existing?.rating, 'del-delivery-time': existing?.avg_delivery_time }
+  Object.entries(fields).forEach(([id, val]) => { const el = document.getElementById(id); if (el) el.value = val != null ? val : '' })
+  openModal('modal-delivery-manual')
+}
+
+window.saveDeliveryManual = async function () {
+  const platform = document.getElementById('delivery-platform-input').value
+  const metric = {
+    platform,
+    source: 'manual',
+    period_start: document.getElementById('del-period-start').value || null,
+    period_end: document.getElementById('del-period-end').value || null,
+    gross_sales: parseFloat(document.getElementById('del-gross-sales').value) || null,
+    order_count: parseInt(document.getElementById('del-order-count').value) || null,
+    commission_pct: parseFloat(document.getElementById('del-commission-pct').value) || null,
+    commission_amount: parseFloat(document.getElementById('del-commission-amount').value) || null,
+    ads_cost: parseFloat(document.getElementById('del-ads-cost').value) || null,
+    cancelled_orders: parseInt(document.getElementById('del-cancelled').value) || null,
+    rating: parseFloat(document.getElementById('del-rating').value) || null,
+    avg_delivery_time: parseInt(document.getElementById('del-delivery-time').value) || null,
+  }
+  await saveDeliveryMetric(metric)
+  closeModal('modal-delivery-manual')
+}
+
+async function saveDeliveryMetric(metric) {
+  if (!currentRestaurant) return
+  try {
+    const { error } = await supabase.from('delivery_metrics').insert({
+      restaurant_id: currentRestaurant.id,
+      ...metric,
+      raw_data: metric.extra || null,
+    })
+    if (error) throw error
+    showToast('Datos de ' + (metric.platform === 'rappi' ? 'Rappi' : 'PedidosYa') + ' guardados ✓', 'success')
+    await loadDeliveryMetrics()
+  } catch (e) {
+    showToast('Error al guardar: ' + e.message, 'error')
+  }
 }
 </script>
 
