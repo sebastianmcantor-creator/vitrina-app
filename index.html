@@ -2174,5 +2174,88 @@ function showPricing(type) {
 
 })();
 </script>
+
+<!-- ── COOKIE BANNER ──────────────────────────────────────────── -->
+<div id="cookie-banner" role="dialog" aria-label="Uso de cookies" aria-live="polite" style="
+  display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  max-width:520px; width:calc(100% - 32px); z-index:9999;
+  background:#1a2332; border:1px solid rgba(255,255,255,.15);
+  border-radius:14px; padding:16px 20px;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  display:none; align-items:center; gap:14px; flex-wrap:wrap;
+  font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+">
+  <p style="flex:1; font-size:13.5px; color:rgba(240,240,235,.75); line-height:1.5; min-width:200px; margin:0">
+    Usamos cookies analíticas para mejorar la experiencia.
+    <a href="/privacidad.html" style="color:#FF7540; text-decoration:none">Más información →</a>
+  </p>
+  <div style="display:flex; gap:8px; flex-shrink:0">
+    <button id="reject-cookies" style="
+      padding:8px 16px; background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.2); border-radius:8px;
+      color:rgba(240,240,235,.7); font-size:13px; font-family:inherit;
+      cursor:pointer; transition:all .15s; white-space:nowrap;
+    " onmouseover="this.style.background='rgba(255,255,255,.14)'"
+       onmouseout="this.style.background='rgba(255,255,255,.08)'">
+      Solo esenciales
+    </button>
+    <button id="accept-cookies" style="
+      padding:8px 18px; background:#E8521A;
+      border:none; border-radius:8px;
+      color:white; font-size:13px; font-weight:600; font-family:inherit;
+      cursor:pointer; transition:background .15s; white-space:nowrap;
+    " onmouseover="this.style.background='#FF7540'"
+       onmouseout="this.style.background='#E8521A'">
+      Aceptar
+    </button>
+  </div>
+</div>
+
+<!-- ── ANALYTICS ──────────────────────────────────────────────── -->
+<script>
+(function() {
+  // Measurement ID — reemplazar con el ID real de GA4 cuando esté configurado
+  // Para crear la propiedad: analytics.google.com → Crear propiedad → vitrinaapp.com.ar
+  var GA_ID = 'G-XXXXXXXXXX'; // TODO: reemplazar con ID real
+
+  function loadAnalytics() {
+    if (!GA_ID || GA_ID === 'G-XXXXXXXXXX') return; // No cargar si no hay ID real
+    var s = document.createElement('script');
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + GA_ID;
+    s.async = true;
+    document.head.appendChild(s);
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+    window.gtag = gtag;
+    gtag('js', new Date());
+    gtag('config', GA_ID, {
+      anonymize_ip: true,
+      cookie_flags: 'SameSite=None;Secure'
+    });
+  }
+
+  var decision = localStorage.getItem('vt_cookies');
+  var banner   = document.getElementById('cookie-banner');
+
+  if (decision === 'accepted') {
+    loadAnalytics();
+  } else if (!decision) {
+    // Primera visita — mostrar banner después de 1.5s para no interrumpir la carga
+    if (banner) setTimeout(function() { banner.style.display = 'flex'; }, 1500);
+  }
+  // Si decision === 'rejected': no cargar analytics, no mostrar banner
+
+  document.getElementById('accept-cookies')?.addEventListener('click', function() {
+    localStorage.setItem('vt_cookies', 'accepted');
+    if (banner) banner.style.display = 'none';
+    loadAnalytics();
+  });
+
+  document.getElementById('reject-cookies')?.addEventListener('click', function() {
+    localStorage.setItem('vt_cookies', 'rejected');
+    if (banner) banner.style.display = 'none';
+  });
+})();
+</script>
 </body>
 </html>
