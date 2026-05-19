@@ -2096,10 +2096,17 @@ input:checked + .toggle-slider:before {
             <div class="page-subtitle" id="menu-page-subtitle">Categorías e ítems de tu negocio</div>
           </div>
           <button class="btn-primary" onclick="openCategoryModal()" style="flex-shrink:0;margin-top:4px">+ Nueva categoría</button>
-          <div style="display:flex;gap:6px;flex-shrink:0;margin-top:4px">
+          <div style="display:flex;gap:6px;flex-shrink:0;margin-top:4px;flex-wrap:wrap">
             <button class="btn-secondary" onclick="openImportMenuModal()" style="font-size:13px">
               📸 Importar desde foto
             </button>
+            <button class="btn-secondary" onclick="downloadCatalogTemplate()" style="font-size:13px;padding:7px 14px">
+              ⬇️ Plantilla CSV
+            </button>
+            <label class="btn-secondary" style="cursor:pointer;font-size:13px;padding:7px 14px;display:inline-flex;align-items:center;gap:6px">
+              📥 Importar CSV
+              <input type="file" id="catalog-csv-input" accept=".csv" onchange="importCatalogCSV(this)" style="display:none">
+            </label>
             <button class="btn-secondary" onclick="toggleAllItemsAvailability(true)" style="font-size:12px;padding:6px 12px" title="Marcar todos disponibles">
               ✅ Todo disponible
             </button>
@@ -3304,6 +3311,35 @@ input:checked + .toggle-slider:before {
           <span style="font-size:13.5px;font-weight:500;color:var(--ink)" id="item-featured-label">⭐ Destacado</span>
         </label>
         <div class="form-hint" style="margin-left:26px" id="item-featured-hint">Aparece en la sección "Destacados" al tope del menú público.</div>
+      </div>
+      <!-- Campos extendidos: precio de costo, preparación, notas, stock, SKU -->
+      <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+          <div class="form-field">
+            <label class="form-label">Precio de costo (opcional)</label>
+            <input class="form-input" id="item-cost-price" type="number" min="0" step="0.01" placeholder="0.00">
+            <span class="form-hint">Para calcular el margen de ganancia. Solo lo ve el dueño.</span>
+          </div>
+          <div class="form-field">
+            <label class="form-label" id="item-prep-time-label">Tiempo de preparación (min)</label>
+            <input class="form-input" id="item-prep-time" type="number" min="0" step="1" placeholder="15">
+          </div>
+        </div>
+        <div class="form-field" style="margin-bottom:14px" id="item-notes-kitchen-wrap">
+          <label class="form-label">Notas para cocina (opcional)</label>
+          <textarea class="form-textarea" id="item-notes-kitchen" placeholder="Ej: Servir caliente, sin cebolla a pedido" style="min-height:56px"></textarea>
+        </div>
+        <!-- Campos de comercio: stock y SKU (solo local/ecommerce) -->
+        <div id="item-commerce-fields" style="display:none;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-field">
+            <label class="form-label">Stock disponible</label>
+            <input class="form-input" id="item-stock" type="number" min="0" step="1" placeholder="0">
+          </div>
+          <div class="form-field">
+            <label class="form-label">SKU / Código</label>
+            <input class="form-input" id="item-sku" placeholder="PROD-001">
+          </div>
+        </div>
       </div>
       <!-- Historial de precios (solo en edición) -->
       <div id="price-history-block" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
@@ -5369,6 +5405,23 @@ window.openItemModal = function (catId, itemId = null) {
     `<div class="tag-chip ${SELECTED_TAGS.has(t.key)?'selected':''}" onclick="toggleTag('${t.key}',this)">${t.label}</div>`
   ).join('')
   document.getElementById('item-featured').checked = editingItem?.is_featured ?? false
+
+  // Campos extendidos
+  document.getElementById('item-cost-price').value   = editingItem?.cost_price        ?? ''
+  document.getElementById('item-prep-time').value    = editingItem?.preparation_time  ?? ''
+  document.getElementById('item-notes-kitchen').value= editingItem?.notes_for_kitchen || ''
+  document.getElementById('item-stock').value        = editingItem?.stock_quantity     ?? ''
+  document.getElementById('item-sku').value          = editingItem?.sku               || ''
+
+  // Mostrar campos de comercio solo para local/ecommerce
+  const btype = currentRestaurant?.business_type || 'restaurant'
+  const isCommerce = btype === 'local' || btype === 'ecommerce'
+  const commerceFields = document.getElementById('item-commerce-fields')
+  commerceFields.style.display = isCommerce ? 'grid' : 'none'
+  // Ajustar label de prep time según tipo
+  const prepLabel = document.getElementById('item-prep-time-label')
+  if (prepLabel) prepLabel.textContent = btype === 'restaurant' ? 'Tiempo de preparación (min)' : 'Tiempo de entrega (min)'
+
   document.getElementById('modal-item').classList.add('open')
   setTimeout(() => document.getElementById('item-name').focus(), 80)
 
@@ -5413,15 +5466,23 @@ window.saveItemModal = async function () {
   const btn = document.getElementById('btn-save-item')
   btn.disabled = true; btn.textContent = 'Guardando...'
   try {
+    const costPriceVal = parseFloat(document.getElementById('item-cost-price').value)
+    const prepTimeVal  = parseInt(document.getElementById('item-prep-time').value)
+    const stockVal     = parseInt(document.getElementById('item-stock').value)
     const payload = {
       name, price,
-      emoji:        document.getElementById('item-emoji').value.trim() || null,
-      description:  document.getElementById('item-desc').value.trim()      || null,
-      image_url:    document.getElementById('item-image-url').value.trim() || null,
-      tags:         [...SELECTED_TAGS],
-      is_featured:  document.getElementById('item-featured').checked,
-      restaurant_id: currentRestaurant.id,
-      category_id:   editingItemCatId,
+      emoji:             document.getElementById('item-emoji').value.trim() || null,
+      description:       document.getElementById('item-desc').value.trim()      || null,
+      image_url:         document.getElementById('item-image-url').value.trim() || null,
+      tags:              [...SELECTED_TAGS],
+      is_featured:       document.getElementById('item-featured').checked,
+      restaurant_id:     currentRestaurant.id,
+      category_id:       editingItemCatId,
+      cost_price:        isNaN(costPriceVal) ? null : costPriceVal,
+      preparation_time:  isNaN(prepTimeVal)  ? null : prepTimeVal,
+      notes_for_kitchen: document.getElementById('item-notes-kitchen').value.trim() || null,
+      stock_quantity:    isNaN(stockVal)     ? null : stockVal,
+      sku:               document.getElementById('item-sku').value.trim() || null,
     }
     if (editingItem) {
       // Registrar historial de precio si cambió
@@ -10154,6 +10215,17 @@ function buildVitiSystemPrompt() {
     r.website_url      ? `- Sitio web: ${r.website_url}` : '',
   ].filter(Boolean).join('\n')
 
+  // Márgenes del catálogo (cost_price)
+  let marginsSection = ''
+  const itemsWithCost = Object.values(menuItemsMap || {}).flat().filter(i => i.cost_price > 0)
+  if (itemsWithCost.length > 0) {
+    const marginData = itemsWithCost.map(i => {
+      const margin = ((i.price - i.cost_price) / i.price * 100).toFixed(0)
+      return `  - ${i.name}: precio $${Number(i.price).toLocaleString('es-AR')}, costo $${Number(i.cost_price).toLocaleString('es-AR')}, margen ${margin}%`
+    }).join('\n')
+    marginsSection = '\n\nMÁRGENES DEL CATÁLOGO:\n' + marginData
+  }
+
   return `Sos Viti, la asistente estratégica de Vitrina para el negocio "${r.name}"${r.city ? ' (' + r.city + ')' : ''}.
 
 DATOS DEL NEGOCIO:
@@ -10164,7 +10236,7 @@ ${r.tagline ? '- Tagline: ' + r.tagline : ''}
 - Horarios configurados: ${r.opening_hours ? 'Sí' : 'No'}
 - Integraciones activas: ${[hasML&&'MercadoLibre', hasTN&&'Tienda Nube', hasGoogle&&'Google Business', hasInstagram&&'Instagram'].filter(Boolean).join(', ') || 'Ninguna por ahora'}${agendaInfo}
 ${socialInfo}
-${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}
+${menuSummary}${priceHistorySection}${topItemsSection}${statsSection}${marginsSection}
 
 TU ROL:
 - Asesorás al dueño sobre estrategia digital, marketing, gestión de catálogo/menú, precios y análisis competitivo.
@@ -10787,6 +10859,137 @@ async function submitPost(schedule) {
   }
 }
 window.submitPost = submitPost
+
+// ─── Importar catálogo desde CSV ──────────────────────────────────────────
+window.downloadCatalogTemplate = function () {
+  const btype = currentRestaurant?.business_type || 'restaurant'
+  const isCommerce = btype === 'local' || btype === 'ecommerce'
+
+  const headers = isCommerce
+    ? 'nombre,descripcion,precio,precio_costo,categoria,emoji,stock,sku,marca,disponible'
+    : 'nombre,descripcion,precio,precio_costo,categoria,emoji,tiempo_prep_min,notas_cocina,disponible'
+
+  const example = isCommerce
+    ? 'Taladro Bosch 18V,Taladro inalámbrico con batería incluida,58400,32000,Herramientas,🔨,10,TOOL-001,Bosch,si'
+    : 'Milanesa napolitana,Con papas fritas y ensalada,22500,8000,Principales,🍖,15,Sin mariscos,si'
+
+  const csv = headers + '\n' + example
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = 'plantilla-catalogo-vitrina.csv'
+  a.click()
+  URL.revokeObjectURL(a.href)
+  showToast('Plantilla descargada ✓', 'success')
+}
+
+window.importCatalogCSV = async function (input) {
+  if (!input.files || !input.files[0] || !currentRestaurant) return
+  const file = input.files[0]
+  const text = await file.text()
+  const lines = text.split('\n').map(l => l.trim()).filter(Boolean)
+  if (lines.length < 2) { showToast('El CSV no tiene datos', 'error'); input.value = ''; return }
+
+  const headers = lines[0].split(',').map(h => h.trim().toLowerCase().replace(/\s+/g, '_'))
+  const rows = lines.slice(1).map(line => {
+    const vals = line.split(',').map(v => v.trim())
+    const obj = {}
+    headers.forEach((h, i) => { obj[h] = vals[i] || '' })
+    return obj
+  })
+
+  // Preview antes de confirmar
+  const previewHtml = `
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px">${rows.length} producto${rows.length !== 1 ? 's' : ''} detectados:</div>
+    <div style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:8px">
+      <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr style="background:var(--cream2)">${headers.map(h => '<th style="padding:6px 10px;text-align:left;border-bottom:1px solid var(--border)">' + h + '</th>').join('')}</tr></thead>
+        <tbody>${rows.slice(0,5).map(r => '<tr>' + headers.map(h => '<td style="padding:5px 10px;border-bottom:1px solid var(--border)">' + (r[h] || '—') + '</td>').join('') + '</tr>').join('')}</tbody>
+      </table>
+      ${rows.length > 5 ? '<div style="padding:8px 10px;font-size:12px;color:var(--muted)">...y ' + (rows.length - 5) + ' más</div>' : ''}
+    </div>`
+
+  // Mostrar modal de confirmación
+  const confirmed = await new Promise(resolve => {
+    const overlay = document.createElement('div')
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:600;display:flex;align-items:center;justify-content:center;padding:16px'
+    overlay.innerHTML = `
+      <div style="background:white;border-radius:16px;padding:24px;max-width:560px;width:100%;max-height:80vh;overflow-y:auto">
+        <div style="font-size:17px;font-weight:600;margin-bottom:12px">Confirmar importación</div>
+        ${previewHtml}
+        <div style="display:flex;gap:10px;margin-top:16px;justify-content:flex-end">
+          <button onclick="this.closest('[data-confirm]').dataset.confirm='false'" data-confirm="false" style="background:none;border:1.5px solid #ddd;border-radius:8px;padding:8px 18px;cursor:pointer;font-family:inherit">Cancelar</button>
+          <button onclick="this.closest('[data-confirm]').dataset.confirm='true'" style="background:#B85A30;color:white;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-family:inherit;font-weight:600">Importar ${rows.length} productos</button>
+        </div>
+      </div>`
+    overlay.setAttribute('data-confirm', '')
+    document.body.appendChild(overlay)
+
+    const observer = new MutationObserver(() => {
+      const val = overlay.getAttribute('data-confirm')
+      if (val === 'true' || val === 'false') {
+        observer.disconnect()
+        document.body.removeChild(overlay)
+        resolve(val === 'true')
+      }
+    })
+    observer.observe(overlay, { attributes: true, attributeFilter: ['data-confirm'] })
+  })
+
+  input.value = ''
+  if (!confirmed) return
+
+  // Obtener categorías existentes para mapear
+  let categories = []
+  try { categories = await menuCategories.list(currentRestaurant.id) } catch {}
+  const catMap = {}
+  categories.forEach(c => { catMap[c.name.toLowerCase()] = c.id })
+
+  let ok = 0, errors = []
+  for (const row of rows) {
+    try {
+      const catName = (row.categoria || row.category || '').trim()
+      let catId = catMap[catName.toLowerCase()]
+      if (!catId && catName) {
+        // Crear categoría si no existe
+        const newCat = await menuCategories.create({ restaurant_id: currentRestaurant.id, name: catName, sort_order: Object.keys(catMap).length })
+        catId = newCat.id
+        catMap[catName.toLowerCase()] = catId
+      }
+      const price = parseFloat((row.precio || row.price || '0').replace(/[^0-9.]/g, '')) || 0
+      const costPrice = parseFloat((row.precio_costo || row.cost_price || '').replace(/[^0-9.]/g, '')) || null
+      const stock = parseInt(row.stock || '') || null
+      const prepTime = parseInt(row.tiempo_prep_min || '') || null
+
+      await menuItems.create({
+        restaurant_id: currentRestaurant.id,
+        category_id: catId || null,
+        name: row.nombre || row.name || 'Sin nombre',
+        description: row.descripcion || row.description || '',
+        price,
+        cost_price: costPrice,
+        emoji: row.emoji || '',
+        is_available: (row.disponible || row.available || 'si').toLowerCase() !== 'no',
+        stock_quantity: stock,
+        preparation_time: prepTime,
+        sku: row.sku || null,
+        brand: row.marca || row.brand || null,
+        notes_for_kitchen: row.notas_cocina || null,
+      })
+      ok++
+    } catch (e) {
+      errors.push((row.nombre || row.name || '?') + ': ' + e.message)
+    }
+  }
+
+  if (errors.length > 0) {
+    showToast(`Importados ${ok} de ${rows.length}. ${errors.length} con error.`, 'error')
+    console.warn('Errores importación CSV:', errors)
+  } else {
+    showToast(`✅ ${ok} productos importados correctamente`, 'success')
+  }
+  loadMenu()
+}
 </script>
 
 <!-- Modal setup de agenda -->
