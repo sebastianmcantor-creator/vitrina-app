@@ -1778,7 +1778,7 @@ input:checked + .toggle-slider:before {
               <div class="form-grid full">
                 <div class="form-field">
                   <label class="form-label" id="setup-name-label">Nombre del negocio <span>*</span></label>
-                  <input type="text" class="form-input" id="setup-name" placeholder="Ej: La Panera Rosa" oninput="autoSlug()" autofocus style="font-size:16px;padding:14px">
+                  <input type="text" class="form-input" id="setup-name" placeholder="Ej: La Panera Rosa" oninput="autoSlug();setupNameChanged()" autofocus style="font-size:16px;padding:14px" aria-required="true" autocomplete="organization">
                 </div>
                 <div class="form-field">
                   <label class="form-label" style="color:var(--muted);font-size:11px">Tu link público</label>
@@ -4622,23 +4622,32 @@ window.selectBusinessType = function (type) {
 
   document.getElementById('setup-step-type').style.display = 'none'
   document.getElementById('setup-step-form').style.display = 'flex'
+  // Botón deshabilitado hasta que se escriba el nombre
+  const createBtn = document.getElementById('btn-create-rest')
+  if (createBtn) { createBtn.disabled = true; createBtn.style.opacity = '0.5'; createBtn.style.cursor = 'not-allowed' }
   setTimeout(() => document.getElementById('setup-name').focus(), 80)
 }
 
 window.toggleSetupWA = function () {
   setupWAEnabled = !setupWAEnabled
-  const card = document.getElementById('setup-wa-option')
+  const card   = document.getElementById('setup-wa-option')
   const noteEl = document.getElementById('setup-wa-enabled')
-  const cfg = BIZ_CONFIG[selectedBusinessType]
-
+  const cfg    = BIZ_CONFIG[selectedBusinessType]
+  if (!card || !noteEl) return // null check — elementos opcionales
   card.classList.toggle('active', setupWAEnabled)
+  noteEl.style.display = setupWAEnabled ? 'block' : 'none'
+  if (setupWAEnabled && cfg) noteEl.textContent = cfg.waNote
+}
 
-  if (setupWAEnabled) {
-    noteEl.style.display = 'block'
-    noteEl.textContent = cfg.waNote
-  } else {
-    noteEl.style.display = 'none'
-  }
+// Habilitar/deshabilitar botón "Crear" según longitud del nombre
+window.setupNameChanged = function () {
+  const name = document.getElementById('setup-name')?.value.trim() || ''
+  const btn  = document.getElementById('btn-create-rest')
+  if (!btn) return
+  const valid = name.length >= 2
+  btn.disabled = !valid
+  btn.style.opacity = valid ? '1' : '0.5'
+  btn.style.cursor  = valid ? 'pointer' : 'not-allowed'
 }
 
 window.backToTypeSelector = function () {
@@ -4654,8 +4663,13 @@ window.createRestaurant = async function () {
   const website = document.getElementById('setup-website').value.trim() || null
   const cfg     = BIZ_CONFIG[selectedBusinessType]
 
-  if (!name || !slug) {
-    showToast('El nombre y la URL son obligatorios.', 'error')
+  if (!name || name.length < 2) {
+    showToast('El nombre debe tener al menos 2 caracteres.', 'error')
+    document.getElementById('setup-name')?.focus()
+    return
+  }
+  if (!slug) {
+    showToast('La URL es obligatoria.', 'error')
     return
   }
 
