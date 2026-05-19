@@ -253,6 +253,11 @@
       <span class="pedidos-bar-text">📋 Ver estado de mis pedidos</span>
       <span class="pedidos-bar-hint">Tocá para ver →</span>
     </div>
+    <!-- Banner total acumulado — SOLO restaurant, se muestra tras el primer pedido -->
+    <div id="banner-acumulado" style="display:none;background:var(--accent,#B85A30);color:white;padding:10px 20px;font-size:14px;font-weight:500;display:none;align-items:center;justify-content:space-between;gap:8px">
+      <span id="banner-acumulado-text">✓ Pedido enviado — Total acumulado: $0</span>
+      <button id="btn-pedir-cuenta" onclick="pedirLaCuenta()" style="background:white;color:var(--accent,#B85A30);border:none;border-radius:8px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">Pedir la cuenta 💳</button>
+    </div>
     <div class="search-bar" id="search-bar" style="display:none">
   <label class="sr-only" for="menu-search">Buscar en el menú</label>
   <input class="search-input" id="menu-search" type="search" placeholder="Buscar en el menú..." oninput="searchMenu(this.value)">
@@ -341,6 +346,13 @@
           Confirmar por WhatsApp
         </a>
         <div style="font-size:11px;color:#8a7a6a;text-align:center;margin-bottom:10px">Abrís WhatsApp con tu pedido ya escrito — tocás Enviar y listo</div>
+      </div>
+      <!-- Botón pedir la cuenta — SOLO restaurant, se inyecta por JS -->
+      <div id="pedir-cuenta-wrap" style="display:none;margin-bottom:8px">
+        <button class="checkout-btn" onclick="pedirLaCuenta()" style="background:var(--accent,#B85A30)">
+          💳 Pedir la cuenta
+        </button>
+        <div style="font-size:11px;color:#8a7a6a;text-align:center;margin-top:6px">Se genera un link de pago con el total de todos tus pedidos</div>
       </div>
       <button class="confirm-close" onclick="cerrarOverlay()">Cerrar</button>
       <button onclick="resetSesion()" style="margin-top:8px;width:100%;padding:8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:#8a7a6a;cursor:pointer;text-decoration:underline">No son míos — empezar de nuevo</button>
@@ -1102,6 +1114,11 @@
         updatePedidosBar()
         abrirOverlayEstado()
 
+        // Banner de total acumulado + botón "Pedir la cuenta" — SOLO restaurant
+        if (btype === 'restaurant') {
+          actualizarBannerAcumulado()
+        }
+
         // Botón WhatsApp confirm (si el restaurante tiene número)
         const waWrap = document.getElementById('wa-confirm-wrap')
         const waBtn  = document.getElementById('wa-confirm-btn')
@@ -1249,6 +1266,78 @@
 
     function updatePedidosBar() {
       document.getElementById('pedidos-bar').style.display = pedidosSesion.length ? 'flex' : 'none'
+    }
+
+    // ─── Total acumulado de visita + "Pedir la cuenta" — SOLO restaurant ─────────
+    // Calcula el total sumando los pedidos de pedidosSesion desde Supabase.
+    async function calcularTotalAcumulado() {
+      if (!pedidosSesion.length) return 0
+      try {
+        const { data } = await supabase
+          .from('orders')
+          .select('total, status')
+          .in('id', pedidosSesion)
+        if (!data) return 0
+        return data
+          .filter(o => o.status !== 'cancelled' && o.status !== 'paid')
+          .reduce((s, o) => s + Number(o.total || 0), 0)
+      } catch {
+        return 0
+      }
+    }
+
+    async function actualizarBannerAcumulado() {
+      const banner  = document.getElementById('banner-acumulado')
+      const textEl  = document.getElementById('banner-acumulado-text')
+      const cuenta  = document.getElementById('pedir-cuenta-wrap')
+      if (!banner || !textEl) return
+
+      const total = await calcularTotalAcumulado()
+      const currency = rest?.currency || 'ARS'
+      textEl.textContent = '✓ Pedido enviado — Total acumulado de la visita: ' + currency + ' $' + total.toLocaleString('es-AR')
+      banner.style.display = 'flex'
+      // Mostrar también el botón en el overlay de estado
+      if (cuenta) cuenta.style.display = 'block'
+    }
+
+    // Genera link de pago MP con el total consolidado de todos los pedidos de la visita
+    window.pedirLaCuenta = async function () {
+      if (!pedidosSesion.length) {
+        alert('No hay pedidos en esta visita.')
+        return
+      }
+      // Solo para restaurantes
+      if ((rest?.business_type || 'restaurant') !== 'restaurant') return
+
+      const btn = document.getElementById('btn-pedir-cuenta')
+      const btnOverlay = document.querySelector('#pedir-cuenta-wrap .checkout-btn')
+      const setBusy = (b) => {
+        if (btn)       { btn.disabled = b; btn.textContent = b ? 'Generando...' : 'Pedir la cuenta 💳' }
+        if (btnOverlay) { btnOverlay.disabled = b; btnOverlay.textContent = b ? 'Generando link de pago...' : '💳 Pedir la cuenta' }
+      }
+      setBusy(true)
+      try {
+        const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/mp/crear-preferencia', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            restaurantId: rest.id,
+            tableNumber:  mesa,
+            orderIds:     pedidosSesion,
+            currency:     rest.currency || 'ARS',
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok || !data.init_point) {
+          alert('No se pudo generar el link de pago. Por favor, pedile al mozo que te traiga la cuenta.')
+          return
+        }
+        window.location.href = data.init_point
+      } catch {
+        alert('Error de conexión. Por favor, pedile al mozo que te traiga la cuenta.')
+      } finally {
+        setBusy(false)
+      }
     }
 
     // ─── Cat nav scroll spy ────────────────────────────────────────────────────

@@ -159,13 +159,15 @@
 
   // Leer params de URL con fallback a localStorage
   const p = new URLSearchParams(location.search)
-  const slug     = p.get('slug')     || p.get('restaurant') || localStorage.getItem('vt_slug') || ''
-  const mesa     = p.get('mesa')     || p.get('table')      || localStorage.getItem('vt_mesa') || '—'
-  const orderId  = p.get('order_id') || p.get('order')      || localStorage.getItem('vt_last_order') || ''
+  const slug       = p.get('slug')     || p.get('restaurant') || localStorage.getItem('vt_slug') || ''
+  const mesa       = p.get('mesa')     || p.get('table')      || localStorage.getItem('vt_mesa') || '—'
+  const orderId    = p.get('order_id') || p.get('order')      || localStorage.getItem('vt_last_order') || ''
+  const pagoStatus = p.get('pago_status') || 'success'
 
-  // Mostrar datos
-  if (orderId) document.getElementById('order-num').textContent = orderId.slice(-6).toUpperCase()
-  if (mesa && mesa !== '—') document.getElementById('table-num').textContent = mesa
+  // Modo consolidado: viene de pago de mesa (restaurant)
+  const isConsolidado = p.get('consolidated') === '1'
+  const orderIdsParam = p.get('order_ids') || ''
+  const orderIds      = orderIdsParam ? orderIdsParam.split(',').filter(Boolean) : []
 
   // Link volver al menú
   if (slug) {
@@ -173,52 +175,110 @@
       'menu.html?slug=' + slug + (mesa && mesa !== '—' ? '&mesa=' + mesa : '')
   }
 
-  // Barra de progreso animada
-  const fill = document.getElementById('eta-fill')
-  const bar  = fill?.closest('[role="progressbar"]')
-  let pct = 10
-  const ticker = setInterval(() => {
-    pct = Math.min(pct + 1, 85)
-    fill.style.width = pct + '%'
-    bar?.setAttribute('aria-valuenow', pct)
-    if (pct >= 85) clearInterval(ticker)
-  }, 300)
+  if (isConsolidado && orderIds.length > 0) {
+    // ── Modo pago consolidado (restaurant) ──────────────────────────────────
+    const mesaLabel = mesa && mesa !== '—' ? 'Mesa ' + mesa : 'Visita'
 
-  // Polling de estado real si tenemos orderId
-  if (orderId) {
-    const statusMap = {
-      pending:   { label: 'Pedido recibido', note: 'Lo arrancan en un momento...', pct: 20, eta: '20–25 min' },
-      confirmed: { label: 'Confirmado', note: '¡Ya arrancan!', pct: 35, eta: '15–20 min' },
-      preparing: { label: 'En preparación 🍳', note: 'Tu pedido está en cocina', pct: 65, eta: '10–15 min' },
-      ready:     { label: '¡Listo para entregar! 🎉', note: 'El mozo ya va a tu mesa', pct: 100, eta: 'Ahora' },
-      delivered: { label: '¡Entregado! 🎉', note: '¡Que lo disfrutes!', pct: 100, eta: '—' },
-    }
+    // Adaptar UI al pago MP
+    document.getElementById('order-num').textContent = orderIds.length + (orderIds.length === 1 ? ' pedido' : ' pedidos')
+    document.getElementById('table-num').textContent = mesaLabel
+    document.querySelector('.pago-ok__title').textContent = pagoStatus === 'failure' ? 'Algo salió mal' : '¡Gracias!'
+    document.querySelector('.pago-ok__sub').textContent   = pagoStatus === 'failure'
+      ? 'El pago no se completó. Podés intentar de nuevo.'
+      : 'Tu pago fue procesado. ¡Que lo disfruten!'
 
-    async function checkStatus() {
+    // ETA y chips: para pago no tiene sentido mostrar tiempo de cocina
+    const etaBlock = document.querySelector('.pago-ok__eta')
+    if (etaBlock) etaBlock.style.display = 'none'
+    const statusChip = document.getElementById('status-chip')
+    if (statusChip && pagoStatus !== 'failure') statusChip.innerHTML = '<span class="status-dot"></span><span>Pago confirmado ✓</span>'
+
+    // Desglose de órdenes — consulta Supabase
+    if (pagoStatus !== 'failure') {
       try {
-        const { data, error } = await supabase
+        const { data: ordersData } = await supabase
           .from('orders')
-          .select('status')
-          .eq('id', orderId)
-          .single()
-        if (error || !data) return
-        const s = statusMap[data.status]
-        if (!s) return
-        // Actualizar UI
-        document.getElementById('status-label').textContent = s.label
-        document.getElementById('status-text').textContent  = s.note
-        document.getElementById('eta-value').textContent    = s.eta
-        clearInterval(ticker)
-        fill.style.width = s.pct + '%'
-        bar?.setAttribute('aria-valuenow', s.pct)
-        if (data.status === 'ready' || data.status === 'delivered') {
-          clearInterval(pollInterval)
+          .select('id, total, order_items(name, quantity, price)')
+          .in('id', orderIds)
+
+        if (ordersData?.length) {
+          let grandTotal = 0
+          const desglose = ordersData.map((o, i) => {
+            const items = (o.order_items || []).map(it => `${it.quantity}x ${it.name}`).join(', ')
+            const subtotal = Number(o.total || 0)
+            grandTotal += subtotal
+            return `<div style="font-size:13px;padding:6px 0;border-bottom:1px solid var(--vt-border)">
+              <span style="font-weight:500">Pedido ${i+1}</span> · $${subtotal.toLocaleString('es-AR')}
+              <div style="font-size:11px;color:var(--vt-text-3);margin-top:2px">${items}</div>
+            </div>`
+          }).join('')
+
+          const etaEl = document.querySelector('.pago-ok__eta')
+          if (etaEl) {
+            etaEl.style.display = 'flex'
+            etaEl.innerHTML = `
+              <span class="eta-label">${mesaLabel} — ${ordersData.length} pedido${ordersData.length !== 1 ? 's' : ''}</span>
+              <div>${desglose}</div>
+              <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding-top:6px">
+                <span>Total pagado</span>
+                <span style="color:var(--vt-brand-light)">$${grandTotal.toLocaleString('es-AR')}</span>
+              </div>`
+          }
         }
       } catch {}
     }
 
-    checkStatus()
-    const pollInterval = setInterval(checkStatus, 15000)
+  } else {
+    // ── Modo orden individual (todos los tipos de negocio) ───────────────────
+    if (orderId) document.getElementById('order-num').textContent = orderId.slice(-6).toUpperCase()
+    if (mesa && mesa !== '—') document.getElementById('table-num').textContent = mesa
+
+    // Barra de progreso animada
+    const fill = document.getElementById('eta-fill')
+    const bar  = fill?.closest('[role="progressbar"]')
+    let pct = 10
+    const ticker = setInterval(() => {
+      pct = Math.min(pct + 1, 85)
+      if (fill) fill.style.width = pct + '%'
+      bar?.setAttribute('aria-valuenow', pct)
+      if (pct >= 85) clearInterval(ticker)
+    }, 300)
+
+    // Polling de estado real si tenemos orderId
+    if (orderId) {
+      const statusMap = {
+        pending:   { label: 'Pedido recibido', note: 'Lo arrancan en un momento...', pct: 20, eta: '20–25 min' },
+        confirmed: { label: 'Confirmado', note: '¡Ya arrancan!', pct: 35, eta: '15–20 min' },
+        preparing: { label: 'En preparación 🍳', note: 'Tu pedido está en cocina', pct: 65, eta: '10–15 min' },
+        ready:     { label: '¡Listo para entregar! 🎉', note: 'El mozo ya va a tu mesa', pct: 100, eta: 'Ahora' },
+        delivered: { label: '¡Entregado! 🎉', note: '¡Que lo disfrutes!', pct: 100, eta: '—' },
+      }
+
+      async function checkStatus() {
+        try {
+          const { data, error } = await supabase
+            .from('orders')
+            .select('status')
+            .eq('id', orderId)
+            .single()
+          if (error || !data) return
+          const s = statusMap[data.status]
+          if (!s) return
+          document.getElementById('status-label').textContent = s.label
+          document.getElementById('status-text').textContent  = s.note
+          document.getElementById('eta-value').textContent    = s.eta
+          clearInterval(ticker)
+          if (fill) fill.style.width = s.pct + '%'
+          bar?.setAttribute('aria-valuenow', s.pct)
+          if (data.status === 'ready' || data.status === 'delivered') {
+            clearInterval(pollInterval)
+          }
+        } catch {}
+      }
+
+      checkStatus()
+      const pollInterval = setInterval(checkStatus, 15000)
+    }
   }
 </script>
 </body>

@@ -261,6 +261,23 @@
   </div>
 </div>
 
+<!-- Modal cobro de mesa — SOLO restaurant -->
+<div id="cobro-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#1a1a1a;border:1px solid #3a3a3a;border-radius:16px;padding:24px;max-width:360px;width:100%">
+    <div style="font-size:18px;font-weight:600;color:#f0f0f0;margin-bottom:6px" id="cobro-title">Mesa X — Cobrar</div>
+    <div style="font-size:13px;color:#888;margin-bottom:16px" id="cobro-desglose">Cargando...</div>
+    <div style="font-size:28px;font-weight:700;color:#c8a84a;margin-bottom:20px" id="cobro-total">$0</div>
+    <button id="cobro-btn-generar" onclick="generarPagoMesa()"
+      style="width:100%;background:#22aa44;color:white;border:none;border-radius:10px;padding:14px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:10px">
+      💳 Generar link de pago
+    </button>
+    <button onclick="document.getElementById('cobro-modal').style.display='none'"
+      style="width:100%;background:none;border:1px solid #3a3a3a;border-radius:10px;padding:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:#888;cursor:pointer">
+      Cancelar
+    </button>
+  </div>
+</div>
+
 <script type="module">
   import { supabase } from './lib/supabase.js'
   import { restaurants, orders } from './lib/db.js'
@@ -760,13 +777,30 @@
           + '</div>'
       }).join('')
 
+      // Total de la mesa — suma de todos los pedidos activos
+      const totalMesa = pedidosMesa
+        .filter(p => p.status !== 'cancelled' && p.status !== 'paid')
+        .reduce((s, p) => s + Number(p.total || 0), 0)
+      const isRestaurant = !rest.business_type || rest.business_type === 'restaurant'
+      const orderIdsMesa = pedidosMesa
+        .filter(p => p.status !== 'cancelled' && p.status !== 'paid')
+        .map(p => p.id)
+
       return '<div class="mesa-group">'
         + '<div class="mesa-group-header">'
         +   '<div class="mesa-group-title">' + mesaLabel + (hayNuevo ? ' <span class="nuevo-badge">NUEVO</span>' : '') + '</div>'
         +   '<div class="mesa-group-meta">'
         +     (nPedidos > 1 ? '<span class="mesa-order-count">' + nPedidos + ' pedidos</span>' : '')
         +     '<span>' + totalItems + ' ítem' + (totalItems !== 1 ? 's' : '') + '</span>'
+        +     (isRestaurant && totalMesa > 0
+                ? '<span style="font-size:11px;font-weight:600;color:#c8a84a;margin-left:4px">$' + totalMesa.toLocaleString('es-AR') + '</span>'
+                : '')
         +     (hayPreparando ? '<button class="mesa-listo-btn" data-key="' + key + '" onclick="marcarMesaListos(this.dataset.key)">✓ Todo listo</button>' : '')
+        +     (isRestaurant && orderIdsMesa.length > 0
+                ? '<button class="mesa-listo-btn" style="background:#22aa4420;border-color:#22aa4440;color:#44cc66;margin-left:4px" '
+                  + 'data-key="' + key + '" data-table="' + key + '" data-total="' + totalMesa + '" data-n="' + nPedidos + '" data-ids="' + orderIdsMesa.join(',') + '" '
+                  + 'onclick="cobrarMesa(this)">💳 Cobrar</button>'
+                : '')
         +   '</div>'
         + '</div>'
         + cardsHtml
@@ -814,6 +848,64 @@
       } catch {}
     }
     renderAll()
+  }
+
+  // ── Cobrar mesa (SOLO restaurant) ────────────────────────────────────────────
+  let _cobroData = null // { tableNumber, orderIds, total, nPedidos }
+
+  window.cobrarMesa = function (btn) {
+    // Solo para restaurantes
+    if (rest.business_type && rest.business_type !== 'restaurant') return
+
+    const tableNumber = btn.dataset.table
+    const total       = Number(btn.dataset.total)
+    const nPedidos    = Number(btn.dataset.n)
+    const orderIds    = btn.dataset.ids.split(',').filter(Boolean)
+
+    _cobroData = { tableNumber, orderIds, total, nPedidos }
+
+    const mesaLabel = tableNumber && tableNumber !== 'sin-mesa' ? 'Mesa ' + tableNumber : 'Sin mesa'
+    document.getElementById('cobro-title').textContent = mesaLabel + ' — Cobrar'
+    document.getElementById('cobro-desglose').textContent =
+      nPedidos + ' pedido' + (nPedidos !== 1 ? 's' : '') + ' · ' + orderIds.length + ' orden' + (orderIds.length !== 1 ? 'es' : '') + ' activas'
+    document.getElementById('cobro-total').textContent = '$' + total.toLocaleString('es-AR')
+    document.getElementById('cobro-btn-generar').disabled = false
+    document.getElementById('cobro-btn-generar').textContent = '💳 Generar link de pago'
+    document.getElementById('cobro-modal').style.display = 'flex'
+  }
+
+  window.generarPagoMesa = async function () {
+    if (!_cobroData) return
+    const btn = document.getElementById('cobro-btn-generar')
+    btn.disabled = true
+    btn.textContent = 'Generando...'
+    try {
+      const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/mp/crear-preferencia', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurantId: rest.id,
+          tableNumber:  _cobroData.tableNumber !== 'sin-mesa' ? Number(_cobroData.tableNumber) : null,
+          orderIds:     _cobroData.orderIds,
+          currency:     'ARS',
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.init_point) {
+        alert('No se pudo generar el link de pago: ' + (data.error || 'intente nuevamente'))
+        btn.disabled = false
+        btn.textContent = '💳 Generar link de pago'
+        return
+      }
+      // Abrir en nueva pestaña y cerrar modal
+      window.open(data.init_point, '_blank')
+      document.getElementById('cobro-modal').style.display = 'none'
+      _cobroData = null
+    } catch (e) {
+      alert('Error de red: ' + e.message)
+      btn.disabled = false
+      btn.textContent = '💳 Generar link de pago'
+    }
   }
 
   window.cambiarEstado = cambiarEstado
