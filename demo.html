@@ -1231,7 +1231,7 @@
 // ============================================================
 // DATOS DEL MENÚ
 // ============================================================
-const MENU = {
+let MENU = {
   'picar-1': { name: 'Tabla de fiambres y quesos', price: 14500, emoji: '🍖' },
   'picar-2': { name: 'Empanadas de carne (x3)', price: 2800, emoji: '🥟' },
   'picar-3': { name: 'Provoleta a la parrilla', price: 8500, emoji: '🧀' },
@@ -1478,7 +1478,7 @@ let tanoOpen = false;
 let tanoHistory = [];
 const WORKER = 'https://vitrina-tano.vitrinaapp.workers.dev';
 
-const TANO_CONTEXT = 'Sos Tano, el asistente de Casa Lucía. Conocés el menú de memoria como el mejor mozo del barrio — hacés recomendaciones genuinas, contás qué tiene cada plato.\n\nTONO Y ESTILO:\n- Cálido, informal, porteño. Tratás de vos. Podés arrancar con "Mirá," o "Che," cuando es natural.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente elección!" — suena a bot.\n- Sin bullet points. Hablás en párrafos cortos y naturales.\n- Máximo 3 oraciones por respuesta. La gente está en el restaurante, no lee paredes de texto.\n- Si recomendás algo, das UNA sola recomendación con una razón concreta y específica.\n- Podés ofrecer agregar al pedido: "¿Lo sumo?" — usalo cuando tenga sentido.\n- Si te preguntan algo fuera del menú: "Eso mejor preguntale al equipo — yo me manejo con el menú."\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas. Tienen gluten y huevo.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano. Tiene lacteos.)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar rebozados con alioli casero y limon. (Tienen gluten.)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. El favorito de la casa. Tiene gluten y lacteos.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada. Tiene gluten y lacteos.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. El clasico. Tiene gluten, lacteos y huevo.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. Sin TACC.\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico. Tiene lacteos.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. Tiene gluten y pescado.\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. Tarda 8 minutos. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC. Tiene lacteos y huevo.)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC. Sin alérgenos comunes.)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml. Tiene gluten.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera pedir algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta. Ejemplo: "[AGREGAR:principales-1:2] Anotadas 2 milanesas — las mando a cocina cuando confirmes."\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "anotatelo" — SIEMPRE usá [AGREGAR:ID:QTY].\n3. Si no estás seguro del ID, usá el más parecido.\n4. Respondé sin markdown. Texto simple y natural.';
+let TANO_CONTEXT = 'Sos Tano, el asistente de Casa Lucía. Conocés el menú de memoria como el mejor mozo del barrio — hacés recomendaciones genuinas, contás qué tiene cada plato.\n\nTONO Y ESTILO:\n- Cálido, informal, porteño. Tratás de vos. Podés arrancar con "Mirá," o "Che," cuando es natural.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente elección!" — suena a bot.\n- Sin bullet points. Hablás en párrafos cortos y naturales.\n- Máximo 3 oraciones por respuesta. La gente está en el restaurante, no lee paredes de texto.\n- Si recomendás algo, das UNA sola recomendación con una razón concreta y específica.\n- Podés ofrecer agregar al pedido: "¿Lo sumo?" — usalo cuando tenga sentido.\n- Si te preguntan algo fuera del menú: "Eso mejor preguntale al equipo — yo me manejo con el menú."\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas. Tienen gluten y huevo.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano. Tiene lacteos.)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar rebozados con alioli casero y limon. (Tienen gluten.)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. El favorito de la casa. Tiene gluten y lacteos.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada. Tiene gluten y lacteos.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. El clasico. Tiene gluten, lacteos y huevo.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. Sin TACC.\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico. Tiene lacteos.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. Tiene gluten y pescado.\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. Tarda 8 minutos. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC. Tiene lacteos y huevo.)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC. Sin alérgenos comunes.)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml. Tiene gluten.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera pedir algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta. Ejemplo: "[AGREGAR:principales-1:2] Anotadas 2 milanesas — las mando a cocina cuando confirmes."\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "anotatelo" — SIEMPRE usá [AGREGAR:ID:QTY].\n3. Si no estás seguro del ID, usá el más parecido.\n4. Respondé sin markdown. Texto simple y natural.';
 
 function openTano() {
   tanoOpen = true;
@@ -1653,9 +1653,211 @@ function generateSectionImages(sectionId) {
 }
 
 // ============================================================
+// MODO COMERCIO — ?tipo=comercio
+// Reemplaza contenido del restaurante con catálogo de ferretería.
+// No afecta nada del modo restaurante (default).
+// ============================================================
+;(function() {
+  if (new URLSearchParams(location.search).get('tipo') !== 'comercio') return;
+
+  // ── Catálogo Ferretería El Tornillo ──────────────────────────────────────
+  MENU = {
+    'pinturas-1':     { name: 'Pintura látex interior blanca 4L',    price: 12500, emoji: '🎨', tags: 'oferta',
+      desc: 'Rendimiento 10m²/L. Secado rápido 2hs. Apta para interiores.',
+      prompt: 'white latex interior paint can 4 liters product photography hardware store' },
+    'pinturas-2':     { name: 'Látex exterior premium 10L',          price: 28900, emoji: '🖌️', tags: 'destacado',
+      desc: 'Alta resistencia a la intemperie. Rendimiento 12m²/L. Colores a pedir.',
+      prompt: 'exterior premium paint bucket 10 liters product photography' },
+    'pinturas-3':     { name: 'Esmalte sintético negro satinado 1L', price: 8200,  emoji: '🪣', tags: '',
+      desc: 'Para maderas y metales. Secado 8hs. Resistente a humedad.',
+      prompt: 'black synthetic enamel paint can 1 liter hardware store product' },
+    'pinturas-4':     { name: 'Sellador al agua 4L',                 price: 9800,  emoji: '🧴', tags: 'oferta',
+      desc: 'Sella superficies porosas antes de pintar. Apto interior/exterior.',
+      prompt: 'water-based primer sealer paint can 4 liters hardware store' },
+
+    'herramientas-1': { name: 'Taladro percutor 600W + maletín',     price: 38500, emoji: '🔧', tags: 'destacado',
+      desc: 'Velocidad variable, reversible. Mandril 13mm. Maletín de accesorios incluido.',
+      prompt: 'power drill 600w with carrying case hardware store product photography' },
+    'herramientas-2': { name: 'Set destornilladores 6 piezas',       price: 4900,  emoji: '🪛', tags: '',
+      desc: 'Acero cromo-vanadio. 3 planos + 3 Phillips. Mango ergonómico bicolor.',
+      prompt: '6 piece screwdriver set hand tools hardware store product' },
+    'herramientas-3': { name: 'Sierra circular 7¼" 1200W',           price: 52000, emoji: '🔨', tags: '',
+      desc: 'Hoja 184mm. Base de aluminio. Profundidad de corte 65mm.',
+      prompt: 'circular saw 7 inch 1200w power tool hardware store product photography' },
+    'herramientas-4': { name: 'Nivel de burbuja aluminio 60cm',      price: 3200,  emoji: '📏', tags: 'stock-bajo',
+      desc: 'Perfil de aluminio. 3 burbujas: horizontal, vertical y 45°.',
+      prompt: 'aluminum spirit level 60cm measuring tool hardware store' },
+
+    'canerias-1':     { name: 'Caño PVC clase 6 — 110mm × 3m',       price: 4100,  emoji: '🔩', tags: '',
+      desc: 'Bajada de agua cloacal. Extremo enchufe y liso. Norma IRAM.',
+      prompt: 'pvc pipe 110mm plumbing hardware store product photography' },
+    'canerias-2':     { name: 'Codo PVC 110mm 90°',                   price: 580,   emoji: '⚙️', tags: '',
+      desc: 'Compatible con caño clase 6. Para instalaciones cloacales.',
+      prompt: 'pvc elbow fitting 90 degree plumbing hardware store' },
+    'canerias-3':     { name: 'Llave esférica bronce ½"',             price: 1950,  emoji: '🔧', tags: 'oferta',
+      desc: 'Palanca de cuarto de vuelta. Agua fría y caliente hasta 110°C.',
+      prompt: 'bronze ball valve 1/2 inch plumbing hardware store product' },
+    'canerias-4':     { name: 'Flexible de conexión ½" × 50cm',       price: 890,   emoji: '🔗', tags: 'stock-bajo',
+      desc: 'Trenzado de acero inoxidable. Para inodoros y canillas.',
+      prompt: 'stainless steel flexible hose connector 50cm plumbing hardware' },
+
+    'electricidad-1': { name: 'Cable unipolar 2,5mm² × 100m',        price: 18500, emoji: '⚡', tags: 'destacado',
+      desc: 'Marca Prysmian o similar. Para iluminación y tomacorrientes.',
+      prompt: 'electrical copper wire coil 100 meters hardware store product' },
+    'electricidad-2': { name: 'Disyuntor termomagnético 20A',         price: 3400,  emoji: '🔌', tags: '',
+      desc: 'Bipolar, norma IRAM. Para tableros de distribución domiciliarios.',
+      prompt: 'circuit breaker 20 amp electrical hardware store product photography' },
+    'electricidad-3': { name: 'Tablero eléctrico 12 módulos',         price: 8900,  emoji: '📦', tags: '',
+      desc: 'Con puerta transparente. Rieles DIN incluidas. Para interior.',
+      prompt: 'electrical panel box 12 modules hardware store product' },
+    'electricidad-4': { name: 'Toma corriente triple 10A c/tierra',   price: 1200,  emoji: '🔌', tags: 'stock-bajo',
+      desc: 'Con puesta a tierra. Apto exterior. Norma IRAM 2071.',
+      prompt: 'triple electrical outlet with grounding hardware store product' },
+  };
+
+  // ── Contexto del asistente Viti para ferretería ──────────────────────────
+  TANO_CONTEXT = 'Sos Viti, la asistente de Ferretería El Tornillo. Conocés el catálogo de memoria y ayudás a los clientes a encontrar lo que necesitan.\n\nTONO Y ESTILO:\n- Directo, amable, útil. Tratás de vos.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente!"\n- Sin bullet points. Respuestas cortas y concretas.\n- Máximo 3 oraciones. Si recomendás algo, una sola opción con razón concreta.\n- Si te preguntan algo fuera del catálogo: "Eso te lo responde el equipo en el mostrador."\n\nCATÁLOGO COMPLETO:\nPINTURAS:\n- Pintura látex interior blanca 4L $12.500 (ID: pinturas-1): Rendimiento 10m²/L, secado 2hs. EN OFERTA.\n- Látex exterior premium 10L $28.900 (ID: pinturas-2): Alta resistencia intemperie, colores a pedir. DESTACADO.\n- Esmalte sintético negro satinado 1L $8.200 (ID: pinturas-3): Para madera y metal, resistente humedad.\n- Sellador al agua 4L $9.800 (ID: pinturas-4): Sella superficies porosas. EN OFERTA.\n\nHERRAMIENTAS:\n- Taladro percutor 600W + maletín $38.500 (ID: herramientas-1): Velocidad variable, reversible. DESTACADO.\n- Set destornilladores 6 piezas $4.900 (ID: herramientas-2): Cromo-vanadio, 3 planos + 3 Phillips.\n- Sierra circular 7¼" 1200W $52.000 (ID: herramientas-3): Hoja 184mm, profundidad corte 65mm.\n- Nivel de burbuja aluminio 60cm $3.200 (ID: herramientas-4): 3 burbujas. STOCK BAJO.\n\nCAÑERÍAS:\n- Caño PVC 110mm × 3m $4.100 (ID: canerias-1): Clase 6, bajada cloacal, norma IRAM.\n- Codo PVC 110mm 90° $580 (ID: canerias-2): Compatible clase 6.\n- Llave esférica bronce ½" $1.950 (ID: canerias-3): Para frío y caliente hasta 110°C. EN OFERTA.\n- Flexible de conexión ½" × 50cm $890 (ID: canerias-4): Trenzado inoxidable. STOCK BAJO.\n\nELECTRICIDAD:\n- Cable unipolar 2,5mm² × 100m $18.500 (ID: electricidad-1): Marca Prysmian o similar. DESTACADO.\n- Disyuntor termomagnético 20A $3.400 (ID: electricidad-2): Bipolar, norma IRAM.\n- Tablero eléctrico 12 módulos $8.900 (ID: electricidad-3): Con puerta transparente, rieles DIN.\n- Toma corriente triple 10A c/tierra $1.200 (ID: electricidad-4): Apto exterior. STOCK BAJO.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera consultar o reservar algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta.\n2. Si dice "quiero X", "anotame X", "necesito X" — usá [AGREGAR:ID:QTY].\n3. Respondé sin markdown. Texto simple y natural.';
+
+  // ── Parchar el DOM cuando esté listo ─────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', function() {
+    // Título
+    document.title = 'Demo Catálogo — Ferretería El Tornillo';
+
+    // Banner
+    var banner = document.querySelector('.demo-banner');
+    if (banner) banner.innerHTML = 'Esta es una demo del catálogo digital para comercios con Vitrina. <a href="index.html#comercios">Quiero esto para mi comercio →</a>';
+
+    // Header
+    var cover = document.querySelector('.cover-emoji');
+    var h1    = document.querySelector('.rest-header h1');
+    var sub   = document.querySelector('.rest-header p');
+    var tags  = document.querySelector('.rest-tags');
+    var mesa  = document.querySelector('.mesa-tag');
+    if (cover) cover.textContent = '🔩';
+    if (h1)   h1.textContent    = 'Ferretería El Tornillo';
+    if (sub)  sub.textContent   = 'Pinturas, herramientas y materiales · Villa Urquiza, CABA';
+    if (tags) tags.innerHTML    = '<span>🕐 Lun–Sáb 8:00–18:00</span><span>📍 Triunvirato 2340</span><span>⭐ 4.9</span>';
+    if (mesa) mesa.textContent  = '📦 Mostrador';
+
+    // Confirmación de pedido
+    var conf = document.getElementById('orderConfirmed');
+    if (conf) {
+      var ch3 = conf.querySelector('h3'); if (ch3) ch3.textContent = '¡Consulta enviada!';
+      var cp  = conf.querySelector('p');  if (cp)  cp.textContent  = 'Te contactamos en breve para confirmar disponibilidad y coordinar la entrega o retiro.';
+    }
+
+    // Filtros → Oferta / Destacado / Stock bajo
+    var filtersDiv = document.querySelector('.filters');
+    if (filtersDiv) filtersDiv.innerHTML =
+      '<button class="filter-btn active" id="df-all" onclick="clearFilters()" aria-pressed="true">Todos</button>' +
+      '<button class="filter-btn" id="df-oferta"    onclick="toggleFilter(\'oferta\',\'this\')" aria-pressed="false" onclick="toggleFilter(\'oferta\', this)">🏷️ Oferta</button>' +
+      '<button class="filter-btn" id="df-destacado" onclick="toggleFilter(\'destacado\', this)" aria-pressed="false">⭐ Destacado</button>' +
+      '<button class="filter-btn" id="df-stock-bajo" onclick="toggleFilter(\'stock-bajo\', this)" aria-pressed="false">📦 Stock bajo</button>';
+    // Re-asignar eventos correctamente (sin el bug de comillas dobles)
+    if (filtersDiv) {
+      var fbtns = filtersDiv.querySelectorAll('.filter-btn[id^="df-"]:not(#df-all)');
+      fbtns[0] && fbtns[0].addEventListener('click', function(){ toggleFilter('oferta', this); });
+      fbtns[1] && fbtns[1].addEventListener('click', function(){ toggleFilter('destacado', this); });
+      fbtns[2] && fbtns[2].addEventListener('click', function(){ toggleFilter('stock-bajo', this); });
+      fbtns.forEach(function(b){ b.removeAttribute('onclick'); });
+    }
+
+    // Cat nav → Pinturas / Herramientas / Cañerías / Electricidad
+    var catNav = document.getElementById('catNav');
+    if (catNav) catNav.innerHTML =
+      '<button class="cat-btn active" onclick="goToSection(\'pinturas\', this)">Pinturas</button>' +
+      '<button class="cat-btn" onclick="goToSection(\'herramientas\', this)">Herramientas</button>' +
+      '<button class="cat-btn" onclick="goToSection(\'canerias\', this)">Cañerías</button>' +
+      '<button class="cat-btn" onclick="goToSection(\'electricidad\', this)">Electricidad</button>';
+
+    // Menú body → catálogo ferretería
+    var menuBody = document.getElementById('menuBody');
+    if (menuBody) {
+      var cats = [
+        { id: 'pinturas',     label: 'Pinturas',     ids: ['pinturas-1','pinturas-2','pinturas-3','pinturas-4'] },
+        { id: 'herramientas', label: 'Herramientas', ids: ['herramientas-1','herramientas-2','herramientas-3','herramientas-4'] },
+        { id: 'canerias',     label: 'Cañerías',     ids: ['canerias-1','canerias-2','canerias-3','canerias-4'] },
+        { id: 'electricidad', label: 'Electricidad', ids: ['electricidad-1','electricidad-2','electricidad-3','electricidad-4'] },
+      ];
+      menuBody.innerHTML = cats.map(function(cat) {
+        var itemsHtml = cat.ids.map(function(id) {
+          var it = MENU[id];
+          var badges = '';
+          if (it.tags.indexOf('oferta')     !== -1) badges += '<span class="badge featured">🏷️ Oferta</span>';
+          if (it.tags.indexOf('destacado')  !== -1) badges += '<span class="badge featured">⭐ Destacado</span>';
+          if (it.tags.indexOf('stock-bajo') !== -1) badges += '<span class="badge" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:6px;padding:2px 8px;font-size:11px">📦 Stock bajo</span>';
+          return '<div class="menu-item" data-tags="' + it.tags + '">'
+            + '<div class="item-img-wrap" id="img-' + id + '" data-prompt="' + it.prompt + '">' + it.emoji + '</div>'
+            + '<div class="item-info"><div>'
+            + '<div class="item-name">' + it.name + '</div>'
+            + '<div class="item-desc">' + it.desc + '</div>'
+            + (badges ? '<div class="item-badges">' + badges + '</div>' : '')
+            + '</div><div class="item-footer">'
+            + '<span class="item-price">$' + it.price.toLocaleString('es-AR') + '</span>'
+            + '<div id="ctrl-' + id + '"></div>'
+            + '</div></div></div>';
+        }).join('');
+        return '<div id="sec-' + cat.id + '"><div class="section-title">' + cat.label + '</div>' + itemsHtml + '</div>';
+      }).join('');
+    }
+
+    // Panel asistente → Viti
+    var tanoName   = document.querySelector('.tano-header-name');
+    var tanoStatus = document.querySelector('.tano-header-status');
+    var tanoAvatar = document.querySelector('.tano-avatar');
+    var tanoInput  = document.getElementById('tanoInput');
+    if (tanoName)   tanoName.textContent   = 'Viti';
+    if (tanoStatus) tanoStatus.textContent = 'Tu asistente de ferretería · En línea';
+    if (tanoAvatar) tanoAvatar.textContent = '🔧';
+    if (tanoInput)  tanoInput.placeholder  = 'Preguntale a Viti...';
+
+    // Quick buttons ferretería
+    var qBtns = document.getElementById('tanoQuickBtns');
+    if (qBtns) qBtns.innerHTML =
+      '<button class="quick-btn" onclick="sendQuick(\'¿Tienen pintura látex blanca?\')">Pintura látex blanca</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'¿Qué taladro recomendás para uso doméstico?\')">Taladro para el hogar</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'¿Qué tienen en oferta hoy?\')">¿Qué está en oferta?</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'¿Tienen caños de PVC 110mm?\')">Caños PVC 110mm</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'¿Cuánto rinde la pintura?\')">Rendimiento de pintura</button>';
+
+    // Bienvenida de Viti (sobreescribir openTano)
+    var _origOpenTano = openTano;
+    openTano = function() {
+      tanoOpen = true;
+      document.getElementById('tanoPanel').classList.add('open');
+      document.getElementById('tanoOverlay').classList.add('open');
+      if (tanoHistory.length === 0) {
+        addTanoMsg('tano', '¡Hola! Soy Viti 👋 Puedo ayudarte con precios, stock y recomendaciones del catálogo. ¿Por dónde empezamos?');
+      }
+    };
+
+    // Fab de Tano → Viti
+    var tanoFab = document.getElementById('tanoFab');
+    if (tanoFab) tanoFab.innerHTML = tanoFab.innerHTML.replace(/Tano/g, 'Viti');
+
+    // Inicializar controles con el nuevo MENU y generar imágenes
+    Object.keys(MENU).forEach(function(id) { renderCtrl(id); });
+    generateSectionImages('pinturas');
+    var remCats = ['herramientas','canerias','electricidad'];
+    if ('IntersectionObserver' in window) {
+      var obs = new IntersectionObserver(function(entries) {
+        entries.forEach(function(e) {
+          if (e.isIntersecting) { generateSectionImages(e.target.id.replace('sec-','')); obs.unobserve(e.target); }
+        });
+      }, { rootMargin: '200px' });
+      remCats.forEach(function(s) { var el = document.getElementById('sec-'+s); if (el) obs.observe(el); });
+    } else {
+      remCats.forEach(function(s) { generateSectionImages(s); });
+    }
+  });
+})();
+
+// ============================================================
 // INICIALIZAR CONTROLES + GENERAR IMÁGENES
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
+  // En modo comercio el init ya fue reemplazado arriba — solo correr para restaurante
+  if (new URLSearchParams(location.search).get('tipo') === 'comercio') return;
   Object.keys(MENU).forEach(function(id) { renderCtrl(id); });
 
   // Generar la primera sección inmediatamente (visible al cargar)
