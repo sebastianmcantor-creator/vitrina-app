@@ -1618,37 +1618,7 @@
   </div>
 </section>
 
-<!-- Testimoniales -->
-<section style="padding:72px 24px;background:var(--white)">
-  <div style="max-width:960px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:48px">
-      <span class="section-eyebrow">Resultados reales</span>
-      <h2 class="section-title" style="margin-top:8px">Lo que cambia cuando digitalizás tu negocio</h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
-      <div style="background:var(--cream2);border-radius:20px;padding:28px">
-        <div style="font-size:32px;font-weight:700;color:var(--terra);font-family:'Cormorant Garamond',serif;margin-bottom:8px">-40%</div>
-        <div style="font-size:15px;font-weight:600;margin-bottom:8px">Errores en pedidos</div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.6">Cuando el cliente elige y paga desde el celular, no hay malentendidos. El pedido llega exactamente como lo pidió.</p>
-      </div>
-      <div style="background:var(--cream2);border-radius:20px;padding:28px">
-        <div style="font-size:32px;font-weight:700;color:var(--terra);font-family:'Cormorant Garamond',serif;margin-bottom:8px">+20%</div>
-        <div style="font-size:15px;font-weight:600;margin-bottom:8px">Ticket promedio</div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.6">Con el menú visual y los destacados bien posicionados, los clientes suelen agregar una entrada o postre que no hubieran pedido al mozo.</p>
-      </div>
-      <div style="background:var(--cream2);border-radius:20px;padding:28px">
-        <div style="font-size:32px;font-weight:700;color:var(--terra);font-family:'Cormorant Garamond',serif;margin-bottom:8px">0</div>
-        <div style="font-size:15px;font-weight:600;margin-bottom:8px">No-shows en peluquerías</div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.6">El recordatorio automático 24hs antes elimina prácticamente las ausencias. Los turnos que quedan libres se pueden reasignar.</p>
-      </div>
-      <div style="background:var(--cream2);border-radius:20px;padding:28px">
-        <div style="font-size:32px;font-weight:700;color:var(--terra);font-family:'Cormorant Garamond',serif;margin-bottom:8px">3h</div>
-        <div style="font-size:15px;font-weight:600;margin-bottom:8px">Ahorradas por semana</div>
-        <p style="font-size:14px;color:var(--muted);line-height:1.6">Entre responder preguntas del menú, tomar reservas y publicar en redes — Vitrina lo hace solo. Tres horas semanales de vuelta.</p>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- TESTIMONIOS: espacio reservado para reseñas reales de clientes. Activar cuando tengamos feedback genuino. -->
 
 <!-- ── GARANTÍAS ───────────────────────────────────────────── -->
 <div class="guarantees">
@@ -2115,15 +2085,6 @@ function showPricing(type) {
       });
   });
 
-  /* ── SOCIAL PROOF — testimonials ──────── */
-  var testimonials = document.querySelectorAll('#testimonials .testimonial-card');
-  if (testimonials.length) {
-    gsap.fromTo(testimonials,
-      { opacity: 0, y: 44 },
-      { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out', stagger: 0.15,
-        scrollTrigger: { trigger: '#testimonials', start: 'top 82%', toggleActions: 'play none none none' }
-      });
-  }
 
   /* ── LOGOS BAR fade-in ───────────────────────────── */
   var heroLogos = document.getElementById('hero-logos');
