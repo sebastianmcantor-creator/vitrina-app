@@ -2729,37 +2729,72 @@ input:checked + .toggle-slider:before {
         </div>
 
         <!-- Subtítulos automáticos con Whisper -->
-        <div class="card">
-          <div class="card-title" style="display:flex;align-items:center;gap:10px">
+        <div class="card" style="margin-top:20px">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
             <span>🎙️ Subtítulos automáticos para videos</span>
+            <span style="font-size:11px;font-weight:500;color:var(--muted);background:var(--cream2);padding:3px 10px;border-radius:20px">~$0,006 USD / minuto</span>
           </div>
           <p style="font-size:13.5px;color:var(--muted);margin:8px 0 16px;line-height:1.5">
-            Subí un video de tu negocio y Vitrina genera los subtítulos automáticamente con IA (Whisper). Perfectos para Reels e Instagram.
+            Subí un video y Vitrina genera subtítulos en formato .SRT con marcas de tiempo, listos para agregar a tus Reels.
           </p>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div>
-              <label class="form-label">Idioma del audio</label>
-              <select class="form-select" id="whisper-lang" style="max-width:200px">
-                <option value="es">Español</option>
-                <option value="en">Inglés</option>
-                <option value="pt">Portugués</option>
-              </select>
-            </div>
-            <div>
-              <label class="btn-secondary" style="cursor:pointer;font-size:13px;padding:8px 16px;display:inline-block">
-                📤 Subir audio/video
-                <input type="file" id="whisper-file" accept="audio/*,video/*" onchange="transcribeWithWhisper(this)" style="display:none">
+          <div style="display:flex;flex-direction:column;gap:14px">
+
+            <!-- Selector idioma + subir archivo -->
+            <div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+              <div>
+                <label class="form-label">Idioma del audio</label>
+                <select class="form-select" id="whisper-lang" style="width:160px">
+                  <option value="es">🇦🇷 Español</option>
+                  <option value="en">🇺🇸 Inglés</option>
+                  <option value="pt">🇧🇷 Portugués</option>
+                </select>
+              </div>
+              <label class="btn-primary" style="cursor:pointer;font-size:13px;padding:8px 18px;display:inline-flex;align-items:center;gap:6px;min-height:38px;border-radius:10px">
+                📤 Seleccionar video
+                <input type="file" id="whisper-file" accept=".mp4,.mov,.avi,.webm,.mp3,.m4a,.wav,audio/*,video/*" onchange="onWhisperFileSelected(this)" style="display:none">
               </label>
-              <span class="form-hint" style="margin-left:10px">MP3, MP4, MOV, WAV — máx 25MB</span>
+              <span class="form-hint" style="font-size:12px">MP4, MOV, AVI, WebM · máx 25MB</span>
             </div>
-            <div id="whisper-status" style="display:none"></div>
-            <div id="whisper-result" style="display:none">
-              <label class="form-label">Subtítulos generados</label>
-              <textarea id="whisper-text" class="form-textarea" style="min-height:120px;font-size:13px" readonly></textarea>
-              <button class="btn-secondary" onclick="copyWhisperText()" style="font-size:13px;padding:6px 14px;margin-top:8px">
-                📋 Copiar texto
+
+            <!-- Preview del video + metadatos -->
+            <div id="whisper-preview-wrap" style="display:none;background:var(--cream2);border-radius:12px;padding:14px;border:1px solid var(--border)">
+              <video id="whisper-video-preview" controls style="width:100%;max-height:200px;border-radius:8px;background:#000;display:none"></video>
+              <div id="whisper-meta" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)"></div>
+              <div id="whisper-cost-estimate" style="margin-top:10px;padding:10px 14px;background:var(--cream);border-radius:8px;border:1px solid var(--border);font-size:13px;display:none">
+                <strong style="color:var(--ink)">Costo estimado:</strong> <span id="whisper-cost-val"></span>
+                <span style="color:var(--muted);margin-left:8px">· Whisper cobra $0,006 USD por minuto de audio</span>
+              </div>
+              <button class="btn-primary" id="btn-whisper-start" onclick="transcribeWithWhisper()" style="margin-top:12px;font-size:13px;padding:9px 20px;min-height:40px">
+                🤖 Generar subtítulos con IA
               </button>
             </div>
+
+            <!-- Estado de procesamiento -->
+            <div id="whisper-status" style="display:none;padding:14px;background:var(--cream2);border-radius:10px;border:1px solid var(--border)"></div>
+
+            <!-- Resultado -->
+            <div id="whisper-result" style="display:none">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+                <label class="form-label" style="margin:0">Subtítulos generados — podés editarlos antes de descargar</label>
+                <div style="display:flex;gap:6px">
+                  <button class="btn-secondary" id="btn-whisper-srt" onclick="switchSubFormat('srt')" style="font-size:12px;padding:5px 12px;background:var(--terra-pale);color:var(--terra)">SRT</button>
+                  <button class="btn-secondary" id="btn-whisper-txt" onclick="switchSubFormat('txt')" style="font-size:12px;padding:5px 12px">Texto</button>
+                </div>
+              </div>
+              <textarea id="whisper-text" class="form-textarea" style="min-height:180px;font-size:12px;font-family:monospace;line-height:1.5"></textarea>
+              <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+                <button class="btn-primary" onclick="downloadSubtitles()" style="font-size:13px;padding:7px 16px">
+                  ⬇️ Descargar .SRT
+                </button>
+                <button class="btn-secondary" onclick="copyWhisperText()" style="font-size:13px;padding:7px 14px">
+                  📋 Copiar texto
+                </button>
+                <button class="btn-secondary" onclick="saveSubtitlesToPost()" style="font-size:13px;padding:7px 14px">
+                  💾 Guardar para publicación
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -7094,52 +7129,180 @@ window.connectMetricool = function () {
 }
 
 // ─────────────────────────────────────────────
-// Whisper — subtítulos automáticos
+// Whisper — subtítulos automáticos (flujo completo)
 // ─────────────────────────────────────────────
-window.transcribeWithWhisper = async function (input) {
+let _whisperFile = null
+let _whisperSegments = []
+let _whisperCurrentFormat = 'srt'
+let _whisperFilename = 'subtitulos'
+
+// Paso 1: usuario selecciona archivo → mostrar preview y metadata
+window.onWhisperFileSelected = function (input) {
   if (!input.files || !input.files[0]) return
   const file = input.files[0]
-  const maxSize = 25 * 1024 * 1024 // 25MB
-  if (file.size > maxSize) {
-    showToast('El archivo debe ser menor a 25MB', 'error')
-    input.value = ''
-    return
+  const MAX = 25 * 1024 * 1024
+  if (file.size > MAX) {
+    showToast('El archivo debe ser menor a 25MB. Para videos más grandes, extraé el audio primero.', 'error')
+    input.value = ''; return
   }
+  _whisperFile = file
+  _whisperFilename = file.name.replace(/\.[^.]+$/, '')
 
-  const lang = document.getElementById('whisper-lang').value
+  // Preview de video
+  const previewWrap = document.getElementById('whisper-preview-wrap')
+  const videoEl = document.getElementById('whisper-video-preview')
+  const isVideo = file.type.startsWith('video/')
+  if (isVideo) {
+    videoEl.src = URL.createObjectURL(file)
+    videoEl.style.display = 'block'
+    videoEl.onloadedmetadata = () => showWhisperMeta(file, videoEl.duration)
+  } else {
+    videoEl.style.display = 'none'
+    showWhisperMeta(file, null)
+  }
+  previewWrap.style.display = 'block'
+  document.getElementById('whisper-result').style.display = 'none'
+  document.getElementById('whisper-status').style.display = 'none'
+}
+
+function showWhisperMeta(file, duration) {
+  const sizeMB = (file.size / 1024 / 1024).toFixed(1)
+  const ext = file.name.split('.').pop().toUpperCase()
+  const durText = duration ? Math.floor(duration / 60) + ':' + String(Math.floor(duration % 60)).padStart(2,'0') + ' min' : '—'
+  document.getElementById('whisper-meta').innerHTML =
+    `<span>📁 ${ext}</span><span>⚖️ ${sizeMB} MB</span>` +
+    (duration ? `<span>⏱ ${durText}</span>` : '')
+
+  // Costo estimado (si tenemos duración)
+  if (duration) {
+    const mins = duration / 60
+    const cost = (mins * 0.006).toFixed(4)
+    const costEl = document.getElementById('whisper-cost-estimate')
+    document.getElementById('whisper-cost-val').textContent = `~USD $${cost}`
+    costEl.style.display = 'block'
+  }
+}
+
+// Paso 2: usuario confirma → transcribir
+window.transcribeWithWhisper = async function () {
+  if (!_whisperFile) { showToast('Seleccioná un archivo primero', 'error'); return }
+
+  const lang     = document.getElementById('whisper-lang').value
   const statusEl = document.getElementById('whisper-status')
   const resultEl = document.getElementById('whisper-result')
-  const textEl   = document.getElementById('whisper-text')
+  const startBtn = document.getElementById('btn-whisper-start')
 
   statusEl.style.display = 'block'
-  statusEl.innerHTML = '<div style="font-size:13px;color:var(--muted)">⏳ Transcribiendo... puede tardar hasta 30 segundos.</div>'
+  statusEl.innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted)">
+      <div style="width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--terra);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0"></div>
+      Transcribiendo audio con IA... (~30 segundos por minuto de video)
+    </div>`
   resultEl.style.display = 'none'
+  if (startBtn) { startBtn.disabled = true; startBtn.textContent = '⏳ Procesando...' }
 
   try {
     const formData = new FormData()
-    formData.append('audio', file)
+    formData.append('audio', _whisperFile)
     formData.append('language', lang)
 
     const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/whisper/transcribe', {
       method: 'POST',
       body: formData,
     })
-
     if (!res.ok) {
       const errText = await res.text()
-      throw new Error('Error Whisper: ' + errText)
+      throw new Error(errText.slice(0, 200))
     }
 
     const data = await res.json()
-    textEl.value = data.text || ''
-    statusEl.innerHTML = `<div style="font-size:13px;color:var(--sage)">✅ Transcripción completada${data.duration ? ' · ' + Math.round(data.duration) + 's de audio' : ''}</div>`
+    _whisperSegments = data.segments || []
+
+    // Mostrar resultado
+    const durMsg = data.duration ? ` · ${Math.round(data.duration)}s de audio` : ''
+    statusEl.innerHTML = `<div style="font-size:13px;color:var(--green)">✅ Transcripción completada${durMsg}</div>`
+
+    // Renderizar SRT por defecto
+    _whisperCurrentFormat = 'srt'
+    document.getElementById('whisper-text').value = segmentsToSRT(_whisperSegments) || data.text || ''
+    updateSubFormatBtns()
     resultEl.style.display = 'block'
     showToast('Subtítulos generados ✓', 'success')
+
   } catch (e) {
-    statusEl.innerHTML = `<div style="font-size:13px;color:var(--bad)">❌ Error: ${e.message}</div>`
+    statusEl.innerHTML = `<div style="font-size:13px;color:var(--bad)">❌ Error: ${esc(e.message)}</div>`
     showToast('Error al transcribir: ' + e.message, 'error')
   } finally {
-    input.value = ''
+    if (startBtn) { startBtn.disabled = false; startBtn.textContent = '🤖 Generar subtítulos con IA' }
+  }
+}
+
+// Conversión segments → SRT
+function segmentsToSRT(segments) {
+  if (!segments || !segments.length) return ''
+  return segments.map((seg, i) => {
+    const from = secToSRTTime(seg.start)
+    const to   = secToSRTTime(seg.end)
+    return (i + 1) + '\n' + from + ' --> ' + to + '\n' + (seg.text || '').trim()
+  }).join('\n\n')
+}
+
+function secToSRTTime(sec) {
+  const s = Math.floor(sec)
+  const ms = Math.round((sec - s) * 1000)
+  const h  = Math.floor(s / 3600)
+  const m  = Math.floor((s % 3600) / 60)
+  const ss = s % 60
+  return String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' +
+         String(ss).padStart(2,'0') + ',' + String(ms).padStart(3,'0')
+}
+
+window.switchSubFormat = function (fmt) {
+  _whisperCurrentFormat = fmt
+  const textarea = document.getElementById('whisper-text')
+  if (fmt === 'srt') {
+    textarea.value = segmentsToSRT(_whisperSegments)
+  } else {
+    textarea.value = _whisperSegments.map(s => (s.text || '').trim()).join(' ')
+  }
+  updateSubFormatBtns()
+}
+
+function updateSubFormatBtns() {
+  const srtBtn = document.getElementById('btn-whisper-srt')
+  const txtBtn = document.getElementById('btn-whisper-txt')
+  if (!srtBtn || !txtBtn) return
+  const isSRT = _whisperCurrentFormat === 'srt'
+  srtBtn.style.background = isSRT ? 'var(--terra-pale)' : ''
+  srtBtn.style.color = isSRT ? 'var(--terra)' : ''
+  txtBtn.style.background = !isSRT ? 'var(--terra-pale)' : ''
+  txtBtn.style.color = !isSRT ? 'var(--terra)' : ''
+}
+
+window.downloadSubtitles = function () {
+  const text = document.getElementById('whisper-text').value
+  if (!text) return
+  const ext  = _whisperCurrentFormat === 'srt' ? '.srt' : '.txt'
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
+  const a    = document.createElement('a')
+  a.href     = URL.createObjectURL(blob)
+  a.download = (_whisperFilename || 'subtitulos') + ext
+  a.click()
+  URL.revokeObjectURL(a.href)
+  showToast('Archivo descargado ✓', 'success')
+}
+
+window.saveSubtitlesToPost = function () {
+  const text = document.getElementById('whisper-text').value
+  if (!text) return
+  // Pre-cargar el texto en el modal de nueva publicación como caption
+  const captionEl = document.getElementById('post-caption')
+  if (captionEl) {
+    captionEl.value = text.split('\n').filter(l => l && !l.match(/^\d+$/) && !l.match(/\d\d:\d\d/)).join(' ').trim()
+    openNewPostModal()
+    showToast('Subtítulos cargados en nueva publicación ✓', 'success')
+  } else {
+    showToast('Abrí el calendario de publicaciones para guardar', 'info')
   }
 }
 
