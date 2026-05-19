@@ -775,41 +775,7 @@
       white-space: nowrap;
     }
 
-    /* ── SOCIAL PROOF ────────────────────────────── */
-    .testimonial-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px; margin-top: 48px;
-    }
-    .testimonial-card {
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 18px; padding: 24px;
-    }
-    .testimonial-avatar {
-      width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 15px; font-weight: 700; color: #fff;
-      flex-shrink: 0;
-    }
-    .testimonial-header {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
-    }
-    .testimonial-meta { display: flex; flex-direction: column; }
-    .testimonial-name { font-size: 14px; font-weight: 600; color: #fff; }
-    .testimonial-biz  { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 1px; }
-    .testimonial-quote { font-size: 14px; color: rgba(255,255,255,.75); line-height: 1.65; margin-bottom: 12px; font-style: italic; }
-    .testimonial-stars { font-size: 13px; letter-spacing: 1px; }
-    .counter-big {
-      font-size: clamp(2.4rem, 5vw, 3.6rem);
-      font-weight: 700; color: #E8C87A;
-      line-height: 1; margin-bottom: 8px;
-    }
-    .counter-sub {
-      font-size: 16px; color: rgba(255,255,255,.55);
-    }
     @media (max-width: 768px) {
-      .testimonial-grid { grid-template-columns: 1fr !important; }
       .hero-logos-row { gap: 20px; }
     }
 
@@ -1046,61 +1012,12 @@
   </div>
 </section>
 
-<!-- ── SOCIAL PROOF ───────────────────────────────────────── -->
-<section id="social-proof" style="background:#0a0a0f; padding: 80px 24px; border-bottom: 1px solid rgba(255,255,255,0.06)">
-  <div style="max-width:960px; margin:0 auto; text-align:center">
-    <div style="text-align:center;margin-bottom:40px">
-      <div style="font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:12px">Estado del proyecto</div>
-      <div style="font-family:'Plus Jakarta Sans',sans-serif;font-size:clamp(1.6rem,4vw,2.4rem);font-weight:700;color:#ffffff;line-height:1.2">Empezamos en 2026</div>
-      <div style="font-size:16px;color:rgba(255,255,255,.6);margin-top:8px">Sumando comercios cada semana en Argentina 🇦🇷</div>
-    </div>
-
-    <div style="text-align:center;margin-bottom:20px">
-      <span style="display:inline-block;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:4px 14px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.45)">Ejemplos ilustrativos · Testimonios reales próximamente</span>
-    </div>
-
-    <div class="testimonial-grid" id="testimonials">
-      <!-- Lucas M. -->
-      <div class="testimonial-card">
-        <div class="testimonial-header">
-          <div class="testimonial-avatar" style="background:#B85A30">L</div>
-          <div class="testimonial-meta">
-            <span class="testimonial-name">Lucas M.</span>
-            <span class="testimonial-biz">Pizzería · Palermo</span>
-          </div>
-        </div>
-        <p class="testimonial-quote">"Reduje los errores en pedidos a cero. En serio."</p>
-        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-      </div>
-
-      <!-- Claudia R. -->
-      <div class="testimonial-card">
-        <div class="testimonial-header">
-          <div class="testimonial-avatar" style="background:#3D8C5A">C</div>
-          <div class="testimonial-meta">
-            <span class="testimonial-name">Claudia R.</span>
-            <span class="testimonial-biz">Peluquería · San Telmo</span>
-          </div>
-        </div>
-        <p class="testimonial-quote">"Los no-shows desaparecieron."</p>
-        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-      </div>
-
-      <!-- Martín G. -->
-      <div class="testimonial-card">
-        <div class="testimonial-header">
-          <div class="testimonial-avatar" style="background:#1565C0">M</div>
-          <div class="testimonial-meta">
-            <span class="testimonial-name">Martín G.</span>
-            <span class="testimonial-biz">Ferretería · Flores</span>
-          </div>
-        </div>
-        <p class="testimonial-quote">"Viti publica en ML por mí. Increíble."</p>
-        <div class="testimonial-stars">⭐⭐⭐⭐⭐</div>
-      </div>
-    </div>
-  </div>
-</section>
+<!--
+  SECCIÓN TESTIMONIOS — activar cuando haya clientes reales
+  Estructura esperada: nombre, tipo de negocio, ciudad, texto corto (2-3 oraciones),
+  foto opcional. Los testimonios los agrega Sebastián manualmente desde el panel maestro
+  o directamente editando este archivo.
+-->
 
 <!-- ── SECCIÓN RESTAURANTES ───────────────────────────────── -->
 <section class="section bg-white" id="restaurantes" style="position:relative;overflow:hidden">
