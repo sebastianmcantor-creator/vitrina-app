@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cargando...</title>
+  <title>Menú digital — Vitrina</title>
+  <meta name="description" content="Menú digital. Pedí desde tu mesa.">
+  <meta name="robots" content="noindex, nofollow">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Menú digital">
+  <meta property="og:description" content="Pedí desde tu mesa con un click.">
+  <meta property="og:image" content="https://vitrinaapp.com.ar/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://vitrinaapp.com.ar/og-image.png">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#E8521A">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -431,17 +441,22 @@
       }
       metaDesc.content = `Menú digital de ${rest.name}${rest.city ? ' · ' + rest.city : ''}. Pedí desde tu celular.`
 
-      // OG tags
+      // OG tags dinámicos — usa logo del restaurante si tiene, sino la imagen genérica
+      const ogImage = rest.logo_url || rest.cover_url || 'https://vitrinaapp.com.ar/og-image.png'
       const ogTags = {
-        'og:title': rest.name + ' — Menú Digital',
-        'og:description': `Menú digital de ${rest.name}. Pedí online sin esperar.`,
-        'og:url': `https://vitrinaapp.com.ar/menu.html?slug=${slug}`,
+        'og:title':       rest.name + ' — Menú Digital',
+        'og:description': `Menú digital de ${rest.name}${rest.city ? ' · ' + rest.city : ''}. Pedí desde tu mesa con un click.`,
+        'og:url':         `https://vitrinaapp.com.ar/menu.html?slug=${slug}`,
+        'og:image':       ogImage,
       }
       Object.entries(ogTags).forEach(([prop, content]) => {
         let el = document.querySelector(`meta[property="${prop}"]`)
         if (!el) { el = document.createElement('meta'); el.setAttribute('property', prop); document.head.appendChild(el) }
         el.content = content
       })
+      // Twitter image
+      const twitterImg = document.querySelector('meta[name="twitter:image"]')
+      if (twitterImg) twitterImg.content = ogImage
 
       document.getElementById('rest-name').textContent = rest.name
       const sub = [rest.tagline, rest.address].filter(Boolean).join(' · ')
