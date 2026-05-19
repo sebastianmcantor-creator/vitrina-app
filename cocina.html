@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -74,7 +74,7 @@
     .item-name-cocina { flex: 1; font-size: 15px; font-weight: 500; letter-spacing: 0.01em; }
 
     .pedido-footer { padding: 12px 16px; border-top: 1px solid #2a2a2a; display: flex; gap: 8px; }
-    .estado-btn { flex: 1; border: none; border-radius: 10px; padding: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+    .estado-btn { flex: 1; border: none; border-radius: 10px; padding: 10px; min-height: 48px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
     .estado-btn:hover:not(:disabled) { opacity: 0.88; transform: translateY(-1px); }
     .estado-btn:active:not(:disabled) { transform: translateY(0); }
     .estado-btn.pending, .estado-btn.confirmed { background: #c8a84a; color: #0f0f0f; box-shadow: 0 2px 8px rgba(200,168,74,0.3); }
@@ -315,7 +315,7 @@
     ;(function initSoundBtn() {
       const btn = document.getElementById('btn-mute-sound')
       if (btn && soundMuted) {
-        btn.textContent = '🔇 Silenciado'
+        btn.textContent = '🔕 Alertas silenciadas'
         btn.style.borderColor = '#c8553d'
         btn.style.color = '#c8553d'
       }
@@ -786,7 +786,6 @@
   window.cambiarEstado = cambiarEstado
   window.deshacerEnCard = deshacerEnCard
   window.marcarMesaListos = marcarMesaListos
-  window.setFilter = window.setFilter // already set above
 
   init()
 </script>
