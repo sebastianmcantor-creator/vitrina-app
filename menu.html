@@ -1028,6 +1028,10 @@
         pedidosSesion.push(order.id)
         sessionStorage.setItem(SESSION_KEY, JSON.stringify(pedidosSesion))
         sessionStorage.setItem(SESSION_TS_KEY, Date.now())
+        // Guardar en localStorage para que pago-ok.html pueda leerlos
+        localStorage.setItem('vt_slug',       slug)
+        localStorage.setItem('vt_mesa',       mesaFinal != null ? String(mesaFinal) : '—')
+        localStorage.setItem('vt_last_order', order.id)
 
         // Pedir permiso de notificaciones al primer pedido
         if ('Notification' in window && Notification.permission === 'default') {
