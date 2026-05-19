@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cuenta pausada — Vitrina</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:#0f1117; font-family:'Inter',system-ui,sans-serif; color:#f0f0eb; min-height:100dvh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:24px; text-align:center; }
+    .icon { font-size:56px; margin-bottom:20px; }
+    h1 { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; margin-bottom:12px; }
+    .sub { font-size:15px; color:rgba(240,240,235,.65); margin-bottom:8px; line-height:1.6; max-width:400px; }
+    .date-info { font-size:13px; color:rgba(240,240,235,.4); margin-bottom:32px; }
+    .btn-primary { display:inline-flex; align-items:center; justify-content:center; min-height:48px; padding:0 28px; background:#E8521A; color:white; border:none; border-radius:12px; font-family:'Inter',sans-serif; font-size:15px; font-weight:600; text-decoration:none; cursor:pointer; transition:background .15s; }
+    .btn-primary:hover { background:#FF7540; }
+    .btn-secondary { display:inline-flex; align-items:center; justify-content:center; min-height:44px; padding:0 20px; background:rgba(255,255,255,.06); color:rgba(240,240,235,.7); border:1px solid rgba(255,255,255,.15); border-radius:10px; font-family:'Inter',sans-serif; font-size:14px; text-decoration:none; margin-top:12px; transition:all .15s; }
+    .btn-secondary:hover { background:rgba(255,255,255,.1); color:#f0f0eb; }
+    .actions { display:flex; flex-direction:column; align-items:center; gap:8px; }
+  </style>
+</head>
+<body>
+  <div class="icon">⏸️</div>
+  <h1>Tu cuenta está pausada</h1>
+  <p class="sub" id="suspend-msg">Tu suscripción venció. Para seguir usando Vitrina y que tus clientes puedan hacer pedidos, renovate ahora.</p>
+  <p class="date-info" id="suspend-date"></p>
+  <div class="actions">
+    <a href="/panel.html" class="btn-primary" id="btn-reactivate">Renovar mi plan →</a>
+    <a href="mailto:contacto@vitrinaapp.com.ar?subject=Renovar suscripción" class="btn-secondary">Necesito ayuda</a>
+  </div>
+  <script>
+    const p = new URLSearchParams(location.search)
+    const since = p.get('since')
+    const name  = p.get('name')
+    if (name) document.querySelector('h1').textContent = name + ' — cuenta pausada'
+    if (since) {
+      const d = new Date(since)
+      document.getElementById('suspend-date').textContent = 'Venció el ' + d.toLocaleDateString('es-AR', {day:'numeric',month:'long',year:'numeric'})
+    }
+  </script>
+</body>
+</html>

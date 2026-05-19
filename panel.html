@@ -1569,6 +1569,18 @@ input:checked + .toggle-slider:before {
       <div class="rest-switcher" id="rest-switcher"></div>
     </div>
 
+    <!-- Toggle rápido abierto/cerrado en sidebar (más prominente en mobile) -->
+    <div id="quick-status-toggle" style="display:none;padding:8px 12px;border-top:1px solid rgba(255,255,255,.06)">
+      <button onclick="event.stopPropagation();quickToggleOpen()" id="btn-quick-status"
+        style="width:100%;padding:10px 14px;border-radius:10px;border:none;cursor:pointer;
+               font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;
+               display:flex;align-items:center;gap:8px;justify-content:center;
+               transition:all .2s">
+        <span id="quick-status-dot" style="width:8px;height:8px;border-radius:50%;flex-shrink:0"></span>
+        <span id="quick-status-label">Cargando...</span>
+      </button>
+    </div>
+
     <nav class="sidebar-nav">
       <div class="nav-section-label">Gestión</div>
       <button class="nav-item active" data-section="info" onclick="switchSection('info', this)">
@@ -1715,6 +1727,14 @@ input:checked + .toggle-slider:before {
         </svg>
         <span id="topbar-rest-name" style="font-size:15px;font-weight:600;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Vitrina</span>
       </div>
+      <a id="btn-view-menu" href="#" target="_blank" rel="noopener"
+         style="display:none;align-items:center;gap:5px;padding:6px 12px;background:none;
+                border:1px solid rgba(255,255,255,.2);border-radius:8px;font-size:12px;font-weight:500;
+                color:rgba(255,255,255,.6);text-decoration:none;transition:all .15s;white-space:nowrap"
+         onmouseover="this.style.borderColor='#e8c87a';this.style.color='#e8c87a'"
+         onmouseout="this.style.borderColor='rgba(255,255,255,.2)';this.style.color='rgba(255,255,255,.6)'">
+        🌐 Ver menú ↗
+      </a>
       <button onclick="location.reload()" title="Actualizar" style="background:none;border:none;color:rgba(255,255,255,.3);cursor:pointer;font-size:18px;padding:4px;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.7)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">↻</button>
       <button class="btn-menu-toggle" id="hamburger" onclick="openSidebar()" aria-label="Menú">☰</button>
     </div>
@@ -2309,6 +2329,22 @@ input:checked + .toggle-slider:before {
             <button onclick="exportHistorialCSV()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;color:var(--muted);cursor:pointer">⬇ CSV</button>
           </div>
         </div>
+        <!-- Exportar CSV con rango de fechas -->
+        <div id="export-orders-wrap" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+          <select id="export-period" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);cursor:pointer">
+            <option value="today">Hoy</option>
+            <option value="week">Esta semana</option>
+            <option value="month" selected>Este mes</option>
+            <option value="custom">Rango personalizado</option>
+          </select>
+          <div id="export-custom-range" style="display:none;gap:6px;align-items:center">
+            <input type="date" id="export-date-from" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;width:140px">
+            <span style="font-size:13px;color:var(--muted)">a</span>
+            <input type="date" id="export-date-to" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;width:140px">
+          </div>
+          <button onclick="exportOrdersCSV()" style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--white);font-family:'Outfit',sans-serif;font-size:13px;color:var(--muted);cursor:pointer">⬇ Exportar CSV</button>
+        </div>
+
         <div id="historial-body">
           <div style="padding:40px;text-align:center;color:var(--muted)">Cargando historial...</div>
         </div>
@@ -3833,6 +3869,7 @@ function renderSidebarRestaurant(rest) {
     }
   }
   updateOpenPill(rest.is_open ?? true)
+  updateQuickStatusUI(rest.is_open ?? true)
 
   // Adaptar terminología al tipo de negocio
   const bizTerms = {
@@ -3956,6 +3993,13 @@ function renderSidebarRestaurant(rest) {
   }
   const topbarName = document.getElementById('topbar-rest-name')
   if (topbarName) topbarName.textContent = rest.name
+
+  // Botón "Ver menú público" en topbar
+  const btnViewMenu = document.getElementById('btn-view-menu')
+  if (btnViewMenu && rest.slug) {
+    btnViewMenu.href = '/menu.html?slug=' + rest.slug
+    btnViewMenu.style.display = 'flex'
+  }
 
   // ── Terminología completa por tipo de negocio ──────────────────────────────
   const isRestaurant = btype === 'restaurant'
@@ -4236,17 +4280,44 @@ function updateOpenPill(isOpen) {
   document.getElementById('rest-open-label').textContent = isOpen ? 'Abierto' : 'Cerrado'
 }
 
+function updateQuickStatusUI(isOpen) {
+  const wrap  = document.getElementById('quick-status-toggle')
+  const dot   = document.getElementById('quick-status-dot')
+  const label = document.getElementById('quick-status-label')
+  const btn   = document.getElementById('btn-quick-status')
+  if (!wrap) return
+  wrap.style.display = 'block'
+  if (isOpen) {
+    dot.style.background = '#44cc66'
+    label.textContent    = 'Abierto — tocar para cerrar'
+    btn.style.background = 'rgba(68,204,102,.12)'
+    btn.style.color      = '#44cc66'
+    btn.style.border     = '1px solid rgba(68,204,102,.3)'
+  } else {
+    dot.style.background = '#e84444'
+    label.textContent    = 'Cerrado — tocar para abrir'
+    btn.style.background = 'rgba(232,68,68,.12)'
+    btn.style.color      = '#e84444'
+    btn.style.border     = '1px solid rgba(232,68,68,.3)'
+  }
+}
+
 window.quickToggleOpen = async function () {
   if (!currentRestaurant) return
   const newVal = !(currentRestaurant.is_open ?? true)
+  const btn = document.getElementById('btn-quick-status')
+  if (btn) btn.disabled = true
   try {
     currentRestaurant = await restaurants.update(currentRestaurant.id, { is_open: newVal })
     updateOpenPill(newVal)
+    updateQuickStatusUI(newVal)
     document.getElementById('f-is-open').checked = newVal
     const noun = window._bizNoun || 'Negocio'
     showToast(newVal ? `🟢 ${noun} abierto` : `🔴 ${noun} cerrado`, 'success')
   } catch (e) {
     showToast('Error: ' + e.message, 'error')
+  } finally {
+    if (btn) btn.disabled = false
   }
 }
 
@@ -4496,6 +4567,7 @@ window.loadRestaurant = async function () {
     }
 
     currentRestaurant = restaurantList[0]
+    if (checkAccountStatus(currentRestaurant)) return
     renderSidebarRestaurant(currentRestaurant)
     renderRestSwitcher()
     fillForm(currentRestaurant)
@@ -6543,6 +6615,31 @@ async function loadPaymentsHistory() {
   } catch (e) {
     container.innerHTML = '<div style="color:var(--bad);font-size:13.5px">Error cargando historial: ' + e.message + '</div>'
   }
+}
+
+// Verificar si la cuenta está suspendida y redirigir
+function checkAccountStatus(rest) {
+  if (!rest) return false
+  const plan   = rest.plan ?? 'free'
+  const status = rest.subscription_status ?? 'active'
+  const trialEnd = rest.trial_end ? new Date(rest.trial_end) : null
+
+  // Si el plan es free o activo, no suspender
+  if (plan === 'free' || status === 'active' || status === 'trialing') return false
+
+  // Si está cancelled Y han pasado más de 3 días de gracia desde trial_end
+  if (status === 'cancelled' && trialEnd) {
+    const gracePeriod = 3 * 24 * 60 * 60 * 1000 // 3 días
+    if (Date.now() - trialEnd.getTime() > gracePeriod) {
+      const params = new URLSearchParams({
+        since: trialEnd.toISOString(),
+        name: rest.name || ''
+      })
+      window.location.href = '/suspended.html?' + params.toString()
+      return true
+    }
+  }
+  return false
 }
 
 window.openUpgradeModal = async function () {
@@ -9840,6 +9937,83 @@ window.exportHistorialCSV = function () {
   a.download = 'historial-' + currentRestaurant.slug + '.csv'
   a.click()
 }
+
+// Exportar CSV con rango de fechas seleccionable
+window.exportOrdersCSV = async function () {
+  if (!currentRestaurant) return
+  const period = document.getElementById('export-period')?.value || 'month'
+  const now = new Date()
+  let from, to = new Date()
+
+  if (period === 'today') {
+    from = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  } else if (period === 'week') {
+    from = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  } else if (period === 'month') {
+    from = new Date(now.getFullYear(), now.getMonth(), 1)
+  } else {
+    const f = document.getElementById('export-date-from')?.value
+    const t = document.getElementById('export-date-to')?.value
+    if (!f || !t) { showToast('Seleccioná el rango de fechas', 'error'); return }
+    from = new Date(f); to = new Date(t + 'T23:59:59')
+  }
+
+  showToast('Generando CSV...', 'success')
+
+  try {
+    const { data: ordersData, error } = await supabase
+      .from('orders')
+      .select('*, order_items(name, quantity, price)')
+      .eq('restaurant_id', currentRestaurant.id)
+      .gte('created_at', from.toISOString())
+      .lte('created_at', to.toISOString())
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+
+    const rows = [['Fecha/Hora','Pedido #','Mesa','Ítems','Total ARS','Estado','Email']]
+    ;(ordersData || []).forEach(o => {
+      const dt = new Date(o.created_at).toLocaleString('es-AR')
+      const num = o.id.slice(-6).toUpperCase()
+      const mesa = o.table_number != null ? 'Mesa ' + o.table_number : '—'
+      const items = (o.order_items || []).map(i => i.quantity + 'x ' + i.name).join(' | ')
+      const total = Number(o.total).toLocaleString('es-AR')
+      const status = { pending:'Pendiente', preparing:'En preparación', ready:'Listo', delivered:'Entregado', cancelled:'Cancelado' }[o.status] || o.status
+      const email = o.customer_email || '—'
+      rows.push([dt, num, mesa, items, total, status, email])
+    })
+
+    const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n')
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    const restName = (currentRestaurant.name || 'restaurante').replace(/[^a-z0-9]/gi, '-').toLowerCase()
+    const dateStr = new Date().toISOString().slice(0,10)
+    a.download = 'vitrina-pedidos-' + restName + '-' + dateStr + '.csv'
+    a.click()
+    URL.revokeObjectURL(a.href)
+    showToast(`✅ CSV generado — ${(ordersData || []).length} pedidos`, 'success')
+  } catch (e) {
+    showToast('Error exportando: ' + e.message, 'error')
+  }
+}
+
+// Mostrar/ocultar rango personalizado en selector de exportación
+;(function () {
+  function initExportPeriodToggle() {
+    const sel = document.getElementById('export-period')
+    if (!sel) return
+    sel.addEventListener('change', () => {
+      const wrap = document.getElementById('export-custom-range')
+      if (wrap) wrap.style.display = sel.value === 'custom' ? 'flex' : 'none'
+    })
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initExportPeriodToggle)
+  } else {
+    initExportPeriodToggle()
+  }
+})()
 
 function renderHistorial(data) {
   const container = document.getElementById('historial-body')

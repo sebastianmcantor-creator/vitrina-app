@@ -592,10 +592,13 @@
       document.getElementById('app').style.display = 'block'
 
       if (!rest.is_open) {
-        document.getElementById('cerrado-banner').style.display = 'flex'
-        const btn = document.getElementById('checkout-btn')
-        btn.disabled = true
-        btn.textContent = 'Restaurante cerrado'
+        const banner = document.getElementById('cerrado-banner')
+        if (banner) {
+          banner.innerHTML = `🔒 <strong>${esc(rest.name)}</strong> está cerrado en este momento. Podés ver la carta pero no se aceptan pedidos.`
+          banner.style.display = 'flex'
+        }
+        const checkoutBtn = document.getElementById('checkout-btn')
+        if (checkoutBtn) { checkoutBtn.disabled = true; checkoutBtn.textContent = 'Cerrado por ahora' }
       }
 
       if (mesa === null || isNaN(mesa)) {
