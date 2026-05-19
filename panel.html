@@ -3237,9 +3237,12 @@ input:checked + .toggle-slider:before {
       <div class="form-field" style="margin-bottom:14px">
         <label class="form-label">URL de imagen</label>
         <div style="display:flex;gap:8px;align-items:flex-start">
-          <input class="form-input" id="item-image-url" placeholder="https://... (opcional)" style="flex:1">
+          <input class="form-input" id="item-image-url" placeholder="https://... (opcional)" style="flex:1" oninput="document.getElementById('btn-enhance-image').style.display=this.value.trim().startsWith('http')?'':'none'">
           <button class="btn-secondary" onclick="generateImageAI()" id="btn-generate-image" title="Generar foto con IA" style="padding:8px 12px;font-size:12px;white-space:nowrap">
             🤖 Generar
+          </button>
+          <button class="btn-secondary" onclick="enhanceImage()" id="btn-enhance-image" title="Mejorar foto existente con IA" style="padding:8px 12px;font-size:12px;white-space:nowrap;display:none">
+            ✨ Mejorar
           </button>
           <label class="btn-secondary" style="cursor:pointer;font-size:12px;padding:8px 12px;white-space:nowrap" title="Subir foto desde el dispositivo">
             📷 Subir
@@ -6782,70 +6785,73 @@ window.enhanceImage = async function () {
   }
 
   const btn = document.getElementById('btn-enhance-image')
-  const originalText = btn.textContent
-  btn.textContent = 'Procesando...'
-  btn.disabled = true
+  const originalText = btn ? btn.textContent : '✨ Mejorar'
+  if (btn) { btn.textContent = 'Mejorando con IA...'; btn.disabled = true }
+
+  const hint = document.getElementById('item-image-hint')
+  const originalHint = hint ? hint.textContent : ''
+  if (hint) hint.textContent = '✨ Mejorando la foto con IA... esto puede tardar 10–30 segundos'
 
   try {
-    // Iniciar procesamiento en Replicate
     const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/replicate/enhance-image', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ imageUrl }),
     })
-
-    if (!res.ok) throw new Error('Error iniciando mejora de imagen')
-
+    if (!res.ok) throw new Error('Error iniciando mejora')
     const prediction = await res.json()
 
-    if (prediction.status === 'succeeded' && prediction.output) {
-      // Si ya está procesada (poco común)
-      imageUrlInput.value = Array.isArray(prediction.output) ? prediction.output[0] : prediction.output
-      showToast('✨ Imagen mejorada correctamente', 'success')
-    } else {
-      // Polling para obtener resultado
-      showToast('Procesando imagen... esto puede tomar 10-30 segundos', 'info')
-      btn.textContent = 'Esperando...'
-
-      let attempts = 0
-      const maxAttempts = 20
-
-      const checkStatus = async () => {
-        if (attempts >= maxAttempts) {
-          throw new Error('Tiempo de espera agotado')
-        }
-
-        attempts++
-        const statusRes = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/replicate/prediction/${prediction.id}`)
-
-        if (!statusRes.ok) throw new Error('Error obteniendo estado')
-
-        const statusData = await statusRes.json()
-
-        if (statusData.status === 'succeeded') {
-          const enhancedUrl = Array.isArray(statusData.output) ? statusData.output[0] : statusData.output
-          imageUrlInput.value = enhancedUrl
-          showToast('✨ Imagen mejorada correctamente', 'success')
-          btn.textContent = originalText
-          btn.disabled = false
-        } else if (statusData.status === 'failed') {
-          throw new Error('Error procesando imagen')
-        } else {
-          // Seguir esperando
-          setTimeout(checkStatus, 2000)
-        }
+    // Obtener URL mejorada (inmediata o via polling)
+    const getEnhanced = () => new Promise((resolve, reject) => {
+      if (prediction.status === 'succeeded' && prediction.output) {
+        resolve(Array.isArray(prediction.output) ? prediction.output[0] : prediction.output)
+        return
       }
+      let attempts = 0
+      const MAX = 30 // 60s max
+      const poll = async () => {
+        if (attempts++ >= MAX) { reject(new Error('La mejora tardó demasiado — intentá de nuevo en unos minutos')); return }
+        try {
+          const sr = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/replicate/prediction/' + prediction.id)
+          if (!sr.ok) { reject(new Error('Error obteniendo estado')); return }
+          const sd = await sr.json()
+          if (sd.status === 'succeeded') resolve(Array.isArray(sd.output) ? sd.output[0] : sd.output)
+          else if (sd.status === 'failed') reject(new Error('Replicate no pudo procesar la imagen'))
+          else setTimeout(poll, 2000)
+        } catch (e) { reject(e) }
+      }
+      setTimeout(poll, 2000)
+    })
 
-      setTimeout(checkStatus, 2000)
-      return // No resetear botón aún
+    const enhancedUrl = await getEnhanced()
+
+    // Mostrar comparación antes/después
+    const previewWrap = document.getElementById('item-image-preview-wrap')
+    if (previewWrap) {
+      previewWrap.style.display = 'block'
+      previewWrap.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">Original</div>
+            <img src="${imageUrl}" alt="Original" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--border);opacity:.7">
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;font-weight:700;color:var(--terra);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">✨ Mejorada</div>
+            <img src="${enhancedUrl}" alt="Mejorada" style="width:100%;height:100px;object-fit:cover;border-radius:8px;border:2px solid var(--terra)">
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn-primary" onclick="document.getElementById('item-image-url').value='${enhancedUrl}';document.getElementById('item-enhance-after').style.display='none';showToast('✨ Foto mejorada aplicada. Guardá el plato.','success')" style="font-size:12px;padding:6px 14px;flex:1">✓ Usar foto mejorada</button>
+          <button class="btn-secondary" onclick="document.getElementById('item-image-preview-wrap').style.display='none';showToast('Imagen original mantenida.','success')" style="font-size:12px;padding:6px 14px;flex:1">Mantener original</button>
+        </div>`
     }
+    if (hint) hint.textContent = '✅ Elegí qué versión usar.'
+    if (btn) { btn.textContent = originalText; btn.disabled = false }
+
   } catch (e) {
+    if (hint) hint.textContent = originalHint
     showToast('Error: ' + e.message, 'error')
-  } finally {
-    if (btn.textContent !== 'Esperando...') {
-      btn.textContent = originalText
-      btn.disabled = false
-    }
+    if (btn) { btn.textContent = originalText; btn.disabled = false }
   }
 }
 
@@ -6978,14 +6984,26 @@ window.uploadItemImage = async function (input) {
   const allowed = ['jpg','jpeg','png','webp']
   if (!allowed.includes(ext)) { showToast('Formato no válido. Usá JPG, PNG o WebP', 'error'); return }
 
-  // Mostrar preview inmediata
+  // Mostrar preview inmediata + check de dimensiones
   const reader = new FileReader()
   reader.onload = e => {
     const previewWrap = document.getElementById('item-image-preview-wrap')
     const previewImg  = document.getElementById('item-image-preview')
     if (previewImg) { previewImg.src = e.target.result; previewWrap.style.display = 'block' }
+    // Verificar dimensiones mínimas
+    const img = new window.Image()
+    img.onload = () => {
+      if (img.width < 200 || img.height < 200) {
+        showToast('⚠️ Imagen muy pequeña (' + img.width + '×' + img.height + 'px). El resultado puede no ser óptimo — usá una imagen de al menos 400×400px.', 'error')
+      }
+    }
+    img.src = e.target.result
   }
   reader.readAsDataURL(file)
+
+  // También mostrar el botón Mejorar después de subir
+  const enhanceBtn = document.getElementById('btn-enhance-image')
+  if (enhanceBtn) enhanceBtn.style.display = ''
 
   showToast('Subiendo imagen...', 'success')
 
