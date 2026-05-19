@@ -520,6 +520,16 @@
       historial[id] = anterior
       if (siguiente === 'ready') {
         notificarPedidoListo(id, rest.id).catch(() => {})
+        // Trigger followup msg1 — solo para restaurantes
+        if (rest.business_type === 'restaurant' || !rest.business_type) {
+          scheduleFollowup(pedidos[id], 'first_plate').catch(() => {})
+        }
+      }
+      if (siguiente === 'delivered') {
+        // Trigger followup msg2 + msg3 — solo para restaurantes
+        if (rest.business_type === 'restaurant' || !rest.business_type) {
+          scheduleFollowup(pedidos[id], 'all_plates').catch(() => {})
+        }
       }
     } catch {
       if (btn) btn.disabled = false
@@ -552,6 +562,29 @@
       })
     } catch (e) {
       console.error('Error al notificar pedido listo:', e)
+    }
+  }
+
+  // ── WA Followup — mensajes automáticos de seguimiento ─────────────────────────
+  // Solo se ejecuta si rest.business_type === 'restaurant' (o sin tipo definido).
+  // Skip silencioso si el pedido no tiene customer_phone.
+  async function scheduleFollowup(pedido, trigger) {
+    const phone = pedido?.customer_phone
+    if (!phone) return // sin teléfono → skip silencioso
+    if (!rest?.wa_followup_config?.enabled) return // feature desactivada
+    try {
+      await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/wa/schedule-followup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId:      pedido.id,
+          restaurantId: rest.id,
+          trigger,
+          phone,
+        }),
+      })
+    } catch {
+      // Fallo silencioso — no interrumpir el flujo de cocina
     }
   }
 
