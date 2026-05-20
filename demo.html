@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo Menú — Casa Lucía Restaurante</title>
-  <meta name="description" content="Demo interactiva del menú digital de Vitrina. Así se ve el menú QR de tu restaurante — con pedidos, Tano IA y pago integrado.">
-  <meta property="og:title" content="Demo Menú Digital — Vitrina">
-  <meta property="og:description" content="Así se ve el menú digital de tu restaurante con Vitrina. Probalo gratis.">
+  <title>Demo MenÃº â€” Casa LucÃ­a Restaurante</title>
+  <meta name="description" content="Demo interactiva del menÃº digital de Vitrina. AsÃ­ se ve el menÃº QR de tu restaurante â€” con pedidos, Tano IA y pago integrado.">
+  <meta property="og:title" content="Demo MenÃº Digital â€” Vitrina">
+  <meta property="og:description" content="AsÃ­ se ve el menÃº digital de tu restaurante con Vitrina. Probalo gratis.">
   <meta property="og:url" content="https://vitrinaapp.com.ar/demo.html">
   <link rel="stylesheet" href="lib/vitrina-tokens.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -94,7 +94,7 @@
       display: inline-block;
     }
 
-    /* Sticky wrapper — filtros + categorías quedan fijas juntas */
+    /* Sticky wrapper â€” filtros + categorÃ­as quedan fijas juntas */
     .sticky-nav {
       position: sticky;
       top: 0;
@@ -168,7 +168,7 @@
       color: white;
     }
 
-    /* Nav categorías */
+    /* Nav categorÃ­as */
     .cat-nav {
       background: white;
       padding: 0.6rem 1rem;
@@ -197,7 +197,7 @@
       border-bottom-color: var(--terra);
     }
 
-    /* Menú */
+    /* MenÃº */
     .menu-body { padding: 0 0 150px; }
 
     .section-title {
@@ -491,7 +491,7 @@
     }
     .cart-order-btn:hover { background: var(--brown); }
 
-    /* Modal confirmación */
+    /* Modal confirmaciÃ³n */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -765,30 +765,30 @@
 
 <!-- Banner demo -->
 <div class="demo-banner">
-  Esta es una demo de cómo se ve el menú digital con Vitrina.
-  <a href="index.html">Quiero esto para mi restaurante →</a>
+  Esta es una demo de cÃ³mo se ve el menÃº digital con Vitrina.
+  <a href="index.html">Quiero esto para mi restaurante â†’</a>
 </div>
 
 <!-- Header -->
 <div class="rest-header">
-  <span class="cover-emoji">🏡</span>
-  <h1>Casa Lucía</h1>
-  <p>Cocina casera de autor · San Telmo, CABA</p>
+  <span class="cover-emoji">ðŸ¡</span>
+  <h1>Casa LucÃ­a</h1>
+  <p>Cocina casera de autor Â· San Telmo, CABA</p>
   <div class="rest-tags">
-    <span>🕐 12:00 – 23:30</span>
-    <span>📍 Defensa 1234</span>
-    <span>⭐ 4.8</span>
+    <span>ðŸ• 12:00 â€“ 23:30</span>
+    <span>ðŸ“ Defensa 1234</span>
+    <span>â­ 4.8</span>
   </div>
-  <div class="mesa-tag">📋 Mesa 5</div>
+  <div class="mesa-tag">ðŸ“‹ Mesa 5</div>
 </div>
 
-<!-- Nav fija: filtros + categorías -->
+<!-- Nav fija: filtros + categorÃ­as -->
 <div class="sticky-nav">
   <div class="filters">
     <button class="filter-btn active" id="df-all" onclick="clearFilters()" aria-pressed="true">Todos</button>
-    <button class="filter-btn" id="df-veg"   onclick="toggleFilter('veg',  this)" aria-pressed="false">🥦 Vegetariano</button>
-    <button class="filter-btn" id="df-vegan" onclick="toggleFilter('vegan',this)" aria-pressed="false">🌱 Vegano</button>
-    <button class="filter-btn" id="df-tacc"  onclick="toggleFilter('tacc', this)" aria-pressed="false">🌾 Sin TACC</button>
+    <button class="filter-btn" id="df-veg"   onclick="toggleFilter('veg',  this)" aria-pressed="false">ðŸ¥¦ Vegetariano</button>
+    <button class="filter-btn" id="df-vegan" onclick="toggleFilter('vegan',this)" aria-pressed="false">ðŸŒ± Vegano</button>
+    <button class="filter-btn" id="df-tacc"  onclick="toggleFilter('tacc', this)" aria-pressed="false">ðŸŒ¾ Sin TACC</button>
   </div>
   <div class="cat-nav" id="catNav">
     <button class="cat-btn active" onclick="goToSection('picar', this)">Para picar</button>
@@ -801,12 +801,12 @@
 
 <!-- Pedido confirmado -->
 <div class="order-confirmed" id="orderConfirmed">
-  <div class="ok-emoji">✅</div>
-  <h3>¡Pedido enviado a cocina!</h3>
-  <p>Tu pedido está siendo preparado. El mozo te avisa cuando esté listo.</p>
+  <div class="ok-emoji">âœ…</div>
+  <h3>Â¡Pedido enviado a cocina!</h3>
+  <p>Tu pedido estÃ¡ siendo preparado. El mozo te avisa cuando estÃ© listo.</p>
 </div>
 
-<!-- Menú -->
+<!-- MenÃº -->
 <div class="menu-body" id="menuBody">
 
   <!-- Para picar -->
@@ -814,12 +814,12 @@
     <div class="section-title">Para picar</div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-picar-1" data-prompt="rustic charcuterie board with sliced cured ham, salami, brie and manchego cheese, artisan bread slices, fig jam, wooden board, restaurant menu photography">🍖</div>
+      <div class="item-img-wrap" id="img-picar-1" data-prompt="rustic charcuterie board with sliced cured ham, salami, brie and manchego cheese, artisan bread slices, fig jam, wooden board, restaurant menu photography">ðŸ–</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tabla de fiambres y quesos</div>
-          <div class="item-desc">Selección del día: jamón crudo, salame, queso brie y manchego. Con pan artesanal y mermelada de higos.</div>
-          <div class="item-badges"><span class="badge featured">⭐ Recomendado</span></div>
+          <div class="item-desc">SelecciÃ³n del dÃ­a: jamÃ³n crudo, salame, queso brie y manchego. Con pan artesanal y mermelada de higos.</div>
+          <div class="item-badges"><span class="badge featured">â­ Recomendado</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$14.500</span>
@@ -829,7 +829,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-picar-2" data-prompt="three golden baked Argentine beef empanadas on white plate, crispy dough, professional food photography, top view">🥟</div>
+      <div class="item-img-wrap" id="img-picar-2" data-prompt="three golden baked Argentine beef empanadas on white plate, crispy dough, professional food photography, top view">ðŸ¥Ÿ</div>
       <div class="item-info">
         <div>
           <div class="item-name">Empanadas de carne (x3)</div>
@@ -843,12 +843,12 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-picar-3" data-prompt="melted grilled provolone cheese on black cast iron pan, oregano sprinkled on top, olive oil drizzle, bread slices on side, rustic restaurant style">🧀</div>
+      <div class="item-img-wrap" id="img-picar-3" data-prompt="melted grilled provolone cheese on black cast iron pan, oregano sprinkled on top, olive oil drizzle, bread slices on side, rustic restaurant style">ðŸ§€</div>
       <div class="item-info">
         <div>
           <div class="item-name">Provoleta a la parrilla</div>
-          <div class="item-desc">Queso provolone fundido con orégano, ají molido y un toque de oliva. Viene con pan tostado.</div>
-          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+          <div class="item-desc">Queso provolone fundido con orÃ©gano, ajÃ­ molido y un toque de oliva. Viene con pan tostado.</div>
+          <div class="item-badges"><span class="badge veg">ðŸ¥¦ Vegetariano</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$8.500</span>
@@ -858,11 +858,11 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-picar-4" data-prompt="crispy fried calamari rings pile on white plate, served with aioli dip sauce and lemon wedge, golden batter, restaurant food photography">🦑</div>
+      <div class="item-img-wrap" id="img-picar-4" data-prompt="crispy fried calamari rings pile on white plate, served with aioli dip sauce and lemon wedge, golden batter, restaurant food photography">ðŸ¦‘</div>
       <div class="item-info">
         <div>
           <div class="item-name">Rabas fritas</div>
-          <div class="item-desc">Anillos de calamar tiernos, rebozados y fritos. Con alioli casero y limón fresco.</div>
+          <div class="item-desc">Anillos de calamar tiernos, rebozados y fritos. Con alioli casero y limÃ³n fresco.</div>
           <div class="item-badges"></div>
         </div>
         <div class="item-footer">
@@ -878,12 +878,12 @@
     <div class="section-title">Pastas</div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-pastas-1" data-prompt="penne rigate pasta with rich slow-cooked beef ragu bolognese sauce, grated parmesan cheese on top, fresh basil leaves, white deep plate, Italian restaurant photography">🍝</div>
+      <div class="item-img-wrap" id="img-pastas-1" data-prompt="penne rigate pasta with rich slow-cooked beef ragu bolognese sauce, grated parmesan cheese on top, fresh basil leaves, white deep plate, Italian restaurant photography">ðŸ</div>
       <div class="item-info">
         <div>
-          <div class="item-name">Penne Rigate con Ragú de Carne</div>
-          <div class="item-desc">Ragú de res cocido a fuego lento por 4 horas, penne al dente, queso parmesano y albahaca fresca.</div>
-          <div class="item-badges"><span class="badge featured">⭐ Favorito</span></div>
+          <div class="item-name">Penne Rigate con RagÃº de Carne</div>
+          <div class="item-desc">RagÃº de res cocido a fuego lento por 4 horas, penne al dente, queso parmesano y albahaca fresca.</div>
+          <div class="item-badges"><span class="badge featured">â­ Favorito</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$16.800</span>
@@ -893,12 +893,12 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-pastas-2" data-prompt="potato gnocchi with vibrant green basil pesto sauce, toasted pistachios, shaved parmesan cheese, white plate, Italian restaurant close up food photography">🥔</div>
+      <div class="item-img-wrap" id="img-pastas-2" data-prompt="potato gnocchi with vibrant green basil pesto sauce, toasted pistachios, shaved parmesan cheese, white plate, Italian restaurant close up food photography">ðŸ¥”</div>
       <div class="item-info">
         <div>
-          <div class="item-name">Ñoquis al pesto de albahaca</div>
-          <div class="item-desc">Ñoquis de papa artesanales con pesto genovés, pistachos tostados y parmesano rallado en mesa.</div>
-          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+          <div class="item-name">Ã‘oquis al pesto de albahaca</div>
+          <div class="item-desc">Ã‘oquis de papa artesanales con pesto genovÃ©s, pistachos tostados y parmesano rallado en mesa.</div>
+          <div class="item-badges"><span class="badge veg">ðŸ¥¦ Vegetariano</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$15.200</span>
@@ -908,11 +908,11 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-pastas-3" data-prompt="fettuccine pasta in creamy white sauce with prosciutto ham strips, sauteed mushrooms, nutmeg, parmesan, elegant restaurant plate, warm lighting">🍜</div>
+      <div class="item-img-wrap" id="img-pastas-3" data-prompt="fettuccine pasta in creamy white sauce with prosciutto ham strips, sauteed mushrooms, nutmeg, parmesan, elegant restaurant plate, warm lighting">ðŸœ</div>
       <div class="item-info">
         <div>
-          <div class="item-name">Fettuccine crema y jamón</div>
-          <div class="item-desc">Pasta larga en salsa crema con jamón serrano, hongos salteados y nuez moscada. Clásico de la casa.</div>
+          <div class="item-name">Fettuccine crema y jamÃ³n</div>
+          <div class="item-desc">Pasta larga en salsa crema con jamÃ³n serrano, hongos salteados y nuez moscada. ClÃ¡sico de la casa.</div>
         </div>
         <div class="item-footer">
           <span class="item-price">$15.900</span>
@@ -922,12 +922,12 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-pastas-4" data-prompt="tagliatelle pasta with red sun-dried tomato pesto sauce, toasted almonds, ricotta cheese dollops, fresh arugula leaves, lemon zest, white plate restaurant photography">🍝</div>
+      <div class="item-img-wrap" id="img-pastas-4" data-prompt="tagliatelle pasta with red sun-dried tomato pesto sauce, toasted almonds, ricotta cheese dollops, fresh arugula leaves, lemon zest, white plate restaurant photography">ðŸ</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tallarines al pesto rojo</div>
-          <div class="item-desc">Tallarines artesanales con pesto de tomates secos, almendras y ricota. Toque de limón y rúcula.</div>
-          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+          <div class="item-desc">Tallarines artesanales con pesto de tomates secos, almendras y ricota. Toque de limÃ³n y rÃºcula.</div>
+          <div class="item-badges"><span class="badge veg">ðŸ¥¦ Vegetariano</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$14.800</span>
@@ -942,12 +942,12 @@
     <div class="section-title">Principales</div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-principales-1" data-prompt="Argentine milanesa napolitana breaded veal cutlet topped with tomato sauce, melted ham and cheese, served with golden crispy french fries, restaurant plate, appetizing food photography">🥩</div>
+      <div class="item-img-wrap" id="img-principales-1" data-prompt="Argentine milanesa napolitana breaded veal cutlet topped with tomato sauce, melted ham and cheese, served with golden crispy french fries, restaurant plate, appetizing food photography">ðŸ¥©</div>
       <div class="item-info">
         <div>
           <div class="item-name">Milanesa napolitana con papas fritas</div>
-          <div class="item-desc">Milanesa de ternera con salsa de tomate, jamón y queso gratinado. Con papas fritas caseras.</div>
-          <div class="item-badges"><span class="badge featured">⭐ Clásico</span></div>
+          <div class="item-desc">Milanesa de ternera con salsa de tomate, jamÃ³n y queso gratinado. Con papas fritas caseras.</div>
+          <div class="item-badges"><span class="badge featured">â­ ClÃ¡sico</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$22.500</span>
@@ -957,12 +957,12 @@
     </div>
 
     <div class="menu-item" data-tags="tacc">
-      <div class="item-img-wrap" id="img-principales-2" data-prompt="thick juicy Argentine ribeye bife de chorizo steak grilled on barbecue, perfect grill marks, served with chimichurri sauce and mixed salad, restaurant food photography">🥩</div>
+      <div class="item-img-wrap" id="img-principales-2" data-prompt="thick juicy Argentine ribeye bife de chorizo steak grilled on barbecue, perfect grill marks, served with chimichurri sauce and mixed salad, restaurant food photography">ðŸ¥©</div>
       <div class="item-info">
         <div>
           <div class="item-name">Bife de chorizo a la parrilla</div>
-          <div class="item-desc">400g de corte selecto, cocción a pedido. Acompañado de ensalada mixta y chimichurri de la casa.</div>
-          <div class="item-badges"><span class="badge tacc">🌾 Sin TACC</span></div>
+          <div class="item-desc">400g de corte selecto, cocciÃ³n a pedido. AcompaÃ±ado de ensalada mixta y chimichurri de la casa.</div>
+          <div class="item-badges"><span class="badge tacc">ðŸŒ¾ Sin TACC</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$28.000</span>
@@ -972,11 +972,11 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-principales-3" data-prompt="stuffed chicken breast supreme sliced open showing spinach and cream cheese filling, sauteed in clarified butter, served with rustic mashed potatoes, elegant plate restaurant photography">🍗</div>
+      <div class="item-img-wrap" id="img-principales-3" data-prompt="stuffed chicken breast supreme sliced open showing spinach and cream cheese filling, sauteed in clarified butter, served with rustic mashed potatoes, elegant plate restaurant photography">ðŸ—</div>
       <div class="item-info">
         <div>
           <div class="item-name">Suprema de pollo rellena</div>
-          <div class="item-desc">Pechuga rellena con espinaca y queso crema, salteada con manteca clarificada. Con puré rústico.</div>
+          <div class="item-desc">Pechuga rellena con espinaca y queso crema, salteada con manteca clarificada. Con purÃ© rÃºstico.</div>
         </div>
         <div class="item-footer">
           <span class="item-price">$18.500</span>
@@ -986,12 +986,12 @@
     </div>
 
     <div class="menu-item" data-tags="tacc">
-      <div class="item-img-wrap" id="img-principales-4" data-prompt="fried hake fish fillet in light tempura batter, golden crispy, on bed of arugula with cherry tomatoes and lemon wedge, white plate, Mediterranean restaurant food photography">🐟</div>
+      <div class="item-img-wrap" id="img-principales-4" data-prompt="fried hake fish fillet in light tempura batter, golden crispy, on bed of arugula with cherry tomatoes and lemon wedge, white plate, Mediterranean restaurant food photography">ðŸŸ</div>
       <div class="item-info">
         <div>
           <div class="item-name">Merluza romana</div>
-          <div class="item-desc">Filete fresco rebozado en tempura liviana, con ensalada de rúcula, tomates cherry y aliño de limón.</div>
-          <div class="item-badges"><span class="badge tacc">🌾 Sin TACC</span></div>
+          <div class="item-desc">Filete fresco rebozado en tempura liviana, con ensalada de rÃºcula, tomates cherry y aliÃ±o de limÃ³n.</div>
+          <div class="item-badges"><span class="badge tacc">ðŸŒ¾ Sin TACC</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$19.800</span>
@@ -1006,14 +1006,14 @@
     <div class="section-title">Postres</div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-postres-1" data-prompt="classic tiramisu served in individual glass cup, layers of mascarpone cream and coffee-soaked ladyfingers, cocoa powder dusted on top, elegant dessert photography, dark background">🍰</div>
+      <div class="item-img-wrap" id="img-postres-1" data-prompt="classic tiramisu served in individual glass cup, layers of mascarpone cream and coffee-soaked ladyfingers, cocoa powder dusted on top, elegant dessert photography, dark background">ðŸ°</div>
       <div class="item-info">
         <div>
-          <div class="item-name">Tiramisú de la casa</div>
-          <div class="item-desc">Receta clásica con mascarpone, café espresso y cacao amargo. Se sirve en copa individual.</div>
+          <div class="item-name">TiramisÃº de la casa</div>
+          <div class="item-desc">Receta clÃ¡sica con mascarpone, cafÃ© espresso y cacao amargo. Se sirve en copa individual.</div>
           <div class="item-badges">
-            <span class="badge veg">🥦 Vegetariano</span>
-            <span class="badge featured">⭐ Imperdible</span>
+            <span class="badge veg">ðŸ¥¦ Vegetariano</span>
+            <span class="badge featured">â­ Imperdible</span>
           </div>
         </div>
         <div class="item-footer">
@@ -1024,12 +1024,12 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-postres-2" data-prompt="chocolate lava cake molten fondant cut open revealing liquid chocolate center flowing out, vanilla ice cream scoop on side, dark elegant plate, restaurant dessert photography">🍫</div>
+      <div class="item-img-wrap" id="img-postres-2" data-prompt="chocolate lava cake molten fondant cut open revealing liquid chocolate center flowing out, vanilla ice cream scoop on side, dark elegant plate, restaurant dessert photography">ðŸ«</div>
       <div class="item-info">
         <div>
-          <div class="item-name">Volcán de chocolate</div>
-          <div class="item-desc">Corazón fundente de chocolate belga con helado de crema artesanal. 8 minutos de preparación.</div>
-          <div class="item-badges"><span class="badge veg">🥦 Vegetariano</span></div>
+          <div class="item-name">VolcÃ¡n de chocolate</div>
+          <div class="item-desc">CorazÃ³n fundente de chocolate belga con helado de crema artesanal. 8 minutos de preparaciÃ³n.</div>
+          <div class="item-badges"><span class="badge veg">ðŸ¥¦ Vegetariano</span></div>
         </div>
         <div class="item-footer">
           <span class="item-price">$8.200</span>
@@ -1039,14 +1039,14 @@
     </div>
 
     <div class="menu-item" data-tags="veg tacc">
-      <div class="item-img-wrap" id="img-postres-3" data-prompt="homemade vanilla flan upturned on white plate with golden caramel sauce, dulce de leche drizzled on top, whipped cream, Argentine dessert restaurant food photography">🍮</div>
+      <div class="item-img-wrap" id="img-postres-3" data-prompt="homemade vanilla flan upturned on white plate with golden caramel sauce, dulce de leche drizzled on top, whipped cream, Argentine dessert restaurant food photography">ðŸ®</div>
       <div class="item-info">
         <div>
           <div class="item-name">Flan casero con dulce de leche</div>
           <div class="item-desc">Flan de vainilla hecho en casa, con dulce de leche repostero y crema batida.</div>
           <div class="item-badges">
-            <span class="badge veg">🥦 Vegetariano</span>
-            <span class="badge tacc">🌾 Sin TACC</span>
+            <span class="badge veg">ðŸ¥¦ Vegetariano</span>
+            <span class="badge tacc">ðŸŒ¾ Sin TACC</span>
           </div>
         </div>
         <div class="item-footer">
@@ -1057,14 +1057,14 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-postres-4" data-prompt="colorful fresh seasonal fruit salad in elegant glass bowl, strawberries, kiwi, mango, blueberries, honey drizzle, fresh mint leaves, ginger, vibrant colors food photography">🍓</div>
+      <div class="item-img-wrap" id="img-postres-4" data-prompt="colorful fresh seasonal fruit salad in elegant glass bowl, strawberries, kiwi, mango, blueberries, honey drizzle, fresh mint leaves, ginger, vibrant colors food photography">ðŸ“</div>
       <div class="item-info">
         <div>
-          <div class="item-name">Ensalada de frutas de estación</div>
+          <div class="item-name">Ensalada de frutas de estaciÃ³n</div>
           <div class="item-desc">Frutas frescas de temporada con miel de flores, menta y un toque de jengibre.</div>
           <div class="item-badges">
-            <span class="badge vegan">🌱 Vegano</span>
-            <span class="badge tacc">🌾 Sin TACC</span>
+            <span class="badge vegan">ðŸŒ± Vegano</span>
+            <span class="badge tacc">ðŸŒ¾ Sin TACC</span>
           </div>
         </div>
         <div class="item-footer">
@@ -1080,14 +1080,14 @@
     <div class="section-title">Bebidas</div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-1" data-prompt="clear sparkling mineral water bottle with condensation drops, glass with ice and lemon slice, white background, clean minimal beverage photography">💧</div>
+      <div class="item-img-wrap" id="img-bebidas-1" data-prompt="clear sparkling mineral water bottle with condensation drops, glass with ice and lemon slice, white background, clean minimal beverage photography">ðŸ’§</div>
       <div class="item-info">
         <div>
           <div class="item-name">Agua mineral</div>
           <div class="item-desc">Con o sin gas, botella 500ml.</div>
           <div class="item-badges">
-            <span class="badge vegan">🌱 Vegano</span>
-            <span class="badge tacc">🌾 Sin TACC</span>
+            <span class="badge vegan">ðŸŒ± Vegano</span>
+            <span class="badge tacc">ðŸŒ¾ Sin TACC</span>
           </div>
         </div>
         <div class="item-footer">
@@ -1098,14 +1098,14 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-2" data-prompt="cold cola Coca-Cola drink in glass with ice cubes, condensation on glass, dark bubbling soda, restaurant beverage photography, close up">🥤</div>
+      <div class="item-img-wrap" id="img-bebidas-2" data-prompt="cold cola Coca-Cola drink in glass with ice cubes, condensation on glass, dark bubbling soda, restaurant beverage photography, close up">ðŸ¥¤</div>
       <div class="item-info">
         <div>
           <div class="item-name">Gaseosa</div>
           <div class="item-desc">Coca-Cola, Sprite o Fanta. Lata 350ml o botella 500ml.</div>
           <div class="item-badges">
-            <span class="badge vegan">🌱 Vegano</span>
-            <span class="badge tacc">🌾 Sin TACC</span>
+            <span class="badge vegan">ðŸŒ± Vegano</span>
+            <span class="badge tacc">ðŸŒ¾ Sin TACC</span>
           </div>
         </div>
         <div class="item-footer">
@@ -1116,14 +1116,14 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-3" data-prompt="elegant wine glass with deep red Malbec Argentine wine, swirling in glass, dark moody restaurant background, fine dining wine photography, bokeh lights">🍷</div>
+      <div class="item-img-wrap" id="img-bebidas-3" data-prompt="elegant wine glass with deep red Malbec Argentine wine, swirling in glass, dark moody restaurant background, fine dining wine photography, bokeh lights">ðŸ·</div>
       <div class="item-info">
         <div>
           <div class="item-name">Vino por copa</div>
-          <div class="item-desc">Selección de la carta: Malbec, Torrontés o Cabernet. Preguntar variedad del día.</div>
+          <div class="item-desc">SelecciÃ³n de la carta: Malbec, TorrontÃ©s o Cabernet. Preguntar variedad del dÃ­a.</div>
           <div class="item-badges">
-            <span class="badge vegan">🌱 Vegano</span>
-            <span class="badge tacc">🌾 Sin TACC</span>
+            <span class="badge vegan">ðŸŒ± Vegano</span>
+            <span class="badge tacc">ðŸŒ¾ Sin TACC</span>
           </div>
         </div>
         <div class="item-footer">
@@ -1134,13 +1134,13 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-4" data-prompt="craft artisan beer pint glass with golden amber liquid, thick white foam head, condensation drops on glass, rustic bar background, appetizing beverage photography">🍺</div>
+      <div class="item-img-wrap" id="img-bebidas-4" data-prompt="craft artisan beer pint glass with golden amber liquid, thick white foam head, condensation drops on glass, rustic bar background, appetizing beverage photography">ðŸº</div>
       <div class="item-info">
         <div>
           <div class="item-name">Cerveza artesanal</div>
-          <div class="item-desc">Rubia, roja o negra. Elaboración local, pinta 500ml. Consultar variedades disponibles.</div>
+          <div class="item-desc">Rubia, roja o negra. ElaboraciÃ³n local, pinta 500ml. Consultar variedades disponibles.</div>
           <div class="item-badges">
-            <span class="badge tacc">🌾 Sin TACC</span>
+            <span class="badge tacc">ðŸŒ¾ Sin TACC</span>
           </div>
         </div>
         <div class="item-footer">
@@ -1167,8 +1167,8 @@
 <div class="cart-drawer" id="cartDrawer">
   <div class="cart-handle"></div>
   <div class="cart-header">
-    <h3>🛒 Tu pedido</h3>
-    <button class="cart-close" onclick="closeCart()">✕</button>
+    <h3>ðŸ›’ Tu pedido</h3>
+    <button class="cart-close" onclick="closeCart()">âœ•</button>
   </div>
   <div class="cart-items" id="cartItems"></div>
   <div class="cart-footer">
@@ -1176,15 +1176,15 @@
       <span class="cart-total-label">Total</span>
       <span class="cart-total-value" id="cartTotal">$0</span>
     </div>
-    <button class="cart-order-btn" onclick="confirmOrder()">Enviar pedido a cocina →</button>
+    <button class="cart-order-btn" onclick="confirmOrder()">Enviar pedido a cocina â†’</button>
   </div>
 </div>
 
-<!-- Modal confirmación pedido -->
+<!-- Modal confirmaciÃ³n pedido -->
 <div class="modal-overlay" id="orderModal">
   <div class="modal-box">
-    <span class="modal-emoji">👨‍🍳</span>
-    <div class="modal-title">¿Mandamos el pedido a cocina?</div>
+    <span class="modal-emoji">ðŸ‘¨â€ðŸ³</span>
+    <div class="modal-title">Â¿Mandamos el pedido a cocina?</div>
     <div class="modal-text" id="orderSummaryText">Una vez enviado, no se puede modificar.</div>
     <div class="modal-actions">
       <button class="modal-btn-primary" onclick="sendOrder()">Mandar a cocina</button>
@@ -1205,53 +1205,53 @@
 <!-- Panel Tano -->
 <div class="tano-panel" id="tanoPanel">
   <div class="tano-header">
-    <div class="tano-avatar">🤵</div>
+    <div class="tano-avatar">ðŸ¤µ</div>
     <div class="tano-header-info">
       <div class="tano-header-name">Tano</div>
-      <div class="tano-header-status">Tu asistente del menú · En línea</div>
+      <div class="tano-header-status">Tu asistente del menÃº Â· En lÃ­nea</div>
     </div>
-    <button class="tano-close-btn" onclick="closeTano()" aria-label="Cerrar chat con Tano">✕</button>
+    <button class="tano-close-btn" onclick="closeTano()" aria-label="Cerrar chat con Tano">âœ•</button>
   </div>
   <div class="tano-msgs" id="tanoMsgs"></div>
   <div class="tano-quick-btns" id="tanoQuickBtns">
-    <button class="quick-btn" onclick="sendQuick('¿Qué recomendás para hoy?')">¿Qué recomendás?</button>
-    <button class="quick-btn" onclick="sendQuick('¿Tienen opciones vegetarianas?')">Opciones vegetarianas</button>
-    <button class="quick-btn" onclick="sendQuick('¿Qué tiene el volcán de chocolate?')">Volcán de chocolate</button>
-    <button class="quick-btn" onclick="sendQuick('¿Hay platos sin TACC?')">Sin TACC</button>
-    <button class="quick-btn" onclick="sendQuick('¿Cuánto tarda la milanesa?')">Tiempo de espera</button>
+    <button class="quick-btn" onclick="sendQuick('Â¿QuÃ© recomendÃ¡s para hoy?')">Â¿QuÃ© recomendÃ¡s?</button>
+    <button class="quick-btn" onclick="sendQuick('Â¿Tienen opciones vegetarianas?')">Opciones vegetarianas</button>
+    <button class="quick-btn" onclick="sendQuick('Â¿QuÃ© tiene el volcÃ¡n de chocolate?')">VolcÃ¡n de chocolate</button>
+    <button class="quick-btn" onclick="sendQuick('Â¿Hay platos sin TACC?')">Sin TACC</button>
+    <button class="quick-btn" onclick="sendQuick('Â¿CuÃ¡nto tarda la milanesa?')">Tiempo de espera</button>
   </div>
   <div class="tano-input-area">
     <label class="sr-only" for="tanoInput">Escribile a Tano</label>
     <textarea class="tano-input" id="tanoInput" placeholder="Preguntale a Tano..." rows="1" onkeydown="tanoKeydown(event)" oninput="autoResize(this)"></textarea>
-    <button class="tano-send-btn" onclick="sendTano()" aria-label="Enviar mensaje">➤</button>
+    <button class="tano-send-btn" onclick="sendTano()" aria-label="Enviar mensaje">âž¤</button>
   </div>
 </div>
 
 <script>
 // ============================================================
-// DATOS DEL MENÚ
+// DATOS DEL MENÃš
 // ============================================================
 let MENU = {
-  'picar-1': { name: 'Tabla de fiambres y quesos', price: 14500, emoji: '🍖' },
-  'picar-2': { name: 'Empanadas de carne (x3)', price: 2800, emoji: '🥟' },
-  'picar-3': { name: 'Provoleta a la parrilla', price: 8500, emoji: '🧀' },
-  'picar-4': { name: 'Rabas fritas', price: 9200, emoji: '🦑' },
-  'pastas-1': { name: 'Penne Rigate con Ragú de Carne', price: 16800, emoji: '🍝' },
-  'pastas-2': { name: 'Ñoquis al pesto de albahaca', price: 15200, emoji: '🫘' },
-  'pastas-3': { name: 'Fettuccine crema y jamón', price: 15900, emoji: '🍜' },
-  'pastas-4': { name: 'Tallarines al pesto rojo', price: 14800, emoji: '🍝' },
-  'principales-1': { name: 'Milanesa napolitana con papas fritas', price: 22500, emoji: '🍖' },
-  'principales-2': { name: 'Bife de chorizo a la parrilla', price: 28000, emoji: '🥩' },
-  'principales-3': { name: 'Suprema de pollo rellena', price: 18500, emoji: '🍗' },
-  'principales-4': { name: 'Merluza romana', price: 19800, emoji: '🐟' },
-  'postres-1': { name: 'Tiramisú de la casa', price: 7500, emoji: '🍰' },
-  'postres-2': { name: 'Volcán de chocolate', price: 8200, emoji: '🍫' },
-  'postres-3': { name: 'Flan casero con dulce de leche', price: 5800, emoji: '🍮' },
-  'postres-4': { name: 'Ensalada de frutas de estación', price: 5200, emoji: '🍓' },
-  'bebidas-1': { name: 'Agua mineral', price: 1800, emoji: '💧' },
-  'bebidas-2': { name: 'Gaseosa', price: 2200, emoji: '🥤' },
-  'bebidas-3': { name: 'Vino por copa', price: 5500, emoji: '🍷' },
-  'bebidas-4': { name: 'Cerveza artesanal', price: 4800, emoji: '🍺' }
+  'picar-1': { name: 'Tabla de fiambres y quesos', price: 14500, emoji: 'ðŸ–' },
+  'picar-2': { name: 'Empanadas de carne (x3)', price: 2800, emoji: 'ðŸ¥Ÿ' },
+  'picar-3': { name: 'Provoleta a la parrilla', price: 8500, emoji: 'ðŸ§€' },
+  'picar-4': { name: 'Rabas fritas', price: 9200, emoji: 'ðŸ¦‘' },
+  'pastas-1': { name: 'Penne Rigate con RagÃº de Carne', price: 16800, emoji: 'ðŸ' },
+  'pastas-2': { name: 'Ã‘oquis al pesto de albahaca', price: 15200, emoji: 'ðŸ«˜' },
+  'pastas-3': { name: 'Fettuccine crema y jamÃ³n', price: 15900, emoji: 'ðŸœ' },
+  'pastas-4': { name: 'Tallarines al pesto rojo', price: 14800, emoji: 'ðŸ' },
+  'principales-1': { name: 'Milanesa napolitana con papas fritas', price: 22500, emoji: 'ðŸ–' },
+  'principales-2': { name: 'Bife de chorizo a la parrilla', price: 28000, emoji: 'ðŸ¥©' },
+  'principales-3': { name: 'Suprema de pollo rellena', price: 18500, emoji: 'ðŸ—' },
+  'principales-4': { name: 'Merluza romana', price: 19800, emoji: 'ðŸŸ' },
+  'postres-1': { name: 'TiramisÃº de la casa', price: 7500, emoji: 'ðŸ°' },
+  'postres-2': { name: 'VolcÃ¡n de chocolate', price: 8200, emoji: 'ðŸ«' },
+  'postres-3': { name: 'Flan casero con dulce de leche', price: 5800, emoji: 'ðŸ®' },
+  'postres-4': { name: 'Ensalada de frutas de estaciÃ³n', price: 5200, emoji: 'ðŸ“' },
+  'bebidas-1': { name: 'Agua mineral', price: 1800, emoji: 'ðŸ’§' },
+  'bebidas-2': { name: 'Gaseosa', price: 2200, emoji: 'ðŸ¥¤' },
+  'bebidas-3': { name: 'Vino por copa', price: 5500, emoji: 'ðŸ·' },
+  'bebidas-4': { name: 'Cerveza artesanal', price: 4800, emoji: 'ðŸº' }
 };
 
 // ============================================================
@@ -1281,7 +1281,7 @@ function renderCtrl(id) {
   } else {
     el.innerHTML = `
       <div class="qty-controls">
-        <button class="qty-btn" onclick="removeItem('${id}')" aria-label="Quitar uno de ${itemName}">−</button>
+        <button class="qty-btn" onclick="removeItem('${id}')" aria-label="Quitar uno de ${itemName}">âˆ’</button>
         <span class="qty-num">${qty}</span>
         <button class="qty-btn" onclick="addItem('${id}')" aria-label="Agregar otro ${itemName}">+</button>
       </div>`;
@@ -1361,7 +1361,7 @@ function closeCart() {
 function renderCartDrawer() {
   const el = document.getElementById('cartItems');
   if (getCount() === 0) {
-    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#999;font-size:0.9rem;">Tu pedido está vacío 🛒</div>';
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:#999;font-size:0.9rem;">Tu pedido estÃ¡ vacÃ­o ðŸ›’</div>';
     return;
   }
   el.innerHTML = Object.entries(cart).map(([id, qty]) => {
@@ -1374,7 +1374,7 @@ function renderCartDrawer() {
           <div class="cart-item-price">${fmt(item.price)} c/u</div>
         </div>
         <div class="cart-item-controls">
-          <button class="cart-qty-btn" onclick="removeItem('${id}');renderCartDrawer();updateCartFab()">−</button>
+          <button class="cart-qty-btn" onclick="removeItem('${id}');renderCartDrawer();updateCartFab()">âˆ’</button>
           <span class="cart-qty-num">${qty}</span>
           <button class="cart-qty-btn" onclick="addItem('${id}');renderCartDrawer()">+</button>
         </div>
@@ -1405,7 +1405,7 @@ function sendOrder() {
   ids.forEach(id => renderCtrl(id));
   updateCartFab();
   syncTanoFab();
-  // Mostrar confirmación
+  // Mostrar confirmaciÃ³n
   const conf = document.getElementById('orderConfirmed');
   conf.classList.add('show');
   conf.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1413,7 +1413,7 @@ function sendOrder() {
 }
 
 // ============================================================
-// FILTROS — multi-select con lógica AND
+// FILTROS â€” multi-select con lÃ³gica AND
 // ============================================================
 var activeFilters = new Set();
 
@@ -1430,7 +1430,7 @@ function filterItems() {
       return;
     }
     var tags = (item.getAttribute('data-tags') || '').split(' ').filter(Boolean);
-    // AND: el ítem debe tener TODOS los filtros activos
+    // AND: el Ã­tem debe tener TODOS los filtros activos
     var matches = true;
     activeFilters.forEach(function(f) {
       if (tags.indexOf(f) === -1) matches = false;
@@ -1462,7 +1462,7 @@ function clearFilters() {
 }
 
 // ============================================================
-// SCROLL A SECCIÓN
+// SCROLL A SECCIÃ“N
 // ============================================================
 function goToSection(sec, btn) {
   var el = document.getElementById('sec-' + sec);
@@ -1478,14 +1478,14 @@ let tanoOpen = false;
 let tanoHistory = [];
 const WORKER = 'https://vitrina-tano.vitrinaapp.workers.dev';
 
-let TANO_CONTEXT = 'Sos Tano, el asistente de Casa Lucía. Conocés el menú de memoria como el mejor mozo del barrio — hacés recomendaciones genuinas, contás qué tiene cada plato.\n\nTONO Y ESTILO:\n- Cálido, informal, porteño. Tratás de vos. Podés arrancar con "Mirá," o "Che," cuando es natural.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente elección!" — suena a bot.\n- Sin bullet points. Hablás en párrafos cortos y naturales.\n- Máximo 3 oraciones por respuesta. La gente está en el restaurante, no lee paredes de texto.\n- Si recomendás algo, das UNA sola recomendación con una razón concreta y específica.\n- Podés ofrecer agregar al pedido: "¿Lo sumo?" — usalo cuando tenga sentido.\n- Si te preguntan algo fuera del menú: "Eso mejor preguntale al equipo — yo me manejo con el menú."\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas. Tienen gluten y huevo.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano. Tiene lacteos.)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar rebozados con alioli casero y limon. (Tienen gluten.)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. El favorito de la casa. Tiene gluten y lacteos.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada. Tiene gluten y lacteos.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. El clasico. Tiene gluten, lacteos y huevo.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. Sin TACC.\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico. Tiene lacteos.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. Tiene gluten y pescado.\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. Tarda 8 minutos. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC. Tiene lacteos y huevo.)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC. Sin alérgenos comunes.)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml. Tiene gluten.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera pedir algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta. Ejemplo: "[AGREGAR:principales-1:2] Anotadas 2 milanesas — las mando a cocina cuando confirmes."\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "anotatelo" — SIEMPRE usá [AGREGAR:ID:QTY].\n3. Si no estás seguro del ID, usá el más parecido.\n4. Respondé sin markdown. Texto simple y natural.';
+let TANO_CONTEXT = 'Sos Tano, el asistente de Casa LucÃ­a. ConocÃ©s el menÃº de memoria como el mejor mozo del barrio â€” hacÃ©s recomendaciones genuinas, contÃ¡s quÃ© tiene cada plato.\n\nTONO Y ESTILO:\n- CÃ¡lido, informal, porteÃ±o. TratÃ¡s de vos. PodÃ©s arrancar con "MirÃ¡," o "Che," cuando es natural.\n- NUNCA empezÃ¡s con "Â¡Claro!", "Â¡Por supuesto!", "Â¡Excelente elecciÃ³n!" â€” suena a bot.\n- Sin bullet points. HablÃ¡s en pÃ¡rrafos cortos y naturales.\n- MÃ¡ximo 3 oraciones por respuesta. La gente estÃ¡ en el restaurante, no lee paredes de texto.\n- Si recomendÃ¡s algo, das UNA sola recomendaciÃ³n con una razÃ³n concreta y especÃ­fica.\n- PodÃ©s ofrecer agregar al pedido: "Â¿Lo sumo?" â€” usalo cuando tenga sentido.\n- Si te preguntan algo fuera del menÃº: "Eso mejor preguntale al equipo â€” yo me manejo con el menÃº."\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas. Tienen gluten y huevo.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano. Tiene lacteos.)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar rebozados con alioli casero y limon. (Tienen gluten.)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. El favorito de la casa. Tiene gluten y lacteos.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovÃ©s, pistachos, parmesano. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada. Tiene gluten y lacteos.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. El clasico. Tiene gluten, lacteos y huevo.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. Sin TACC.\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico. Tiene lacteos.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. Tiene gluten y pescado.\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. Tarda 8 minutos. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC. Tiene lacteos y huevo.)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC. Sin alÃ©rgenos comunes.)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml. Tiene gluten.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera pedir algo, respondÃ© con [AGREGAR:ID:CANTIDAD] antes de tu respuesta. Ejemplo: "[AGREGAR:principales-1:2] Anotadas 2 milanesas â€” las mando a cocina cuando confirmes."\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "anotatelo" â€” SIEMPRE usÃ¡ [AGREGAR:ID:QTY].\n3. Si no estÃ¡s seguro del ID, usÃ¡ el mÃ¡s parecido.\n4. RespondÃ© sin markdown. Texto simple y natural.';
 
 function openTano() {
   tanoOpen = true;
   document.getElementById('tanoPanel').classList.add('open');
   document.getElementById('tanoOverlay').classList.add('open');
   if (tanoHistory.length === 0) {
-    addTanoMsg('tano', '¡Hola! Soy Tano 👋 Podés preguntarme lo que quieras del menú — ingredientes, alergias, qué recomiendo... ¡lo que necesites!');
+    addTanoMsg('tano', 'Â¡Hola! Soy Tano ðŸ‘‹ PodÃ©s preguntarme lo que quieras del menÃº â€” ingredientes, alergias, quÃ© recomiendo... Â¡lo que necesites!');
   }
 }
 
@@ -1542,7 +1542,7 @@ async function sendTano() {
     removeTyping();
     if (res.ok) {
       var data = await res.json();
-      var reply = (data.content && data.content[0] && data.content[0].text) || data.reply || 'Hmm, no pude responder ahora. Intentá de nuevo.';
+      var reply = (data.content && data.content[0] && data.content[0].text) || data.reply || 'Hmm, no pude responder ahora. IntentÃ¡ de nuevo.';
       // Parsear comandos de carrito [AGREGAR:id:qty]
       var added = [];
       var cleanReply = reply.replace(/\[AGREGAR:([^:\]]+):(\d+)\]/g, function(_, id, qty) {
@@ -1555,21 +1555,21 @@ async function sendTano() {
       }).trim();
       addTanoMsg('tano', cleanReply);
       if (added.length > 0) {
-        // Mostrar chip de confirmación en el chat
+        // Mostrar chip de confirmaciÃ³n en el chat
         var msgs2 = document.getElementById('tanoMsgs');
         var chip = document.createElement('div');
         chip.style.cssText = 'background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:0.5rem 0.8rem;font-size:0.78rem;color:#15803d;align-self:flex-start;max-width:85%';
-        chip.innerHTML = '🛒 Agregado al pedido: ' + added.join(', ');
+        chip.innerHTML = 'ðŸ›’ Agregado al pedido: ' + added.join(', ');
         msgs2.appendChild(chip);
         msgs2.scrollTop = msgs2.scrollHeight;
         updateCartFab();
       }
     } else {
-      addTanoMsg('tano', 'No pude responder en este momento. Preguntale al mozo 😊');
+      addTanoMsg('tano', 'No pude responder en este momento. Preguntale al mozo ðŸ˜Š');
     }
   } catch (e) {
     removeTyping();
-    addTanoMsg('tano', 'No pude responder en este momento. Preguntale al mozo 😊');
+    addTanoMsg('tano', 'No pude responder en este momento. Preguntale al mozo ðŸ˜Š');
   }
 }
 
@@ -1591,7 +1591,7 @@ function autoResize(el) {
 }
 
 // ============================================================
-// GENERACIÓN DE IMÁGENES CON CLOUDFLARE AI
+// GENERACIÃ“N DE IMÃGENES CON CLOUDFLARE AI
 // ============================================================
 var generatedCache = {};
 var generatingQueue = new Set();
@@ -1629,7 +1629,7 @@ async function generateImage(id) {
       requestAnimationFrame(function() { img.classList.add('ready'); });
     };
     img.onerror = function() {
-      // Si el base64 es inválido, deja el emoji
+      // Si el base64 es invÃ¡lido, deja el emoji
       wrap.textContent = emoji;
     };
     img.className = '';
@@ -1653,79 +1653,79 @@ function generateSectionImages(sectionId) {
 }
 
 // ============================================================
-// MODO COMERCIO — ?tipo=comercio
-// Reemplaza contenido del restaurante con catálogo de ferretería.
+// MODO COMERCIO â€” ?tipo=comercio
+// Reemplaza contenido del restaurante con catÃ¡logo de ferreterÃ­a.
 // No afecta nada del modo restaurante (default).
 // ============================================================
 ;(function() {
   if (new URLSearchParams(location.search).get('tipo') !== 'comercio') return;
 
-  // ── Catálogo Ferretería El Tornillo ──────────────────────────────────────
+  // â”€â”€ CatÃ¡logo FerreterÃ­a El Tornillo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   MENU = {
-    'pinturas-1':     { name: 'Pintura látex interior blanca 4L',    price: 12500, emoji: '🎨', tags: 'oferta',
-      desc: 'Rendimiento 10m²/L. Secado rápido 2hs. Apta para interiores.',
+    'pinturas-1':     { name: 'Pintura lÃ¡tex interior blanca 4L',    price: 12500, emoji: 'ðŸŽ¨', tags: 'oferta',
+      desc: 'Rendimiento 10mÂ²/L. Secado rÃ¡pido 2hs. Apta para interiores.',
       prompt: 'white latex interior paint can 4 liters product photography hardware store' },
-    'pinturas-2':     { name: 'Látex exterior premium 10L',          price: 28900, emoji: '🖌️', tags: 'destacado',
-      desc: 'Alta resistencia a la intemperie. Rendimiento 12m²/L. Colores a pedir.',
+    'pinturas-2':     { name: 'LÃ¡tex exterior premium 10L',          price: 28900, emoji: 'ðŸ–Œï¸', tags: 'destacado',
+      desc: 'Alta resistencia a la intemperie. Rendimiento 12mÂ²/L. Colores a pedir.',
       prompt: 'exterior premium paint bucket 10 liters product photography' },
-    'pinturas-3':     { name: 'Esmalte sintético negro satinado 1L', price: 8200,  emoji: '🪣', tags: '',
+    'pinturas-3':     { name: 'Esmalte sintÃ©tico negro satinado 1L', price: 8200,  emoji: 'ðŸª£', tags: '',
       desc: 'Para maderas y metales. Secado 8hs. Resistente a humedad.',
       prompt: 'black synthetic enamel paint can 1 liter hardware store product' },
-    'pinturas-4':     { name: 'Sellador al agua 4L',                 price: 9800,  emoji: '🧴', tags: 'oferta',
+    'pinturas-4':     { name: 'Sellador al agua 4L',                 price: 9800,  emoji: 'ðŸ§´', tags: 'oferta',
       desc: 'Sella superficies porosas antes de pintar. Apto interior/exterior.',
       prompt: 'water-based primer sealer paint can 4 liters hardware store' },
 
-    'herramientas-1': { name: 'Taladro percutor 600W + maletín',     price: 38500, emoji: '🔧', tags: 'destacado',
-      desc: 'Velocidad variable, reversible. Mandril 13mm. Maletín de accesorios incluido.',
+    'herramientas-1': { name: 'Taladro percutor 600W + maletÃ­n',     price: 38500, emoji: 'ðŸ”§', tags: 'destacado',
+      desc: 'Velocidad variable, reversible. Mandril 13mm. MaletÃ­n de accesorios incluido.',
       prompt: 'power drill 600w with carrying case hardware store product photography' },
-    'herramientas-2': { name: 'Set destornilladores 6 piezas',       price: 4900,  emoji: '🪛', tags: '',
-      desc: 'Acero cromo-vanadio. 3 planos + 3 Phillips. Mango ergonómico bicolor.',
+    'herramientas-2': { name: 'Set destornilladores 6 piezas',       price: 4900,  emoji: 'ðŸª›', tags: '',
+      desc: 'Acero cromo-vanadio. 3 planos + 3 Phillips. Mango ergonÃ³mico bicolor.',
       prompt: '6 piece screwdriver set hand tools hardware store product' },
-    'herramientas-3': { name: 'Sierra circular 7¼" 1200W',           price: 52000, emoji: '🔨', tags: '',
+    'herramientas-3': { name: 'Sierra circular 7Â¼" 1200W',           price: 52000, emoji: 'ðŸ”¨', tags: '',
       desc: 'Hoja 184mm. Base de aluminio. Profundidad de corte 65mm.',
       prompt: 'circular saw 7 inch 1200w power tool hardware store product photography' },
-    'herramientas-4': { name: 'Nivel de burbuja aluminio 60cm',      price: 3200,  emoji: '📏', tags: 'stock-bajo',
-      desc: 'Perfil de aluminio. 3 burbujas: horizontal, vertical y 45°.',
+    'herramientas-4': { name: 'Nivel de burbuja aluminio 60cm',      price: 3200,  emoji: 'ðŸ“', tags: 'stock-bajo',
+      desc: 'Perfil de aluminio. 3 burbujas: horizontal, vertical y 45Â°.',
       prompt: 'aluminum spirit level 60cm measuring tool hardware store' },
 
-    'canerias-1':     { name: 'Caño PVC clase 6 — 110mm × 3m',       price: 4100,  emoji: '🔩', tags: '',
+    'canerias-1':     { name: 'CaÃ±o PVC clase 6 â€” 110mm Ã— 3m',       price: 4100,  emoji: 'ðŸ”©', tags: '',
       desc: 'Bajada de agua cloacal. Extremo enchufe y liso. Norma IRAM.',
       prompt: 'pvc pipe 110mm plumbing hardware store product photography' },
-    'canerias-2':     { name: 'Codo PVC 110mm 90°',                   price: 580,   emoji: '⚙️', tags: '',
-      desc: 'Compatible con caño clase 6. Para instalaciones cloacales.',
+    'canerias-2':     { name: 'Codo PVC 110mm 90Â°',                   price: 580,   emoji: 'âš™ï¸', tags: '',
+      desc: 'Compatible con caÃ±o clase 6. Para instalaciones cloacales.',
       prompt: 'pvc elbow fitting 90 degree plumbing hardware store' },
-    'canerias-3':     { name: 'Llave esférica bronce ½"',             price: 1950,  emoji: '🔧', tags: 'oferta',
-      desc: 'Palanca de cuarto de vuelta. Agua fría y caliente hasta 110°C.',
+    'canerias-3':     { name: 'Llave esfÃ©rica bronce Â½"',             price: 1950,  emoji: 'ðŸ”§', tags: 'oferta',
+      desc: 'Palanca de cuarto de vuelta. Agua frÃ­a y caliente hasta 110Â°C.',
       prompt: 'bronze ball valve 1/2 inch plumbing hardware store product' },
-    'canerias-4':     { name: 'Flexible de conexión ½" × 50cm',       price: 890,   emoji: '🔗', tags: 'stock-bajo',
+    'canerias-4':     { name: 'Flexible de conexiÃ³n Â½" Ã— 50cm',       price: 890,   emoji: 'ðŸ”—', tags: 'stock-bajo',
       desc: 'Trenzado de acero inoxidable. Para inodoros y canillas.',
       prompt: 'stainless steel flexible hose connector 50cm plumbing hardware' },
 
-    'electricidad-1': { name: 'Cable unipolar 2,5mm² × 100m',        price: 18500, emoji: '⚡', tags: 'destacado',
-      desc: 'Marca Prysmian o similar. Para iluminación y tomacorrientes.',
+    'electricidad-1': { name: 'Cable unipolar 2,5mmÂ² Ã— 100m',        price: 18500, emoji: 'âš¡', tags: 'destacado',
+      desc: 'Marca Prysmian o similar. Para iluminaciÃ³n y tomacorrientes.',
       prompt: 'electrical copper wire coil 100 meters hardware store product' },
-    'electricidad-2': { name: 'Disyuntor termomagnético 20A',         price: 3400,  emoji: '🔌', tags: '',
-      desc: 'Bipolar, norma IRAM. Para tableros de distribución domiciliarios.',
+    'electricidad-2': { name: 'Disyuntor termomagnÃ©tico 20A',         price: 3400,  emoji: 'ðŸ”Œ', tags: '',
+      desc: 'Bipolar, norma IRAM. Para tableros de distribuciÃ³n domiciliarios.',
       prompt: 'circuit breaker 20 amp electrical hardware store product photography' },
-    'electricidad-3': { name: 'Tablero eléctrico 12 módulos',         price: 8900,  emoji: '📦', tags: '',
+    'electricidad-3': { name: 'Tablero elÃ©ctrico 12 mÃ³dulos',         price: 8900,  emoji: 'ðŸ“¦', tags: '',
       desc: 'Con puerta transparente. Rieles DIN incluidas. Para interior.',
       prompt: 'electrical panel box 12 modules hardware store product' },
-    'electricidad-4': { name: 'Toma corriente triple 10A c/tierra',   price: 1200,  emoji: '🔌', tags: 'stock-bajo',
+    'electricidad-4': { name: 'Toma corriente triple 10A c/tierra',   price: 1200,  emoji: 'ðŸ”Œ', tags: 'stock-bajo',
       desc: 'Con puesta a tierra. Apto exterior. Norma IRAM 2071.',
       prompt: 'triple electrical outlet with grounding hardware store product' },
   };
 
-  // ── Contexto del asistente Viti para ferretería ──────────────────────────
-  TANO_CONTEXT = 'Sos Viti, la asistente de Ferretería El Tornillo. Conocés el catálogo de memoria y ayudás a los clientes a encontrar lo que necesitan.\n\nTONO Y ESTILO:\n- Directo, amable, útil. Tratás de vos.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente!"\n- Sin bullet points. Respuestas cortas y concretas.\n- Máximo 3 oraciones. Si recomendás algo, una sola opción con razón concreta.\n- Si te preguntan algo fuera del catálogo: "Eso te lo responde el equipo en el mostrador."\n\nCATÁLOGO COMPLETO:\nPINTURAS:\n- Pintura látex interior blanca 4L $12.500 (ID: pinturas-1): Rendimiento 10m²/L, secado 2hs. EN OFERTA.\n- Látex exterior premium 10L $28.900 (ID: pinturas-2): Alta resistencia intemperie, colores a pedir. DESTACADO.\n- Esmalte sintético negro satinado 1L $8.200 (ID: pinturas-3): Para madera y metal, resistente humedad.\n- Sellador al agua 4L $9.800 (ID: pinturas-4): Sella superficies porosas. EN OFERTA.\n\nHERRAMIENTAS:\n- Taladro percutor 600W + maletín $38.500 (ID: herramientas-1): Velocidad variable, reversible. DESTACADO.\n- Set destornilladores 6 piezas $4.900 (ID: herramientas-2): Cromo-vanadio, 3 planos + 3 Phillips.\n- Sierra circular 7¼" 1200W $52.000 (ID: herramientas-3): Hoja 184mm, profundidad corte 65mm.\n- Nivel de burbuja aluminio 60cm $3.200 (ID: herramientas-4): 3 burbujas. STOCK BAJO.\n\nCAÑERÍAS:\n- Caño PVC 110mm × 3m $4.100 (ID: canerias-1): Clase 6, bajada cloacal, norma IRAM.\n- Codo PVC 110mm 90° $580 (ID: canerias-2): Compatible clase 6.\n- Llave esférica bronce ½" $1.950 (ID: canerias-3): Para frío y caliente hasta 110°C. EN OFERTA.\n- Flexible de conexión ½" × 50cm $890 (ID: canerias-4): Trenzado inoxidable. STOCK BAJO.\n\nELECTRICIDAD:\n- Cable unipolar 2,5mm² × 100m $18.500 (ID: electricidad-1): Marca Prysmian o similar. DESTACADO.\n- Disyuntor termomagnético 20A $3.400 (ID: electricidad-2): Bipolar, norma IRAM.\n- Tablero eléctrico 12 módulos $8.900 (ID: electricidad-3): Con puerta transparente, rieles DIN.\n- Toma corriente triple 10A c/tierra $1.200 (ID: electricidad-4): Apto exterior. STOCK BAJO.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera consultar o reservar algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta.\n2. Si dice "quiero X", "anotame X", "necesito X" — usá [AGREGAR:ID:QTY].\n3. Respondé sin markdown. Texto simple y natural.';
+  // â”€â”€ Contexto del asistente Viti para ferreterÃ­a â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  TANO_CONTEXT = 'Sos Viti, la asistente de FerreterÃ­a El Tornillo. ConocÃ©s el catÃ¡logo de memoria y ayudÃ¡s a los clientes a encontrar lo que necesitan.\n\nTONO Y ESTILO:\n- Directo, amable, Ãºtil. TratÃ¡s de vos.\n- NUNCA empezÃ¡s con "Â¡Claro!", "Â¡Por supuesto!", "Â¡Excelente!"\n- Sin bullet points. Respuestas cortas y concretas.\n- MÃ¡ximo 3 oraciones. Si recomendÃ¡s algo, una sola opciÃ³n con razÃ³n concreta.\n- Si te preguntan algo fuera del catÃ¡logo: "Eso te lo responde el equipo en el mostrador."\n\nCATÃLOGO COMPLETO:\nPINTURAS:\n- Pintura lÃ¡tex interior blanca 4L $12.500 (ID: pinturas-1): Rendimiento 10mÂ²/L, secado 2hs. EN OFERTA.\n- LÃ¡tex exterior premium 10L $28.900 (ID: pinturas-2): Alta resistencia intemperie, colores a pedir. DESTACADO.\n- Esmalte sintÃ©tico negro satinado 1L $8.200 (ID: pinturas-3): Para madera y metal, resistente humedad.\n- Sellador al agua 4L $9.800 (ID: pinturas-4): Sella superficies porosas. EN OFERTA.\n\nHERRAMIENTAS:\n- Taladro percutor 600W + maletÃ­n $38.500 (ID: herramientas-1): Velocidad variable, reversible. DESTACADO.\n- Set destornilladores 6 piezas $4.900 (ID: herramientas-2): Cromo-vanadio, 3 planos + 3 Phillips.\n- Sierra circular 7Â¼" 1200W $52.000 (ID: herramientas-3): Hoja 184mm, profundidad corte 65mm.\n- Nivel de burbuja aluminio 60cm $3.200 (ID: herramientas-4): 3 burbujas. STOCK BAJO.\n\nCAÃ‘ERÃAS:\n- CaÃ±o PVC 110mm Ã— 3m $4.100 (ID: canerias-1): Clase 6, bajada cloacal, norma IRAM.\n- Codo PVC 110mm 90Â° $580 (ID: canerias-2): Compatible clase 6.\n- Llave esfÃ©rica bronce Â½" $1.950 (ID: canerias-3): Para frÃ­o y caliente hasta 110Â°C. EN OFERTA.\n- Flexible de conexiÃ³n Â½" Ã— 50cm $890 (ID: canerias-4): Trenzado inoxidable. STOCK BAJO.\n\nELECTRICIDAD:\n- Cable unipolar 2,5mmÂ² Ã— 100m $18.500 (ID: electricidad-1): Marca Prysmian o similar. DESTACADO.\n- Disyuntor termomagnÃ©tico 20A $3.400 (ID: electricidad-2): Bipolar, norma IRAM.\n- Tablero elÃ©ctrico 12 mÃ³dulos $8.900 (ID: electricidad-3): Con puerta transparente, rieles DIN.\n- Toma corriente triple 10A c/tierra $1.200 (ID: electricidad-4): Apto exterior. STOCK BAJO.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera consultar o reservar algo, respondÃ© con [AGREGAR:ID:CANTIDAD] antes de tu respuesta.\n2. Si dice "quiero X", "anotame X", "necesito X" â€” usÃ¡ [AGREGAR:ID:QTY].\n3. RespondÃ© sin markdown. Texto simple y natural.';
 
-  // ── Parchar el DOM cuando esté listo ─────────────────────────────────────
+  // â”€â”€ Parchar el DOM cuando estÃ© listo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   document.addEventListener('DOMContentLoaded', function() {
-    // Título
-    document.title = 'Demo Catálogo — Ferretería El Tornillo';
+    // TÃ­tulo
+    document.title = 'Demo CatÃ¡logo â€” FerreterÃ­a El Tornillo';
 
     // Banner
     var banner = document.querySelector('.demo-banner');
-    if (banner) banner.innerHTML = 'Esta es una demo del catálogo digital para comercios con Vitrina. <a href="index.html#comercios">Quiero esto para mi comercio →</a>';
+    if (banner) banner.innerHTML = 'Esta es una demo del catÃ¡logo digital para comercios con Vitrina. <a href="index.html#comercios">Quiero esto para mi comercio â†’</a>';
 
     // Header
     var cover = document.querySelector('.cover-emoji');
@@ -1733,26 +1733,26 @@ function generateSectionImages(sectionId) {
     var sub   = document.querySelector('.rest-header p');
     var tags  = document.querySelector('.rest-tags');
     var mesa  = document.querySelector('.mesa-tag');
-    if (cover) cover.textContent = '🔩';
-    if (h1)   h1.textContent    = 'Ferretería El Tornillo';
-    if (sub)  sub.textContent   = 'Pinturas, herramientas y materiales · Villa Urquiza, CABA';
-    if (tags) tags.innerHTML    = '<span>🕐 Lun–Sáb 8:00–18:00</span><span>📍 Triunvirato 2340</span><span>⭐ 4.9</span>';
-    if (mesa) mesa.textContent  = '📦 Mostrador';
+    if (cover) cover.textContent = 'ðŸ”©';
+    if (h1)   h1.textContent    = 'FerreterÃ­a El Tornillo';
+    if (sub)  sub.textContent   = 'Pinturas, herramientas y materiales Â· Villa Urquiza, CABA';
+    if (tags) tags.innerHTML    = '<span>ðŸ• Lunâ€“SÃ¡b 8:00â€“18:00</span><span>ðŸ“ Triunvirato 2340</span><span>â­ 4.9</span>';
+    if (mesa) mesa.textContent  = 'ðŸ“¦ Mostrador';
 
-    // Confirmación de pedido
+    // ConfirmaciÃ³n de pedido
     var conf = document.getElementById('orderConfirmed');
     if (conf) {
-      var ch3 = conf.querySelector('h3'); if (ch3) ch3.textContent = '¡Consulta enviada!';
+      var ch3 = conf.querySelector('h3'); if (ch3) ch3.textContent = 'Â¡Consulta enviada!';
       var cp  = conf.querySelector('p');  if (cp)  cp.textContent  = 'Te contactamos en breve para confirmar disponibilidad y coordinar la entrega o retiro.';
     }
 
-    // Filtros → Oferta / Destacado / Stock bajo
+    // Filtros â†’ Oferta / Destacado / Stock bajo
     var filtersDiv = document.querySelector('.filters');
     if (filtersDiv) filtersDiv.innerHTML =
       '<button class="filter-btn active" id="df-all" onclick="clearFilters()" aria-pressed="true">Todos</button>' +
-      '<button class="filter-btn" id="df-oferta"    onclick="toggleFilter(\'oferta\',\'this\')" aria-pressed="false" onclick="toggleFilter(\'oferta\', this)">🏷️ Oferta</button>' +
-      '<button class="filter-btn" id="df-destacado" onclick="toggleFilter(\'destacado\', this)" aria-pressed="false">⭐ Destacado</button>' +
-      '<button class="filter-btn" id="df-stock-bajo" onclick="toggleFilter(\'stock-bajo\', this)" aria-pressed="false">📦 Stock bajo</button>';
+      '<button class="filter-btn" id="df-oferta"    onclick="toggleFilter(\'oferta\',\'this\')" aria-pressed="false" onclick="toggleFilter(\'oferta\', this)">ðŸ·ï¸ Oferta</button>' +
+      '<button class="filter-btn" id="df-destacado" onclick="toggleFilter(\'destacado\', this)" aria-pressed="false">â­ Destacado</button>' +
+      '<button class="filter-btn" id="df-stock-bajo" onclick="toggleFilter(\'stock-bajo\', this)" aria-pressed="false">ðŸ“¦ Stock bajo</button>';
     // Re-asignar eventos correctamente (sin el bug de comillas dobles)
     if (filtersDiv) {
       var fbtns = filtersDiv.querySelectorAll('.filter-btn[id^="df-"]:not(#df-all)');
@@ -1762,30 +1762,30 @@ function generateSectionImages(sectionId) {
       fbtns.forEach(function(b){ b.removeAttribute('onclick'); });
     }
 
-    // Cat nav → Pinturas / Herramientas / Cañerías / Electricidad
+    // Cat nav â†’ Pinturas / Herramientas / CaÃ±erÃ­as / Electricidad
     var catNav = document.getElementById('catNav');
     if (catNav) catNav.innerHTML =
       '<button class="cat-btn active" onclick="goToSection(\'pinturas\', this)">Pinturas</button>' +
       '<button class="cat-btn" onclick="goToSection(\'herramientas\', this)">Herramientas</button>' +
-      '<button class="cat-btn" onclick="goToSection(\'canerias\', this)">Cañerías</button>' +
+      '<button class="cat-btn" onclick="goToSection(\'canerias\', this)">CaÃ±erÃ­as</button>' +
       '<button class="cat-btn" onclick="goToSection(\'electricidad\', this)">Electricidad</button>';
 
-    // Menú body → catálogo ferretería
+    // MenÃº body â†’ catÃ¡logo ferreterÃ­a
     var menuBody = document.getElementById('menuBody');
     if (menuBody) {
       var cats = [
         { id: 'pinturas',     label: 'Pinturas',     ids: ['pinturas-1','pinturas-2','pinturas-3','pinturas-4'] },
         { id: 'herramientas', label: 'Herramientas', ids: ['herramientas-1','herramientas-2','herramientas-3','herramientas-4'] },
-        { id: 'canerias',     label: 'Cañerías',     ids: ['canerias-1','canerias-2','canerias-3','canerias-4'] },
+        { id: 'canerias',     label: 'CaÃ±erÃ­as',     ids: ['canerias-1','canerias-2','canerias-3','canerias-4'] },
         { id: 'electricidad', label: 'Electricidad', ids: ['electricidad-1','electricidad-2','electricidad-3','electricidad-4'] },
       ];
       menuBody.innerHTML = cats.map(function(cat) {
         var itemsHtml = cat.ids.map(function(id) {
           var it = MENU[id];
           var badges = '';
-          if (it.tags.indexOf('oferta')     !== -1) badges += '<span class="badge featured">🏷️ Oferta</span>';
-          if (it.tags.indexOf('destacado')  !== -1) badges += '<span class="badge featured">⭐ Destacado</span>';
-          if (it.tags.indexOf('stock-bajo') !== -1) badges += '<span class="badge" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:6px;padding:2px 8px;font-size:11px">📦 Stock bajo</span>';
+          if (it.tags.indexOf('oferta')     !== -1) badges += '<span class="badge featured">ðŸ·ï¸ Oferta</span>';
+          if (it.tags.indexOf('destacado')  !== -1) badges += '<span class="badge featured">â­ Destacado</span>';
+          if (it.tags.indexOf('stock-bajo') !== -1) badges += '<span class="badge" style="background:#fff3cd;color:#856404;border:1px solid #ffc107;border-radius:6px;padding:2px 8px;font-size:11px">ðŸ“¦ Stock bajo</span>';
           return '<div class="menu-item" data-tags="' + it.tags + '">'
             + '<div class="item-img-wrap" id="img-' + id + '" data-prompt="' + it.prompt + '">' + it.emoji + '</div>'
             + '<div class="item-info"><div>'
@@ -1801,24 +1801,24 @@ function generateSectionImages(sectionId) {
       }).join('');
     }
 
-    // Panel asistente → Viti
+    // Panel asistente â†’ Viti
     var tanoName   = document.querySelector('.tano-header-name');
     var tanoStatus = document.querySelector('.tano-header-status');
     var tanoAvatar = document.querySelector('.tano-avatar');
     var tanoInput  = document.getElementById('tanoInput');
     if (tanoName)   tanoName.textContent   = 'Viti';
-    if (tanoStatus) tanoStatus.textContent = 'Tu asistente de ferretería · En línea';
-    if (tanoAvatar) tanoAvatar.textContent = '🔧';
+    if (tanoStatus) tanoStatus.textContent = 'Tu asistente de ferreterÃ­a Â· En lÃ­nea';
+    if (tanoAvatar) tanoAvatar.textContent = 'ðŸ”§';
     if (tanoInput)  tanoInput.placeholder  = 'Preguntale a Viti...';
 
-    // Quick buttons ferretería
+    // Quick buttons ferreterÃ­a
     var qBtns = document.getElementById('tanoQuickBtns');
     if (qBtns) qBtns.innerHTML =
-      '<button class="quick-btn" onclick="sendQuick(\'¿Tienen pintura látex blanca?\')">Pintura látex blanca</button>' +
-      '<button class="quick-btn" onclick="sendQuick(\'¿Qué taladro recomendás para uso doméstico?\')">Taladro para el hogar</button>' +
-      '<button class="quick-btn" onclick="sendQuick(\'¿Qué tienen en oferta hoy?\')">¿Qué está en oferta?</button>' +
-      '<button class="quick-btn" onclick="sendQuick(\'¿Tienen caños de PVC 110mm?\')">Caños PVC 110mm</button>' +
-      '<button class="quick-btn" onclick="sendQuick(\'¿Cuánto rinde la pintura?\')">Rendimiento de pintura</button>';
+      '<button class="quick-btn" onclick="sendQuick(\'Â¿Tienen pintura lÃ¡tex blanca?\')">Pintura lÃ¡tex blanca</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'Â¿QuÃ© taladro recomendÃ¡s para uso domÃ©stico?\')">Taladro para el hogar</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'Â¿QuÃ© tienen en oferta hoy?\')">Â¿QuÃ© estÃ¡ en oferta?</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'Â¿Tienen caÃ±os de PVC 110mm?\')">CaÃ±os PVC 110mm</button>' +
+      '<button class="quick-btn" onclick="sendQuick(\'Â¿CuÃ¡nto rinde la pintura?\')">Rendimiento de pintura</button>';
 
     // Bienvenida de Viti (sobreescribir openTano)
     var _origOpenTano = openTano;
@@ -1827,15 +1827,15 @@ function generateSectionImages(sectionId) {
       document.getElementById('tanoPanel').classList.add('open');
       document.getElementById('tanoOverlay').classList.add('open');
       if (tanoHistory.length === 0) {
-        addTanoMsg('tano', '¡Hola! Soy Viti 👋 Puedo ayudarte con precios, stock y recomendaciones del catálogo. ¿Por dónde empezamos?');
+        addTanoMsg('tano', 'Â¡Hola! Soy Viti ðŸ‘‹ Puedo ayudarte con precios, stock y recomendaciones del catÃ¡logo. Â¿Por dÃ³nde empezamos?');
       }
     };
 
-    // Fab de Tano → Viti
+    // Fab de Tano â†’ Viti
     var tanoFab = document.getElementById('tanoFab');
     if (tanoFab) tanoFab.innerHTML = tanoFab.innerHTML.replace(/Tano/g, 'Viti');
 
-    // Inicializar controles con el nuevo MENU y generar imágenes
+    // Inicializar controles con el nuevo MENU y generar imÃ¡genes
     Object.keys(MENU).forEach(function(id) { renderCtrl(id); });
     generateSectionImages('pinturas');
     var remCats = ['herramientas','canerias','electricidad'];
@@ -1853,17 +1853,17 @@ function generateSectionImages(sectionId) {
 })();
 
 // ============================================================
-// INICIALIZAR CONTROLES + GENERAR IMÁGENES
+// INICIALIZAR CONTROLES + GENERAR IMÃGENES
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-  // En modo comercio el init ya fue reemplazado arriba — solo correr para restaurante
+  // En modo comercio el init ya fue reemplazado arriba â€” solo correr para restaurante
   if (new URLSearchParams(location.search).get('tipo') === 'comercio') return;
   Object.keys(MENU).forEach(function(id) { renderCtrl(id); });
 
-  // Generar la primera sección inmediatamente (visible al cargar)
+  // Generar la primera secciÃ³n inmediatamente (visible al cargar)
   generateSectionImages('picar');
 
-  // Las demás secciones se generan cuando entran al viewport
+  // Las demÃ¡s secciones se generan cuando entran al viewport
   var sections = ['pastas', 'principales', 'postres', 'bebidas'];
   if ('IntersectionObserver' in window) {
     var observer = new IntersectionObserver(function(entries) {
@@ -1885,6 +1885,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 </script>
-<script>(function(){var GA='G-XXXXXXXXXX';if(GA==='G-XXXXXXXXXX')return;if(localStorage.getItem('vt_cookies')!=='accepted')return;var s=document.createElement('script');s.src='https://www.googletagmanager.com/gtag/js?id='+GA;s.async=true;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config',GA,{anonymize_ip:true});})();</script>
+<script>(function(){var GA='G-9FW2MERRWT';if(GA==='G-9FW2MERRWT')return;if(localStorage.getItem('vt_cookies')!=='accepted')return;var s=document.createElement('script');s.src='https://www.googletagmanager.com/gtag/js?id='+GA;s.async=true;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config',GA,{anonymize_ip:true});})();</script>
 </body>
 </html>
+
