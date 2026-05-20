@@ -871,7 +871,7 @@
         historial[p.id] = 'preparing'
 
         // Notificar al cliente por WhatsApp
-        notificarPedidoListo(p.id, restaurantId).catch(() => {})
+        notificarPedidoListo(p.id, rest.id).catch(() => {})
       } catch {}
     }
     renderAll()
