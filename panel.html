@@ -2547,6 +2547,21 @@ input:checked + .toggle-slider:before {
           </div>
         </div>
 
+        <!-- MercadoPago Pagos -->
+        <div class="card" id="mp-connect-card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>💳 MercadoPago — Cobros de mesa</span>
+            <button id="btn-connect-mp" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectMercadoPago()">
+              Conectar cuenta
+            </button>
+          </div>
+          <div id="mp-connect-content" style="margin-top:16px">
+            <div style="color:var(--muted);font-size:13.5px;line-height:1.6">
+              Conectá tu cuenta de MercadoPago para que los comensales puedan pagar la cuenta desde su celular. La plata va directo a tu cuenta, sin intermediarios.
+            </div>
+          </div>
+        </div>
+
         <!-- Competidores -->
         <div class="card">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
@@ -3830,6 +3845,20 @@ const COLOR_PRESETS = [
 // ─────────────────────────────────────────────
 // Init
 // ─────────────────────────────────────────────
+// Detectar retorno de OAuth de MercadoPago
+;(function checkMpOAuthReturn() {
+  const p = new URLSearchParams(location.search)
+  if (p.get('mp_connected') === '1') {
+    history.replaceState({}, '', location.pathname)
+    // El toast se muestra cuando el restaurante carga (después del auth)
+    window._mpJustConnected = true
+  }
+  if (p.get('mp_error')) {
+    history.replaceState({}, '', location.pathname)
+    window._mpError = p.get('mp_error')
+  }
+})()
+
 window.addEventListener('DOMContentLoaded', async () => {
   try {
     currentUser = await requireAuth('/login.html')
@@ -4644,6 +4673,15 @@ window.loadRestaurant = async function () {
     renderSidebarRestaurant(currentRestaurant)
     renderRestSwitcher()
     fillForm(currentRestaurant)
+    if (window._mpJustConnected) {
+      window._mpJustConnected = false
+      showToast('✅ MercadoPago conectado. Los comensales ya pueden pagar online.', 'success')
+    }
+    if (window._mpError) {
+      const msg = window._mpError === 'oauth_failed' ? 'Error conectando MercadoPago. Intentá de nuevo.' : 'Error en la conexión con MercadoPago.'
+      window._mpError = null
+      showToast(msg, 'error')
+    }
     showSection('info')
     renderGettingStarted()
     initPedidosBadge()
@@ -6901,6 +6939,9 @@ window.loadAnalisis = async function () {
   } catch (e) {
     showToast('Error cargando análisis: ' + e.message, 'error')
   }
+
+  // MercadoPago
+  renderMpCard()
 }
 
 function renderGoogleBusinessData(data) {
@@ -8658,6 +8699,61 @@ window.saveWaFollowupConfig = async function () {
   } catch (e) {
     if (status) { status.textContent = 'Error: ' + e.message; status.style.color = 'var(--error)' }
     showToast('Error guardando: ' + e.message, 'error')
+  }
+}
+
+// ── MercadoPago OAuth ─────────────────────────────────────────────────────────
+function renderMpCard() {
+  const card = document.getElementById('mp-connect-card')
+  if (!card) return
+
+  // Solo para restaurantes
+  const btype = currentRestaurant?.business_type || 'restaurant'
+  if (btype !== 'restaurant') { card.style.display = 'none'; return }
+  card.style.display = 'block'
+
+  const btn     = document.getElementById('btn-connect-mp')
+  const content = document.getElementById('mp-connect-content')
+  const isConn  = !!(currentRestaurant.mp_connected && currentRestaurant.mp_access_token)
+
+  if (isConn) {
+    if (btn) { btn.textContent = 'Desconectar'; btn.onclick = disconnectMercadoPago; btn.className = 'btn-secondary' }
+    if (content) content.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#e8f5e9;border:1px solid #b2dec4;border-radius:10px">
+        <span style="font-size:20px">✅</span>
+        <div>
+          <div style="font-size:14px;font-weight:600;color:#2e7d32">Cuenta conectada</div>
+          <div style="font-size:12px;color:#4a7a55;margin-top:2px">Los comensales pueden pagar la cuenta desde su celular. La plata va directo a tu MP.</div>
+        </div>
+      </div>`
+  } else {
+    if (btn) { btn.textContent = 'Conectar cuenta'; btn.onclick = connectMercadoPago; btn.className = 'btn-secondary' }
+    if (content) content.innerHTML = `<div style="color:var(--muted);font-size:13.5px;line-height:1.6">Conectá tu cuenta de MercadoPago para que los comensales puedan pagar la cuenta desde su celular. La plata va directo a tu cuenta, sin intermediarios.</div>`
+  }
+}
+
+window.connectMercadoPago = function () {
+  if (!currentRestaurant) return
+  const url = 'https://vitrina-tano.vitrinaapp.workers.dev/api/mp/connect?restaurant_id=' + currentRestaurant.id
+  window.location.href = url
+}
+
+window.disconnectMercadoPago = async function () {
+  if (!confirm('¿Desconectar tu cuenta de MercadoPago? Los comensales no podrán pagar online hasta que la vuelvas a conectar.')) return
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/mp/disconnect', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id }),
+    })
+    if (res.ok) {
+      currentRestaurant.mp_connected = false
+      currentRestaurant.mp_access_token = null
+      renderMpCard()
+      showToast('MercadoPago desconectado', 'success')
+    }
+  } catch (e) {
+    showToast('Error: ' + e.message, 'error')
   }
 }
 

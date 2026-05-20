@@ -432,6 +432,31 @@
           return
         }
 
+        // Pago confirmado — mostrar toast y remover de la pantalla después de 6 segundos
+        if (order.status === 'paid') {
+          const mesa = pedidos[order.id]?.table_number
+          const mesaStr = mesa != null ? 'Mesa ' + mesa : 'Pedido'
+          // Actualizar el pedido en memoria para mostrar el badge "Pagado"
+          if (pedidos[order.id]) pedidos[order.id] = { ...pedidos[order.id], status: 'paid' }
+          renderAll()
+          // Toast de confirmación de pago
+          const toastMsg = '💳 ' + mesaStr + ' — Pago confirmado'
+          const toast = document.createElement('div')
+          toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22aa44;color:white;padding:12px 24px;border-radius:12px;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(34,170,68,.4);animation:slideIn .3s ease'
+          toast.textContent = toastMsg
+          document.body.appendChild(toast)
+          setTimeout(() => {
+            toast.style.opacity = '0'
+            toast.style.transition = 'opacity .4s'
+            setTimeout(() => {
+              toast.remove()
+              delete pedidos[order.id]
+              renderAll()
+            }, 400)
+          }, 5000)
+          return
+        }
+
         // Para INSERT necesitamos los order_items — hacemos fetch puntual
         if (payload.eventType === 'INSERT') {
           try {
@@ -670,10 +695,12 @@
   const BADGE_LABEL = {
     pending: '⏳ Pendiente', confirmed: '⏳ Pendiente',
     preparing: '🔥 Preparando', ready: '✅ Listo',
+    paid: '💳 Pagado',
   }
   const BADGE_CLASS = {
     pending: 'badge-pending', confirmed: 'badge-confirmed',
     preparing: 'badge-preparing', ready: 'badge-ready',
+    paid: 'badge-ready',
   }
 
   function formatHora(iso) {
