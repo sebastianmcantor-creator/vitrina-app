@@ -234,7 +234,7 @@ tbody tr:hover {
 .badge-basic { background: #DBEAFE; color: #1E40AF; }
 .badge-pro { background: #D1FAE5; color: #065F46; }
 .badge-full { background: #DDD6FE; color: #5B21B6; }
-.badge-active { background: #D1FAE5; color: #065F46); }
+.badge-active { background: #D1FAE5; color: #065F46; }
 .badge-inactive { background: #FEE2E2; color: #991B1B; }
 .badge-trial { background: #FEF3C7; color: #92400E; }
 .badge-pending { background: #FEF3C7; color: #92400E; }
@@ -515,6 +515,7 @@ tbody tr:hover {
 <script type="module">
 import { requireAuth } from './lib/auth.js'
 import { restaurants, producers, producerCommissions, masterDashboardCache, salesProspects } from './lib/db.js'
+import { supabase } from './lib/supabase.js'
 
 let currentUser = null
 let dashboardData = null
@@ -709,7 +710,7 @@ function renderCurrentTab() {
   }
 }
 
-function renderOverview() {
+async function renderOverview() {
   // Métricas principales
   document.getElementById('metric-active-clients').textContent = dashboardData.active_clients || 0
   document.getElementById('metric-revenue').textContent = '$' + (dashboardData.total_revenue || 0).toLocaleString('es-AR')
@@ -968,33 +969,12 @@ window.deleteRestaurant = async function (id, name) {
   if (!confirm(`⚠️ Eliminar "${name}" permanentemente?\n\nEsto borra el restaurante, su menú y todos sus datos. No se puede deshacer.`)) return
 
   try {
-    const res = await fetch(
-      `${supabase.supabaseUrl}/rest/v1/restaurants?id=eq.${id}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'apikey': supabase.supabaseKey,
-          'Authorization': 'Bearer ' + supabase.supabaseKey,
-        }
-      }
-    )
-    if (res.ok || res.status === 204) {
-      alert(`"${name}" eliminado correctamente.`)
-      await renderClients()
-    } else {
-      const err = await res.text()
-      alert('Error al eliminar: ' + err)
-    }
+    const { error } = await supabase.from('restaurants').delete().eq('id', id)
+    if (error) throw error
+    alert(`"${name}" eliminado correctamente.`)
+    await renderClients()
   } catch (e) {
-    // Fallback: usar supabase client directamente
-    try {
-      const { error } = await supabase.from('restaurants').delete().eq('id', id)
-      if (error) throw error
-      alert(`"${name}" eliminado correctamente.`)
-      await renderClients()
-    } catch (e2) {
-      alert('Error: ' + e2.message)
-    }
+    alert('Error: ' + e.message)
   }
 }
 
