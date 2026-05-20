@@ -2661,26 +2661,23 @@ input:checked + .toggle-slider:before {
           <div class="page-subtitle">Programa publicaciones automáticas en tus redes sociales.</div>
         </div>
 
-        <!-- Conexión Metricool -->
+        <!-- Publicación directa via Meta API -->
         <div class="card">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
-            <span>🚀 Metricool</span>
-            <button id="btn-connect-metricool" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectMetricool()">
-              Conectar cuenta
-            </button>
+            <span>📡 Publicación automática</span>
+            <span id="meta-publish-status-badge" style="font-size:12px;padding:4px 10px;border-radius:20px;background:#e8f5e9;color:#2e7d32;font-weight:600">✅ Activo</span>
           </div>
-          <div id="metricool-status" style="margin-top:16px">
-            <div style="background:var(--cream2);border-radius:10px;padding:16px 18px">
-              <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:8px">¿Cómo conectar Metricool?</div>
-              <ol style="margin-left:16px;font-size:13.5px;color:var(--muted);line-height:2">
-                <li>Contratá el plan Starter en <a href="https://app.metricool.com" target="_blank" rel="noopener noreferrer" style="color:var(--terra)">app.metricool.com</a> ($25 USD/mes)</li>
-                <li>Conectá tu Instagram, Facebook y Google Business en Metricool</li>
-                <li>Ve a Panel Metricool → Settings → API → Generate token</li>
-                <li>Escribinos a <a href="mailto:contacto@vitrinaapp.com.ar?subject=Quiero activar Metricool" style="color:var(--terra)">contacto@vitrinaapp.com.ar</a> con el token y lo activamos</li>
-              </ol>
-              <div style="margin-top:12px;padding:10px 14px;background:#fff8e1;border-radius:8px;font-size:12.5px;color:#856404">
-                💡 Metricool se incluye en el plan Marketing. El costo es tuyo solo si lo contratás antes de que Vitrina lo implemente directamente.
-              </div>
+          <div style="margin-top:12px;font-size:13.5px;color:var(--muted);line-height:1.65">
+            Vitrina publica directamente en Instagram y Facebook usando la API oficial de Meta — sin intermediarios. Conectá tus cuentas en la sección <strong>Análisis</strong> y las publicaciones se programan automáticamente desde el calendario.
+          </div>
+          <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+            <div style="flex:1;min-width:140px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Instagram</div>
+              <div id="meta-ig-status-mini" style="font-size:13px;color:var(--ink)">Verificando...</div>
+            </div>
+            <div style="flex:1;min-width:140px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Facebook</div>
+              <div id="meta-fb-status-mini" style="font-size:13px;color:var(--ink)">Verificando...</div>
             </div>
           </div>
         </div>
@@ -7541,41 +7538,36 @@ window.loadMarketing = async function () {
   try {
     const { integrations, scheduledPosts } = await import('./lib/db.js')
 
-    // Verificar si hay integración con Metricool
-    const metricoolIntegration = await integrations.getByProvider(currentRestaurant.id, 'metricool')
+    // Estado de conexión IG y FB para el mini-status
+    const allInts = await integrations.listByRestaurant(currentRestaurant.id)
+    const igConn = allInts.find(i => i.provider === 'instagram' && i.is_active)
+    const fbConn = allInts.find(i => i.provider === 'facebook' && i.is_active)
+    const igMini = document.getElementById('meta-ig-status-mini')
+    const fbMini = document.getElementById('meta-fb-status-mini')
+    if (igMini) igMini.innerHTML = igConn
+      ? `<span style="color:#2e7d32">✅ Conectado</span>`
+      : `<span style="color:var(--terra)">Sin conectar — <a href="#" onclick="switchSection('analisis',document.querySelector('[data-section=analisis]'));return false" style="color:var(--terra)">Conectar →</a></span>`
+    if (fbMini) fbMini.innerHTML = fbConn
+      ? `<span style="color:#2e7d32">✅ Conectado</span>`
+      : `<span style="color:var(--terra)">Sin conectar — <a href="#" onclick="switchSection('analisis',document.querySelector('[data-section=analisis]'));return false" style="color:var(--terra)">Conectar →</a></span>`
 
-    if (metricoolIntegration && metricoolIntegration.is_active) {
-      document.getElementById('btn-connect-metricool').textContent = 'Desconectar'
-      document.getElementById('btn-connect-metricool').onclick = () => disconnectIntegration('metricool')
-      document.getElementById('metricool-status').innerHTML = `
-        <div style="padding:12px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
-          <div style="font-size:13px;color:var(--muted)">✅ Metricool conectado</div>
-          <div style="font-size:13px;color:var(--ink);margin-top:4px">Podés programar publicaciones en tus redes.</div>
-        </div>`
+    // Mostrar secciones de contenido siempre (publicación directa via Meta)
+    const calCard = document.getElementById('content-calendar-card')
+    const tplCard = document.getElementById('content-templates-card')
+    if (calCard) calCard.style.display = 'block'
+    if (tplCard) tplCard.style.display = 'block'
 
-      // Mostrar secciones de contenido
-      document.getElementById('content-calendar-card').style.display = 'block'
-      document.getElementById('content-templates-card').style.display = 'block'
-
-      // Cargar posts programados
-      scheduledPostsList = await scheduledPosts.listByRestaurant(currentRestaurant.id)
-      renderPosts()
-
-      // Cargar templates
-      loadTemplates()
-    }
+    // Cargar posts programados
+    scheduledPostsList = await scheduledPosts.listByRestaurant(currentRestaurant.id)
+    renderPosts()
+    loadTemplates()
   } catch (e) {
     console.error('Error cargando marketing:', e)
     showToast('Error cargando sección de marketing', 'error')
   }
 
-  // Cargar publicaciones sociales (siempre, independiente de Metricool)
+  // Cargar publicaciones sociales
   loadPublicaciones()
-}
-
-window.connectMetricool = function () {
-  if (!currentRestaurant) return
-  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/metricool/auth?restaurant_id=${currentRestaurant.id}`
 }
 
 // ─────────────────────────────────────────────

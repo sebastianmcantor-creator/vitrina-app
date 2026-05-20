@@ -827,6 +827,7 @@ async function renderClients() {
           <td style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <a href="/panel.html" onclick="localStorage.setItem('maestro_view_rest','${r.id}')" target="_blank" style="font-size:12px;color:var(--terra);text-decoration:none;font-weight:500">Ver →</a>
             ${r.wants_whatsapp ? '<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;white-space:nowrap">📱 WA</span>' : ''}
+            ${(r.subscription_status !== 'active' && r.subscription_status !== 'trialing') ? `<button onclick="activarCortesia('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;color:#92400e;font-family:'DM Sans',sans-serif;font-weight:600" title="Activar mes gratis">🎁 Cortesía</button>` : ''}
             <button onclick="deleteRestaurant('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid #ddd;border-radius:6px;cursor:pointer;color:#aaa;font-family:'DM Sans',sans-serif" title="Eliminar">🗑️</button>
           </td>
         </tr>
@@ -963,6 +964,26 @@ function renderCosts() {
       </div>
     </div>
   `
+}
+
+window.activarCortesia = async function (id, name) {
+  if (!confirm(`🎁 Activar plan cortesía para "${name}"?\n\nEsto les da acceso completo al plan Combo durante 30 días sin cargo.\nVas a recibir un alerta antes de que expire.`)) return
+
+  try {
+    const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+    const { error } = await supabase.from('restaurants').update({
+      subscription_tier:    'rest-combo',
+      subscription_status:  'trialing',
+      trial_ends_at:        trialEnd,
+      can_take_orders:      true,
+      tano_messages_limit:  999999,
+    }).eq('id', id)
+    if (error) throw error
+    alert(`✅ Plan cortesía activado para "${name}".\nTiene acceso completo hasta ${new Date(trialEnd).toLocaleDateString('es-AR')}.\nRecordá hacer seguimiento antes de que venza.`)
+    await renderClients()
+  } catch (e) {
+    alert('Error: ' + e.message)
+  }
 }
 
 window.deleteRestaurant = async function (id, name) {
