@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Conectar WhatsApp Business — Vitrina</title>
-  <meta name="description" content="Guía paso a paso para conectar tu número de WhatsApp Business a Vitrina. Sin soporte técnico necesario.">
+  <title>WhatsApp Business — Vitrina</title>
+  <meta name="description" content="Cómo funciona el número de WhatsApp Business de Vitrina. Lo activamos nosotros, vos solo respondés.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
@@ -23,14 +23,11 @@
       --green-bg: rgba(46,204,113,.12);
       --warn: #f39c12;
       --warn-bg: rgba(243,156,18,.12);
-      --red: #e74c3c;
-      --red-bg: rgba(231,76,60,.12);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text1); line-height: 1.65; }
 
-    /* NAV */
     nav {
       position: sticky; top: 0; z-index: 100;
       background: rgba(15,17,23,.92); backdrop-filter: blur(16px);
@@ -45,13 +42,9 @@
       display: flex; align-items: center; gap: 8px;
     }
     .nav-logo svg { width: 22px; height: 22px; }
-    .nav-back {
-      font-size: 13px; color: var(--text2);
-      text-decoration: none; transition: color .15s;
-    }
+    .nav-back { font-size: 13px; color: var(--text2); text-decoration: none; }
     .nav-back:hover { color: var(--brand-light); }
 
-    /* HERO */
     .hero {
       background: linear-gradient(135deg, #0a0a0f 0%, #0f1923 100%);
       padding: 64px 24px 56px;
@@ -73,12 +66,10 @@
       font-weight: 700; margin-bottom: 14px;
       line-height: 1.1;
     }
-    .hero p { font-size: 16px; color: var(--text2); max-width: 520px; margin: 0 auto; }
+    .hero p { font-size: 16px; color: var(--text2); max-width: 580px; margin: 0 auto; }
 
-    /* LAYOUT */
     .container { max-width: 780px; margin: 0 auto; padding: 56px 24px 100px; }
 
-    /* SECCIONES */
     .section { margin-bottom: 64px; }
     .section-header {
       display: flex; align-items: center; gap: 12px;
@@ -93,7 +84,6 @@
     }
     .section h2 { font-size: 20px; font-weight: 700; }
 
-    /* CARDS */
     .card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -101,39 +91,11 @@
       padding: 24px;
       margin-bottom: 16px;
     }
-    .card.warn { border-color: rgba(243,156,18,.35); background: rgba(243,156,18,.06); }
-    .card.danger { border-color: rgba(231,76,60,.35); background: rgba(231,76,60,.06); }
     .card.success { border-color: rgba(46,204,113,.35); background: rgba(46,204,113,.06); }
+    .card.warn { border-color: rgba(243,156,18,.35); background: rgba(243,156,18,.06); }
 
-    /* CHECKLIST */
-    .checklist { display: flex; flex-direction: column; gap: 12px; }
-    .check-item {
-      display: flex; gap: 12px; align-items: flex-start;
-      font-size: 14px; color: var(--text1);
-    }
-    .check-box {
-      width: 22px; height: 22px; flex-shrink: 0;
-      border-radius: 6px;
-      border: 1.5px solid var(--border2);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 13px; margin-top: 1px;
-    }
-    .check-box.done { background: var(--green-bg); border-color: rgba(46,204,113,.4); color: var(--green); }
-    .check-note {
-      font-size: 12px; color: var(--text2);
-      background: var(--surface2);
-      border-radius: 8px; padding: 8px 12px;
-      margin-top: 6px; line-height: 1.5;
-    }
-    .check-note a { color: var(--brand-light); text-decoration: none; }
-    .check-note a:hover { text-decoration: underline; }
-
-    /* PASOS */
     .steps { display: flex; flex-direction: column; gap: 0; }
-    .step {
-      display: flex; gap: 0;
-      position: relative;
-    }
+    .step { display: flex; gap: 0; position: relative; }
     .step:not(:last-child)::before {
       content: '';
       position: absolute;
@@ -157,27 +119,23 @@
     .step-desc { font-size: 14px; color: var(--text2); line-height: 1.65; }
     .step-desc strong { color: var(--text1); }
     .step-desc a { color: var(--brand-light); text-decoration: none; }
-    .step-desc a:hover { text-decoration: underline; }
-    .step-code {
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .feature-item {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-family: monospace;
-      font-size: 13px;
-      color: var(--green);
-      margin: 10px 0;
-      letter-spacing: .03em;
+      border-radius: 12px;
+      padding: 18px;
     }
-    .step-tip {
-      background: rgba(232,82,26,.08);
-      border: 1px solid rgba(232,82,26,.2);
-      border-radius: 8px; padding: 10px 14px;
-      font-size: 13px; color: rgba(255,117,64,.9);
-      margin-top: 10px;
-    }
+    .feature-emoji { font-size: 24px; margin-bottom: 8px; }
+    .feature-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .feature-desc { font-size: 13px; color: var(--text2); line-height: 1.55; }
 
-    /* FAQ */
     .faq-list { display: flex; flex-direction: column; gap: 1px; }
     .faq-item { border-bottom: 1px solid var(--border); }
     .faq-q {
@@ -187,7 +145,6 @@
       padding: 18px 0; text-align: left;
       display: flex; justify-content: space-between; align-items: center;
       cursor: pointer; gap: 12px;
-      transition: color .15s;
     }
     .faq-q:hover { color: var(--brand-light); }
     .faq-icon { color: var(--brand); font-size: 18px; transition: transform .2s; flex-shrink: 0; }
@@ -200,7 +157,6 @@
     .faq-a strong { color: var(--text1); }
     .faq-a a { color: var(--brand-light); }
 
-    /* SOPORTE */
     .support-card {
       background: linear-gradient(135deg, var(--surface), var(--surface2));
       border: 1px solid var(--border2);
@@ -215,21 +171,9 @@
       padding: 10px 24px; border-radius: 10px;
       font-size: 14px; font-weight: 600;
       text-decoration: none;
-      transition: background .15s;
     }
     .support-email:hover { background: var(--brand-light); }
-    .support-note { font-size: 12px; color: var(--text3); margin-top: 12px; }
 
-    /* BADGE */
-    .badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 11px; font-weight: 600; padding: 3px 10px;
-      border-radius: 9999px;
-    }
-    .badge.free { background: var(--green-bg); color: var(--green); border: 1px solid rgba(46,204,113,.25); }
-    .badge.warn { background: var(--warn-bg); color: var(--warn); border: 1px solid rgba(243,156,18,.25); }
-
-    /* DIVIDER */
     hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
 
     @media (max-width: 640px) {
@@ -254,169 +198,92 @@
   <a href="/" class="nav-back">← Volver al inicio</a>
 </nav>
 
-<!-- HERO -->
 <div class="hero">
-  <div class="hero-tag">📱 WhatsApp Business</div>
-  <h1>Conectar tu número<br>de WhatsApp</h1>
-  <p>Guía completa, paso a paso. Seguila y tu número queda conectado en menos de 15 minutos.</p>
+  <div class="hero-tag">📱 WhatsApp Business incluido</div>
+  <h1>WhatsApp Business<br>sin complicaciones</h1>
+  <p>Te asignamos un número, lo activamos por vos y todos los mensajes los manejás desde el panel de Vitrina. Sin chips, sin trámites, sin instalar nada.</p>
 </div>
 
 <div class="container">
 
-  <!-- ─── SECCIÓN 1: ANTES DE EMPEZAR ─────────────────────────────── -->
+  <!-- ─── SECCIÓN 1: CÓMO FUNCIONA ────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
-      <div class="section-num">✓</div>
-      <h2>Antes de empezar — lo que necesitás</h2>
+      <div class="section-num">1</div>
+      <h2>Cómo funciona</h2>
     </div>
 
-    <div class="card">
-      <div class="checklist">
-
-        <div class="check-item">
-          <div class="check-box done">□</div>
-          <div>
-            <div>Un número de teléfono disponible (recomendamos uno nuevo)</div>
-            <div class="check-note">
-              Conseguí un chip prepago en cualquier operadora. Sale entre $2.000 y $3.000 ARS y tarda 5 minutos en activarse. Así no arriesgás tu número personal.
-            </div>
-          </div>
+    <div class="card success" style="display:flex;gap:14px;align-items:flex-start">
+      <span style="font-size:28px;flex-shrink:0">✨</span>
+      <div>
+        <div style="font-size:15px;font-weight:600;margin-bottom:6px;color:var(--text1)">Vos no tenés que hacer nada técnico.</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.7">
+          Cuando contratás un plan pago, te asignamos un número de WhatsApp Business propio para tu negocio. Tus clientes te escriben a ese número, y el asistente IA responde lo que sabe (menú, reservas, productos, precios). Vos ves todas las conversaciones desde el panel de Vitrina y respondés lo que el asistente no pudo cerrar.
         </div>
-
-        <div class="check-item">
-          <div class="check-box done">□</div>
-          <div>
-            <div>Ese número <strong>NO tiene WhatsApp instalado</strong> actualmente</div>
-            <div class="check-note" style="border-left: 3px solid rgba(231,76,60,.5);">
-              ⚠️ <strong>Importante:</strong> si conectás un número que ya tiene WhatsApp, ese número quedará <strong>bloqueado para uso normal</strong> — no podrás chatear desde el celular. Por eso recomendamos un chip nuevo. Si igualmente querés usar un número existente, primero desinstalá WhatsApp de ese celular, esperá 24hs, y después seguí esta guía.
-            </div>
-          </div>
-        </div>
-
-        <div class="check-item">
-          <div class="check-box done">□</div>
-          <div>
-            <div>Acceso a <strong>Facebook Business Manager</strong> de tu negocio</div>
-            <div class="check-note">
-              Si no tenés uno, lo podés crear gratis en
-              <a href="https://business.facebook.com" target="_blank" rel="noopener">business.facebook.com</a>.
-              Tarda 5 minutos — solo necesitás nombre del negocio y email.
-            </div>
-          </div>
-        </div>
-
-        <div class="check-item">
-          <div class="check-box done">□</div>
-          <div>
-            <div>El número puede <strong>recibir un SMS o llamada</strong> para verificación</div>
-            <div class="check-note">
-              Meta te manda un código de 6 dígitos al número. Asegurate de tener el chip activo y con señal antes de empezar.
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
 
-    <div class="card success" style="display:flex;gap:12px;align-items:flex-start">
-      <span style="font-size:24px;flex-shrink:0">💡</span>
-      <div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:4px">¿Tenés todo? Estás listo para empezar.</div>
-        <div style="font-size:13px;color:var(--text2)">El proceso completo lleva entre 10 y 20 minutos. Meta puede tardar unos minutos en verificar el número — es normal.</div>
+    <div class="feature-grid">
+      <div class="feature-item">
+        <div class="feature-emoji">🚫📱</div>
+        <div class="feature-title">No usás tu celular personal</div>
+        <div class="feature-desc">Tu número privado queda separado del negocio. Sin mezclas.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-emoji">🤖</div>
+        <div class="feature-title">El asistente responde solo</div>
+        <div class="feature-desc">Responde menú, reservas, productos y precios sin que vos intervengas.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-emoji">💻</div>
+        <div class="feature-title">Todo desde el panel</div>
+        <div class="feature-desc">Bandeja de mensajes en Vitrina. Respondés desde la compu o el celular.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-emoji">📢</div>
+        <div class="feature-title">Campañas de marketing</div>
+        <div class="feature-desc">50 promociones por mes a tu base de contactos. Sin spam, con opt-in.</div>
       </div>
     </div>
   </div>
 
   <hr>
 
-  <!-- ─── SECCIÓN 2: PASO A PASO ────────────────────────────────────── -->
+  <!-- ─── SECCIÓN 2: ACTIVACIÓN PASO A PASO ────────────────────────────── -->
   <div class="section">
     <div class="section-header">
       <div class="section-num">2</div>
-      <h2>Paso a paso</h2>
+      <h2>De contratar a operar — 3 pasos</h2>
     </div>
 
     <div class="steps">
 
-      <!-- PASO 1 -->
       <div class="step">
         <div class="step-dot">1</div>
         <div class="step-body">
-          <div class="step-title">Crear o acceder a Meta Business Suite</div>
+          <div class="step-title">Contratás un plan pago</div>
           <div class="step-desc">
-            Andá a <a href="https://business.facebook.com" target="_blank" rel="noopener">business.facebook.com</a> e iniciá sesión con tu cuenta de Facebook personal.<br><br>
-            Si es la primera vez, hacé click en <strong>"Crear cuenta"</strong> y completá:
-            <ul style="margin: 10px 0 0 18px; display:flex;flex-direction:column;gap:4px">
-              <li>Nombre del negocio (ej: "Casa Lucía")</li>
-              <li>Tu nombre completo</li>
-              <li>Email de contacto del negocio</li>
-            </ul>
-            <br>
-            Verificá el email que te llega de Meta antes de continuar.
-          </div>
-          <div class="step-tip">
-            💡 Si ya tenés cuenta de Business Manager, saltá directamente al Paso 2.
+            Cualquier plan pago de Vitrina (Solo Menú $27, Marketing $57, Combo $70 o Comercio $62) incluye <strong>número de WhatsApp Business propio</strong>. No hay que pagar extra ni elegir un add-on.
           </div>
         </div>
       </div>
 
-      <!-- PASO 2 -->
       <div class="step">
         <div class="step-dot">2</div>
         <div class="step-body">
-          <div class="step-title">Agregar tu número a WhatsApp Business Platform</div>
+          <div class="step-title">Te activamos el número en 24 horas</div>
           <div class="step-desc">
-            Dentro de <strong>Business Suite</strong>, seguí este camino:
-            <br><br>
-            <strong>Configuración → Cuentas → Cuentas de WhatsApp → Agregar cuenta</strong>
-            <br><br>
-            Completá la información del perfil del negocio (nombre que van a ver tus clientes cuando reciban mensajes) y luego:
-            <br><br>
-            <strong>1.</strong> Ingresá el número nuevo con código de país:<br>
-            <div class="step-code">+54 9 11 XXXX XXXX &nbsp;(Argentina)</div>
-            <strong>2.</strong> Elegí verificación por <strong>SMS</strong> (más rápido) o llamada.<br>
-            <strong>3.</strong> Ingresá el código de 6 dígitos que te llegó.<br>
-            <strong>4.</strong> Listo — el número queda registrado en Meta.
+            Nosotros compramos y configuramos el número desde nuestro proveedor (Twilio). Te avisamos por mail cuando esté listo. <strong>No tenés que comprar chip, ir a la operadora ni cargar nada en Meta.</strong>
           </div>
         </div>
       </div>
 
-      <!-- PASO 3 -->
       <div class="step">
         <div class="step-dot">3</div>
         <div class="step-body">
-          <div class="step-title">Conectar con Vitrina</div>
+          <div class="step-title">Empezás a recibir mensajes</div>
           <div class="step-desc">
-            En el <strong>panel de Vitrina</strong>, andá a:
-            <br><br>
-            <strong>Configuración → WhatsApp Business → Conectar mi número</strong>
-            <br><br>
-            Vitrina te redirige a una pantalla de Meta para autorizar el acceso:
-            <br><br>
-            <strong>1.</strong> Seleccioná tu cuenta de Business Manager.<br>
-            <strong>2.</strong> Seleccioná el número que acabás de agregar.<br>
-            <strong>3.</strong> Aceptá los permisos (Vitrina solo necesita enviar mensajes operativos).<br>
-            <strong>4.</strong> Te redirige de vuelta al panel.
-          </div>
-          <div class="step-tip">
-            💡 Meta genera un token de acceso permanente para ese número. Vitrina lo guarda de forma segura y lo usa solo para mandarte notificaciones de pedidos y alertas.
-          </div>
-        </div>
-      </div>
-
-      <!-- PASO 4 -->
-      <div class="step">
-        <div class="step-dot">4</div>
-        <div class="step-body">
-          <div class="step-title">Verificar que funciona</div>
-          <div class="step-desc">
-            Después de conectar, en el panel de Vitrina vas a ver:<br>
-            <span style="display:inline-flex;align-items:center;gap:6px;margin:8px 0;padding:6px 12px;background:var(--green-bg);border:1px solid rgba(46,204,113,.3);border-radius:8px;font-size:13px;color:var(--green);font-weight:600">✅ WhatsApp: Conectado</span><br><br>
-            Para verificar que los mensajes llegan:
-            <br><br>
-            <strong>1.</strong> Hacé un pedido de prueba desde <a href="/demo.html" target="_blank">demo.html</a><br>
-            <strong>2.</strong> Vas a recibir una notificación en el número conectado con los detalles del pedido.<br>
-            <strong>3.</strong> Si no llega en 2 minutos, revisá la sección de Preguntas frecuentes abajo.
+            Imprimís el QR con el número de tu negocio (te lo generamos), lo pegás en la entrada o en la mesa, y tus clientes ya pueden escribirte. El asistente responde lo que sabe, vos ves todo en el panel.
           </div>
         </div>
       </div>
@@ -426,7 +293,59 @@
 
   <hr>
 
-  <!-- ─── SECCIÓN 3: FAQ ────────────────────────────────────────────── -->
+  <!-- ─── SECCIÓN 3: QUÉ INCLUYE TU NÚMERO ─────────────────────────────── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <h2>Qué incluye el WhatsApp de tu plan</h2>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span>
+          <div style="font-size:14px;color:var(--text1)">
+            <strong>150 mensajes operativos por mes</strong> — confirmaciones de reserva, recordatorios, avisos de pedido listo. Casi siempre alcanza para cualquier nivel de actividad.
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span>
+          <div style="font-size:14px;color:var(--text1)">
+            <strong>50 mensajes de campaña por mes</strong> — promociones, novedades, invitaciones a tu base de contactos. Con reglas anti-spam incorporadas.
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span>
+          <div style="font-size:14px;color:var(--text1)">
+            <strong>Conversaciones ilimitadas</strong> que inicia tu cliente (consultas, pedidos, dudas sobre productos o menú). El asistente responde 24/7.
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span>
+          <div style="font-size:14px;color:var(--text1)">
+            <strong>El nombre de tu negocio aparece en grande</strong> cuando tus clientes reciben los mensajes. El número técnico queda en segundo plano.
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <span style="color:var(--green);font-weight:700;flex-shrink:0">✓</span>
+          <div style="font-size:14px;color:var(--text1)">
+            <strong>Bandeja de mensajes en el panel</strong> de Vitrina. Ves todo, respondés lo que el asistente no cerró, derivás a alguien del equipo si querés.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card warn" style="margin-top:14px">
+      <div style="font-size:13px;color:var(--text1);font-weight:600;margin-bottom:6px">¿Necesitás más mensajes?</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.65">
+        Si te quedás corto, sumás bloques extra desde el panel: <strong>+50 mensajes operativos por $2 USD</strong> o <strong>+50 mensajes de campaña por $3 USD</strong>. Sin compromiso, sin cambio de plan.
+      </div>
+    </div>
+  </div>
+
+  <hr>
+
+  <!-- ─── SECCIÓN 4: FAQ ─────────────────────────────────────────────── -->
   <div class="section">
     <div class="section-header">
       <div class="section-num">?</div>
@@ -437,101 +356,83 @@
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          ¿Qué pasa si el número ya tiene WhatsApp personal?
+          ¿Puedo usar mi número actual de WhatsApp?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          Ese número va a quedar <strong>bloqueado para uso normal</strong> y solo funcionará como API. No vas a poder chatear ni recibir mensajes normales desde el celular.<br><br>
-          <strong>Por eso recomendamos usar un chip nuevo.</strong> Si igualmente querés usar un número existente, tenés que desinstalar WhatsApp de ese celular, esperar 24 horas para que Meta libere el número, y recién ahí intentar conectarlo.
+          No. El número que te asignamos es <strong>nuevo y exclusivo</strong> para tu negocio. Eso nos permite gestionarlo de punta a punta sin tocar tu número personal, y te garantiza que el servicio sigue funcionando aunque cambies de celular o de operadora.
+          <br><br>
+          Si querés que tus clientes existentes te encuentren con el número nuevo, te ayudamos a comunicarlo desde tus redes y desde el local.
         </div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          ¿Tiene algún costo?
+          ¿Cuánto cuesta el número?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          Meta incluye <strong>1.000 conversaciones gratis por mes</strong>. El excedente lo cobra Meta directamente a vos — entre $0,05 y $0,08 USD por conversación adicional.<br><br>
-          Vitrina <strong>no cobra nada adicional</strong> por el uso de WhatsApp. El costo de las conversaciones va directo de Meta a tu cuenta de Business Manager.
+          <strong>Está incluido en el precio del plan</strong>, sin costo adicional. Nosotros pagamos el número y las conversaciones dentro del cupo incluido. Solo pagás extra si superás los cupos (bloques de $2 o $3 USD).
         </div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          ¿Puedo usar el mismo número en varios locales?
+          ¿De qué país es el número?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          No. Cada número de WhatsApp se puede conectar a <strong>una sola cuenta</strong> en Vitrina.<br><br>
-          Para sucursales, necesitás un número diferente por cada una. Podés usar chips prepago de la misma operadora — no hay restricción de marca.
+          Es un número internacional (típicamente de Estados Unidos). En la práctica esto no afecta nada porque <strong>lo que tus clientes ven en grande es el nombre de tu negocio</strong>, no el número. Funciona igual que cuando recibís mensajes de bancos, aerolíneas o Mercado Libre — el número aparece en chico, la marca en grande.
         </div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          ¿Qué tipo de mensajes manda Vitrina?
+          ¿El asistente responde todo solo?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          Solo notificaciones operativas:
-          <ul style="margin: 10px 0 0 18px; color:var(--text2); display:flex;flex-direction:column;gap:4px">
-            <li>Nuevo pedido entrante (para el operativo)</li>
-            <li>Pedido listo para entregar (para el comensal)</li>
-            <li>Alerta de créditos de Tano bajos (para el dueño)</li>
-            <li>Alertas de cambio de tipo de cambio (para el dueño)</li>
-          </ul>
-          <br>
-          Vitrina <strong>no manda publicidad ni mensajes masivos</strong> sin que vos lo actives explícitamente desde el módulo de campañas.
+          Responde lo que <strong>tiene certeza</strong>: consultas sobre el menú, productos, precios, horarios, dirección, disponibilidad de reservas y armado de pedidos. Si una consulta es ambigua o requiere una decisión humana, te avisa en el panel para que respondas vos. Nunca inventa información.
         </div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          Me salió un error "Número no válido para WhatsApp Business"
+          ¿Cómo respondo yo si quiero intervenir?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          Esto pasa cuando el número tiene <strong>WhatsApp personal activo</strong> o fue registrado recientemente en otro servicio de Meta.<br><br>
-          Para resolverlo:
-          <ol style="margin: 10px 0 0 18px; color:var(--text2); display:flex;flex-direction:column;gap:4px">
-            <li>Desinstalá WhatsApp del celular que tiene ese número.</li>
-            <li>Esperá 24 horas (Meta tarda en liberar el número).</li>
-            <li>Volvé a intentar el Paso 2 de esta guía.</li>
-          </ol>
-          <br>
-          Si después de 24hs sigue fallando, contactanos con el número exacto y el mensaje de error.
+          Desde el panel de Vitrina tenés una <strong>bandeja de mensajes</strong> donde aparecen todas las conversaciones. Hacés clic, escribís tu respuesta, se envía como si fuera el negocio respondiendo. Lo podés hacer desde la computadora o desde el navegador del celular.
         </div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          El código de verificación no llegó
+          ¿Qué pasa si me doy de baja del plan?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          Probá estas soluciones en orden:
-          <ol style="margin: 10px 0 0 18px; color:var(--text2); display:flex;flex-direction:column;gap:4px">
-            <li>Esperá 2 minutos — a veces el SMS demora.</li>
-            <li>En la pantalla de Meta, pedí que te manden el código por <strong>llamada</strong> en vez de SMS.</li>
-            <li>Verificá que el número tenga señal y pueda recibir llamadas.</li>
-            <li>Si usás chip nuevo, asegurate de que esté activado (hacé una llamada de prueba primero).</li>
-          </ol>
+          Al final del período pago, el número se libera. Si reactivás el plan dentro de los 30 días, te lo devolvemos. Después de 30 días, te asignamos uno nuevo. <strong>Tu base de contactos se conserva siempre</strong> en tu cuenta de Vitrina.
         </div>
       </div>
 
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
-          Conecté pero no llegan las notificaciones de pedidos
+          ¿Pueden banear mi línea?
           <span class="faq-icon">+</span>
         </button>
         <div class="faq-a">
-          Verificá estos puntos:
-          <ol style="margin: 10px 0 0 18px; color:var(--text2); display:flex;flex-direction:column;gap:4px">
-            <li>En el panel, en <strong>Configuración → WhatsApp</strong>, confirmá que el número conectado sea el correcto.</li>
-            <li>Verificá que el canal operativo (para pedidos) y el canal de gestión (para alertas) estén configurados.</li>
-            <li>Hacé un pedido de prueba desde <a href="/demo.html" target="_blank" style="color:var(--brand-light)">demo.html</a> — si no llega, contactanos.</li>
-          </ol>
+          Tenemos protecciones automáticas para evitarlo: <strong>opt-in obligatorio</strong> para campañas, botón "darse de baja" en cada promoción, tope de mensajes por contacto (máximo 3 por mes), pausa automática si la calidad de la línea baja. En condiciones normales una línea bien usada opera años sin problemas.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-q" onclick="toggleFaq(this)">
+          ¿Cuánto tarda la activación?
+          <span class="faq-icon">+</span>
+        </button>
+        <div class="faq-a">
+          Normalmente <strong>24 horas hábiles</strong> desde que contratás. Te avisamos por mail cuando esté listo y te mandamos el QR para imprimir, los carteles para el local y un instructivo corto para tu equipo.
         </div>
       </div>
 
@@ -540,20 +441,16 @@
 
   <hr>
 
-  <!-- ─── SECCIÓN 4: SOPORTE ─────────────────────────────────────────── -->
+  <!-- ─── SECCIÓN 5: SOPORTE ─────────────────────────────────────────── -->
   <div class="section">
     <div class="support-card">
       <div style="font-size:40px;margin-bottom:12px">🙋</div>
-      <h3>¿Seguiste los pasos y algo no funciona?</h3>
-      <p>Escribinos con el detalle del error y te ayudamos a resolverlo.</p>
-      <a href="mailto:contacto@vitrinaapp.com.ar?subject=WhatsApp Setup — [nombre de tu restaurante]&body=Hola, seguí la guía pero tuve el siguiente problema:%0A%0AError: %0A%0ANúmero (sin el +54): %0A%0APaso en el que trabé:"
+      <h3>¿Tenés dudas antes de contratar?</h3>
+      <p>Escribinos y te contamos cómo se ve operando con un negocio como el tuyo.</p>
+      <a href="mailto:contacto@vitrinaapp.com.ar?subject=Consulta WhatsApp Business — [nombre del negocio]"
          class="support-email">
         📧 Escribirnos
       </a>
-      <div class="support-note">
-        Asunto: <strong>WhatsApp Setup — [nombre de tu restaurante]</strong><br>
-        Contanos en qué paso trabaste y qué error te apareció. Respondemos en menos de 24hs.
-      </div>
     </div>
   </div>
 
@@ -567,7 +464,6 @@
 function toggleFaq(btn) {
   const answer = btn.nextElementSibling;
   const isOpen = answer.classList.contains('open');
-  // Cerrar todos
   document.querySelectorAll('.faq-q').forEach(q => q.classList.remove('open'));
   document.querySelectorAll('.faq-a').forEach(a => a.classList.remove('open'));
   if (!isOpen) {

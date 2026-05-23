@@ -37,14 +37,14 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://vitrinaapp.com.ar/privacidad.html</loc>
-    <lastmod>2026-05-19</lastmod>
+    <loc>https://vitrinaapp.com.ar/privacy.html</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://vitrinaapp.com.ar/terminos.html</loc>
-    <lastmod>2026-05-19</lastmod>
+    <loc>https://vitrinaapp.com.ar/terms.html</loc>
+    <lastmod>2026-05-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.4</priority>
   </url>

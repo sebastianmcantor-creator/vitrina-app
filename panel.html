@@ -2297,6 +2297,38 @@ input:checked + .toggle-slider:before {
             <span id="pedidos-rt-label" style="font-size:12px;color:var(--muted)">Conectando...</span>
           </div>
         </div>
+
+        <!-- Banner sugerente Tienda Nube (solo local/ecommerce sin TN/ML) -->
+        <div id="tn-suggest-banner" style="display:none;margin-bottom:16px;padding:14px 18px;background:linear-gradient(90deg,#fff8e8,#fdf3d3);border:1px solid #f0d77a;border-radius:12px">
+          <div style="display:flex;align-items:flex-start;gap:12px;flex-wrap:wrap">
+            <div style="font-size:24px;line-height:1">💡</div>
+            <div style="flex:1;min-width:240px">
+              <div style="font-weight:600;font-size:14px;color:var(--ink);margin-bottom:4px">Coordiná menos, vendé más</div>
+              <div style="font-size:13px;color:var(--muted);line-height:1.45">
+                Cada venta acá la estás coordinando por WhatsApp. Si activás <strong>Tienda Nube</strong>,
+                el cliente paga con envío incluido y vos no coordinás nada.
+                Plan gratis hasta 50 productos.
+              </div>
+            </div>
+            <button onclick="(window.switchSection||(()=>{}))('catalogo')"
+              style="padding:8px 16px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap">
+              Activar Tienda Nube
+            </button>
+          </div>
+        </div>
+
+        <!-- Sección "Pedidos pendientes de contacto" (solo local/ecommerce) -->
+        <div id="pending-contact-wrap" style="display:none;margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+            <div>
+              <div style="font-size:15px;font-weight:600;color:var(--ink)">📞 Pedidos pendientes de contacto</div>
+              <div style="font-size:12px;color:var(--muted)">Clientes que ya pagaron — contactalos para coordinar retiro o envío.</div>
+            </div>
+            <span id="pending-contact-count" style="display:none;padding:3px 10px;background:#fde4e4;color:#a02929;border-radius:12px;font-size:12px;font-weight:600"></span>
+          </div>
+          <div id="pending-contact-body"></div>
+        </div>
+
         <div id="pedidos-body"></div>
       </div>
 
@@ -3093,7 +3125,7 @@ input:checked + .toggle-slider:before {
           </div>
 
           <div id="wa-setup-alert" style="display:none;padding:12px 16px;background:#e8f5e9;border:1px solid #b2dec4;border-radius:10px;margin-bottom:16px;font-size:13.5px;color:#2e7d32">
-            ✅ Solicitaste un número de WhatsApp Business propio. Cuando esté listo, cargalo aquí y se activa automáticamente. ¿Dudas? escribinos a <a href="mailto:contacto@vitrinaapp.com.ar" style="color:#2e7d32">contacto@vitrinaapp.com.ar</a>
+            ⏳ <strong>Tu número WhatsApp Business llega en 24hs hábiles.</strong> Lo activamos nosotros desde la cuenta Twilio de Vitrina — no tenés que hacer trámites con Meta ni comprar chip. Cuando esté listo te avisamos por email y queda disponible en tu panel. ¿Dudas? <a href="mailto:contacto@vitrinaapp.com.ar" style="color:#2e7d32">contacto@vitrinaapp.com.ar</a>
           </div>
 
           <div style="display:grid;gap:16px">
@@ -3135,7 +3167,7 @@ input:checked + .toggle-slider:before {
 
           <!-- Aviso si no hay WA conectado -->
           <div id="wa-followup-no-wa" style="display:none;padding:14px 16px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;font-size:13.5px;color:var(--muted)">
-            🔌 Conectá tu WhatsApp Business en <strong>Integraciones</strong> para activar esta función.
+            ⏳ Tu número de WhatsApp Business todavía no fue asignado. Lo activamos en 24hs hábiles desde la cuenta Twilio de Vitrina y esta función queda disponible automáticamente.
           </div>
 
           <!-- Mensajes individuales — visibles solo cuando está ON -->
@@ -3568,8 +3600,14 @@ input:checked + .toggle-slider:before {
         </div>
       </div>
       <div class="form-field" style="margin-bottom:14px">
-        <label class="form-label">Descripción</label>
-        <textarea class="form-textarea" id="item-desc" placeholder="Descripción opcional..." style="min-height:64px"></textarea>
+        <label class="form-label">Descripción corta</label>
+        <textarea class="form-textarea" id="item-desc" placeholder="1-2 líneas — aparece en el QR y en respuestas por WhatsApp" style="min-height:60px" maxlength="150" oninput="document.getElementById('item-desc-counter').textContent = this.value.length + '/150'"></textarea>
+        <span class="form-hint"><span id="item-desc-counter">0/150</span> · Hasta 150 caracteres.</span>
+      </div>
+      <div class="form-field" style="margin-bottom:14px" id="item-full-desc-wrap">
+        <label class="form-label">Descripción completa</label>
+        <textarea class="form-textarea" id="item-full-desc" placeholder="Texto largo con detalles, atributos y beneficios. Se usa en MercadoLibre y Tienda Nube." style="min-height:96px"></textarea>
+        <span class="form-hint" id="item-full-desc-hint">Ficha técnica completa. Viti la usa para publicar en ML/TN y para responder consultas detalladas por WhatsApp.</span>
       </div>
       <div class="form-field" style="margin-bottom:14px">
         <label class="form-label">URL de imagen</label>
@@ -3624,8 +3662,8 @@ input:checked + .toggle-slider:before {
           <label class="form-label">Notas para cocina (opcional)</label>
           <textarea class="form-textarea" id="item-notes-kitchen" placeholder="Ej: Servir caliente, sin cebolla a pedido" style="min-height:56px"></textarea>
         </div>
-        <!-- Campos de comercio: stock y SKU (solo local/ecommerce) -->
-        <div id="item-commerce-fields" style="display:none;grid-template-columns:1fr 1fr;gap:12px">
+        <!-- Campos de comercio: stock, SKU y alerta de stock bajo (solo local/ecommerce) -->
+        <div id="item-commerce-fields" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:12px">
           <div class="form-field">
             <label class="form-label">Stock disponible</label>
             <input class="form-input" id="item-stock" type="number" min="0" step="1" placeholder="0">
@@ -3634,8 +3672,66 @@ input:checked + .toggle-slider:before {
             <label class="form-label">SKU / Código</label>
             <input class="form-input" id="item-sku" placeholder="PROD-001">
           </div>
+          <div class="form-field">
+            <label class="form-label">Alerta stock bajo</label>
+            <input class="form-input" id="item-min-stock" type="number" min="0" step="1" placeholder="5">
+          </div>
         </div>
       </div>
+
+      <!-- Envíos: peso y dimensiones (solo local/ecommerce) -->
+      <div id="item-shipping-fields" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">📦 Datos de envío</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
+          <div class="form-field">
+            <label class="form-label">Peso (g)</label>
+            <input class="form-input" id="item-weight" type="number" min="0" step="1" placeholder="500">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Ancho (cm)</label>
+            <input class="form-input" id="item-width" type="number" min="0" step="0.1" placeholder="10">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Alto (cm)</label>
+            <input class="form-input" id="item-height" type="number" min="0" step="0.1" placeholder="10">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Largo (cm)</label>
+            <input class="form-input" id="item-length" type="number" min="0" step="0.1" placeholder="10">
+          </div>
+        </div>
+        <span class="form-hint">Necesarios para calcular el costo de envío en MercadoLibre y Tienda Nube.</span>
+      </div>
+
+      <!-- Atributos MercadoLibre (solo local/ecommerce) — desplegable -->
+      <details id="item-ml-attrs-fields" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+        <summary style="cursor:pointer;font-size:13px;font-weight:600;color:var(--ink);user-select:none;padding:4px 0">
+          🏷️ Atributos para MercadoLibre (opcional)
+        </summary>
+        <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="form-field">
+            <label class="form-label">Marca</label>
+            <input class="form-input" id="item-attr-marca" placeholder="Ej: Black & Decker">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Modelo</label>
+            <input class="form-input" id="item-attr-modelo" placeholder="Ej: BDH200V">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Color</label>
+            <input class="form-input" id="item-attr-color" placeholder="Ej: Negro">
+          </div>
+          <div class="form-field">
+            <label class="form-label">Talle</label>
+            <input class="form-input" id="item-attr-talle" placeholder="Ej: M">
+          </div>
+          <div class="form-field" style="grid-column:1/-1">
+            <label class="form-label">Material</label>
+            <input class="form-input" id="item-attr-material" placeholder="Ej: Algodón 100%">
+          </div>
+        </div>
+        <span class="form-hint">Viti usa estos atributos al publicar en MercadoLibre. Cuantos más completes, mejor calidad de publicación.</span>
+      </details>
       <!-- Historial de precios (solo en edición) -->
       <div id="price-history-block" style="display:none;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
         <div style="font-size:12px;font-weight:500;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Historial de precios</div>
@@ -4963,9 +5059,9 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'casa-lucia',
     btnText: 'Crear mi restaurante',
     successMsg: '¡Restaurante creado! 🎉',
-    waTitle: 'Agregar WhatsApp Business para reservas',
-    waDesc: 'Un número con el nombre de tu restaurante. Los clientes reservan, preguntan horarios y reciben recordatorios automáticos.',
-    waNote: '✓ Reservas automáticas · ✓ Confirmaciones por WA · ✓ Recordatorios 24hs antes · ✓ Respuestas a consultas de horario y menú',
+    waTitle: 'Activar WhatsApp Business para reservas',
+    waDesc: 'Te asignamos un número exclusivo con el nombre de tu restaurante. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los clientes reservan, preguntan horarios y reciben recordatorios automáticos.',
+    waNote: '✓ Número asignado en 24hs · ✓ Reservas automáticas · ✓ Recordatorios 24hs antes · ✓ Todo en tu panel de Vitrina',
   },
   local: {
     icon: '🏪',
@@ -4976,9 +5072,9 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'ferreteria-lopez',
     btnText: 'Crear mi local',
     successMsg: '¡Local creado! 🎉',
-    waTitle: 'Agregar WhatsApp Business como asistente de ventas',
-    waDesc: 'Un número con el nombre de tu local. Los clientes escriben desde Instagram, Google o tu vitrina — el asistente responde y vende 24/7.',
-    waNote: '✓ Responde stock y precios · ✓ Genera links de pago · ✓ Gestiona consultas 24/7 · ✓ CRM de clientes automático',
+    waTitle: 'Activar WhatsApp Business como asistente de ventas',
+    waDesc: 'Te asignamos un número exclusivo con el nombre de tu local. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los clientes escriben desde Instagram, Google o tu vitrina y el asistente responde y vende 24/7.',
+    waNote: '✓ Número asignado en 24hs · ✓ Responde stock y precios · ✓ Genera links de pago · ✓ Todo en tu panel de Vitrina',
   },
   services: {
     icon: '💆',
@@ -4989,9 +5085,9 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'peluqueria-mia',
     btnText: 'Crear mi negocio',
     successMsg: '¡Negocio creado! 🎉',
-    waTitle: 'Agregar WhatsApp Business para turnos',
-    waDesc: 'Un número con el nombre de tu negocio. Los clientes reservan turno por WhatsApp y reciben recordatorio automático.',
-    waNote: '✓ Agenda turnos automáticamente · ✓ Recordatorios al cliente · ✓ Gestión de cancelaciones · ✓ Respuestas a consultas',
+    waTitle: 'Activar WhatsApp Business para turnos',
+    waDesc: 'Te asignamos un número exclusivo con el nombre de tu negocio. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los clientes reservan turno por WhatsApp y reciben recordatorio automático.',
+    waNote: '✓ Número asignado en 24hs · ✓ Agenda automática · ✓ Recordatorios al cliente · ✓ Todo en tu panel de Vitrina',
   },
   ecommerce: {
     icon: '📦',
@@ -5002,9 +5098,9 @@ const BIZ_CONFIG = {
     slugPlaceholder: 'mi-tienda',
     btnText: 'Crear mi tienda',
     successMsg: '¡Tienda creada! 🎉',
-    waTitle: 'Agregar WhatsApp Business como vendedor automático',
-    waDesc: 'Un número con tu marca. Los compradores preguntan por WhatsApp y el asistente responde, cotiza y genera el link de pago.',
-    waNote: '✓ Responde consultas de productos · ✓ Cotiza y genera link de pago · ✓ Seguimiento de pedidos · ✓ 24/7 sin intervención',
+    waTitle: 'Activar WhatsApp Business como vendedor automático',
+    waDesc: 'Te asignamos un número exclusivo con tu marca. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los compradores preguntan por WhatsApp y el asistente responde, cotiza y genera el link de pago.',
+    waNote: '✓ Número asignado en 24hs · ✓ Cotiza y genera link de pago · ✓ Seguimiento de pedidos · ✓ Todo en tu panel de Vitrina',
   },
 }
 
@@ -5158,7 +5254,7 @@ window.createRestaurant = async function () {
       }).catch(() => {})
     }
     if (setupWAEnabled) {
-      setTimeout(() => showToast('📱 WhatsApp Business: te contactaremos para configurar tu número dedicado.', 'success'), 1800)
+      setTimeout(() => showToast('📱 WhatsApp Business: te asignamos un número exclusivo y lo activamos en 24hs hábiles. Te avisamos por email.', 'success'), 1800)
     }
     // Notificar al admin del nuevo registro
     fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notify/new-registration', {
@@ -5753,6 +5849,8 @@ window.openItemModal = function (catId, itemId = null) {
   document.getElementById('item-price').value     = editingItem?.price       ?? ''
   document.getElementById('item-emoji').value     = editingItem?.emoji       || ''
   document.getElementById('item-desc').value      = editingItem?.description || ''
+  document.getElementById('item-desc-counter').textContent = (editingItem?.description?.length || 0) + '/150'
+  document.getElementById('item-full-desc').value = editingItem?.full_description || ''
   document.getElementById('item-image-url').value = editingItem?.image_url   || ''
   SELECTED_TAGS.clear()
   ;(editingItem?.tags ?? []).forEach(t => SELECTED_TAGS.add(t))
@@ -5767,12 +5865,31 @@ window.openItemModal = function (catId, itemId = null) {
   document.getElementById('item-notes-kitchen').value= editingItem?.notes_for_kitchen || ''
   document.getElementById('item-stock').value        = editingItem?.stock_quantity     ?? ''
   document.getElementById('item-sku').value          = editingItem?.sku               || ''
+  document.getElementById('item-min-stock').value    = editingItem?.min_stock_alert    ?? ''
+
+  // Envíos
+  document.getElementById('item-weight').value = editingItem?.weight_grams ?? ''
+  document.getElementById('item-width').value  = editingItem?.width_cm     ?? ''
+  document.getElementById('item-height').value = editingItem?.height_cm    ?? ''
+  document.getElementById('item-length').value = editingItem?.length_cm    ?? ''
+
+  // Atributos ML
+  const mlAttrs = editingItem?.ml_attributes || {}
+  document.getElementById('item-attr-marca').value    = mlAttrs.marca    || ''
+  document.getElementById('item-attr-modelo').value   = mlAttrs.modelo   || ''
+  document.getElementById('item-attr-color').value    = mlAttrs.color    || ''
+  document.getElementById('item-attr-talle').value    = mlAttrs.talle    || ''
+  document.getElementById('item-attr-material').value = mlAttrs.material || ''
 
   // Mostrar campos de comercio solo para local/ecommerce
   const btype = currentRestaurant?.business_type || 'restaurant'
   const isCommerce = btype === 'local' || btype === 'ecommerce'
   const commerceFields = document.getElementById('item-commerce-fields')
   commerceFields.style.display = isCommerce ? 'grid' : 'none'
+  document.getElementById('item-shipping-fields').style.display = isCommerce ? 'block' : 'none'
+  document.getElementById('item-ml-attrs-fields').style.display = isCommerce ? 'block' : 'none'
+  // En restaurantes, mantener "Descripción completa" oculta — solo se usa la corta
+  document.getElementById('item-full-desc-wrap').style.display = isCommerce ? 'block' : 'none'
   // Ajustar label de prep time según tipo
   const prepLabel = document.getElementById('item-prep-time-label')
   if (prepLabel) prepLabel.textContent = btype === 'restaurant' ? 'Tiempo de preparación (min)' : 'Tiempo de entrega (min)'
@@ -5824,10 +5941,28 @@ window.saveItemModal = async function () {
     const costPriceVal = parseFloat(document.getElementById('item-cost-price').value)
     const prepTimeVal  = parseInt(document.getElementById('item-prep-time').value)
     const stockVal     = parseInt(document.getElementById('item-stock').value)
+    const minStockVal  = parseInt(document.getElementById('item-min-stock').value)
+    const weightVal    = parseInt(document.getElementById('item-weight').value)
+    const widthVal     = parseFloat(document.getElementById('item-width').value)
+    const heightVal    = parseFloat(document.getElementById('item-height').value)
+    const lengthVal    = parseFloat(document.getElementById('item-length').value)
+    // Atributos ML: solo guardo los que tienen valor
+    const mlAttrs = {}
+    const mlMarca    = document.getElementById('item-attr-marca').value.trim()
+    const mlModelo   = document.getElementById('item-attr-modelo').value.trim()
+    const mlColor    = document.getElementById('item-attr-color').value.trim()
+    const mlTalle    = document.getElementById('item-attr-talle').value.trim()
+    const mlMaterial = document.getElementById('item-attr-material').value.trim()
+    if (mlMarca)    mlAttrs.marca    = mlMarca
+    if (mlModelo)   mlAttrs.modelo   = mlModelo
+    if (mlColor)    mlAttrs.color    = mlColor
+    if (mlTalle)    mlAttrs.talle    = mlTalle
+    if (mlMaterial) mlAttrs.material = mlMaterial
     const payload = {
       name, price,
       emoji:             document.getElementById('item-emoji').value.trim() || null,
       description:       document.getElementById('item-desc').value.trim()      || null,
+      full_description:  document.getElementById('item-full-desc').value.trim() || null,
       image_url:         document.getElementById('item-image-url').value.trim() || null,
       tags:              [...SELECTED_TAGS],
       is_featured:       document.getElementById('item-featured').checked,
@@ -5838,6 +5973,12 @@ window.saveItemModal = async function () {
       notes_for_kitchen: document.getElementById('item-notes-kitchen').value.trim() || null,
       stock_quantity:    isNaN(stockVal)     ? null : stockVal,
       sku:               document.getElementById('item-sku').value.trim() || null,
+      min_stock_alert:   isNaN(minStockVal)  ? null : minStockVal,
+      weight_grams:      isNaN(weightVal)    ? null : weightVal,
+      width_cm:          isNaN(widthVal)     ? null : widthVal,
+      height_cm:         isNaN(heightVal)    ? null : heightVal,
+      length_cm:         isNaN(lengthVal)    ? null : lengthVal,
+      ml_attributes:     mlAttrs,
     }
     if (editingItem) {
       // Registrar historial de precio si cambió
@@ -6184,6 +6325,122 @@ window.loadPedidos = async function () {
     suscribirPedidosRealtime()
   } catch (e) {
     showToast('Error cargando pedidos: ' + e.message, 'error')
+  }
+
+  // Pedidos pendientes de contacto (solo local/ecommerce)
+  loadPendingContacts().catch(() => {})
+  updateTNSuggestBanner().catch(() => {})
+}
+
+// ═══════════════════════════════════════════
+// PEDIDOS PENDIENTES DE CONTACTO (local/ecommerce sin TN/ML)
+// Cliente pagó vía MP, el local debe contactarlo para coordinar retiro/envío.
+// ═══════════════════════════════════════════
+async function loadPendingContacts() {
+  const wrap = document.getElementById('pending-contact-wrap')
+  const body = document.getElementById('pending-contact-body')
+  const countBadge = document.getElementById('pending-contact-count')
+  if (!wrap || !body || !currentRestaurant) return
+
+  const btype = currentRestaurant.business_type || 'restaurant'
+  if (!['local', 'ecommerce'].includes(btype)) {
+    wrap.style.display = 'none'
+    return
+  }
+
+  try {
+    const res = await fetch(`${WORKER_URL}/api/pending-contact?restaurant_id=${currentRestaurant.id}`)
+    if (!res.ok) { wrap.style.display = 'none'; return }
+    const { items = [] } = await res.json()
+    const pendings = items.filter(i => i.status === 'pending')
+
+    if (!items.length) {
+      wrap.style.display = 'none'
+      return
+    }
+
+    wrap.style.display = 'block'
+    if (pendings.length > 0) {
+      countBadge.style.display = 'inline-block'
+      countBadge.textContent = `${pendings.length} sin contactar`
+    } else {
+      countBadge.style.display = 'none'
+    }
+
+    body.innerHTML = items.map(it => {
+      const elapsed = formatElapsedPedido(it.paid_at)
+      const isPending = it.status === 'pending'
+      const isStale2h = isPending && (Date.now() - new Date(it.paid_at).getTime()) > 2 * 60 * 60 * 1000
+      const borderColor = isStale2h ? '#a02929' : (isPending ? '#f0d77a' : 'var(--border)')
+      const bgColor = isStale2h ? '#fff5f5' : (isPending ? '#fffdf5' : '#f5fff7')
+      const statusBadge = isPending
+        ? `<span style="padding:2px 8px;background:${isStale2h?'#fde4e4':'#fdf3d3'};color:${isStale2h?'#a02929':'#9a7a13'};border-radius:10px;font-size:11px;font-weight:600">${isStale2h?'⚠️ +2hs sin contactar':'Pendiente'}</span>`
+        : `<span style="padding:2px 8px;background:#dff5e0;color:#1a6b25;border-radius:10px;font-size:11px;font-weight:600">✓ Contactado</span>`
+
+      const phone = (it.customer_phone || '').replace(/[^\d+]/g, '')
+      const waLink = phone ? `https://wa.me/${phone.replace(/^\+/, '')}` : null
+
+      return `
+        <div style="border:1px solid ${borderColor};background:${bgColor};border-radius:12px;padding:14px 16px;margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:8px">
+            <div style="flex:1;min-width:180px">
+              <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px">${escHtml(it.customer_name || 'Cliente sin nombre')}</div>
+              <div style="font-size:12px;color:var(--muted)">${escHtml(it.customer_phone || 'Sin teléfono')} · pagó ${elapsed}</div>
+            </div>
+            ${statusBadge}
+          </div>
+          <div style="font-size:13px;color:var(--ink);margin-bottom:6px">${escHtml(it.product_summary)}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:12px">$${Number(it.amount_ars || 0).toLocaleString('es-AR')}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            ${waLink ? `<a href="${waLink}" target="_blank" rel="noopener" style="padding:7px 14px;background:#25D366;color:#fff;border-radius:8px;text-decoration:none;font-size:13px;font-weight:500">💬 WhatsApp</a>` : ''}
+            ${isPending ? `<button onclick="markPendingContactContacted(${it.id})" style="padding:7px 14px;background:var(--ink);color:#fff;border:none;border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer">Marcar como contactado</button>` : ''}
+            ${!isPending ? `<button onclick="markPendingContactCompleted(${it.id})" style="padding:7px 14px;background:var(--cream2);color:var(--ink);border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer">Marcar como entregado</button>` : ''}
+          </div>
+        </div>`
+    }).join('')
+  } catch (e) {
+    console.error('loadPendingContacts:', e)
+    wrap.style.display = 'none'
+  }
+}
+
+window.markPendingContactContacted = async function (id) {
+  try {
+    const res = await fetch(`${WORKER_URL}/api/pending-contact/${id}/mark-contacted`, { method: 'POST' })
+    if (!res.ok) throw new Error(await res.text())
+    showToast && showToast('Marcado como contactado', 'success')
+    loadPendingContacts()
+  } catch (e) { showToast && showToast('Error: ' + e.message, 'error') }
+}
+
+window.markPendingContactCompleted = async function (id) {
+  try {
+    const res = await fetch(`${WORKER_URL}/api/pending-contact/${id}/mark-completed`, { method: 'POST' })
+    if (!res.ok) throw new Error(await res.text())
+    showToast && showToast('Marcado como entregado', 'success')
+    loadPendingContacts()
+  } catch (e) { showToast && showToast('Error: ' + e.message, 'error') }
+}
+
+// Banner sugerente: aparece solo si es local/ecommerce sin TN/ML conectados
+async function updateTNSuggestBanner() {
+  const banner = document.getElementById('tn-suggest-banner')
+  if (!banner || !currentRestaurant) return
+  const btype = currentRestaurant.business_type || 'restaurant'
+  if (!['local', 'ecommerce'].includes(btype)) {
+    banner.style.display = 'none'
+    return
+  }
+  try {
+    const { data: ints } = await supabase
+      .from('integrations')
+      .select('provider,is_active,status')
+      .eq('restaurant_id', currentRestaurant.id)
+      .in('provider', ['tiendanube', 'mercadolibre'])
+    const hasTNorML = (ints || []).some(i => i.is_active === true || i.status === 'active')
+    banner.style.display = hasTNorML ? 'none' : 'block'
+  } catch {
+    banner.style.display = 'none'
   }
 }
 
@@ -9283,7 +9540,7 @@ window.loadAgenda = async function () {
         if (card && !document.getElementById('wa-status-badge')) {
           card.insertAdjacentHTML('beforeend', `
             <div id="wa-status-badge" style="margin-top:16px;padding:12px 16px;background:#fff8e1;border:1px solid #ffd54f;border-radius:10px;font-size:13px;color:#856404;display:flex;align-items:center;gap:8px">
-              ⏳ Cuando contrates tu número de WhatsApp Business, te avisamos por email para configurarlo.
+              ⏳ Tu número WhatsApp Business llega en 24hs hábiles. Lo activamos nosotros — sin trámites con Meta. Te avisamos por email cuando esté listo.
             </div>`)
         }
       }, 100)

@@ -180,9 +180,9 @@
         <li>Enviar la revisión</li>
       </ul>
       <div class="highlight">
-        ✅ La app de Vitrina en Meta ya está publicada con todos los permisos aprobados. Vitrina publica directamente en Instagram y Facebook via API oficial — sin intermediarios.
+        ✅ La app de Vitrina en Meta ya está publicada en modo Live. Los permisos base (instagram_business_basic, instagram_manage_comments, instagram_business_manage_messages) están aprobados. Los permisos avanzados (insights, engagement, messages, content_publish) están en App Review desde el 22/05/2026.
       </div>
-      <p>Mentras tanto, podés usar la app en <strong>modo desarrollo</strong> con tu propia cuenta de Instagram como cuenta de prueba.</p>
+      <p>Mientras los avanzados se aprueban, podés usar la app con tu propia cuenta de Instagram como cuenta de prueba (modo desarrollo + testers internos).</p>
     </div>
   </div>
 
@@ -190,25 +190,34 @@
   <div class="step" style="background:#f9fff9;border-color:#c8e6c9">
     <div class="step-header">
       <div class="step-num done">📋</div>
-      <div class="step-title">Estado actual del trámite</div>
+      <div class="step-title">Estado actual del trámite (al 22/05/2026)</div>
     </div>
     <div class="step-body">
       <ul>
-        <li>✅ privacy.html publicada</li>
-        <li>✅ terms.html publicada</li>
-        <li>✅ Dominio vitrinaapp.com.ar activo</li>
-        <li>✅ Endpoint /api/instagram/auth implementado</li>
-        <li>✅ Endpoint /api/instagram/callback implementado</li>
-        <li>⏳ App en Meta Developers — pendiente creación manual</li>
-        <li>⏳ INSTAGRAM_APP_ID / INSTAGRAM_APP_SECRET — pendiente</li>
-        <li>⏳ Revisión de Meta — pendiente inicio del trámite</li>
+        <li>✅ privacy.html y terms.html publicadas con CUIT y AAIP</li>
+        <li>✅ Dominio vitrinaapp.com.ar activo y verificado</li>
+        <li>✅ App Meta creada — ID 1626148071948901 — namespace vitrinaapp</li>
+        <li>✅ App publicada (modo Live)</li>
+        <li>✅ Casos de uso agregados: Instagram (Vitrina-IG ID 1618135162776352), Facebook Pages, WhatsApp Business</li>
+        <li>✅ Endpoints /api/instagram/auth, /api/instagram/callback, /api/facebook/auth, /api/facebook/callback implementados</li>
+        <li>✅ Endpoint /api/social/schedule-post publica directo en IG + FB via API Meta</li>
+        <li>✅ Permisos base aprobados: instagram_business_basic, instagram_manage_comments, instagram_business_manage_messages, public_profile</li>
+        <li>⏳ Permisos avanzados en App Review (solicitados 22/05): instagram_manage_insights, instagram_manage_engagement, instagram_manage_messages, instagram_content_publish, business_management, pages_*, read_insights, whatsapp_business_messaging, whatsapp_business_management</li>
+        <li>⏳ Business Verification de empresa enviada 20/05 con constancia AFIP — verificar estado en business.facebook.com → Centro de seguridad</li>
+        <li>⏳ Video screencast para App Review — pendiente grabación (script preparado)</li>
       </ul>
+      <div class="highlight" style="margin-top:14px;background:#fff8e1;border-left-color:#856404">
+        ⚠️ Mientras los permisos avanzados no estén aprobados, solo funcionan con cuentas marcadas como testers internos. Para que clientes externos puedan conectar sus cuentas IG/FB con Acceso Avanzado, hay que esperar la aprobación de Meta (4-8 semanas).
+      </div>
+      <div class="highlight" style="margin-top:14px">
+        💡 Para WhatsApp Business operamos vía Twilio mientras los permisos de Meta WA quedan aprobados. Twilio actúa como BSP (Business Solution Provider) registrado, con sus propios permisos Meta ya activos. Esto nos permite operar con clientes desde el día 1.
+      </div>
     </div>
   </div>
 </div>
 
 <div class="footer-note">
-  Esta guía es solo para uso interno de Sebastián Medina Cantor — fundador de Vitrina.
+  Documentación interna del equipo de Vitrina — actualizada 22/05/2026.
 </div>
 
 </body>
