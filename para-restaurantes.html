@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vitrina para Restaurantes — Menú QR, pedidos y Tano IA</title>
-  <meta name="description" content="Vitrina digitaliza tu restaurante: menú QR, pedidos online, pantalla de cocina, reservas y Tano — el asistente que atiende a tus clientes. 14 días gratis.">
-  <meta property="og:title" content="Vitrina para Restaurantes — Menú digital, pedidos y cocina IA">
+  <title>Vitrina para Restaurantes · Menú QR, pedidos y Tano IA</title>
+  <meta name="description" content="Vitrina digitaliza tu restaurante: menú QR, pedidos online, pantalla de cocina, reservas y Tano, el asistente que atiende a tus clientes. 14 días gratis.">
+  <meta property="og:title" content="Vitrina para Restaurantes · Menú digital, pedidos y cocina IA">
   <meta property="og:description" content="Menú QR, pedidos online, pantalla de cocina en tiempo real y Tano el mozo IA. Sin comisiones sobre ventas. 14 días gratis.">
   <meta property="og:image" content="https://vitrinaapp.com.ar/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -22,9 +22,14 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'DM Sans', sans-serif; background: #FAF7F2; color: #1C1208; overflow-x: hidden; }
-    .nav { background: rgba(250,247,242,.95); backdrop-filter: blur(12px); border-bottom: 1px solid #E8DDD0; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-    .logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #B85A30; text-decoration: none; display: flex; align-items: center; gap: 8px; }
-    .cta-nav { padding: 8px 18px; background: #B85A30; color: white; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; }
+    .nav { background: rgba(250,247,242,.95); backdrop-filter: blur(12px); border-bottom: 1px solid #E8DDD0; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; gap: 16px; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #B85A30; text-decoration: none; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-links { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; align-items: center; }
+    .nav-links a { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #4A3828; text-decoration: none; font-weight: 500; transition: color .15s; }
+    .nav-links a:hover { color: #B85A30; }
+    .nav-links a.active { color: #B85A30; font-weight: 600; }
+    .cta-nav { padding: 8px 18px; background: #B85A30; color: white; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+    @media (max-width: 720px) { .nav-links { display: none; } }
     .hero { padding: 80px 24px 64px; text-align: center; background: linear-gradient(160deg, #FAF7F2, #F4EDE4); }
     .badge { display: inline-block; background: #F4E8DF; color: #B85A30; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
     h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); margin-bottom: 16px; line-height: 1.15; }
@@ -69,13 +74,20 @@
     <svg width="18" height="22" viewBox="0 0 18 22" fill="none"><rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#B85A30"/><rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/><rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/><path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
     Vitrina
   </a>
+  <ul class="nav-links">
+    <li><a href="/">Inicio</a></li>
+    <li><a href="/para-restaurantes.html" class="active">Restaurantes</a></li>
+    <li><a href="/para-comercios.html">Comercios</a></li>
+    <li><a href="/para-servicios.html">Servicios</a></li>
+    <li><a href="/precios.html">Precios</a></li>
+  </ul>
   <a href="/panel.html" class="cta-nav">Empezar gratis →</a>
 </nav>
 
 <section class="hero">
   <div class="badge">🍽️ Para restaurantes y bares</div>
   <h1>Tu restaurante digital,<br><em>listo en 15 minutos</em></h1>
-  <p class="sub">Menú QR, pedidos online con MercadoPago, pantalla de cocina en tiempo real y Tano — el asistente que atiende a tus clientes.</p>
+  <p class="sub">Menú QR, pedidos online con MercadoPago, pantalla de cocina en tiempo real y Tano, el asistente que atiende a tus clientes.</p>
   <div class="cta-group">
     <a href="/panel.html" class="btn-primary">Probarlo 14 días gratis →</a>
     <a href="/demo.html" class="btn-ghost">Ver demo 🍽️</a>
@@ -126,8 +138,8 @@
   <p>Sin comisión sobre tus ventas. Precio fijo mensual en pesos al tipo de cambio oficial.</p>
   <div class="price-cards">
     <div class="price-card"><div class="price-val" id="p-r1">$38k</div><div class="price-label">Solo Menú · USD 27/mes</div></div>
-    <div class="price-card"><div class="price-val" id="p-r3">$81k</div><div class="price-label">Marketing · USD 58/mes<br><span style="color:#e8c87a;font-size:10px">🎁 Al pagar: $10 USD para tu primera campaña con Viti</span></div></div>
-    <div class="price-card" style="border-color:rgba(200,168,74,.4)"><div class="price-val" id="p-r5">$99k</div><div class="price-label">Combo · USD 70/mes · <span style="color:#e8c87a;font-weight:600">Ahorrás USD 15</span><br><span style="color:#e8c87a;font-size:10px">🎁 Al pagar: $10 USD para tu primera campaña con Viti</span></div></div>
+    <div class="price-card"><div class="price-val" id="p-r3">$81k</div><div class="price-label">Marketing · USD 57/mes<br><span style="color:#e8c87a;font-size:10px">🎁 Al pagar: $10 USD para tu primera campaña con Viti</span></div></div>
+    <div class="price-card" style="border-color:rgba(200,168,74,.4)"><div class="price-val" id="p-r5">$99k</div><div class="price-label">Combo · USD 70/mes · <span style="color:#e8c87a;font-weight:600">Ahorrás USD 14</span><br><span style="color:#e8c87a;font-size:10px">🎁 Al pagar: $10 USD para tu primera campaña con Viti</span></div></div>
   </div>
   <p style="color:rgba(255,255,255,.5);font-size:12px;margin-bottom:8px">📱 WhatsApp Business incluido. Te asignamos un número exclusivo, lo activamos en 24hs y el asistente responde 24/7. Sin trámites con Meta.</p>
   <a href="/panel.html" class="btn-primary">Empezar 14 días gratis →</a>
@@ -135,7 +147,7 @@
 </div>
 
 <footer>
-  <p>© 2026 Vitrina · <a href="/">vitrinaapp.com.ar</a> · <a href="mailto:contacto@vitrinaapp.com.ar">contacto@vitrinaapp.com.ar</a></p>
+  <p>© 2026 Vitrina · <a href="/">vitrinaapp.com.ar</a> · <a href="/precios.html">Precios</a> · <a href="mailto:contacto@vitrinaapp.com.ar">contacto@vitrinaapp.com.ar</a></p>
 </footer>
 
 <div class="sticky-cta">
@@ -150,7 +162,7 @@
     const tc = d.oficial || 1418
     const fmt = usd => '$' + Math.round(usd * tc / 1000) + 'k'
     const p1 = document.getElementById('p-r1'); if(p1) p1.textContent = fmt(27)
-    const p3 = document.getElementById('p-r3'); if(p3) p3.textContent = fmt(58)
+    const p3 = document.getElementById('p-r3'); if(p3) p3.textContent = fmt(57)
     const p5 = document.getElementById('p-r5'); if(p5) p5.textContent = fmt(70)
   } catch {}
 })()

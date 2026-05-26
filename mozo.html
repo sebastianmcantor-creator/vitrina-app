@@ -99,7 +99,7 @@
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:14px;font-weight:600;color:#e8c87a;letter-spacing:.02em">Tano</span>
             <span style="font-size:11px;color:#5a4a2a">·</span>
-            <div class="restaurant-name" id="rest-name" style="font-size:13px;font-weight:400;color:#8a7450">—</div>
+            <div class="restaurant-name" id="rest-name" style="font-size:13px;font-weight:400;color:#8a7450"></div>
           </div>
           <div class="table-badge" id="table-badge">
             <span class="status-dot"></span>Tu asistente del menú · En línea
@@ -228,7 +228,7 @@
       currentRestData = rest
       document.getElementById('loader-name').textContent = rest.name
       document.getElementById('rest-name').textContent = rest.name
-      document.title = rest.name + ' — Tano'
+      document.title = rest.name + ' · Tano'
       // Actualizar link de vuelta al menú con slug y mesa correctos
       const backBtn = document.getElementById('back-to-menu')
       if (backBtn) backBtn.href = 'menu.html?slug=' + slug + (mesa ? '&mesa=' + mesa : '')
@@ -490,8 +490,8 @@
     }
 
     const LANG_GREETINGS = {
-      en: name => `Hello! Welcome to ${name} 👋 I'm Tano, your menu assistant. I can help you with dishes, ingredients, vegetarian, vegan or gluten-free options, and recommendations. What can I help you with?`,
-      pt: name => `Olá! Bem-vindo ao ${name} 👋 Sou o Tano, seu assistente de cardápio. Posso ajudar com pratos, ingredientes, opções vegetarianas, veganas ou sem glúten, e recomendações. Em que posso ajudar?`,
+      en: name => `Hello! Welcome to ${name} 👋 How can we help you? I can tell you about dishes, ingredients, vegetarian, vegan or gluten-free options, and give recommendations.`,
+      pt: name => `Olá! Bem-vindo ao ${name} 👋 Em que posso ajudar? Posso falar sobre pratos, ingredientes, opções vegetarianas, veganas ou sem glúten, e dar recomendações.`,
       es: name => null, // usa tano_welcome o default en español
     }
 
@@ -520,9 +520,8 @@
         msg = LANG_GREETINGS[lang](rest.name)
       } else {
         msg = rest.tano_welcome?.trim()
-          || '¡Hola! Bienvenido a ' + rest.name + ' 👋 Soy Tano, tu asistente de menú. '
-            + 'Puedo ayudarte con los platos, ingredientes, opciones vegetarianas, veganas o sin TACC, y hacerte recomendaciones. '
-            + '¿En qué te puedo ayudar?'
+          || '¡Hola! Bienvenido a ' + rest.name + ' 👋 '
+            + '¿En qué te puedo ayudar? Te cuento sobre los platos, ingredientes, opciones vegetarianas, veganas o sin TACC, y te hago recomendaciones.'
       }
       if (typeof msg === 'string') msg += closedNote
       addMessage('assistant', msg)
@@ -605,7 +604,7 @@
       // Si ya llegó al límite, responder sin llamar a la API
       if (tanoLimitReached) {
         showTyping(false)
-        addMessage('assistant', 'Por ahora no puedo seguir respondiendo — llegué al límite de mensajes del mes. El equipo del restaurante te atiende con gusto 😊')
+        addMessage('assistant', 'Por ahora no puedo seguir respondiendo. Llegué al límite de mensajes del mes, el equipo del restaurante te atiende con gusto 😊')
         isLoading = false
         return
       }

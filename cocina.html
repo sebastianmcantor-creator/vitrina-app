@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cocina — Pedidos</title>
+  <title>Cocina · Pedidos</title>
   <link rel="stylesheet" href="lib/vitrina-tokens.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -264,7 +264,7 @@
 <!-- Modal cobro de mesa — SOLO restaurant -->
 <div id="cobro-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px">
   <div style="background:#1a1a1a;border:1px solid #3a3a3a;border-radius:16px;padding:24px;max-width:360px;width:100%">
-    <div style="font-size:18px;font-weight:600;color:#f0f0f0;margin-bottom:6px" id="cobro-title">Mesa X — Cobrar</div>
+    <div style="font-size:18px;font-weight:600;color:#f0f0f0;margin-bottom:6px" id="cobro-title">Mesa X · Cobrar</div>
     <div style="font-size:13px;color:#888;margin-bottom:16px" id="cobro-desglose">Cargando...</div>
     <div style="font-size:28px;font-weight:700;color:#c8a84a;margin-bottom:20px" id="cobro-total">$0</div>
     <button id="cobro-btn-generar" onclick="generarPagoMesa()"
@@ -322,7 +322,7 @@
       showError('No se encontró el restaurante "' + slug + '".')
       return
     }
-    document.getElementById('rest-sub').textContent = rest.name + ' — Pedidos en tiempo real'
+    document.getElementById('rest-sub').textContent = rest.name + ' · Pedidos en tiempo real'
     show('main-view')
     await fetchPedidos()
     suscribirRealtime()
@@ -440,7 +440,7 @@
           if (pedidos[order.id]) pedidos[order.id] = { ...pedidos[order.id], status: 'paid' }
           renderAll()
           // Toast de confirmación de pago
-          const toastMsg = '💳 ' + mesaStr + ' — Pago confirmado'
+          const toastMsg = '💳 ' + mesaStr + ' · Pago confirmado'
           const toast = document.createElement('div')
           toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22aa44;color:white;padding:12px 24px;border-radius:12px;font-family:"DM Sans",sans-serif;font-size:14px;font-weight:600;z-index:999;box-shadow:0 4px 20px rgba(34,170,68,.4);animation:slideIn .3s ease'
           toast.textContent = toastMsg
@@ -892,7 +892,7 @@
     _cobroData = { tableNumber, orderIds, total, nPedidos }
 
     const mesaLabel = tableNumber && tableNumber !== 'sin-mesa' ? 'Mesa ' + tableNumber : 'Sin mesa'
-    document.getElementById('cobro-title').textContent = mesaLabel + ' — Cobrar'
+    document.getElementById('cobro-title').textContent = mesaLabel + ' · Cobrar'
     document.getElementById('cobro-desglose').textContent =
       nPedidos + ' pedido' + (nPedidos !== 1 ? 's' : '') + ' · ' + orderIds.length + ' orden' + (orderIds.length !== 1 ? 'es' : '') + ' activas'
     document.getElementById('cobro-total').textContent = '$' + total.toLocaleString('es-AR')

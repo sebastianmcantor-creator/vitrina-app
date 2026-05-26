@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo Menú — Casa Lucía Restaurante</title>
-  <meta name="description" content="Demo interactiva del menú digital de Vitrina. Así se ve el menú QR de tu restaurante — con pedidos, Tano IA y pago integrado.">
-  <meta property="og:title" content="Demo Menú Digital — Vitrina">
+  <title>Demo Menú · Casa Lucía Restaurante</title>
+  <meta name="description" content="Demo interactiva del menú digital de Vitrina. Así se ve el menú QR de tu restaurante: con pedidos, Tano IA y pago integrado.">
+  <meta property="og:title" content="Demo Menú Digital · Vitrina">
   <meta property="og:description" content="Así se ve el menú digital de tu restaurante con Vitrina. Probalo gratis.">
   <meta property="og:url" content="https://vitrinaapp.com.ar/demo.html">
   <link rel="stylesheet" href="lib/vitrina-tokens.css">
@@ -563,6 +563,113 @@
     .order-confirmed h3 { color: #15803d; font-size: 1.1rem; margin: 0.5rem 0 0.3rem; }
     .order-confirmed p { color: #166534; font-size: 0.85rem; }
 
+    /* Banner total acumulado de mesa (restaurant) */
+    .cart-total-bar {
+      background: linear-gradient(90deg, #1a1f2e, #2a3041);
+      color: #fff;
+      padding: 12px 16px;
+      display: none;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      gap: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .cart-total-bar.visible { display: flex; }
+    .cart-total-bar .total-info { display: flex; flex-direction: column; gap: 2px; }
+    .cart-total-bar .total-label { font-size: 11px; opacity: 0.8; }
+    .cart-total-bar .total-amount { font-weight: 700; font-size: 15px; color: #FFB870; }
+    .cart-total-bar .pedir-cuenta-btn {
+      background: #E8521A;
+      color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 600;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+    .cart-total-bar .pedir-cuenta-btn:active { background: #b8390f; }
+
+    /* Modal Pedir la cuenta */
+    .cuenta-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 400;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .cuenta-modal.open { display: flex; }
+    .cuenta-modal-box {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 420px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 1.4rem;
+    }
+    .cuenta-modal-title { font-family: 'Cormorant Garamond', serif; font-size: 1.4rem; font-weight: 700; color: var(--brown); margin-bottom: 0.4rem; }
+    .cuenta-modal-sub { font-size: 0.82rem; color: var(--grey); margin-bottom: 1rem; }
+    .cuenta-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px dashed #eee; font-size: 0.85rem; }
+    .cuenta-row .qty { color: var(--grey); margin-right: 6px; }
+    .cuenta-row .price { font-weight: 600; color: var(--black); }
+    .cuenta-total-row { display: flex; justify-content: space-between; padding: 0.8rem 0 0.2rem; font-size: 1rem; font-weight: 700; color: var(--brown); border-top: 2px solid #ddd; margin-top: 0.5rem; }
+    .cuenta-total-row .total { color: var(--terra); font-size: 1.15rem; }
+    .cuenta-pay-btn {
+      width: 100%;
+      background: #009ee3;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.95rem;
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    .cuenta-pay-btn:active { background: #0078b8; }
+    .cuenta-close-btn {
+      width: 100%;
+      background: none;
+      border: 1.5px solid #ddd;
+      border-radius: 10px;
+      padding: 0.85rem;
+      font-family: 'Outfit', sans-serif;
+      color: var(--grey);
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+
+    /* Badge "Ya pedido" en items enviados */
+    .item-ordered-badge {
+      display: inline-block;
+      background: #f0fdf4;
+      color: #166534;
+      border: 1px solid #86efac;
+      border-radius: 12px;
+      padding: 2px 8px;
+      font-size: 10.5px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .item-ordered-badge.preparing { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+    .item-ordered-badge.ready     { background: #dcfce7; color: #14532d; border-color: #4ade80; }
+    .add-btn.again {
+      background: #fff;
+      color: var(--terra);
+      border: 1.5px solid var(--terra);
+      box-shadow: none;
+    }
+    .add-btn.again:active { background: #fff5ef; }
+
     /* Tano */
     .tano-fab {
       position: fixed;
@@ -582,7 +689,9 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+      transition: bottom 0.2s ease;
     }
+    .tano-fab.with-cart-banner { bottom: 96px !important; }
     .tano-fab-dot {
       width: 8px; height: 8px;
       background: #4ade80;
@@ -759,6 +868,404 @@
       font-weight: 500;
     }
     .quick-btn:hover { background: var(--beige); }
+
+    /* ============================================================
+       MODO COMERCIO — Simulación flujo WhatsApp + Panel del local
+       ============================================================
+       Solo se muestra cuando ?tipo=comercio (lo activa el JS).
+    */
+    #comercioSimulation { display: none; }
+    body.comercio-mode #comercioSimulation { display: block; }
+    body.comercio-mode { max-width: 1100px; }
+    body.comercio-mode .rest-header,
+    body.comercio-mode .sticky-nav,
+    body.comercio-mode .cart-total-bar,
+    body.comercio-mode .cart-fab,
+    body.comercio-mode .tano-fab { display: none !important; }
+    body.comercio-mode .menu-body {
+      padding: 1rem 0 80px;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    body.comercio-mode .item-footer [id^="ctrl-"] { display: none; }
+    body.comercio-mode .menu-item { pointer-events: auto; }
+    body.comercio-mode .cart-overlay,
+    body.comercio-mode .cart-drawer,
+    body.comercio-mode .modal-overlay,
+    body.comercio-mode .cuenta-modal,
+    body.comercio-mode .tano-overlay,
+    body.comercio-mode .tano-panel { display: none !important; }
+
+    .csim-banner {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      color: white;
+      padding: 1rem 1.2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+    .csim-banner strong { display: block; font-size: 0.95rem; margin-bottom: 0.25rem; }
+
+    .csim-business-header {
+      background: var(--brown);
+      color: white;
+      padding: 1.5rem 1.2rem;
+      text-align: center;
+    }
+    .csim-business-header .cover { font-size: 2.5rem; display: block; margin-bottom: 0.4rem; }
+    .csim-business-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.7rem;
+      font-weight: 700;
+    }
+    .csim-business-header p { font-size: 0.8rem; opacity: 0.85; margin-top: 0.3rem; }
+
+    .csim-stage {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      padding: 1.5rem 1rem;
+      background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%);
+    }
+    @media (min-width: 850px) {
+      .csim-stage { grid-template-columns: 1fr 1fr; gap: 2rem; padding: 2rem; }
+    }
+
+    .csim-col-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--grey);
+      font-weight: 700;
+      margin-bottom: 0.7rem;
+      text-align: center;
+    }
+
+    /* Teléfono mockup */
+    .csim-phone {
+      max-width: 360px;
+      margin: 0 auto;
+      background: #111;
+      border-radius: 32px;
+      padding: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+    .csim-phone-screen {
+      background: #ECE5DD;
+      border-radius: 24px;
+      overflow: hidden;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+    .csim-wa-header {
+      background: #128C7E;
+      color: white;
+      padding: 0.7rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .csim-wa-header .avatar {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: var(--terra);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .csim-wa-header .name { font-weight: 600; font-size: 0.95rem; }
+    .csim-wa-header .status { font-size: 0.7rem; opacity: 0.85; }
+
+    .csim-wa-body {
+      flex: 1;
+      padding: 1rem 0.7rem;
+      overflow-y: auto;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='40'><circle cx='20' cy='20' r='1' fill='%23d4ccc1' opacity='0.4'/></svg>");
+      background-color: #ECE5DD;
+    }
+
+    .csim-msg {
+      max-width: 80%;
+      padding: 0.55rem 0.75rem;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      line-height: 1.35;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+      animation: csimSlideUp 0.3s ease-out;
+      word-wrap: break-word;
+    }
+    .csim-msg.in { background: white; color: #111; align-self: flex-start; border-radius: 0 10px 10px 10px; margin-right: auto; }
+    .csim-msg.out { background: #DCF8C6; color: #111; align-self: flex-end; border-radius: 10px 0 10px 10px; margin-left: auto; }
+    .csim-msg .time { display: block; font-size: 0.65rem; color: #888; margin-top: 0.2rem; text-align: right; }
+
+    .csim-msgs { display: flex; flex-direction: column; }
+
+    .csim-product-card {
+      background: white;
+      border-radius: 10px;
+      padding: 0.5rem;
+      max-width: 80%;
+      margin-bottom: 0.5rem;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+      animation: csimSlideUp 0.3s ease-out;
+    }
+    .csim-product-img {
+      width: 100%;
+      height: 130px;
+      border-radius: 6px;
+      background: linear-gradient(135deg, #FFE082, #FFB300);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .csim-product-name { font-weight: 600; font-size: 0.88rem; color: #111; }
+    .csim-product-desc { font-size: 0.75rem; color: #555; margin-top: 0.2rem; line-height: 1.3; }
+    .csim-product-price { color: var(--terra); font-weight: 700; font-size: 1rem; margin-top: 0.4rem; }
+    .csim-pay-btn {
+      display: block;
+      width: 100%;
+      margin-top: 0.6rem;
+      background: #009EE3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+    }
+    .csim-pay-btn:hover { background: #007fb5; }
+    .csim-pay-btn:disabled { background: #aaa; cursor: default; }
+
+    .csim-typing {
+      align-self: flex-start;
+      background: white;
+      padding: 0.6rem 0.9rem;
+      border-radius: 0 10px 10px 10px;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      display: inline-flex;
+      gap: 4px;
+      animation: csimSlideUp 0.3s ease-out;
+    }
+    .csim-typing span {
+      width: 6px; height: 6px;
+      background: #888;
+      border-radius: 50%;
+      animation: csimDot 1.2s infinite;
+    }
+    .csim-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .csim-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes csimDot {
+      0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+      30% { opacity: 1; transform: translateY(-3px); }
+    }
+    @keyframes csimSlideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes csimSlideInRight {
+      from { opacity: 0; transform: translateX(30px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* Overlay MP */
+    .csim-mp-overlay {
+      position: absolute;
+      inset: 12px;
+      background: white;
+      border-radius: 24px;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      z-index: 10;
+    }
+    .csim-mp-overlay.open { display: flex; animation: csimSlideUp 0.3s ease-out; }
+    .csim-mp-logo {
+      background: #009EE3;
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.5px;
+    }
+    .csim-mp-amount { font-size: 1.8rem; font-weight: 700; color: #111; margin-bottom: 0.5rem; }
+    .csim-mp-product { color: var(--grey); font-size: 0.85rem; margin-bottom: 2rem; text-align: center; }
+    .csim-mp-confirm {
+      background: #009EE3; color: white; border: none;
+      width: 100%; padding: 0.9rem; border-radius: 8px;
+      font-weight: 700; font-size: 0.95rem; cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+    }
+    .csim-mp-spinner {
+      width: 50px; height: 50px;
+      border: 4px solid #e0e0e0;
+      border-top-color: #009EE3;
+      border-radius: 50%;
+      animation: csimSpin 0.8s linear infinite;
+    }
+    @keyframes csimSpin { to { transform: rotate(360deg); } }
+    .csim-mp-check {
+      font-size: 4rem;
+      color: #4CAF50;
+      animation: csimPop 0.4s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes csimPop {
+      from { opacity: 0; transform: scale(0.5); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .csim-mp-text { margin-top: 1rem; font-size: 0.95rem; font-weight: 600; color: #111; }
+
+    /* phone wrapper relativo para el overlay */
+    .csim-phone-screen { position: relative; }
+
+    /* Panel del local */
+    .csim-panel {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+    }
+    .csim-panel-topbar {
+      background: var(--brown);
+      color: white;
+      padding: 0.9rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .csim-panel-topbar .label { font-weight: 600; font-size: 0.9rem; }
+    .csim-panel-topbar .pill {
+      background: rgba(255,255,255,0.2);
+      padding: 0.2rem 0.7rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+    }
+
+    .csim-panel-alert {
+      background: #fff3cd;
+      color: #856404;
+      padding: 0.7rem 1.2rem;
+      border-bottom: 1px solid #ffeaa7;
+      font-size: 0.82rem;
+      font-weight: 600;
+      display: none;
+      animation: csimSlideUp 0.3s ease-out;
+    }
+    .csim-panel-alert.visible { display: block; }
+
+    .csim-panel-list {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+      background: #fafafa;
+    }
+    .csim-panel-empty {
+      color: var(--grey);
+      text-align: center;
+      padding: 3rem 1rem;
+      font-size: 0.85rem;
+    }
+
+    .csim-pedido-card {
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.8rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-left: 4px solid var(--terra);
+      animation: csimSlideInRight 0.4s ease-out;
+    }
+    .csim-pedido-card.contacted {
+      border-left-color: #4CAF50;
+      opacity: 0.75;
+    }
+    .csim-pedido-card .row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 0.5rem; margin-bottom: 0.4rem;
+    }
+    .csim-pedido-card .producto { font-weight: 700; font-size: 0.95rem; color: #111; }
+    .csim-pedido-card .monto { color: var(--terra); font-weight: 700; font-size: 1rem; white-space: nowrap; }
+    .csim-pedido-card .meta { font-size: 0.78rem; color: var(--grey); line-height: 1.5; }
+    .csim-pedido-card .meta strong { color: #333; }
+    .csim-pedido-card .btn-contactado {
+      width: 100%;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6rem;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-top: 0.7rem;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+    }
+    .csim-pedido-card .btn-contactado:hover { background: #43a047; }
+    .csim-pedido-card .badge-done {
+      display: inline-block;
+      background: #4CAF50;
+      color: white;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-top: 0.7rem;
+    }
+
+    .csim-reset-bar {
+      text-align: center;
+      padding: 0.8rem;
+      background: #f5f5f5;
+      border-top: 1px solid #e8e8e8;
+    }
+    .csim-reset-btn {
+      background: none;
+      border: 1.5px solid var(--terra);
+      color: var(--terra);
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+    }
+    .csim-reset-btn:hover { background: var(--terra); color: white; }
+
+    /* Catálogo secundario */
+    .csim-catalog-intro {
+      background: white;
+      padding: 1.8rem 1.2rem 0.8rem;
+      text-align: center;
+      border-top: 1px solid #eee;
+      margin-top: 1rem;
+    }
+    .csim-catalog-intro h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      color: var(--brown);
+      margin-bottom: 0.4rem;
+    }
+    .csim-catalog-intro p {
+      font-size: 0.85rem;
+      color: var(--grey);
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -767,6 +1274,75 @@
 <div class="demo-banner">
   Esta es una demo de cómo se ve el menú digital con Vitrina.
   <a href="index.html">Quiero esto para mi restaurante →</a>
+</div>
+
+<!-- ============================================================
+     MODO COMERCIO — Simulación flujo WA + Panel del local
+     ============================================================
+     Visible solo cuando body.comercio-mode (lo activa el JS).
+-->
+<div id="comercioSimulation">
+  <div class="csim-banner">
+    <strong>Así funciona en un comercio</strong>
+    El cliente pregunta por WhatsApp, el asistente responde con producto y link de pago. Cuando paga, te enterás al instante y coordinás la entrega como prefieras.
+  </div>
+
+  <div class="csim-business-header">
+    <span class="cover">🔩</span>
+    <h1>Ferretería El Tornillo</h1>
+    <p>Villa Urquiza, CABA · Triunvirato 2340</p>
+  </div>
+
+  <div class="csim-stage">
+    <!-- Columna izquierda — Teléfono con WhatsApp -->
+    <div>
+      <div class="csim-col-title">Lo que ve el cliente en WhatsApp</div>
+      <div class="csim-phone">
+        <div class="csim-phone-screen">
+          <div class="csim-wa-header">
+            <div class="avatar">F</div>
+            <div>
+              <div class="name">Ferretería El Tornillo</div>
+              <div class="status">en línea</div>
+            </div>
+          </div>
+          <div class="csim-wa-body">
+            <div class="csim-msgs" id="csimMsgs"></div>
+          </div>
+          <!-- Overlay simulación MP -->
+          <div class="csim-mp-overlay" id="csimMpOverlay">
+            <div class="csim-mp-logo">mercado pago</div>
+            <div class="csim-mp-amount" id="csimMpAmount">$45.000</div>
+            <div class="csim-mp-product" id="csimMpProduct">Taladro percutor Black &amp; Decker 600W</div>
+            <div id="csimMpStage"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna derecha — Panel del local -->
+    <div>
+      <div class="csim-col-title">Lo que ves vos en el panel</div>
+      <div class="csim-panel">
+        <div class="csim-panel-topbar">
+          <span class="label">📦 Ventas por WhatsApp</span>
+          <span class="pill" id="csimPanelPill">0 pendientes</span>
+        </div>
+        <div class="csim-panel-alert" id="csimPanelAlert"></div>
+        <div class="csim-panel-list" id="csimPanelList">
+          <div class="csim-panel-empty">No hay ventas pendientes. Cuando un cliente pague, aparece acá.</div>
+        </div>
+        <div class="csim-reset-bar">
+          <button class="csim-reset-btn" id="csimResetBtn" type="button">↻ Reiniciar simulación</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="csim-catalog-intro">
+    <h2>También podés mostrar el catálogo completo en tu QR</h2>
+    <p>Subí tus productos una sola vez y compartilos por QR, link o cualquier red social. El asistente del local conoce todo el catálogo y responde 24/7 por WhatsApp.</p>
+  </div>
 </div>
 
 <!-- Header -->
@@ -797,6 +1373,15 @@
     <button class="cat-btn" onclick="goToSection('postres', this)">Postres</button>
     <button class="cat-btn" onclick="goToSection('bebidas', this)">Bebidas</button>
   </div>
+</div>
+
+<!-- Banner total acumulado de la visita (solo restaurant, oculto hasta primer pedido enviado) -->
+<div class="cart-total-bar" id="cartTotalBar">
+  <div class="total-info">
+    <span class="total-label">Total acumulado de tu visita</span>
+    <span class="total-amount" id="cartTotalBarAmount">$0</span>
+  </div>
+  <button class="pedir-cuenta-btn" onclick="openCuentaModal()">Pedir la cuenta 💳</button>
 </div>
 
 <!-- Pedido confirmado -->
@@ -1193,6 +1778,21 @@
   </div>
 </div>
 
+<!-- Modal Pedir la cuenta -->
+<div class="cuenta-modal" id="cuentaModal" onclick="if(event.target===this)closeCuentaModal()">
+  <div class="cuenta-modal-box">
+    <div class="cuenta-modal-title">Cuenta de la mesa</div>
+    <div class="cuenta-modal-sub">Desglose de lo consumido en esta visita.</div>
+    <div id="cuentaModalItems"></div>
+    <div class="cuenta-total-row">
+      <span>Total a pagar</span>
+      <span class="total" id="cuentaModalTotal">$0</span>
+    </div>
+    <button class="cuenta-pay-btn" onclick="payCuenta()">Pagar con MercadoPago</button>
+    <button class="cuenta-close-btn" onclick="closeCuentaModal()">Cerrar</button>
+  </div>
+</div>
+
 <!-- Tano FAB -->
 <button class="tano-fab" id="tanoFab" onclick="openTano()">
   <span class="tano-fab-dot"></span>
@@ -1259,6 +1859,90 @@ let MENU = {
 // ============================================================
 let cart = {};
 
+// Items que ya fueron enviados a cocina en esta visita.
+// Estructura: { itemId: { qty, sentAt, status: 'recibido'|'preparando'|'listo' } }
+let pedidosSesion = {};
+// Solo se aplica al modo restaurante. El modo comercio lo desactiva.
+let trackSession = true;
+
+function isComercioMode() {
+  return new URLSearchParams(location.search).get('tipo') === 'comercio';
+}
+
+function getSessionTotal() {
+  return Object.entries(pedidosSesion).reduce(function(acc, kv) {
+    var id = kv[0], info = kv[1];
+    if (!MENU[id]) return acc;
+    return acc + MENU[id].price * info.qty;
+  }, 0);
+}
+
+function getSessionCount() {
+  return Object.values(pedidosSesion).reduce(function(a, b) { return a + b.qty; }, 0);
+}
+
+function minutesAgo(ts) {
+  return Math.max(1, Math.floor((Date.now() - ts) / 60000));
+}
+
+function statusLabel(info) {
+  var min = minutesAgo(info.sentAt);
+  if (info.status === 'listo')      return 'Listo · hace ' + min + ' min';
+  if (info.status === 'preparando') return 'En preparación · hace ' + min + ' min';
+  return 'Ya pedido · hace ' + min + ' min';
+}
+
+function statusClass(info) {
+  if (info.status === 'listo')      return 'ready';
+  if (info.status === 'preparando') return 'preparing';
+  return '';
+}
+
+function updateCartTotalBar() {
+  var bar = document.getElementById('cartTotalBar');
+  if (!bar) return;
+  // Solo restaurante
+  if (isComercioMode() || !trackSession) {
+    bar.classList.remove('visible');
+    return;
+  }
+  if (getSessionCount() > 0) {
+    document.getElementById('cartTotalBarAmount').textContent = fmt(getSessionTotal());
+    bar.classList.add('visible');
+  } else {
+    bar.classList.remove('visible');
+  }
+}
+
+function refreshOrderedBadges() {
+  // Re-render solo de los controles de items con estado, para refrescar "hace X min"
+  Object.keys(pedidosSesion).forEach(function(id) { renderCtrl(id); });
+}
+setInterval(refreshOrderedBadges, 60000);
+
+function openCuentaModal() {
+  var box = document.getElementById('cuentaModalItems');
+  if (!box) return;
+  box.innerHTML = Object.entries(pedidosSesion).map(function(kv) {
+    var id = kv[0], info = kv[1];
+    var item = MENU[id];
+    if (!item) return '';
+    return '<div class="cuenta-row"><span><span class="qty">' + info.qty + '×</span>' + item.name +
+           '</span><span class="price">' + fmt(item.price * info.qty) + '</span></div>';
+  }).join('');
+  document.getElementById('cuentaModalTotal').textContent = fmt(getSessionTotal());
+  document.getElementById('cuentaModal').classList.add('open');
+}
+
+function closeCuentaModal() {
+  document.getElementById('cuentaModal').classList.remove('open');
+}
+
+function payCuenta() {
+  // En la demo, solo simulamos redirect.
+  window.location.href = 'pago-ok.html?demo=1';
+}
+
 function fmt(n) {
   return '$' + n.toLocaleString('es-AR');
 }
@@ -1276,8 +1960,12 @@ function renderCtrl(id) {
   if (!el) return;
   const qty = cart[id] || 0;
   const itemName = (MENU[id] && MENU[id].name) ? MENU[id].name : id;
+  const sent = pedidosSesion[id];
+  const isAlreadyOrdered = trackSession && !isComercioMode() && sent;
+  const addLabel = isAlreadyOrdered ? 'Pedir otro' : 'Agregar';
+  const addClass = isAlreadyOrdered ? 'add-btn again' : 'add-btn';
   if (qty === 0) {
-    el.innerHTML = `<button class="add-btn" onclick="addItem('${id}')" aria-label="Agregar ${itemName} al pedido">Agregar</button>`;
+    el.innerHTML = `<button class="${addClass}" onclick="addItem('${id}')" aria-label="${addLabel} ${itemName}">${addLabel}</button>`;
   } else {
     el.innerHTML = `
       <div class="qty-controls">
@@ -1285,6 +1973,24 @@ function renderCtrl(id) {
         <span class="qty-num">${qty}</span>
         <button class="qty-btn" onclick="addItem('${id}')" aria-label="Agregar otro ${itemName}">+</button>
       </div>`;
+  }
+  // Badge "Ya pedido" dentro del contenedor de nombre/desc/badges del item
+  var menuItem = el.closest ? el.closest('.menu-item') : null;
+  var existingBadge = menuItem && menuItem.querySelector('[data-ordered-badge="' + id + '"]');
+  if (isAlreadyOrdered) {
+    if (existingBadge) {
+      existingBadge.className = 'item-ordered-badge ' + statusClass(sent);
+      existingBadge.textContent = sent.qty + '× ' + statusLabel(sent);
+    } else if (menuItem) {
+      var infoBox = menuItem.querySelector('.item-info > div');
+      var badge = document.createElement('div');
+      badge.className = 'item-ordered-badge ' + statusClass(sent);
+      badge.textContent = sent.qty + '× ' + statusLabel(sent);
+      badge.setAttribute('data-ordered-badge', id);
+      if (infoBox) infoBox.appendChild(badge);
+    }
+  } else if (existingBadge) {
+    existingBadge.remove();
   }
 }
 
@@ -1318,6 +2024,12 @@ function updateCartFab() {
   document.getElementById('cartFabTotal').textContent = fmt(total);
   if (count > 0) fab.classList.add('visible');
   else fab.classList.remove('visible');
+  // MJ-2: cuando el banner del carrito está visible, mover Tano FAB arriba
+  var tanoFab = document.getElementById('tanoFab');
+  if (tanoFab) {
+    if (count > 0) tanoFab.classList.add('with-cart-banner');
+    else tanoFab.classList.remove('with-cart-banner');
+  }
 }
 
 function openWithFocusTrap(elementId) {
@@ -1399,12 +2111,40 @@ function closeModal() {
 
 function sendOrder() {
   closeModal();
-  // Reset cart
+  // MJ-3: guardar items enviados en pedidosSesion antes de vaciar el carrito
   const ids = Object.keys(cart);
+  if (trackSession && !isComercioMode()) {
+    ids.forEach(function(id) {
+      var prev = pedidosSesion[id];
+      pedidosSesion[id] = {
+        qty: (prev ? prev.qty : 0) + cart[id],
+        sentAt: Date.now(),
+        status: 'recibido'
+      };
+      // Simulación del flujo cocina: recibido → preparando (5s) → listo (30s)
+      (function(itemId) {
+        setTimeout(function() {
+          if (pedidosSesion[itemId]) {
+            pedidosSesion[itemId].status = 'preparando';
+            renderCtrl(itemId);
+          }
+        }, 5000);
+        setTimeout(function() {
+          if (pedidosSesion[itemId]) {
+            pedidosSesion[itemId].status = 'listo';
+            renderCtrl(itemId);
+          }
+        }, 30000);
+      })(id);
+    });
+  }
+  // Reset cart
   cart = {};
   ids.forEach(id => renderCtrl(id));
   updateCartFab();
   syncTanoFab();
+  // MJ-4: refrescar banner de total acumulado
+  updateCartTotalBar();
   // Mostrar confirmación
   const conf = document.getElementById('orderConfirmed');
   conf.classList.add('show');
@@ -1478,14 +2218,14 @@ let tanoOpen = false;
 let tanoHistory = [];
 const WORKER = 'https://vitrina-tano.vitrinaapp.workers.dev';
 
-let TANO_CONTEXT = 'Sos Tano, el asistente de Casa Lucía. Conocés el menú de memoria como el mejor mozo del barrio — hacés recomendaciones genuinas, contás qué tiene cada plato.\n\nTONO Y ESTILO:\n- Cálido, informal, porteño. Tratás de vos. Podés arrancar con "Mirá," o "Che," cuando es natural.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente elección!" — suena a bot.\n- Sin bullet points. Hablás en párrafos cortos y naturales.\n- Máximo 3 oraciones por respuesta. La gente está en el restaurante, no lee paredes de texto.\n- Si recomendás algo, das UNA sola recomendación con una razón concreta y específica.\n- Podés ofrecer agregar al pedido: "¿Lo sumo?" — usalo cuando tenga sentido.\n- Si te preguntan algo fuera del menú: "Eso mejor preguntale al equipo — yo me manejo con el menú."\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas. Tienen gluten y huevo.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano. Tiene lacteos.)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar rebozados con alioli casero y limon. (Tienen gluten.)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. El favorito de la casa. Tiene gluten y lacteos.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada. Tiene gluten y lacteos.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. El clasico. Tiene gluten, lacteos y huevo.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. Sin TACC.\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico. Tiene lacteos.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. Tiene gluten y pescado.\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. Tarda 8 minutos. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC. Tiene lacteos y huevo.)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC. Sin alérgenos comunes.)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml. Tiene gluten.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera pedir algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta. Ejemplo: "[AGREGAR:principales-1:2] Anotadas 2 milanesas — las mando a cocina cuando confirmes."\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "anotatelo" — SIEMPRE usá [AGREGAR:ID:QTY].\n3. Si no estás seguro del ID, usá el más parecido.\n4. Respondé sin markdown. Texto simple y natural.';
+let TANO_CONTEXT = 'Sos parte del equipo de Casa Lucía. Conocés el menú de memoria como el mejor mozo del barrio — hacés recomendaciones genuinas, contás qué tiene cada plato.\n\nIDENTIDAD:\n- NUNCA digas "soy Tano", "soy un asistente", "soy una IA", "soy un bot".\n- NUNCA digas que sos de Vitrina ni menciones la palabra Vitrina.\n- Hablás en primera persona del plural cuando aplica ("te lo preparamos", "te lo mandamos") o en singular natural, como cualquier mozo del salón.\n\nTONO Y ESTILO:\n- Cálido, informal, porteño. Tratás de vos. Podés arrancar con "Mirá," o "Che," cuando es natural.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente elección!" — suena a bot.\n- Sin bullet points. Hablás en párrafos cortos y naturales.\n- Máximo 3 oraciones por respuesta. La gente está en el restaurante, no lee paredes de texto.\n- Si recomendás algo, das UNA sola recomendación con una razón concreta y específica.\n- Podés ofrecer agregar al pedido: "¿Lo sumo?" — usalo cuando tenga sentido.\n- Si te preguntan algo fuera del menú: "Eso mejor preguntale al equipo del salón."\n\nMENU COMPLETO:\nPARA PICAR:\n- Tabla de fiambres y quesos $14.500 (ID: picar-1): jamon crudo, salame, queso brie y manchego, pan artesanal y mermelada de higos.\n- Empanadas de carne x3 $2.800 (ID: picar-2): masa casera horneada, relleno criollo con cebolla, huevo duro y aceitunas. Tienen gluten y huevo.\n- Provoleta a la parrilla $8.500 (ID: picar-3): queso provolone fundido con oregano, aji molido y oliva. Pan tostado. (Vegetariano. Tiene lacteos.)\n- Rabas fritas $9.200 (ID: picar-4): anillos de calamar rebozados con alioli casero y limon. (Tienen gluten.)\n\nPASTAS:\n- Penne Rigate con Ragu de Carne $16.800 (ID: pastas-1): ragu de res cocido 4 horas, parmesano y albahaca. El favorito de la casa. Tiene gluten y lacteos.\n- Noquis al pesto de albahaca $15.200 (ID: pastas-2): noquis de papa artesanales, pesto genovés, pistachos, parmesano. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n- Fettuccine crema y jamon $15.900 (ID: pastas-3): salsa crema, jamon serrano, hongos, nuez moscada. Tiene gluten y lacteos.\n- Tallarines al pesto rojo $14.800 (ID: pastas-4): pesto de tomates secos, almendras, ricota, limon y rucula. (Vegetariano. Tiene gluten, lacteos, frutos secos.)\n\nPRINCIPALES:\n- Milanesa napolitana con papas fritas $22.500 (ID: principales-1): ternera, salsa de tomate, jamon y queso gratinado. El clasico. Tiene gluten, lacteos y huevo.\n- Bife de chorizo a la parrilla $28.000 (ID: principales-2): 400g, coccion a pedido, ensalada mixta y chimichurri. Sin TACC.\n- Suprema de pollo rellena $18.500 (ID: principales-3): rellena con espinaca y queso crema, manteca clarificada, pure rustico. Tiene lacteos.\n- Merluza romana $19.800 (ID: principales-4): filete en tempura liviana, rucula, tomates cherry, alino de limon. Tiene gluten y pescado.\n\nPOSTRES:\n- Tiramisu de la casa $7.500 (ID: postres-1): mascarpone, cafe espresso y cacao amargo. Imperdible. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Volcan de chocolate $8.200 (ID: postres-2): corazon fundente, helado de crema artesanal. Tarda 8 minutos. (Vegetariano. Tiene gluten, lacteos y huevo.)\n- Flan casero con dulce de leche $5.800 (ID: postres-3): flan de vainilla, dulce de leche repostero, crema. (Vegetariano, Sin TACC. Tiene lacteos y huevo.)\n- Ensalada de frutas de estacion $5.200 (ID: postres-4): frutas frescas, miel, menta y jengibre. (Vegano, Sin TACC. Sin alérgenos comunes.)\n\nBEBIDAS:\n- Agua mineral $1.800 (ID: bebidas-1): con o sin gas, 500ml\n- Gaseosa $2.200 (ID: bebidas-2): Coca-Cola, Sprite o Fanta\n- Vino por copa $5.500 (ID: bebidas-3): Malbec, Torrontes o Cabernet\n- Cerveza artesanal $4.800 (ID: bebidas-4): rubia, roja o negra, 500ml. Tiene gluten.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera pedir algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta. Ejemplo: "[AGREGAR:principales-1:2] Anotadas 2 milanesas — las mando a cocina cuando confirmes."\n2. Si el cliente dice "quiero X", "poneme X", "agregame X", "anotatelo" — SIEMPRE usá [AGREGAR:ID:QTY].\n3. Si no estás seguro del ID, usá el más parecido.\n4. Respondé sin markdown. Texto simple y natural.';
 
 function openTano() {
   tanoOpen = true;
   document.getElementById('tanoPanel').classList.add('open');
   document.getElementById('tanoOverlay').classList.add('open');
   if (tanoHistory.length === 0) {
-    addTanoMsg('tano', '¡Hola! Soy Tano 👋 Podés preguntarme lo que quieras del menú — ingredientes, alergias, qué recomiendo... ¡lo que necesites!');
+    addTanoMsg('tano', '¡Hola! 👋 Preguntame lo que quieras del menú: ingredientes, alergias, qué recomendamos... lo que necesites.');
   }
 }
 
@@ -1660,6 +2400,9 @@ function generateSectionImages(sectionId) {
 ;(function() {
   if (new URLSearchParams(location.search).get('tipo') !== 'comercio') return;
 
+  // En modo comercio no hay "mesa": desactivamos el tracking de sesión y el banner de cuenta.
+  trackSession = false;
+
   // ── Catálogo Ferretería El Tornillo ──────────────────────────────────────
   MENU = {
     'pinturas-1':     { name: 'Pintura látex interior blanca 4L',    price: 12500, emoji: '🎨', tags: 'oferta',
@@ -1688,7 +2431,7 @@ function generateSectionImages(sectionId) {
       desc: 'Perfil de aluminio. 3 burbujas: horizontal, vertical y 45°.',
       prompt: 'aluminum spirit level 60cm measuring tool hardware store' },
 
-    'canerias-1':     { name: 'Caño PVC clase 6 — 110mm × 3m',       price: 4100,  emoji: '🔩', tags: '',
+    'canerias-1':     { name: 'Caño PVC clase 6 · 110mm × 3m',       price: 4100,  emoji: '🔩', tags: '',
       desc: 'Bajada de agua cloacal. Extremo enchufe y liso. Norma IRAM.',
       prompt: 'pvc pipe 110mm plumbing hardware store product photography' },
     'canerias-2':     { name: 'Codo PVC 110mm 90°',                   price: 580,   emoji: '⚙️', tags: '',
@@ -1715,17 +2458,22 @@ function generateSectionImages(sectionId) {
       prompt: 'triple electrical outlet with grounding hardware store product' },
   };
 
-  // ── Contexto del asistente Viti para ferretería ──────────────────────────
-  TANO_CONTEXT = 'Sos Viti, la asistente de Ferretería El Tornillo. Conocés el catálogo de memoria y ayudás a los clientes a encontrar lo que necesitan.\n\nTONO Y ESTILO:\n- Directo, amable, útil. Tratás de vos.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente!"\n- Sin bullet points. Respuestas cortas y concretas.\n- Máximo 3 oraciones. Si recomendás algo, una sola opción con razón concreta.\n- Si te preguntan algo fuera del catálogo: "Eso te lo responde el equipo en el mostrador."\n\nCATÁLOGO COMPLETO:\nPINTURAS:\n- Pintura látex interior blanca 4L $12.500 (ID: pinturas-1): Rendimiento 10m²/L, secado 2hs. EN OFERTA.\n- Látex exterior premium 10L $28.900 (ID: pinturas-2): Alta resistencia intemperie, colores a pedir. DESTACADO.\n- Esmalte sintético negro satinado 1L $8.200 (ID: pinturas-3): Para madera y metal, resistente humedad.\n- Sellador al agua 4L $9.800 (ID: pinturas-4): Sella superficies porosas. EN OFERTA.\n\nHERRAMIENTAS:\n- Taladro percutor 600W + maletín $38.500 (ID: herramientas-1): Velocidad variable, reversible. DESTACADO.\n- Set destornilladores 6 piezas $4.900 (ID: herramientas-2): Cromo-vanadio, 3 planos + 3 Phillips.\n- Sierra circular 7¼" 1200W $52.000 (ID: herramientas-3): Hoja 184mm, profundidad corte 65mm.\n- Nivel de burbuja aluminio 60cm $3.200 (ID: herramientas-4): 3 burbujas. STOCK BAJO.\n\nCAÑERÍAS:\n- Caño PVC 110mm × 3m $4.100 (ID: canerias-1): Clase 6, bajada cloacal, norma IRAM.\n- Codo PVC 110mm 90° $580 (ID: canerias-2): Compatible clase 6.\n- Llave esférica bronce ½" $1.950 (ID: canerias-3): Para frío y caliente hasta 110°C. EN OFERTA.\n- Flexible de conexión ½" × 50cm $890 (ID: canerias-4): Trenzado inoxidable. STOCK BAJO.\n\nELECTRICIDAD:\n- Cable unipolar 2,5mm² × 100m $18.500 (ID: electricidad-1): Marca Prysmian o similar. DESTACADO.\n- Disyuntor termomagnético 20A $3.400 (ID: electricidad-2): Bipolar, norma IRAM.\n- Tablero eléctrico 12 módulos $8.900 (ID: electricidad-3): Con puerta transparente, rieles DIN.\n- Toma corriente triple 10A c/tierra $1.200 (ID: electricidad-4): Apto exterior. STOCK BAJO.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera consultar o reservar algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta.\n2. Si dice "quiero X", "anotame X", "necesito X" — usá [AGREGAR:ID:QTY].\n3. Respondé sin markdown. Texto simple y natural.';
+  // ── Contexto del asistente para ferretería ──────────────────────────────
+  // Internamente el asistente se llama Lucas (etiqueta del header).
+  // Hacia el cliente final NUNCA se identifica como Lucas ni como asistente/IA: habla como staff del local.
+  TANO_CONTEXT = 'Sos parte del equipo de Ferretería El Tornillo. Conocés el catálogo de memoria y ayudás a los clientes a encontrar lo que necesitan.\n\nIDENTIDAD:\n- NUNCA digas "soy Lucas", "soy un asistente", "soy una IA", "soy un bot".\n- NUNCA digas que sos de Vitrina ni menciones la palabra Vitrina.\n- Hablás en primera persona del plural cuando aplica ("tenemos", "te lo guardamos") o en singular natural, como cualquier vendedor del mostrador.\n\nTONO Y ESTILO:\n- Directo, amable, útil. Tratás de vos.\n- NUNCA empezás con "¡Claro!", "¡Por supuesto!", "¡Excelente!"\n- Sin bullet points. Respuestas cortas y concretas.\n- Máximo 3 oraciones. Si recomendás algo, una sola opción con razón concreta.\n- Si te preguntan algo fuera del catálogo: "Eso te lo responde el equipo en el mostrador."\n\nCATÁLOGO COMPLETO:\nPINTURAS:\n- Pintura látex interior blanca 4L $12.500 (ID: pinturas-1): Rendimiento 10m²/L, secado 2hs. EN OFERTA.\n- Látex exterior premium 10L $28.900 (ID: pinturas-2): Alta resistencia intemperie, colores a pedir. DESTACADO.\n- Esmalte sintético negro satinado 1L $8.200 (ID: pinturas-3): Para madera y metal, resistente humedad.\n- Sellador al agua 4L $9.800 (ID: pinturas-4): Sella superficies porosas. EN OFERTA.\n\nHERRAMIENTAS:\n- Taladro percutor 600W + maletín $38.500 (ID: herramientas-1): Velocidad variable, reversible. DESTACADO.\n- Set destornilladores 6 piezas $4.900 (ID: herramientas-2): Cromo-vanadio, 3 planos + 3 Phillips.\n- Sierra circular 7¼" 1200W $52.000 (ID: herramientas-3): Hoja 184mm, profundidad corte 65mm.\n- Nivel de burbuja aluminio 60cm $3.200 (ID: herramientas-4): 3 burbujas. STOCK BAJO.\n\nCAÑERÍAS:\n- Caño PVC 110mm × 3m $4.100 (ID: canerias-1): Clase 6, bajada cloacal, norma IRAM.\n- Codo PVC 110mm 90° $580 (ID: canerias-2): Compatible clase 6.\n- Llave esférica bronce ½" $1.950 (ID: canerias-3): Para frío y caliente hasta 110°C. EN OFERTA.\n- Flexible de conexión ½" × 50cm $890 (ID: canerias-4): Trenzado inoxidable. STOCK BAJO.\n\nELECTRICIDAD:\n- Cable unipolar 2,5mm² × 100m $18.500 (ID: electricidad-1): Marca Prysmian o similar. DESTACADO.\n- Disyuntor termomagnético 20A $3.400 (ID: electricidad-2): Bipolar, norma IRAM.\n- Tablero eléctrico 12 módulos $8.900 (ID: electricidad-3): Con puerta transparente, rieles DIN.\n- Toma corriente triple 10A c/tierra $1.200 (ID: electricidad-4): Apto exterior. STOCK BAJO.\n\nREGLAS DE CARRITO:\n1. Cuando el cliente quiera consultar o reservar algo, respondé con [AGREGAR:ID:CANTIDAD] antes de tu respuesta.\n2. Si dice "quiero X", "anotame X", "necesito X" — usá [AGREGAR:ID:QTY].\n3. Respondé sin markdown. Texto simple y natural.';
 
   // ── Parchar el DOM cuando esté listo ─────────────────────────────────────
   document.addEventListener('DOMContentLoaded', function() {
-    // Título
-    document.title = 'Demo Catálogo — Ferretería El Tornillo';
+    // Activar modo comercio: muestra simulación WA + panel local, oculta header/cart/etc.
+    document.body.classList.add('comercio-mode');
 
-    // Banner
+    // Título
+    document.title = 'Demo Catálogo · Ferretería El Tornillo';
+
+    // Banner top — más corto, ya que el banner verde explicativo está adentro
     var banner = document.querySelector('.demo-banner');
-    if (banner) banner.innerHTML = 'Esta es una demo del catálogo digital para comercios con Vitrina. <a href="index.html#comercios">Quiero esto para mi comercio →</a>';
+    if (banner) banner.innerHTML = 'Demo Vitrina para comercios. <a href="index.html#comercios">Quiero esto para mi comercio →</a>';
 
     // Header
     var cover = document.querySelector('.cover-emoji');
@@ -1744,6 +2492,19 @@ function generateSectionImages(sectionId) {
     if (conf) {
       var ch3 = conf.querySelector('h3'); if (ch3) ch3.textContent = '¡Consulta enviada!';
       var cp  = conf.querySelector('p');  if (cp)  cp.textContent  = 'Te contactamos en breve para confirmar disponibilidad y coordinar la entrega o retiro.';
+    }
+
+    // Botón del carrito y modal de confirmación → quitar terminología "cocina"
+    var cartOrderBtn = document.querySelector('.cart-order-btn');
+    if (cartOrderBtn) cartOrderBtn.textContent = 'Enviar pedido →';
+    var orderModal = document.getElementById('orderModal');
+    if (orderModal) {
+      var mEmoji   = orderModal.querySelector('.modal-emoji');
+      var mTitle   = orderModal.querySelector('.modal-title');
+      var mPrimary = orderModal.querySelector('.modal-btn-primary');
+      if (mEmoji)   mEmoji.textContent   = '📦';
+      if (mTitle)   mTitle.textContent   = '¿Confirmamos el pedido?';
+      if (mPrimary) mPrimary.textContent = 'Confirmar pedido';
     }
 
     // Filtros → Oferta / Destacado / Stock bajo
@@ -1801,15 +2562,19 @@ function generateSectionImages(sectionId) {
       }).join('');
     }
 
-    // Panel asistente → Viti
+    // Panel asistente → Lucas (Ferretería El Tornillo)
     var tanoName   = document.querySelector('.tano-header-name');
     var tanoStatus = document.querySelector('.tano-header-status');
     var tanoAvatar = document.querySelector('.tano-avatar');
     var tanoInput  = document.getElementById('tanoInput');
-    if (tanoName)   tanoName.textContent   = 'Viti';
-    if (tanoStatus) tanoStatus.textContent = 'Tu asistente de ferretería · En línea';
-    if (tanoAvatar) tanoAvatar.textContent = '🔧';
-    if (tanoInput)  tanoInput.placeholder  = 'Preguntale a Viti...';
+    var tanoLabel  = document.querySelector('label[for="tanoInput"]');
+    var tanoCloseBtn = document.querySelector('.tano-close-btn');
+    if (tanoName)   tanoName.textContent   = 'Lucas';
+    if (tanoStatus) tanoStatus.textContent = 'Te ayuda con el catálogo · En línea';
+    if (tanoAvatar) { tanoAvatar.textContent = 'L'; tanoAvatar.style.fontWeight = '700'; }
+    if (tanoInput)  tanoInput.placeholder  = 'Escribí tu consulta...';
+    if (tanoLabel)  tanoLabel.textContent  = 'Escribí tu consulta';
+    if (tanoCloseBtn) tanoCloseBtn.setAttribute('aria-label', 'Cerrar chat');
 
     // Quick buttons ferretería
     var qBtns = document.getElementById('tanoQuickBtns');
@@ -1820,20 +2585,20 @@ function generateSectionImages(sectionId) {
       '<button class="quick-btn" onclick="sendQuick(\'¿Tienen caños de PVC 110mm?\')">Caños PVC 110mm</button>' +
       '<button class="quick-btn" onclick="sendQuick(\'¿Cuánto rinde la pintura?\')">Rendimiento de pintura</button>';
 
-    // Bienvenida de Viti (sobreescribir openTano)
+    // Bienvenida del asistente — sin auto-identificación, habla como staff del local
     var _origOpenTano = openTano;
     openTano = function() {
       tanoOpen = true;
       document.getElementById('tanoPanel').classList.add('open');
       document.getElementById('tanoOverlay').classList.add('open');
       if (tanoHistory.length === 0) {
-        addTanoMsg('tano', '¡Hola! Soy Viti 👋 Puedo ayudarte con precios, stock y recomendaciones del catálogo. ¿Por dónde empezamos?');
+        addTanoMsg('tano', '¡Hola! 👋 ¿Qué estás buscando? Te puedo ayudar con precios, stock y recomendaciones del catálogo.');
       }
     };
 
-    // Fab de Tano → Viti
+    // FAB → Lucas
     var tanoFab = document.getElementById('tanoFab');
-    if (tanoFab) tanoFab.innerHTML = tanoFab.innerHTML.replace(/Tano/g, 'Viti');
+    if (tanoFab) tanoFab.innerHTML = tanoFab.innerHTML.replace(/Tano/g, 'Lucas');
 
     // Inicializar controles con el nuevo MENU y generar imágenes
     Object.keys(MENU).forEach(function(id) { renderCtrl(id); });
@@ -1849,7 +2614,217 @@ function generateSectionImages(sectionId) {
     } else {
       remCats.forEach(function(s) { generateSectionImages(s); });
     }
+
+    // Arrancar la simulación del flujo WhatsApp del comercio
+    startComercioSimulation();
+    var resetBtn = document.getElementById('csimResetBtn');
+    if (resetBtn) resetBtn.addEventListener('click', resetComercioSimulation);
   });
+
+  // ============================================================
+  // SIMULACIÓN — flujo de venta por WhatsApp + panel del local
+  // ============================================================
+  var csimTimers = [];
+  var csimPedidos = [];
+
+  function csimSchedule(fn, ms) {
+    var t = setTimeout(fn, ms);
+    csimTimers.push(t);
+  }
+  function csimClearTimers() {
+    csimTimers.forEach(function(t) { clearTimeout(t); });
+    csimTimers = [];
+  }
+
+  function csimAddMsg(side, html) {
+    var box = document.getElementById('csimMsgs');
+    if (!box) return null;
+    var el = document.createElement('div');
+    el.className = 'csim-msg ' + side;
+    el.innerHTML = html + '<span class="time">' + csimTimeNow() + '</span>';
+    box.appendChild(el);
+    box.parentElement.scrollTop = box.parentElement.scrollHeight;
+    return el;
+  }
+  function csimTimeNow() {
+    var d = new Date();
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+  function csimAddTyping() {
+    var box = document.getElementById('csimMsgs');
+    if (!box) return null;
+    var el = document.createElement('div');
+    el.className = 'csim-typing';
+    el.id = 'csimTyping';
+    el.innerHTML = '<span></span><span></span><span></span>';
+    box.appendChild(el);
+    box.parentElement.scrollTop = box.parentElement.scrollHeight;
+    return el;
+  }
+  function csimRemoveTyping() {
+    var el = document.getElementById('csimTyping');
+    if (el) el.remove();
+  }
+
+  function csimAddProductCard(product, onPay) {
+    var box = document.getElementById('csimMsgs');
+    if (!box) return;
+    var card = document.createElement('div');
+    card.className = 'csim-product-card';
+    card.innerHTML =
+      '<div class="csim-product-img">' + product.emoji + '</div>' +
+      '<div class="csim-product-name">' + product.name + '</div>' +
+      '<div class="csim-product-desc">' + product.desc + '</div>' +
+      '<div class="csim-product-price">$' + product.price.toLocaleString('es-AR') + '</div>' +
+      '<button class="csim-pay-btn" type="button">💳 Pagar con MercadoPago</button>';
+    card.querySelector('button').addEventListener('click', function() {
+      this.disabled = true;
+      this.textContent = 'Abriendo MercadoPago...';
+      csimSchedule(function() { onPay(); }, 600);
+    });
+    box.appendChild(card);
+    box.parentElement.scrollTop = box.parentElement.scrollHeight;
+  }
+
+  function csimShowMpOverlay(product) {
+    var ov = document.getElementById('csimMpOverlay');
+    document.getElementById('csimMpAmount').textContent = '$' + product.price.toLocaleString('es-AR');
+    document.getElementById('csimMpProduct').textContent = product.name;
+    var stage = document.getElementById('csimMpStage');
+    stage.innerHTML = '<button class="csim-mp-confirm" type="button" id="csimMpPayBtn">Pagar $' + product.price.toLocaleString('es-AR') + '</button>';
+    ov.classList.add('open');
+    document.getElementById('csimMpPayBtn').addEventListener('click', function() {
+      stage.innerHTML = '<div class="csim-mp-spinner"></div><div class="csim-mp-text">Procesando pago...</div>';
+      csimSchedule(function() {
+        stage.innerHTML = '<div class="csim-mp-check">✓</div><div class="csim-mp-text">¡Pago aprobado!</div>';
+        csimSchedule(function() {
+          ov.classList.remove('open');
+          csimOnPaymentConfirmed(product);
+        }, 1400);
+      }, 1600);
+    });
+  }
+
+  function csimOnPaymentConfirmed(product) {
+    // Mensaje al cliente (en WA) y notificación al local (en panel)
+    csimAddMsg('in',
+      '✅ <strong>Tu pago se confirmó</strong><br>' +
+      'Alguien del equipo te va a contactar en breve para coordinar retiro o envío.<br>' +
+      'Si en 2 horas no tenés novedades, escribime y reviso.'
+    );
+    csimAddPedidoAlLocal(product);
+  }
+
+  function csimAddPedidoAlLocal(product) {
+    var alert = document.getElementById('csimPanelAlert');
+    var list  = document.getElementById('csimPanelList');
+    var pill  = document.getElementById('csimPanelPill');
+    if (!list) return;
+    // Limpiar empty state
+    var empty = list.querySelector('.csim-panel-empty');
+    if (empty) empty.remove();
+    var pedido = {
+      id: 'p' + Date.now(),
+      product: product,
+      cliente: 'María González',
+      telefono: '+54 11 2345-6789',
+      hora: csimTimeNow(),
+      contacted: false
+    };
+    csimPedidos.push(pedido);
+    var card = document.createElement('div');
+    card.className = 'csim-pedido-card';
+    card.id = pedido.id;
+    card.innerHTML =
+      '<div class="row"><span class="producto">' + product.emoji + ' ' + product.name + '</span>' +
+      '<span class="monto">$' + product.price.toLocaleString('es-AR') + '</span></div>' +
+      '<div class="meta">' +
+        '<strong>Cliente:</strong> ' + pedido.cliente + '<br>' +
+        '<strong>Teléfono:</strong> ' + pedido.telefono + '<br>' +
+        '<strong>Pagó:</strong> ' + pedido.hora + ' · MercadoPago' +
+      '</div>' +
+      '<button class="btn-contactado" type="button">Marcar como contactado</button>';
+    card.querySelector('button').addEventListener('click', function() {
+      csimMarkContacted(pedido.id);
+    });
+    list.prepend(card);
+    csimUpdatePanelHeader();
+    if (alert) {
+      alert.textContent = '🔔 Venta nueva esperando ser contactada';
+      alert.classList.add('visible');
+    }
+  }
+
+  function csimMarkContacted(pedidoId) {
+    var card = document.getElementById(pedidoId);
+    if (!card) return;
+    card.classList.add('contacted');
+    var btn = card.querySelector('.btn-contactado');
+    if (btn) btn.outerHTML = '<span class="badge-done">✓ Contactado</span>';
+    var p = csimPedidos.find(function(x) { return x.id === pedidoId; });
+    if (p) p.contacted = true;
+    csimUpdatePanelHeader();
+  }
+
+  function csimUpdatePanelHeader() {
+    var pending = csimPedidos.filter(function(p) { return !p.contacted; }).length;
+    var pill = document.getElementById('csimPanelPill');
+    var alert = document.getElementById('csimPanelAlert');
+    if (pill) pill.textContent = pending + (pending === 1 ? ' pendiente' : ' pendientes');
+    if (alert && pending === 0) alert.classList.remove('visible');
+    else if (alert && pending > 0) {
+      alert.classList.add('visible');
+      alert.textContent = '🔔 ' + pending + (pending === 1 ? ' venta nueva esperando ser contactada' : ' ventas nuevas esperando ser contactadas');
+    }
+  }
+
+  function startComercioSimulation() {
+    var box = document.getElementById('csimMsgs');
+    if (!box) return;
+    box.innerHTML = '';
+    csimPedidos = [];
+    var list  = document.getElementById('csimPanelList');
+    if (list) list.innerHTML = '<div class="csim-panel-empty">No hay ventas pendientes. Cuando un cliente pague, aparece acá.</div>';
+    var alert = document.getElementById('csimPanelAlert');
+    if (alert) alert.classList.remove('visible');
+    var pill = document.getElementById('csimPanelPill');
+    if (pill) pill.textContent = '0 pendientes';
+
+    var product = {
+      name: 'Taladro percutor Black & Decker 600W',
+      desc: 'Velocidad variable, reversible. Mandril 13mm. Maletín de accesorios incluido.',
+      price: 45000,
+      emoji: '🔧'
+    };
+
+    // Secuencia de mensajes
+    csimSchedule(function() {
+      csimAddMsg('out', 'Hola, ¿tenés taladros Black &amp; Decker?');
+    }, 800);
+
+    csimSchedule(function() { csimAddTyping(); }, 1900);
+    csimSchedule(function() {
+      csimRemoveTyping();
+      csimAddMsg('in', '¡Hola! Sí, tenemos en stock. Te paso el que más se lleva 👇');
+    }, 3000);
+
+    csimSchedule(function() { csimAddTyping(); }, 3700);
+    csimSchedule(function() {
+      csimRemoveTyping();
+      csimAddProductCard(product, function() { csimShowMpOverlay(product); });
+    }, 4600);
+  }
+
+  function resetComercioSimulation() {
+    csimClearTimers();
+    var ov = document.getElementById('csimMpOverlay');
+    if (ov) ov.classList.remove('open');
+    startComercioSimulation();
+  }
+
+  // Exponer para que se pueda llamar desde el botón
+  window.startComercioSimulation = startComercioSimulation;
+  window.resetComercioSimulation = resetComercioSimulation;
 })();
 
 // ============================================================

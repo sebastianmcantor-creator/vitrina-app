@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Menú digital — Vitrina</title>
+  <title>Menú digital · Vitrina</title>
   <meta name="description" content="Menú digital. Pedí desde tu mesa.">
   <meta name="robots" content="noindex, nofollow">
   <meta property="og:type" content="website">
@@ -255,7 +255,7 @@
     </div>
     <!-- Banner total acumulado — SOLO restaurant, se muestra tras el primer pedido -->
     <div id="banner-acumulado" style="display:none;background:var(--accent,#B85A30);color:white;padding:10px 20px;font-size:14px;font-weight:500;display:none;align-items:center;justify-content:space-between;gap:8px">
-      <span id="banner-acumulado-text">✓ Pedido enviado — Total acumulado: $0</span>
+      <span id="banner-acumulado-text">✓ Pedido enviado · Total acumulado: $0</span>
       <button id="btn-pedir-cuenta" onclick="pedirLaCuenta()" style="background:white;color:var(--accent,#B85A30);border:none;border-radius:8px;padding:6px 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0">Pedir la cuenta 💳</button>
     </div>
     <div class="search-bar" id="search-bar" style="display:none">
@@ -306,7 +306,7 @@
   <div class="confirm-overlay" id="checkout-summary-overlay">
     <div class="confirm-box" style="max-width:380px">
       <div class="confirm-heading">¿Mandamos el pedido a cocina?</div>
-      <div class="confirm-mesa-label" id="checkout-mesa-label">Mesa —</div>
+      <div class="confirm-mesa-label" id="checkout-mesa-label">Mesa</div>
       <div style="font-size:12px;color:#8a7a6a;margin-bottom:12px;">Una vez enviado, no se puede modificar.</div>
       <div id="checkout-summary-items" style="overflow-y:auto;max-height:200px;margin-bottom:14px;border:1px solid var(--border, #ede8e2);border-radius:10px;padding:10px 12px"></div>
       <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:600;color:#1a1208;margin-bottom:16px;padding:0 2px">
@@ -338,14 +338,14 @@
   <div class="confirm-overlay" id="confirm-overlay">
     <div class="confirm-box">
       <div class="confirm-heading">Tus pedidos</div>
-      <div class="confirm-mesa-label" id="confirm-mesa-label">Mesa —</div>
+      <div class="confirm-mesa-label" id="confirm-mesa-label">Mesa</div>
       <div class="confirm-list" id="confirm-list"></div>
       <div id="wa-confirm-wrap" style="display:none">
         <a id="wa-confirm-btn" class="wa-confirm-btn" href="#" target="_blank">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Confirmar por WhatsApp
         </a>
-        <div style="font-size:11px;color:#8a7a6a;text-align:center;margin-bottom:10px">Abrís WhatsApp con tu pedido ya escrito — tocás Enviar y listo</div>
+        <div style="font-size:11px;color:#8a7a6a;text-align:center;margin-bottom:10px">Abrís WhatsApp con tu pedido ya escrito, tocás Enviar y listo</div>
       </div>
       <!-- Botón pedir la cuenta — SOLO restaurant, se inyecta por JS -->
       <div id="pedir-cuenta-wrap" style="display:none;margin-bottom:8px">
@@ -355,7 +355,7 @@
         <div style="font-size:11px;color:#8a7a6a;text-align:center;margin-top:6px">Se genera un link de pago con el total de todos tus pedidos</div>
       </div>
       <button class="confirm-close" onclick="cerrarOverlay()">Cerrar</button>
-      <button onclick="resetSesion()" style="margin-top:8px;width:100%;padding:8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:#8a7a6a;cursor:pointer;text-decoration:underline">No son míos — empezar de nuevo</button>
+      <button onclick="resetSesion()" style="margin-top:8px;width:100%;padding:8px;background:none;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:#8a7a6a;cursor:pointer;text-decoration:underline">No son míos, empezar de nuevo</button>
     </div>
   </div>
 
@@ -395,7 +395,7 @@
         <a href="/" style="margin-top:24px;color:#FF7540;font-size:14px;">
           Crear mi propio menú →
         </a>`
-      throw new Error('Sin slug — deteniendo ejecución')
+      throw new Error('Sin slug, deteniendo ejecución')
     }
     const slug = _slug
     const mesa = params.get('mesa') !== null ? Number(params.get('mesa')) : null
@@ -433,7 +433,7 @@
 
     // ─── Init ──────────────────────────────────────────────────────────────────
     async function init() {
-      if (!slug) { showError('URL inválida — falta el parámetro slug.'); return }
+      if (!slug) { showError('URL inválida: falta el parámetro slug.'); return }
       try {
         rest = await restaurants.getBySlug(slug)
       } catch {
@@ -442,7 +442,7 @@
       }
 
       document.documentElement.style.setProperty('--accent', rest.primary_color || '#B85A30')
-      document.title = rest.name + ' — Menú'
+      document.title = rest.name + ' · Menú'
 
       // Meta tags dinámicos para sharing
       let metaDesc = document.querySelector('meta[name="description"]')
@@ -456,7 +456,7 @@
       // OG tags dinámicos — usa logo del restaurante si tiene, sino la imagen genérica
       const ogImage = rest.logo_url || rest.cover_url || 'https://vitrinaapp.com.ar/og-image.png'
       const ogTags = {
-        'og:title':       rest.name + ' — Menú Digital',
+        'og:title':       rest.name + ' · Menú Digital',
         'og:description': `Menú digital de ${rest.name}${rest.city ? ' · ' + rest.city : ''}. Pedí desde tu mesa con un click.`,
         'og:url':         `https://vitrinaapp.com.ar/menu.html?slug=${slug}`,
         'og:image':       ogImage,
@@ -484,8 +484,8 @@
           mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
           reservaMsg:   `Hola! Quisiera reservar una mesa en ${rest.name}. ¿Tienen disponibilidad?`,
           reservaLabel: '📅 Reservar',
-          pageTitle:    rest.name + ' — Menú',
-          ogTitle:      rest.name + ' — Menú Digital',
+          pageTitle:    rest.name + ' · Menú',
+          ogTitle:      rest.name + ' · Menú Digital',
           ogDesc:       `Menú digital de ${rest.name}. Pedí online sin esperar.`,
           showDietBar:  true,
         },
@@ -496,8 +496,8 @@
           mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
           reservaMsg:   `Hola! Quisiera reservar un turno en ${rest.name}. ¿Tienen disponibilidad?`,
           reservaLabel: '📅 Reservar turno',
-          pageTitle:    rest.name + ' — Servicios',
-          ogTitle:      rest.name + ' — Reservá tu turno',
+          pageTitle:    rest.name + ' · Servicios',
+          ogTitle:      rest.name + ' · Reservá tu turno',
           ogDesc:       `Servicios de ${rest.name}. Reservá tu turno online.`,
           showDietBar:  false,
         },
@@ -508,8 +508,8 @@
           mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
           reservaMsg:   `Hola! Tengo una consulta sobre productos de ${rest.name}.`,
           reservaLabel: '💬 Consultar',
-          pageTitle:    rest.name + ' — Catálogo',
-          ogTitle:      rest.name + ' — Catálogo Digital',
+          pageTitle:    rest.name + ' · Catálogo',
+          ogTitle:      rest.name + ' · Catálogo Digital',
           ogDesc:       `Catálogo de productos de ${rest.name}.`,
           showDietBar:  false,
         },
@@ -520,8 +520,8 @@
           mozoHref:     'mozo.html?slug=' + slug + '&mesa=' + (mesa ?? ''),
           reservaMsg:   `Hola! Tengo una consulta sobre un producto de ${rest.name}.`,
           reservaLabel: '💬 Consultar',
-          pageTitle:    rest.name + ' — Tienda',
-          ogTitle:      rest.name + ' — Tienda Online',
+          pageTitle:    rest.name + ' · Tienda',
+          ogTitle:      rest.name + ' · Tienda Online',
           ogDesc:       `Tienda de ${rest.name}. Comprá online.`,
           showDietBar:  false,
         },
@@ -985,7 +985,7 @@
       if (mesaInputWrap) mesaInputWrap.style.display = noMesa ? 'block' : 'none'
       if (confirmBtn) confirmBtn.disabled = noMesa && !mesaManual
 
-      document.getElementById('checkout-mesa-label').textContent = mesaEfectiva() != null ? 'Mesa ' + mesaEfectiva() : '— sin mesa detectada'
+      document.getElementById('checkout-mesa-label').textContent = mesaEfectiva() != null ? 'Mesa ' + mesaEfectiva() : 'sin mesa detectada'
       document.getElementById('checkout-total').textContent = currency + ' ' + total.toLocaleString('es-AR')
       document.getElementById('checkout-summary-items').innerHTML = ids.map(id => {
         const item = itemsById[id]
@@ -1185,7 +1185,7 @@
       // Notificación del sistema (si tiene permiso)
       if ('Notification' in window && Notification.permission === 'granted') {
         new Notification('¡Tu pedido está listo! 🎉', {
-          body: 'Pedido #' + orderId.slice(-6).toUpperCase() + ' — podés pasar a retirarlo.',
+          body: 'Pedido #' + orderId.slice(-6).toUpperCase() + ', podés pasar a retirarlo.',
           icon: '/favicon.ico'
         })
       }
@@ -1294,7 +1294,7 @@
 
       const total = await calcularTotalAcumulado()
       const currency = rest?.currency || 'ARS'
-      textEl.textContent = '✓ Pedido enviado — Total acumulado de la visita: ' + currency + ' $' + total.toLocaleString('es-AR')
+      textEl.textContent = '✓ Pedido enviado · Total acumulado de la visita: ' + currency + ' $' + total.toLocaleString('es-AR')
       banner.style.display = 'flex'
       // Mostrar también el botón en el overlay de estado
       if (cuenta) cuenta.style.display = 'block'

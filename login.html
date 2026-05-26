@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vitrina — Ingresar</title>
-<meta name="description" content="Ingresá a tu panel de Vitrina — gestión digital para tu restaurante, local o negocio de servicios.">
+<title>Vitrina · Ingresar</title>
+<meta name="description" content="Ingresá a tu panel de Vitrina: gestión digital para tu restaurante, local o negocio de servicios.">
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -259,7 +259,7 @@ window.handleGoogleLogin = async function () {
 
   try {
     await signInWithGoogle()
-    // La redirección la maneja Supabase OAuth — no llega acá en flujo normal
+    // La redirección la maneja Supabase OAuth, no llega acá en flujo normal
   } catch (err) {
     errEl.textContent = err.message || 'No se pudo conectar con Google. Intentá de nuevo.'
     errEl.classList.add('visible')

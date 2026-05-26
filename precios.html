@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Precios · Vitrina · Planes claros, sin sorpresas</title>
+  <meta name="description" content="Planes Vitrina pesificados al dólar oficial. WhatsApp Business incluido. Sin permanencia, sin fees sobre ventas. 14 días gratis.">
+  <meta property="og:title" content="Precios Vitrina · Planes claros, sin sorpresas">
+  <meta property="og:description" content="Planes desde USD 27/mes con WhatsApp Business incluido. Pesificado al dólar oficial Banco Nación. Sin fees sobre ventas. 14 días gratis.">
+  <meta property="og:image" content="https://vitrinaapp.com.ar/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://vitrinaapp.com.ar/precios.html">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="es_AR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://vitrinaapp.com.ar/og-image.png">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://vitrinaapp.com.ar/precios.html">
+  <meta name="theme-color" content="#B85A30">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --terra: #B85A30; --cream: #FAF7F2; --cream2: #F4EDE4; --ink: #1C1208; --muted: #8A7A6A; --border: #E8DDD0; --gold: #e8c87a; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+    a { color: inherit; }
+
+    /* Nav (consistente con para-restaurantes.html) */
+    .nav { background: rgba(250,247,242,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; gap: 16px; }
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--terra); text-decoration: none; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-links { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; align-items: center; }
+    .nav-links a { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #4A3828; text-decoration: none; font-weight: 500; transition: color .15s; }
+    .nav-links a:hover { color: var(--terra); }
+    .nav-links a.active { color: var(--terra); font-weight: 600; }
+    .cta-nav { padding: 8px 18px; background: var(--terra); color: white; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+    @media (max-width: 720px) { .nav-links { display: none; } }
+
+    /* Hero */
+    .hero { padding: 72px 24px 40px; text-align: center; background: linear-gradient(160deg, var(--cream), var(--cream2)); }
+    .badge { display: inline-block; background: #F4E8DF; color: var(--terra); padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
+    h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.4rem); margin-bottom: 16px; line-height: 1.15; }
+    h1 em { font-style: normal; color: var(--terra); }
+    .sub { font-size: 16px; color: #4A3828; max-width: 600px; margin: 0 auto; line-height: 1.7; }
+
+    /* Toggle rubro */
+    .rubro-toggle { display: inline-flex; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 4px; gap: 4px; margin: 28px auto 0; box-shadow: 0 2px 10px rgba(28,18,8,.04); }
+    .rubro-toggle button { background: none; border: none; padding: 9px 18px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; border-radius: 8px; transition: all .15s; }
+    .rubro-toggle button.active { background: var(--terra); color: white; }
+    @media (max-width: 520px) { .rubro-toggle { flex-direction: column; width: calc(100% - 32px); } .rubro-toggle button { width: 100%; } }
+
+    /* Plan cards */
+    .plans { max-width: 1180px; margin: 0 auto; padding: 48px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+    .plan { background: white; border: 1px solid var(--border); border-radius: 18px; padding: 28px 24px; display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(28,18,8,.04); transition: transform .2s, box-shadow .2s; position: relative; }
+    .plan:hover { transform: translateY(-3px); box-shadow: 0 10px 28px rgba(28,18,8,.08); }
+    .plan.featured { border: 2px solid var(--terra); box-shadow: 0 8px 28px rgba(184,90,48,.15); }
+    .plan-tag { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--terra); color: white; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 12px; letter-spacing: .04em; text-transform: uppercase; }
+    .plan-name { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+    .plan-pitch { font-size: 12.5px; color: var(--muted); margin-bottom: 18px; min-height: 32px; line-height: 1.4; }
+    .plan-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+    .plan-price .val { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 600; color: var(--ink); line-height: 1; }
+    .plan-price .unit { font-size: 13px; color: var(--muted); }
+    .plan-price-ars { font-size: 12px; color: var(--muted); margin-bottom: 18px; min-height: 18px; }
+    .plan-price-ars b { color: var(--terra); }
+    .plan ul { list-style: none; padding: 0; margin: 0 0 22px; flex: 1; }
+    .plan ul li { font-size: 13.5px; color: #4A3828; padding: 6px 0 6px 22px; line-height: 1.5; position: relative; }
+    .plan ul li::before { content: "✓"; color: var(--terra); position: absolute; left: 0; font-weight: 700; }
+    .plan ul li.muted { color: var(--muted); }
+    .plan ul li.muted::before { content: "·"; color: var(--muted); font-size: 18px; line-height: 1; }
+    .plan .btn { display: block; text-align: center; padding: 11px 18px; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 600; transition: all .15s; }
+    .plan .btn-primary { background: var(--terra); color: white; box-shadow: 0 4px 12px rgba(184,90,48,.25); }
+    .plan .btn-primary:hover { background: #9A4827; transform: translateY(-1px); }
+    .plan .btn-ghost { background: white; color: var(--terra); border: 1.5px solid var(--terra); }
+    .plan .btn-ghost:hover { background: #FDF3EE; }
+
+    /* Tabla comparativa */
+    .compare-wrap { max-width: 1100px; margin: 24px auto 0; padding: 32px 24px 64px; }
+    .compare-wrap h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; text-align: center; margin-bottom: 8px; }
+    .compare-wrap .compare-sub { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 32px; }
+    .compare-scroll { overflow-x: auto; }
+    .compare { width: 100%; min-width: 640px; border-collapse: collapse; background: white; border-radius: 14px; overflow: hidden; box-shadow: 0 4px 16px rgba(28,18,8,.05); }
+    .compare th, .compare td { padding: 13px 14px; text-align: left; font-size: 13.5px; border-bottom: 1px solid var(--border); }
+    .compare thead th { background: var(--ink); color: var(--gold); font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 15px; text-align: center; }
+    .compare thead th:first-child { text-align: left; }
+    .compare thead th .th-price { display: block; font-size: 11px; color: rgba(255,255,255,.55); font-family: 'DM Sans', sans-serif; font-weight: 500; margin-top: 2px; }
+    .compare tbody td { text-align: center; color: #4A3828; }
+    .compare tbody td:first-child { text-align: left; font-weight: 500; color: var(--ink); }
+    .compare tbody tr:nth-child(even) { background: #FBF7F1; }
+    .compare tbody tr:last-child td { border-bottom: none; }
+    .compare .yes { color: #2E7D32; font-weight: 700; }
+    .compare .no { color: #c0b3a3; }
+
+    /* FAQ */
+    .faq-wrap { max-width: 720px; margin: 0 auto; padding: 32px 24px 56px; }
+    .faq-wrap h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.9rem; text-align: center; margin-bottom: 28px; }
+    .faq-wrap details { border-bottom: 1px solid var(--border); padding: 16px 4px; }
+    .faq-wrap details:first-of-type { border-top: 1px solid var(--border); }
+    .faq-wrap summary { cursor: pointer; font-size: 14.5px; font-weight: 600; color: var(--ink); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .faq-wrap summary::-webkit-details-marker { display: none; }
+    .faq-wrap summary span { color: var(--terra); font-size: 22px; line-height: 1; transition: transform .15s; }
+    .faq-wrap details[open] summary span { transform: rotate(45deg); }
+    .faq-wrap details p { margin-top: 10px; font-size: 13.5px; color: #6A5A4A; line-height: 1.65; }
+
+    /* CTA final */
+    .final-cta { background: var(--ink); color: white; padding: 64px 24px; text-align: center; }
+    .final-cta h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: var(--gold); margin-bottom: 14px; }
+    .final-cta p { font-size: 15px; color: rgba(255,255,255,.65); margin-bottom: 28px; }
+    .final-cta .btn-primary { display: inline-block; padding: 14px 32px; background: var(--terra); color: white; border-radius: 12px; text-decoration: none; font-size: 16px; font-weight: 600; box-shadow: 0 6px 20px rgba(184,90,48,.35); transition: all .2s; }
+    .final-cta .btn-primary:hover { background: #9A4827; transform: translateY(-2px); }
+    .final-cta .small { margin-top: 14px; font-size: 12.5px; color: rgba(255,255,255,.4); }
+
+    /* Footer (consistente con index.html) */
+    footer { background: var(--ink); color: rgba(255,255,255,.7); padding: 56px 24px 32px; border-top: 1px solid rgba(255,255,255,.06); }
+    .footer-grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+    .footer-brand p { font-size: 13px; margin-top: 10px; line-height: 1.6; color: rgba(255,255,255,.55); }
+    .footer-col h5 { font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.3); margin-bottom: 14px; }
+    .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,.5); text-decoration: none; margin-bottom: 8px; transition: color .15s; }
+    .footer-col a:hover { color: rgba(255,255,255,.9); }
+    .footer-bottom { max-width: 1100px; margin: 24px auto 0; padding-top: 24px; border-top: 1px solid rgba(255,255,255,.08); font-size: 13px; text-align: center; line-height: 1.8; color: rgba(255,255,255,.4); }
+    .footer-bottom a { color: rgba(255,255,255,.45); text-decoration: none; margin: 0 8px; }
+    @media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; gap: 24px; } }
+    @media (max-width: 540px) { .footer-grid { grid-template-columns: 1fr; gap: 24px; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/" class="logo">
+    <svg width="18" height="22" viewBox="0 0 18 22" fill="none"><rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#B85A30"/><rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/><rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#B85A30"/><path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+    Vitrina
+  </a>
+  <ul class="nav-links">
+    <li><a href="/">Inicio</a></li>
+    <li><a href="/para-restaurantes.html">Restaurantes</a></li>
+    <li><a href="/para-comercios.html">Comercios</a></li>
+    <li><a href="/para-servicios.html">Servicios</a></li>
+    <li><a href="/precios.html" class="active">Precios</a></li>
+  </ul>
+  <a href="/panel.html" class="cta-nav">Empezar gratis →</a>
+</nav>
+
+<section class="hero">
+  <div class="badge">💳 Planes y precios</div>
+  <h1>Precios claros,<br><em>sin sorpresas</em></h1>
+  <p class="sub">Todos los planes incluyen WhatsApp Business. Sin permanencia. Sin fees sobre ventas. Pesificado al dólar oficial Banco Nación.</p>
+
+  <div class="rubro-toggle" role="tablist" aria-label="Elegir rubro">
+    <button id="tab-rest" class="active" onclick="setRubro('rest')" type="button">Restaurantes</button>
+    <button id="tab-com" onclick="setRubro('com')" type="button">Comercios</button>
+    <button id="tab-svc" onclick="setRubro('svc')" type="button">Servicios</button>
+  </div>
+</section>
+
+<!-- Plans restaurantes -->
+<section class="plans" id="plans-rest">
+  <div class="plan">
+    <div class="plan-name">Free</div>
+    <div class="plan-pitch">Para probar con un menú básico.</div>
+    <div class="plan-price"><span class="val">$0</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">Para siempre</div>
+    <ul>
+      <li>Menú QR</li>
+      <li>Tano: 75 mensajes/mes</li>
+      <li>1 idioma</li>
+      <li>Hasta 45 platos</li>
+      <li class="muted">Con marca de agua Vitrina</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-ghost">Empezar gratis</a>
+  </div>
+
+  <div class="plan">
+    <div class="plan-name">Solo Menú</div>
+    <div class="plan-pitch">Operación digital completa, sin marketing.</div>
+    <div class="plan-price"><span class="val">USD 27</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">≈ <b id="ars-r27">$38k</b> ARS · TC oficial</div>
+    <ul>
+      <li>Todo lo del Free</li>
+      <li>Pedidos online + cocina en tiempo real</li>
+      <li>Pagos MercadoPago integrados</li>
+      <li>Tano ilimitado ES / EN / PT</li>
+      <li>Fotos IA (60 al activar + 5/mes)</li>
+      <li>WhatsApp operativo (sin campañas)</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-ghost">Probar 14 días gratis</a>
+  </div>
+
+  <div class="plan">
+    <div class="plan-name">Marketing</div>
+    <div class="plan-pitch">Presencia digital con Viti y campañas.</div>
+    <div class="plan-price"><span class="val">USD 57</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">≈ <b id="ars-r57">$81k</b> ARS · TC oficial</div>
+    <ul>
+      <li>Viti: estrategia mensual</li>
+      <li>30 publicaciones auto/mes (IG + FB + Google)</li>
+      <li>Análisis de competidores</li>
+      <li>Informe PDF mensual</li>
+      <li>WhatsApp con campañas (50/mes)</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-ghost">Probar 14 días gratis</a>
+  </div>
+
+  <div class="plan featured">
+    <div class="plan-tag">Más elegido</div>
+    <div class="plan-name">Combo</div>
+    <div class="plan-pitch">Solo Menú + Marketing en uno. Ahorrás USD 14.</div>
+    <div class="plan-price"><span class="val">USD 70</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">≈ <b id="ars-r70">$99k</b> ARS · TC oficial</div>
+    <ul>
+      <li>Todo lo de Solo Menú</li>
+      <li>Todo lo de Marketing</li>
+      <li>WhatsApp con campañas (50/mes)</li>
+      <li>Viti + Tano trabajando juntos</li>
+      <li class="muted">Ahorra USD 14 vs comprar los dos por separado</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-primary">Probar 14 días gratis →</a>
+  </div>
+</section>
+
+<!-- Plans comercios -->
+<section class="plans" id="plans-com" style="display:none">
+  <div class="plan">
+    <div class="plan-name">Free</div>
+    <div class="plan-pitch">Para probar con un catálogo básico.</div>
+    <div class="plan-price"><span class="val">$0</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">Para siempre</div>
+    <ul>
+      <li>Catálogo QR</li>
+      <li>Asistente: 75 mensajes/mes</li>
+      <li class="muted">Con marca de agua Vitrina</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-ghost">Empezar gratis</a>
+  </div>
+
+  <div class="plan featured">
+    <div class="plan-tag">Plan único pago</div>
+    <div class="plan-name">Marketing</div>
+    <div class="plan-pitch">Catálogo + ML + Tienda Nube + Viti + campañas.</div>
+    <div class="plan-price"><span class="val">USD 62</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">≈ <b id="ars-c62">$88k</b> ARS · TC oficial</div>
+    <ul>
+      <li>Catálogo digital con asistente IA</li>
+      <li>MercadoLibre + Tienda Nube sync bidireccional</li>
+      <li>Viti: estrategia mensual</li>
+      <li>30 publicaciones auto/mes</li>
+      <li>Análisis de competidores</li>
+      <li>WhatsApp con campañas (50/mes)</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-primary">Probar 14 días gratis →</a>
+  </div>
+</section>
+
+<!-- Plans servicios -->
+<section class="plans" id="plans-svc" style="display:none">
+  <div class="plan">
+    <div class="plan-name">Free</div>
+    <div class="plan-pitch">Para probar con turnos básicos.</div>
+    <div class="plan-price"><span class="val">$0</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">Para siempre</div>
+    <ul>
+      <li>Agenda QR pública</li>
+      <li>Asistente: 75 mensajes/mes</li>
+      <li class="muted">Con marca de agua Vitrina</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-ghost">Empezar gratis</a>
+  </div>
+
+  <div class="plan featured">
+    <div class="plan-tag">Plan único pago</div>
+    <div class="plan-name">Marketing</div>
+    <div class="plan-pitch">Turnos + asistente + Viti + campañas.</div>
+    <div class="plan-price"><span class="val">USD 62</span><span class="unit">/mes</span></div>
+    <div class="plan-price-ars">≈ <b id="ars-s62">$88k</b> ARS · TC oficial</div>
+    <ul>
+      <li>Agenda de turnos automatizada</li>
+      <li>Recordatorios WhatsApp 24h y 2h antes</li>
+      <li>Viti: estrategia mensual</li>
+      <li>30 publicaciones auto/mes</li>
+      <li>Análisis de competidores</li>
+      <li>WhatsApp con campañas (50/mes)</li>
+    </ul>
+    <a href="/panel.html" class="btn btn-primary">Probar 14 días gratis →</a>
+  </div>
+</section>
+
+<!-- Tabla comparativa -->
+<div class="compare-wrap">
+  <h2>Qué incluye cada plan</h2>
+  <p class="compare-sub">Comparativa rápida de los planes para restaurantes. Para comercios y servicios aplica el plan Marketing.</p>
+  <div class="compare-scroll">
+    <table class="compare">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>Free<span class="th-price">$0</span></th>
+          <th>Solo Menú<span class="th-price">USD 27</span></th>
+          <th>Marketing<span class="th-price">USD 57</span></th>
+          <th>Combo<span class="th-price">USD 70</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Menú / catálogo QR</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Pedidos online</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+        <tr><td>Pantalla de cocina</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+        <tr><td>Tano (asistente cliente final) ilimitado</td><td class="no">75/mes</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Pagos MercadoPago integrados</td><td class="no">—</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+        <tr><td>Sucursales incluidas</td><td>1</td><td>1</td><td>3</td><td>5</td></tr>
+        <tr><td>Viti (asistente estratégico)</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Publicaciones automáticas IG / FB</td><td class="no">—</td><td class="no">—</td><td class="yes">30/mes</td><td class="yes">30/mes</td></tr>
+        <tr><td>Análisis de competidores</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Informe PDF mensual</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>WhatsApp Business número exclusivo</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Mensajes operativos WhatsApp / mes</td><td>—</td><td>150</td><td>150</td><td>150</td></tr>
+        <tr><td>Mensajes marketing WhatsApp / mes</td><td class="no">—</td><td class="no">—</td><td>50</td><td>50</td></tr>
+        <tr><td>MercadoLibre + Tienda Nube</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Soporte</td><td>Comunidad</td><td>Email</td><td>Email + WA</td><td>Email + WA prioritario</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-wrap" id="contacto">
+  <h2>Preguntas frecuentes</h2>
+  <details>
+    <summary>¿Necesito tarjeta para el período de prueba? <span>+</span></summary>
+    <p>No. Probás 14 días con acceso completo al plan que elijas, sin cargar ningún dato de pago. Si no te convence, no pagás nada.</p>
+  </details>
+  <details>
+    <summary>¿Hay permanencia? <span>+</span></summary>
+    <p>No. Cancelás cuando quieras desde el panel. Pagás mes a mes, sin contratos largos.</p>
+  </details>
+  <details>
+    <summary>¿Vitrina cobra fee sobre mis ventas? <span>+</span></summary>
+    <p>No. Precio fijo mensual sin comisiones sobre transacciones, ni sobre el menú, ni sobre el catálogo, ni sobre el presupuesto publicitario.</p>
+  </details>
+  <details>
+    <summary>¿Qué pasa si supero los mensajes incluidos? <span>+</span></summary>
+    <p>Te avisamos al 80% del consumo. Si querés seguir, podés extender bloques: +50 mensajes operativos por USD 2, o +50 mensajes marketing por USD 3. Los servicios operativos (Tano, pedidos, cocina, pagos, reservas, utility WA) nunca se pausan.</p>
+  </details>
+  <details>
+    <summary>¿Cómo se pesifica el precio? <span>+</span></summary>
+    <p>Se cobra en pesos al tipo de cambio oficial del Banco Nación (venta). La cotización se actualiza automáticamente todos los lunes a las 10am ART.</p>
+  </details>
+  <details>
+    <summary>¿Necesito el WhatsApp Business yo? <span>+</span></summary>
+    <p>No. Vitrina te asigna un número exclusivo a través de Twilio, lo activamos en 24hs hábiles y queda operativo. No hacés trámites con Meta, no necesitás chip nuevo, no usás tu WhatsApp personal.</p>
+  </details>
+</div>
+
+<!-- CTA final -->
+<section class="final-cta">
+  <h2>Probalo 14 días, sin riesgo</h2>
+  <p>Acceso completo al plan que elijas. Si no te convence, no pagás nada.</p>
+  <a href="/panel.html" class="btn-primary">Probar 14 días gratis →</a>
+  <div class="small">Sin tarjeta. Sin permanencia.</div>
+</section>
+
+<!-- Footer (consistente con index.html) -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+        <svg width="22" height="27" viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#e8c87a"/>
+          <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+          <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+          <path d="M2.5 8 Q9 1 15.5 8" stroke="#e8c87a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:#e8c87a;letter-spacing:.02em">Vitrina</span>
+      </a>
+      <p>Presencia digital completa para comercios, restaurantes y vendedores online argentinos.</p>
+    </div>
+    <div class="footer-col">
+      <h5>Producto</h5>
+      <a href="/para-restaurantes.html">Para restaurantes</a>
+      <a href="/para-servicios.html">Para servicios y turnos</a>
+      <a href="/para-comercios.html">Para comercios</a>
+      <a href="/precios.html">Precios</a>
+      <a href="/demo.html">Demo restaurante</a>
+      <a href="/demo-servicios.html">Demo servicios</a>
+      <a href="/panel.html">Ingresar al panel</a>
+    </div>
+    <div class="footer-col">
+      <h5>Legal</h5>
+      <a href="/terms.html">Términos de servicio</a>
+      <a href="/privacy.html">Política de privacidad</a>
+    </div>
+    <div class="footer-col">
+      <h5>Contacto</h5>
+      <a href="mailto:contacto@vitrinaapp.com.ar">contacto@vitrinaapp.com.ar</a>
+      <a href="mailto:contacto@vitrinaapp.com.ar?subject=Quiero%20hablar%20de%20precios">Agendar una llamada →</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2026 Vitrina · Hecho en Argentina 🇦🇷
+    <br>
+    <a href="/terms.html">Términos de servicio</a>·
+    <a href="/privacy.html">Política de privacidad</a>·
+    <a href="/status.html">Estado del sistema</a>
+  </div>
+</footer>
+
+<script>
+// Toggle rubro
+function setRubro(r) {
+  const map = { rest: 'plans-rest', com: 'plans-com', svc: 'plans-svc' };
+  Object.values(map).forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  const target = document.getElementById(map[r]); if (target) target.style.display = '';
+  ['tab-rest','tab-com','tab-svc'].forEach(id => { const b = document.getElementById(id); if (b) b.classList.remove('active'); });
+  const activeBtn = { rest:'tab-rest', com:'tab-com', svc:'tab-svc' }[r];
+  const btn = document.getElementById(activeBtn); if (btn) btn.classList.add('active');
+  try { history.replaceState(null, '', '?r=' + r); } catch {}
+}
+(function initRubro() {
+  const params = new URLSearchParams(location.search);
+  const r = params.get('r');
+  if (r === 'com' || r === 'svc') setRubro(r);
+})();
+
+// Pesificar precios al TC oficial
+;(async function() {
+  try {
+    const r = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio');
+    const d = await r.json();
+    const tc = d.oficial || 1418;
+    const fmt = usd => '$' + Math.round(usd * tc / 1000) + 'k';
+    const mapPrices = { 'ars-r27': 27, 'ars-r57': 57, 'ars-r70': 70, 'ars-c62': 62, 'ars-s62': 62 };
+    Object.entries(mapPrices).forEach(([id, usd]) => {
+      const el = document.getElementById(id); if (el) el.textContent = fmt(usd);
+    });
+  } catch {}
+})();
+</script>
+<script>(function(){var GA='G-9FW2MERRWT';if(GA==='G-XXXXXXXXXX')return;if(localStorage.getItem('vt_cookies')!=='accepted')return;var s=document.createElement('script');s.src='https://www.googletagmanager.com/gtag/js?id='+GA;s.async=true;document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config',GA,{anonymize_ip:true});})();</script>
+</body>
+</html>

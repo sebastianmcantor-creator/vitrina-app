@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo del Panel · Así se ve Vitrina por dentro</title>
+  <meta name="description" content="Demo navegable del panel de Vitrina. Mirá cómo se ven el dashboard, la cocina en vivo, Viti tu asistente estratégica y el calendario de marketing. Sin registro.">
+  <meta name="keywords" content="demo vitrina, panel restaurante, cocina en vivo, asistente IA, marketing automatizado">
+  <link rel="canonical" href="https://vitrinaapp.com.ar/demo-panel.html">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vitrinaapp.com.ar/demo-panel.html">
+  <meta property="og:title" content="Demo del Panel · Vitrina por dentro">
+  <meta property="og:description" content="Demo 100% interactiva. Dashboard, cocina, Viti y calendario marketing en un clic.">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:site_name" content="Vitrina">
+
+  <meta name="theme-color" content="#0E0A06">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'><rect x='0' y='18' width='18' height='2.5' rx='1.2' fill='%23B85A30'/><rect x='0' y='8' width='2.5' height='12' rx='1.2' fill='%23B85A30'/><rect x='15.5' y='8' width='2.5' height='12' rx='1.2' fill='%23B85A30'/><path d='M2.5 8 Q9 1 15.5 8' stroke='%23B85A30' stroke-width='2.5' fill='none' stroke-linecap='round'/></svg>">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --terra:       #E8521A;
+      --terra2:      #B85A30;
+      --terra-dim:   #6B2E16;
+      --terra-pale:  rgba(232,82,26,0.12);
+      --gold:        #E8C87A;
+      --bg:          #0E0A06;
+      --bg2:         #15100A;
+      --panel:       #1C1612;
+      --panel2:      #241D17;
+      --border:      rgba(255,255,255,0.08);
+      --border2:     rgba(255,255,255,0.14);
+      --text:        #F5EFE6;
+      --text-dim:    rgba(245,239,230,0.65);
+      --text-mute:   rgba(245,239,230,0.42);
+      --green:       #4ECB71;
+      --green-dim:   rgba(78,203,113,0.15);
+      --yellow:      #E8C87A;
+      --yellow-dim:  rgba(232,200,122,0.15);
+      --red:         #E85A5A;
+      --red-dim:     rgba(232,90,90,0.15);
+      --blue:        #6FB3F0;
+      --blue-dim:    rgba(111,179,240,0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.01em;
+    }
+
+    a { color: var(--terra); text-decoration: none; }
+
+    /* ─── NAV ─── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(14,10,6,0.92);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo-link { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 600;
+      color: var(--gold); letter-spacing: 0.02em;
+    }
+    .nav-actions { display: flex; gap: 12px; align-items: center; }
+    .nav-link {
+      font-size: 14px; color: var(--text-dim);
+      padding: 8px 14px; border-radius: 8px;
+      transition: all 0.15s;
+    }
+    .nav-link:hover { background: rgba(255,255,255,0.06); color: var(--text); }
+    .nav-cta {
+      padding: 9px 18px;
+      background: var(--terra); color: white;
+      border-radius: 10px; font-size: 14px; font-weight: 600;
+      box-shadow: 0 2px 10px rgba(232,82,26,0.4);
+      transition: all 0.15s;
+    }
+    .nav-cta:hover { background: var(--terra2); transform: translateY(-1px); }
+
+    /* ─── HERO ─── */
+    .hero {
+      padding: 128px 24px 56px;
+      text-align: center;
+      background: radial-gradient(ellipse at top, rgba(232,82,26,0.08) 0%, transparent 60%);
+    }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      background: var(--terra-pale); color: var(--terra);
+      border-radius: 20px; font-size: 12px; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      color: var(--text);
+      max-width: 720px; margin: 0 auto 16px;
+    }
+    .hero h1 em { font-style: normal; color: var(--terra); }
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--text-dim);
+      max-width: 560px; margin: 0 auto 24px;
+    }
+    .hero-tag {
+      display: inline-flex; gap: 8px; align-items: center;
+      padding: 7px 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px; color: var(--text-dim);
+    }
+
+    /* ─── TABS ─── */
+    .demo-wrap {
+      max-width: 1100px;
+      margin: 32px auto 64px;
+      padding: 0 24px;
+    }
+
+    .tabs {
+      display: flex; gap: 4px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex: 1; min-width: max-content;
+      padding: 12px 18px;
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 500;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: all 0.2s;
+      display: flex; align-items: center; gap: 8px;
+      justify-content: center;
+    }
+    .tab-btn:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+    .tab-btn.active {
+      background: var(--terra);
+      color: white;
+      box-shadow: 0 2px 10px rgba(232,82,26,0.35);
+    }
+    .tab-icon { font-size: 16px; }
+
+    /* Tab panels */
+    .tab-panel {
+      display: none;
+      margin-top: 24px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      animation: fadeIn 0.3s ease;
+    }
+    .tab-panel.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 24px;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .panel-head h2 {
+      font-size: 26px; color: var(--text);
+    }
+    .panel-head p {
+      font-size: 13px; color: var(--text-dim); margin-top: 4px;
+    }
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 12px;
+      background: var(--green-dim);
+      color: var(--green);
+      border-radius: 999px;
+      font-size: 12px; font-weight: 600;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* ─── TAB 1: DASHBOARD ─── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .kpi-label {
+      font-size: 12px; color: var(--text-mute);
+      text-transform: uppercase; letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .kpi-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px; font-weight: 600;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .kpi-delta {
+      font-size: 12px; color: var(--green);
+      margin-top: 6px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .kpi-delta.down { color: var(--red); }
+
+    .dash-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+    }
+    .dash-card {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .dash-card h3 {
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    .chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      height: 160px;
+      padding-top: 8px;
+    }
+    .bar {
+      flex: 1;
+      background: linear-gradient(180deg, var(--terra) 0%, var(--terra-dim) 100%);
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      transition: opacity 0.2s;
+      min-height: 6px;
+    }
+    .bar:hover { opacity: 0.85; }
+    .bar::after {
+      content: attr(data-h);
+      position: absolute;
+      bottom: -22px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 10px; color: var(--text-mute);
+    }
+    .chart-label {
+      margin-top: 28px;
+      font-size: 12px; color: var(--text-mute);
+      text-align: center;
+    }
+
+    .info-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row-emoji { font-size: 20px; }
+    .info-row-text { flex: 1; font-size: 14px; color: var(--text); }
+    .info-row-text small { display: block; color: var(--text-mute); font-size: 12px; margin-top: 2px; }
+
+    .alert-box {
+      margin-top: 16px;
+      padding: 14px 16px;
+      background: var(--yellow-dim);
+      border-left: 3px solid var(--yellow);
+      border-radius: 8px;
+      font-size: 13px;
+      display: flex; gap: 10px; align-items: flex-start;
+    }
+    .alert-box strong { color: var(--yellow); }
+
+    /* ─── TAB 2: COCINA ─── */
+    .cocina-banner {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      font-size: 14px;
+      flex-wrap: wrap; gap: 10px;
+    }
+    .cocina-banner-left { display: flex; gap: 18px; align-items: center; }
+    .cocina-banner-stat { color: var(--text-dim); }
+    .cocina-banner-stat strong { color: var(--text); font-weight: 600; }
+    .cocina-banner-stat.warn strong { color: var(--red); }
+
+    .pedidos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .pedido {
+      background: var(--panel2);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      transition: all 0.3s;
+    }
+    .pedido.green  { border-color: rgba(78,203,113,0.35); background: linear-gradient(135deg, var(--panel2), rgba(78,203,113,0.04)); }
+    .pedido.yellow { border-color: rgba(232,200,122,0.45); background: linear-gradient(135deg, var(--panel2), rgba(232,200,122,0.05)); }
+    .pedido.red    { border-color: rgba(232,90,90,0.45); background: linear-gradient(135deg, var(--panel2), rgba(232,90,90,0.06)); }
+    .pedido.done   { opacity: 0.4; border-color: var(--border); background: var(--panel2); }
+    .pedido.done .pedido-time { color: var(--green); }
+    .pedido.done .pedido-btn { background: var(--green); }
+
+    .pedido-head {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .pedido-mesa {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px; font-weight: 600; color: var(--text);
+    }
+    .pedido-time {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 20px; font-weight: 600;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .pedido.yellow .pedido-time { color: var(--yellow); }
+    .pedido.red .pedido-time { color: var(--red); }
+
+    .pedido-items {
+      list-style: none;
+      margin: 12px 0 16px;
+    }
+    .pedido-items li {
+      font-size: 13px;
+      color: var(--text-dim);
+      padding: 4px 0;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pedido-items li::before {
+      content: '·';
+      color: var(--terra);
+      font-size: 18px;
+    }
+    .pedido-btn {
+      width: 100%;
+      padding: 11px;
+      background: var(--terra);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .pedido-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(232,82,26,0.3); }
+
+    /* ─── TAB 3: VITI ─── */
+    .viti-intro {
+      display: flex; gap: 14px; align-items: center;
+      padding: 16px;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 18px;
+    }
+    .viti-avatar {
+      width: 48px; height: 48px;
+      background: linear-gradient(135deg, var(--terra), var(--gold));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .viti-intro-text strong {
+      display: block;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .viti-intro-text span { font-size: 13px; color: var(--text-mute); }
+
+    .chat-window {
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      min-height: 380px;
+      display: flex; flex-direction: column;
+      gap: 12px;
+    }
+    .msg-viti {
+      display: flex; gap: 10px; align-items: flex-start;
+      max-width: 90%;
+    }
+    .msg-viti-bubble {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      border-radius: 4px 14px 14px 14px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text);
+    }
+    .msg-viti-bubble strong { color: var(--terra); }
+    .msg-mini-avatar {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--terra), var(--gold));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; font-weight: 700;
+      color: white;
+      flex-shrink: 0;
+    }
+    .msg-user {
+      align-self: flex-end;
+      max-width: 80%;
+    }
+    .msg-user-bubble {
+      background: var(--terra);
+      color: white;
+      padding: 10px 14px;
+      border-radius: 14px 14px 4px 14px;
+      font-size: 14px;
+    }
+    .observations {
+      list-style: none;
+      padding: 8px 0;
+    }
+    .observations li {
+      padding: 8px 0;
+      font-size: 13.5px;
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .chat-input-wrap {
+      display: flex; gap: 8px;
+      margin-top: 14px;
+      padding: 6px;
+      background: var(--panel2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+    }
+    .chat-input {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      padding: 10px 12px;
+      outline: none;
+    }
+    .chat-input::placeholder { color: var(--text-mute); }
+    .chat-send {
+      padding: 10px 18px;
+      background: var(--terra);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.15s;
+    }
+    .chat-send:hover { background: var(--terra2); }
+
+    .chat-quick {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      margin-top: 10px;
+    }
+    .chat-quick-btn {
+      padding: 6px 12px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chat-quick-btn:hover { border-color: var(--terra); color: var(--terra); }
+
+    /* ─── TAB 4: MARKETING ─── */
+    .mkt-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 18px;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .mkt-stat {
+      display: flex; gap: 10px; align-items: center;
+      padding: 10px 16px;
+      background: var(--green-dim);
+      color: var(--green);
+      border-radius: 999px;
+      font-size: 13px; font-weight: 600;
+    }
+    .mkt-month {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px; color: var(--text);
+    }
+
+    .cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .cal-weekday {
+      font-size: 11px;
+      color: var(--text-mute);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 6px 0;
+    }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+    .cal-day {
+      aspect-ratio: 1;
+      background: var(--panel2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px;
+      position: relative;
+      display: flex; flex-direction: column;
+      gap: 2px;
+      min-height: 70px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .cal-day:hover { border-color: var(--terra); transform: translateY(-2px); }
+    .cal-day.empty {
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+    .cal-day.empty:hover { transform: none; }
+    .cal-num {
+      font-size: 11px;
+      color: var(--text-mute);
+      font-weight: 600;
+    }
+    .cal-day.today .cal-num {
+      color: var(--terra);
+    }
+    .cal-day.today {
+      border-color: var(--terra);
+    }
+    .cal-post {
+      flex: 1;
+      border-radius: 4px;
+      padding: 3px 4px;
+      font-size: 9px;
+      font-weight: 600;
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      line-height: 1.1;
+      overflow: hidden;
+    }
+    .cal-post.ig { background: linear-gradient(135deg, #833AB4, #E1306C, #F77737); }
+    .cal-post.fb { background: linear-gradient(135deg, #1877F2, #3578E5); }
+    .cal-post.both { background: linear-gradient(135deg, #833AB4, #1877F2); }
+    .cal-post.draft { background: var(--panel); color: var(--text-mute); border: 1px dashed var(--border2); }
+
+    .legend {
+      display: flex; gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+    .legend-item { display: flex; gap: 6px; align-items: center; }
+    .legend-dot {
+      width: 12px; height: 12px;
+      border-radius: 3px;
+    }
+    .legend-dot.ig { background: linear-gradient(135deg, #833AB4, #E1306C, #F77737); }
+    .legend-dot.fb { background: linear-gradient(135deg, #1877F2, #3578E5); }
+    .legend-dot.both { background: linear-gradient(135deg, #833AB4, #1877F2); }
+    .legend-dot.draft { background: var(--panel); border: 1px dashed var(--border2); }
+
+    /* ─── CTA FINAL ─── */
+    .cta-final {
+      max-width: 900px;
+      margin: 64px auto 0;
+      padding: 56px 32px;
+      text-align: center;
+      background: radial-gradient(ellipse at center, rgba(232,82,26,0.15) 0%, transparent 70%);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background-color: var(--panel);
+    }
+    .cta-final h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      color: var(--text);
+      margin-bottom: 16px;
+    }
+    .cta-final h2 em { font-style: normal; color: var(--terra); }
+    .cta-final p {
+      font-size: 15px;
+      color: var(--text-dim);
+      margin-bottom: 28px;
+    }
+    .btn-primary-lg {
+      display: inline-block;
+      padding: 16px 36px;
+      background: var(--terra);
+      color: white;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px; font-weight: 600;
+      box-shadow: 0 6px 24px rgba(232,82,26,0.4);
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary-lg:hover {
+      background: var(--terra2);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 32px rgba(232,82,26,0.5);
+    }
+    .cta-small {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-mute);
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: var(--bg2);
+      color: var(--text-dim);
+      padding: 40px 24px 28px;
+      border-top: 1px solid var(--border);
+      margin-top: 64px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      text-align: center;
+    }
+    .footer-links {
+      display: flex; gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .footer-links a {
+      color: var(--text-mute);
+      font-size: 13px;
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+    .footer-links a:hover { color: var(--gold); }
+    .footer-bottom {
+      font-size: 12px;
+      color: var(--text-mute);
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 880px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .dash-row { grid-template-columns: 1fr; }
+      .tab-btn { padding: 10px 12px; font-size: 13px; }
+      .tab-btn span:not(.tab-icon) { display: none; }
+      .tab-panel { padding: 20px 16px; }
+    }
+    @media (max-width: 560px) {
+      .hero { padding: 100px 16px 40px; }
+      .demo-wrap { padding: 0 14px; margin-top: 20px; }
+      .pedidos-grid { grid-template-columns: 1fr; }
+      .nav-link { display: none; }
+      .cal-day { min-height: 56px; padding: 4px; }
+      .cal-post { font-size: 8px; padding: 2px; }
+      .panel-head h2 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="logo-link">
+      <svg width="22" height="27" viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0" y="18" width="18" height="2.5" rx="1.2" fill="#e8c87a"/>
+        <rect x="0" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+        <rect x="15.5" y="8" width="2.5" height="12" rx="1.2" fill="#e8c87a"/>
+        <path d="M2.5 8 Q9 1 15.5 8" stroke="#e8c87a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <span class="logo-text">Vitrina</span>
+    </a>
+    <div class="nav-actions">
+      <a href="/" class="nav-link">Inicio</a>
+      <a href="/demo.html" class="nav-link">Demo menú</a>
+      <a href="/#precios" class="nav-cta">Probar gratis</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">Demo navegable</div>
+  <h1>Así se ve tu <em>panel de Vitrina</em></h1>
+  <p class="hero-sub">Hacé clic en las secciones para ver qué tiene adentro. Es 100% interactivo.</p>
+  <div class="hero-tag">
+    <span style="color: var(--terra)">●</span> Sin registro · 2 min para conocerlo
+  </div>
+</section>
+
+<!-- DEMO TABS -->
+<div class="demo-wrap">
+
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="dashboard" onclick="switchTab('dashboard')">
+      <span class="tab-icon">📊</span> <span>Dashboard</span>
+    </button>
+    <button class="tab-btn" data-tab="cocina" onclick="switchTab('cocina')">
+      <span class="tab-icon">🍳</span> <span>Cocina en vivo</span>
+    </button>
+    <button class="tab-btn" data-tab="viti" onclick="switchTab('viti')">
+      <span class="tab-icon">💡</span> <span>Viti</span>
+    </button>
+    <button class="tab-btn" data-tab="marketing" onclick="switchTab('marketing')">
+      <span class="tab-icon">📅</span> <span>Marketing</span>
+    </button>
+  </div>
+
+  <!-- TAB 1: DASHBOARD -->
+  <div class="tab-panel active" id="tab-dashboard">
+    <div class="panel-head">
+      <div>
+        <h2>Dashboard</h2>
+        <p>Resumen del día · Casa Lucía Restaurante</p>
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span> En vivo
+      </div>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Pedidos hoy</div>
+        <div class="kpi-value">23</div>
+        <div class="kpi-delta">↑ 18% vs ayer</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Facturación</div>
+        <div class="kpi-value">$145.800</div>
+        <div class="kpi-delta">↑ 12% vs ayer</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Reservas</div>
+        <div class="kpi-value">8</div>
+        <div class="kpi-delta">↑ 2 vs ayer</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Clientes nuevos</div>
+        <div class="kpi-value">3</div>
+        <div class="kpi-delta down">igual que ayer</div>
+      </div>
+    </div>
+
+    <div class="dash-row">
+      <div class="dash-card">
+        <h3>Pedidos por hora</h3>
+        <div class="chart">
+          <div class="bar" style="height: 15%" data-h="11h"></div>
+          <div class="bar" style="height: 25%" data-h="12h"></div>
+          <div class="bar" style="height: 70%" data-h="13h"></div>
+          <div class="bar" style="height: 55%" data-h="14h"></div>
+          <div class="bar" style="height: 20%" data-h="15h"></div>
+          <div class="bar" style="height: 10%" data-h="16h"></div>
+          <div class="bar" style="height: 18%" data-h="17h"></div>
+          <div class="bar" style="height: 35%" data-h="18h"></div>
+          <div class="bar" style="height: 60%" data-h="19h"></div>
+          <div class="bar" style="height: 90%" data-h="20h"></div>
+          <div class="bar" style="height: 100%" data-h="21h"></div>
+          <div class="bar" style="height: 75%" data-h="22h"></div>
+        </div>
+        <div class="chart-label">El pico fue a las 21h con 5 pedidos</div>
+      </div>
+
+      <div class="dash-card">
+        <h3>Lo destacado</h3>
+        <div class="info-row">
+          <div class="info-row-emoji">🍝</div>
+          <div class="info-row-text">
+            Plato más pedido
+            <small>Milanesa napolitana · 7 unidades</small>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-row-emoji">⭐</div>
+          <div class="info-row-text">
+            Reseñas Google
+            <small>2 nuevas hoy · 4.8 ★ promedio</small>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-row-emoji">📸</div>
+          <div class="info-row-text">
+            Publicación del día
+            <small>340 likes en IG · publicada 14h</small>
+          </div>
+        </div>
+
+        <div class="alert-box">
+          <span>⚠️</span>
+          <div><strong>Stock bajo:</strong> 2 items por agotarse (provoleta y bondiola). Ver Catálogo →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 2: COCINA -->
+  <div class="tab-panel" id="tab-cocina">
+    <div class="panel-head">
+      <div>
+        <h2>Cocina en vivo</h2>
+        <p>Pedidos llegan en tiempo real desde el menú QR</p>
+      </div>
+      <div class="live-badge">
+        <span class="live-dot"></span> En vivo
+      </div>
+    </div>
+
+    <div class="cocina-banner">
+      <div class="cocina-banner-left">
+        <span class="cocina-banner-stat"><strong id="cocina-count">3</strong> pedidos en cocina</span>
+        <span class="cocina-banner-stat warn"><strong>1</strong> retrasado</span>
+      </div>
+      <span class="cocina-banner-stat" style="font-size:12px">Tip: tocá "Listo" para marcarlo como entregado</span>
+    </div>
+
+    <div class="pedidos-grid" id="pedidos-grid">
+      <!-- Pedidos se generan dinámicamente -->
+    </div>
+  </div>
+
+  <!-- TAB 3: VITI -->
+  <div class="tab-panel" id="tab-viti">
+    <div class="panel-head">
+      <div>
+        <h2>Viti, tu asistente estratégica</h2>
+        <p>Analiza tus datos y te da observaciones todos los días</p>
+      </div>
+    </div>
+
+    <div class="viti-intro">
+      <div class="viti-avatar">V</div>
+      <div class="viti-intro-text">
+        <strong>Viti</strong>
+        <span>Analizó las últimas 30 días de Casa Lucía · Conectada con IG, FB, Google y MP</span>
+      </div>
+    </div>
+
+    <div class="chat-window" id="chat-window">
+      <div class="msg-viti">
+        <div class="msg-mini-avatar">V</div>
+        <div class="msg-viti-bubble">
+          ¡Buenos días Lucía! Anoche tuviste <strong>18 pedidos</strong>, 12% más que el martes pasado. Te dejo 3 observaciones para hoy.
+        </div>
+      </div>
+
+      <div class="msg-viti">
+        <div class="msg-mini-avatar">V</div>
+        <div class="msg-viti-bubble">
+          <ul class="observations">
+            <li>📈 La <strong>milanesa napolitana</strong> está agotando reservas todos los días. Considerá subir 5% el precio.</li>
+            <li>📸 Tu publicación del jueves tuvo <strong>340 likes</strong> vs el promedio de 120. Replicar formato (plato cenital + caption corta).</li>
+            <li>⚠️ Tres reseñas mencionan <strong>"demora en cocina"</strong> en mayo. Habría que revisar el flujo de la franja 21–22h.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="chat-quick">
+      <button class="chat-quick-btn" onclick="askViti('¿Cómo viene la semana?')">¿Cómo viene la semana?</button>
+      <button class="chat-quick-btn" onclick="askViti('¿Qué publico hoy?')">¿Qué publico hoy?</button>
+      <button class="chat-quick-btn" onclick="askViti('Compará con la competencia')">Compará con la competencia</button>
+    </div>
+
+    <div class="chat-input-wrap">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Preguntale a Viti...">
+      <button class="chat-send" onclick="sendChat()">Enviar</button>
+    </div>
+  </div>
+
+  <!-- TAB 4: MARKETING -->
+  <div class="tab-panel" id="tab-marketing">
+    <div class="panel-head">
+      <div>
+        <h2>Marketing: calendario auto</h2>
+        <p>30 publicaciones al mes programadas y aprobadas por vos</p>
+      </div>
+    </div>
+
+    <div class="mkt-head">
+      <div class="mkt-month">Mayo 2026</div>
+      <div class="mkt-stat">
+        <span>✓</span> 30 de 30 publicaciones programadas
+      </div>
+    </div>
+
+    <div class="cal-weekdays">
+      <div class="cal-weekday">Lun</div>
+      <div class="cal-weekday">Mar</div>
+      <div class="cal-weekday">Mié</div>
+      <div class="cal-weekday">Jue</div>
+      <div class="cal-weekday">Vie</div>
+      <div class="cal-weekday">Sáb</div>
+      <div class="cal-weekday">Dom</div>
+    </div>
+
+    <div class="cal-grid" id="cal-grid">
+      <!-- Calendario se genera dinámicamente -->
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot ig"></div> Instagram</div>
+      <div class="legend-item"><div class="legend-dot fb"></div> Facebook</div>
+      <div class="legend-item"><div class="legend-dot both"></div> IG + FB</div>
+      <div class="legend-item"><div class="legend-dot draft"></div> Borrador</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- CTA FINAL -->
+<div class="demo-wrap">
+  <section class="cta-final">
+    <h2>Probá <em>Vitrina</em> 14 días gratis</h2>
+    <p>El panel completo, sin restricciones. Configurá tu menú, conectá redes y empezá a recibir pedidos.</p>
+    <a href="/#precios" class="btn-primary-lg">Empezar gratis →</a>
+    <div class="cta-small">Sin tarjeta · Sin permanencia · Cancelás cuando quieras</div>
+  </section>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-links">
+      <a href="/">Inicio</a>
+      <a href="/demo.html">Demo menú</a>
+      <a href="/demo-servicios.html">Demo servicios</a>
+      <a href="/#precios">Precios</a>
+      <a href="/terms.html">Términos</a>
+      <a href="/privacy.html">Privacidad</a>
+    </div>
+    <div class="footer-bottom">
+      © 2026 Vitrina · Hecho en Argentina 🇦🇷
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ─── TAB SWITCHER ───
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + name));
+  }
+
+  // ─── COCINA: pedidos con cronómetro ───
+  const pedidos = [
+    { mesa: 'Mesa 4',  segundos: 8 * 60 + 42, items: ['2 milanesas napolitana', '1 ensalada César', '2 agua sin gas'] },
+    { mesa: 'Mesa 7',  segundos: 12 * 60 + 15, items: ['1 bondiola braseada', '1 entraña 350g', '1 papas rústicas', '2 vino tinto copa'] },
+    { mesa: 'Take-away', segundos: 2 * 60 + 30, items: ['1 milanesa napolitana', '1 papas fritas', '1 coca 500ml'] }
+  ];
+
+  function fmtTime(s) {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+  }
+
+  function colorByTime(s) {
+    if (s < 5 * 60) return 'green';
+    if (s < 10 * 60) return 'yellow';
+    return 'red';
+  }
+
+  function renderPedidos() {
+    const grid = document.getElementById('pedidos-grid');
+    grid.innerHTML = '';
+    pedidos.forEach((p, i) => {
+      if (p.done) {
+        grid.insertAdjacentHTML('beforeend', `
+          <div class="pedido done">
+            <div class="pedido-head">
+              <div class="pedido-mesa">${p.mesa}</div>
+              <div class="pedido-time">✓ Listo</div>
+            </div>
+            <ul class="pedido-items">
+              ${p.items.map(it => `<li>${it}</li>`).join('')}
+            </ul>
+            <button class="pedido-btn" disabled style="opacity:0.7">Entregado</button>
+          </div>
+        `);
+      } else {
+        const color = colorByTime(p.segundos);
+        grid.insertAdjacentHTML('beforeend', `
+          <div class="pedido ${color}">
+            <div class="pedido-head">
+              <div class="pedido-mesa">${p.mesa}</div>
+              <div class="pedido-time" data-idx="${i}">${fmtTime(p.segundos)}</div>
+            </div>
+            <ul class="pedido-items">
+              ${p.items.map(it => `<li>${it}</li>`).join('')}
+            </ul>
+            <button class="pedido-btn" onclick="marcarListo(${i})">Listo ✓</button>
+          </div>
+        `);
+      }
+    });
+    const activos = pedidos.filter(p => !p.done).length;
+    document.getElementById('cocina-count').textContent = activos;
+  }
+
+  function marcarListo(i) {
+    pedidos[i].done = true;
+    renderPedidos();
+  }
+
+  // Cronómetro real cada segundo
+  setInterval(() => {
+    let changed = false;
+    pedidos.forEach((p, i) => {
+      if (!p.done) {
+        p.segundos++;
+        const el = document.querySelector(`.pedido-time[data-idx="${i}"]`);
+        if (el) {
+          el.textContent = fmtTime(p.segundos);
+          // Verifica si cambia de color
+          const newColor = colorByTime(p.segundos);
+          const card = el.closest('.pedido');
+          if (card && !card.classList.contains(newColor)) {
+            card.classList.remove('green', 'yellow', 'red');
+            card.classList.add(newColor);
+          }
+        }
+        changed = true;
+      }
+    });
+  }, 1000);
+
+  renderPedidos();
+
+  // ─── VITI CHAT ───
+  const vitiResponses = {
+    'cómo viene la semana': 'Vas <strong>+8% en facturación</strong> vs la semana pasada. El sábado fue tu mejor día (52 pedidos). Mié y jue siguen flojos: habría que probar una promo de mediodía.',
+    'qué publico hoy': 'Te propongo un <strong>video corto de la milanesa napolitana saliendo de la cocina</strong> + caption: "Lo de siempre, hecho como hace 30 años". Lo subo a IG y FB a las 12:30, 15 min antes del pico de pedidos.',
+    'compará con la competencia': 'Analicé 4 restaurantes a 500m: <strong>2 subieron precios</strong> esta semana, 1 lanzó menú ejecutivo a $9.500, y tu rating Google (4.8) es el más alto de la zona. Mantenete así.',
+    'default': 'Buena pregunta. Dame un segundo, miro los datos y te respondo con detalle. Mientras tanto, fijate las observaciones de arriba.'
+  };
+
+  function askViti(question) {
+    document.getElementById('chat-input').value = question;
+    sendChat();
+  }
+
+  function sendChat() {
+    const input = document.getElementById('chat-input');
+    const q = input.value.trim();
+    if (!q) return;
+
+    const chat = document.getElementById('chat-window');
+    chat.insertAdjacentHTML('beforeend', `
+      <div class="msg-user">
+        <div class="msg-user-bubble">${q}</div>
+      </div>
+    `);
+    input.value = '';
+
+    // Buscar respuesta
+    const qLower = q.toLowerCase();
+    let response = vitiResponses['default'];
+    for (const key in vitiResponses) {
+      if (key !== 'default' && qLower.includes(key.toLowerCase())) {
+        response = vitiResponses[key];
+        break;
+      }
+    }
+
+    setTimeout(() => {
+      chat.insertAdjacentHTML('beforeend', `
+        <div class="msg-viti">
+          <div class="msg-mini-avatar">V</div>
+          <div class="msg-viti-bubble">${response}</div>
+        </div>
+      `);
+      chat.scrollTop = chat.scrollHeight;
+    }, 700);
+  }
+
+  document.getElementById('chat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendChat();
+  });
+
+  // ─── CALENDARIO MARKETING ───
+  const monthDays = 31; // Mayo
+  const firstDayOffset = 4; // Mayo 2026 empieza viernes (offset desde Lun=0)
+  const today = 24;
+  const grid = document.getElementById('cal-grid');
+
+  const postTypes = ['ig', 'fb', 'both', 'ig', 'both', 'fb', 'ig'];
+  const postCaptions = [
+    'Plato del día', 'Reel cocina', 'Reseña ⭐', 'Foto local',
+    'Promo viernes', 'Carta nueva', 'Detrás escena', 'Cliente del mes',
+    'Sorteo', 'Plato cenital', 'Nuevo postre', 'Story menú'
+  ];
+
+  // Días vacíos al inicio
+  for (let i = 0; i < firstDayOffset; i++) {
+    grid.insertAdjacentHTML('beforeend', '<div class="cal-day empty"></div>');
+  }
+
+  for (let d = 1; d <= monthDays; d++) {
+    const isPast = d < today;
+    const isToday = d === today;
+    const type = postTypes[d % postTypes.length];
+    const caption = postCaptions[d % postCaptions.length];
+    const status = isPast ? 'Publicado' : (d > today + 7 ? 'draft' : 'Programado');
+    const cls = status === 'draft' ? 'draft' : type;
+    const todayClass = isToday ? ' today' : '';
+
+    grid.insertAdjacentHTML('beforeend', `
+      <div class="cal-day${todayClass}">
+        <div class="cal-num">${d}</div>
+        <div class="cal-post ${cls}">${caption}</div>
+      </div>
+    `);
+  }
+</script>
+
+</body>
+</html>

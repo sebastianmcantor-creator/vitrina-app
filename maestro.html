@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel Maestro — Vitrina</title>
+<title>Panel Maestro · Vitrina</title>
 <style>
 :root {
   --ink:        #1C1612;
@@ -301,6 +301,158 @@ tbody tr:hover {
   background: var(--terra2);
 }
 
+/* ── CRM Ventas ─────────────────────────────────────────────────────────── */
+.sales-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.sales-filters label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.sales-filters input[type="text"],
+.sales-filters input[type="number"],
+.sales-filters select {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 13px;
+  color: var(--ink);
+  font-family: inherit;
+}
+.sales-filters .checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.sales-filters .checkbox-row input { width: auto; }
+
+.kanban {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.kanban-col {
+  background: var(--cream);
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 200px;
+  border: 1px solid var(--border);
+}
+.kanban-col h4 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.kanban-col h4 .count {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--white);
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+.kanban-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: box-shadow .15s;
+  font-size: 12px;
+}
+.kanban-card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+.kanban-card .name {
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 3px;
+  font-size: 13px;
+}
+.kanban-card .meta {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.sales-result-row { font-size: 13px; }
+.sales-thumb {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: var(--cream);
+}
+.sales-btn-primary {
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  background: var(--terra);
+  color: var(--white);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+.sales-btn-primary:hover { background: var(--terra2); }
+.sales-btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: none;
+  align-items: center; justify-content: center;
+  z-index: 9999; padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+.modal-box {
+  background: var(--white);
+  border-radius: 14px;
+  max-width: 560px; width: 100%;
+  max-height: 80vh; overflow-y: auto;
+  padding: 24px;
+}
+.modal-box h3 { font-size: 18px; margin-bottom: 12px; color: var(--ink); }
+.modal-box textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-family: inherit;
+  font-size: 13px;
+  min-height: 100px;
+  resize: vertical;
+}
+
+.bar-chart {
+  display: flex; align-items: flex-end; gap: 8px;
+  height: 140px; margin-top: 12px;
+}
+.bar-col {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  font-size: 11px; color: var(--muted);
+}
+.bar {
+  width: 100%;
+  background: var(--terra);
+  border-radius: 6px 6px 0 0;
+  min-height: 4px;
+  transition: height .3s;
+}
+
 @media (max-width: 768px) {
   .metrics-grid {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -343,6 +495,8 @@ tbody tr:hover {
     <button class="tab" data-tab="producers" onclick="switchTab('producers')">🤝 Productores</button>
     <button class="tab" data-tab="agents" onclick="switchTab('agents')">🤖 Agentes IA</button>
     <button class="tab" data-tab="costs" onclick="switchTab('costs')">📉 Costos</button>
+    <button class="tab" data-tab="sales" onclick="switchTab('sales')">🎯 Ventas</button>
+    <button class="tab" data-tab="twilio" onclick="switchTab('twilio')">📡 Twilio</button>
   </div>
 
   <!-- Vista General -->
@@ -508,6 +662,205 @@ tbody tr:hover {
     <div class="card">
       <div class="card-title">Desglose de costos</div>
       <div id="costs-breakdown">Cargando...</div>
+    </div>
+  </div>
+
+  <!-- Ventas / CRM -->
+  <div id="tab-sales" class="tab-content">
+    <!-- A) Métricas top -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-label">Mails este mes</div>
+        <div class="metric-value" id="sales-metric-mails">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Open rate</div>
+        <div class="metric-value" id="sales-metric-open">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Reply rate</div>
+        <div class="metric-value" id="sales-metric-reply">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Trials</div>
+        <div class="metric-value" id="sales-metric-trials">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Clientes pagos nuevos</div>
+        <div class="metric-value" id="sales-metric-customers">-</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">ROI campaña</div>
+        <div class="metric-value" id="sales-metric-roi">-</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Evolución semanal (mails enviados)</div>
+      <div id="sales-bar-chart" class="bar-chart"></div>
+    </div>
+
+    <!-- A) Filtros de búsqueda -->
+    <div class="card">
+      <div class="card-title">🔎 Buscar nuevos prospects</div>
+      <div class="sales-filters">
+        <div>
+          <label>Rubro</label>
+          <select id="f-rubro">
+            <option value="restaurant">Restaurantes</option>
+            <option value="local">Comercios / Locales</option>
+            <option value="services">Servicios</option>
+            <option value="ecommerce">E-commerce</option>
+          </select>
+        </div>
+        <div>
+          <label>Zona</label>
+          <select id="f-zona">
+            <option>CABA</option>
+            <option>GBA Norte</option>
+            <option>GBA Oeste</option>
+            <option>GBA Sur</option>
+            <option>Córdoba</option>
+            <option>Rosario</option>
+            <option>Mendoza</option>
+            <option>Mar del Plata</option>
+            <option value="custom">Otro (escribir)…</option>
+          </select>
+          <input type="text" id="f-zona-custom" placeholder="Ej: La Plata, Argentina" style="display:none;margin-top:6px">
+        </div>
+        <div>
+          <label>Rating mínimo</label>
+          <input type="number" id="f-rating" value="4.0" min="0" max="5" step="0.1">
+        </div>
+        <div>
+          <label>Reseñas mínimas</label>
+          <input type="number" id="f-reviews" value="50" min="0" step="10">
+        </div>
+        <div class="checkbox-row"><input type="checkbox" id="f-active" checked><label for="f-active" style="margin-bottom:0">Solo activos</label></div>
+        <div class="checkbox-row"><input type="checkbox" id="f-web"><label for="f-web" style="margin-bottom:0">Tiene sitio web</label></div>
+        <div class="checkbox-row"><input type="checkbox" id="f-ig"><label for="f-ig" style="margin-bottom:0">IG público</label></div>
+        <div class="checkbox-row"><input type="checkbox" id="f-exclude" checked><label for="f-exclude" style="margin-bottom:0">Excluir ya cliente / contactado</label></div>
+      </div>
+      <button class="sales-btn-primary" id="btn-search-prospects" onclick="window.searchProspects()">Buscar prospects →</button>
+    </div>
+
+    <!-- B) Resultados -->
+    <div class="card" id="search-results-card" style="display:none">
+      <div class="card-title">Resultados de búsqueda <span id="search-count" style="color:var(--muted);font-size:13px;font-weight:400"></span></div>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px">
+        <label style="font-size:13px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="sel-all" onclick="window.toggleSelectAll()"> Seleccionar todos</label>
+        <span style="flex:1"></span>
+        <button class="sales-btn-primary" onclick="window.generateCampaign()" id="btn-generate-campaign">Crear prospects con seleccionados</button>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th width="32"></th>
+              <th></th>
+              <th>Nombre</th>
+              <th>Rating</th>
+              <th>Reseñas</th>
+              <th>Web</th>
+              <th>Teléfono</th>
+              <th>Ubicación</th>
+            </tr>
+          </thead>
+          <tbody id="search-results-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- C) Pipeline / Kanban -->
+    <div class="card">
+      <div class="card-title">📋 Pipeline (CRM)</div>
+      <div class="kanban" id="kanban-board">
+        <div class="loading">Cargando pipeline...</div>
+      </div>
+    </div>
+
+    <!-- D) Configuración de campaña -->
+    <div class="card">
+      <div class="card-title">⚙️ Configuración de campaña</div>
+      <div id="campaign-config-container">Cargando configuración...</div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab: Twilio (WA per cliente) -->
+<div id="tab-twilio" class="tab-content">
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Líneas activas</div>
+      <div class="metric-value" id="twilio-active-lines">-</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Costo total Twilio/mes</div>
+      <div class="metric-value" id="twilio-total-cost">-</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Líneas en alerta</div>
+      <div class="metric-value" id="twilio-alert-lines">-</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Pendientes de activación</div>
+      <div class="metric-value" id="twilio-pending-lines">-</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="card-title">📡 Líneas Twilio por cliente</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Modo actual: stubeado (provisionamiento simulado). Cuando Twilio apruebe la cuenta, las acciones acá disparan provisión real.</div>
+    <div class="table-wrapper">
+      <table id="twilio-table">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Plan</th>
+            <th>Número</th>
+            <th>Estado</th>
+            <th>Quality</th>
+            <th>Utility</th>
+            <th>Marketing</th>
+            <th>Costo USD</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="twilio-tbody">
+          <tr><td colspan="9" class="loading">Cargando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: detalle de prospect -->
+<div class="modal-backdrop" id="prospect-modal" onclick="if(event.target===this) this.classList.remove('open')">
+  <div class="modal-box">
+    <h3 id="pm-title">Detalle</h3>
+    <div id="pm-body" style="font-size:13px;color:var(--ink);line-height:1.6"></div>
+    <div style="margin-top:14px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted)">Notas internas</label>
+      <textarea id="pm-notes" placeholder="Notas internas..."></textarea>
+    </div>
+    <div style="margin-top:14px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted)">Cambiar estado</label>
+      <select id="pm-status" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px;margin-top:4px">
+        <option value="discovered">📥 Descubierto</option>
+        <option value="contacted">📤 Contactado</option>
+        <option value="opened">👁 Abrió mail</option>
+        <option value="replied">💬 Respondió</option>
+        <option value="interested">🔥 Interesado</option>
+        <option value="trial">▶️ En trial</option>
+        <option value="customer">💰 Cliente pago</option>
+        <option value="baja">❌ Baja</option>
+        <option value="not_interested">🛑 No interesado</option>
+      </select>
+    </div>
+    <div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">
+      <button class="sales-btn-primary" onclick="window.savePmProspect()">Guardar</button>
+      <button class="action-btn" onclick="window.sendManualMail()">📧 Enviar mail ahora</button>
+      <button class="action-btn" onclick="document.getElementById('prospect-modal').classList.remove('open')">Cerrar</button>
     </div>
   </div>
 </div>
@@ -707,7 +1060,520 @@ function renderCurrentTab() {
     case 'costs':
       renderCosts()
       break
+    case 'sales':
+      renderSales()
+      break
+    case 'twilio':
+      renderTwilio()
+      break
   }
+}
+
+// ─────────────────────────────────────────────
+// Twilio — WA per cliente (maestro)
+// ─────────────────────────────────────────────
+async function renderTwilio () {
+  const tbody = document.getElementById('twilio-tbody')
+  if (!tbody) return
+  tbody.innerHTML = '<tr><td colspan="9" class="loading">Cargando...</td></tr>'
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/wa-lines')
+    const data = await res.json()
+    const lines = data.lines || []
+
+    let active = 0, pending = 0, alert = 0
+    lines.forEach(l => {
+      if (l.wa_status === 'active') active++
+      else if (l.wa_status === 'pending') pending++
+      if (l.wa_status === 'paused_marketing' || l.wa_status === 'paused_all' || (l.quality_rating && l.quality_rating !== 'green')) alert++
+    })
+
+    document.getElementById('twilio-active-lines').textContent  = active
+    document.getElementById('twilio-pending-lines').textContent = pending
+    document.getElementById('twilio-alert-lines').textContent   = alert
+    document.getElementById('twilio-total-cost').textContent    = '$' + (data.total_cost_usd || 0).toFixed(2)
+
+    if (!lines.length) {
+      tbody.innerHTML = '<tr><td colspan="9" class="loading">Sin líneas Twilio asignadas aún.</td></tr>'
+      return
+    }
+
+    tbody.innerHTML = lines.map(l => {
+      const statusBadge = ({
+        pending: '⏳ pending',
+        active:  '✅ active',
+        paused_marketing: '🟠 paused_mkt',
+        paused_all: '🔴 paused_all',
+        released: '⚪ released',
+      })[l.wa_status] || l.wa_status
+
+      return `<tr>
+        <td>${(l.name||'—').replace(/</g,'&lt;')}</td>
+        <td>${l.plan || '—'}</td>
+        <td><code style="font-size:12px">${l.twilio_number || '—'}</code></td>
+        <td>${statusBadge}</td>
+        <td>${l.quality_rating || '—'}</td>
+        <td>${l.utility_used || 0}</td>
+        <td>${l.marketing_used || 0}</td>
+        <td>$${(l.line_cost_usd || 0).toFixed(2)}</td>
+        <td>
+          ${l.wa_status === 'pending' || !l.twilio_number
+            ? `<button class="btn btn-primary" style="font-size:11px;padding:4px 8px" onclick="adminProvisionWa('${l.restaurant_id}')">Provisionar</button>`
+            : `<button class="btn" style="font-size:11px;padding:4px 8px" onclick="adminReleaseWa('${l.restaurant_id}')">Liberar</button>`}
+        </td>
+      </tr>`
+    }).join('')
+  } catch (e) {
+    tbody.innerHTML = `<tr><td colspan="9" class="loading" style="color:#c00">Error: ${e.message}</td></tr>`
+  }
+}
+
+window.adminProvisionWa = async function (restaurantId) {
+  if (!confirm('Provisionar número Twilio (modo stub) para este cliente?')) return
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/wa/provision', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: restaurantId }),
+    })
+    const data = await res.json()
+    if (data.ok) { alert('Número asignado: ' + data.number); renderTwilio() }
+    else alert('Error: ' + (data.error || 'no se pudo'))
+  } catch (e) { alert('Error: ' + e.message) }
+}
+
+window.adminReleaseWa = async function (restaurantId) {
+  if (!confirm('Liberar el número Twilio de este cliente?')) return
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/wa/release', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: restaurantId }),
+    })
+    const data = await res.json()
+    if (data.ok) { alert('Liberado.'); renderTwilio() }
+    else alert('Error: ' + (data.error || 'no se pudo'))
+  } catch (e) { alert('Error: ' + e.message) }
+}
+
+// ─────────────────────────────────────────────
+// CRM Ventas
+// ─────────────────────────────────────────────
+const WORKER_BASE = 'https://vitrina-tano.vitrinaapp.workers.dev'
+let lastSearchResults = []
+let allProspects = []
+let salesConfig = null
+
+const KANBAN_COLUMNS = [
+  { key: 'contacted',      label: '📥 Contactado' },
+  { key: 'opened',         label: '👁 Abrió' },
+  { key: 'replied',        label: '💬 Respondió' },
+  { key: 'interested',     label: '🔥 Interesado' },
+  { key: 'trial',          label: '▶️ En trial' },
+  { key: 'customer',       label: '💰 Cliente pago' },
+  { key: 'baja',           label: '❌ Baja' },
+  { key: 'not_interested', label: '🛑 No interesado' },
+]
+
+async function renderSales() {
+  // Listener para zona custom
+  const zoneSelect = document.getElementById('f-zona')
+  if (zoneSelect && !zoneSelect._wired) {
+    zoneSelect._wired = true
+    zoneSelect.addEventListener('change', () => {
+      document.getElementById('f-zona-custom').style.display =
+        zoneSelect.value === 'custom' ? 'block' : 'none'
+    })
+  }
+
+  await Promise.all([
+    loadSalesMetrics(),
+    loadSalesPipeline(),
+    loadSalesConfig(),
+  ])
+}
+
+async function loadSalesMetrics() {
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/metrics?days=30`)
+    const data = r.ok ? await r.json() : { metrics: [], totals: {} }
+    const t = data.totals || {}
+
+    const sent     = t.prospects_contacted || 0
+    const opens    = t.responses_received || 0    // approx (depende de tracking)
+    const replies  = (data.metrics || []).reduce((s,m) => s + (m.responses_received || 0), 0)
+    const trials   = t.interested_count || 0
+    const customers= t.converted_count || 0
+    const cost     = (parseFloat(t.whatsapp_cost || 0) + parseFloat(t.api_cost || 0)) || 1
+
+    document.getElementById('sales-metric-mails').textContent = sent
+    document.getElementById('sales-metric-open').textContent  = sent ? Math.round(opens * 100 / sent) + '%' : '—'
+    document.getElementById('sales-metric-reply').textContent = sent ? Math.round(replies * 100 / sent) + '%' : '—'
+    document.getElementById('sales-metric-trials').textContent = trials
+    document.getElementById('sales-metric-customers').textContent = customers
+    // ROI: asumiendo $40 USD ingreso promedio / cliente nuevo / mes
+    const ingresos = customers * 40
+    const roi = cost > 0 ? Math.round((ingresos - cost) * 100 / cost) : 0
+    document.getElementById('sales-metric-roi').textContent = customers ? roi + '%' : '—'
+
+    // Gráfico semanal
+    const weekly = aggregateWeekly(data.metrics || [])
+    renderBarChart(weekly)
+  } catch (e) {
+    console.warn('loadSalesMetrics error:', e)
+  }
+}
+
+function aggregateWeekly(metrics) {
+  const buckets = {}
+  metrics.forEach(m => {
+    const d = new Date(m.date)
+    const year = d.getFullYear()
+    // Calcular semana ISO simple
+    const onejan = new Date(year, 0, 1)
+    const week = Math.ceil(((d - onejan) / 86400000 + onejan.getDay() + 1) / 7)
+    const key = `S${week}`
+    buckets[key] = (buckets[key] || 0) + (m.prospects_contacted || 0)
+  })
+  const keys = Object.keys(buckets).slice(-8)
+  return keys.map(k => ({ label: k, value: buckets[k] }))
+}
+
+function renderBarChart(data) {
+  const el = document.getElementById('sales-bar-chart')
+  if (!el) return
+  if (!data.length) { el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:20px">Sin datos todavía.</div>'; return }
+  const max = Math.max(...data.map(d => d.value), 1)
+  el.innerHTML = data.map(d => `
+    <div class="bar-col">
+      <div style="font-size:11px;color:var(--ink);font-weight:600">${d.value}</div>
+      <div class="bar" style="height:${(d.value / max) * 100}%"></div>
+      <div>${d.label}</div>
+    </div>
+  `).join('')
+}
+
+async function loadSalesPipeline() {
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/prospects`)
+    const data = r.ok ? await r.json() : { prospects: [] }
+    allProspects = data.prospects || []
+    renderKanban()
+  } catch (e) {
+    console.warn('loadSalesPipeline error:', e)
+    document.getElementById('kanban-board').innerHTML =
+      '<div style="color:var(--bad);font-size:13px;padding:20px">Error cargando pipeline.</div>'
+  }
+}
+
+function renderKanban() {
+  const board = document.getElementById('kanban-board')
+  const html = KANBAN_COLUMNS.map(col => {
+    const items = allProspects.filter(p => p.status === col.key)
+    return `
+      <div class="kanban-col" data-status="${col.key}">
+        <h4>${col.label} <span class="count">${items.length}</span></h4>
+        ${items.length === 0
+          ? '<div style="font-size:11px;color:var(--muted);text-align:center;padding:12px">Vacío</div>'
+          : items.map(p => `
+            <div class="kanban-card" onclick="window.openProspect('${p.id}')">
+              <div class="name">${escapeHtml(p.name || '')}</div>
+              <div class="meta">${escapeHtml(p.business_type || 'restaurant')} · ${escapeHtml(p.city || '—')}</div>
+              <div class="meta" style="margin-top:3px">${p.last_contact_at ? 'Contact: ' + new Date(p.last_contact_at).toLocaleDateString('es-AR', {day:'2-digit',month:'short'}) : 'Sin contacto'}</div>
+              ${p.opens_count ? `<div class="meta" style="margin-top:3px;color:var(--good)">👁 ${p.opens_count} aperturas</div>` : ''}
+            </div>
+          `).join('')}
+      </div>
+    `
+  }).join('')
+  board.innerHTML = html
+}
+
+async function loadSalesConfig() {
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/config`)
+    const data = r.ok ? await r.json() : { config: null }
+    salesConfig = data.config || {}
+    renderCampaignConfig()
+  } catch (e) {
+    console.warn('loadSalesConfig error:', e)
+  }
+}
+
+function renderCampaignConfig() {
+  const c = salesConfig || {}
+  document.getElementById('campaign-config-container').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Volumen diario actual</label>
+        <input type="number" id="cfg-volume" value="${c.daily_volume || 50}" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px">
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Recomendado: semana 1 → 50/día, semana 5 → 200/día</div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Semana de rampa</label>
+        <input type="number" id="cfg-ramp" value="${c.daily_volume_ramp_week || 1}" min="1" max="10" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Horarios envío restaurantes</label>
+        <div style="display:flex;gap:6px">
+          <input type="time" id="cfg-resto-start" value="${c.contact_hours_resto_start || '12:00'}" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px">
+          <input type="time" id="cfg-resto-end" value="${c.contact_hours_resto_end || '22:00'}" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px">
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Horarios envío locales / servicios</label>
+        <div style="display:flex;gap:6px">
+          <input type="time" id="cfg-local-start" value="${c.contact_hours_local_start || '10:00'}" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px">
+          <input type="time" id="cfg-local-end" value="${c.contact_hours_local_end || '17:00'}" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px">
+        </div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Asunto del mail (vars: {{nombre_negocio}}, {{ciudad}})</label>
+      <input type="text" id="cfg-subject" value="${escapeHtml(c.email_template_subject || '{{nombre_negocio}}: análisis de tu presencia digital')}" style="width:100%;padding:8px;border-radius:8px;border:1px solid var(--border);font-size:13px">
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bottom:4px">Cuerpo del mail (vars: {{nombre_negocio}}, {{ciudad}}, {{informe_link}}, {{puntos}})</label>
+      <textarea id="cfg-body" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border);font-family:inherit;font-size:13px;min-height:140px">${escapeHtml(c.email_template_body || '')}</textarea>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <button class="sales-btn-primary" onclick="window.saveCampaignConfig()">Guardar configuración</button>
+      <label style="font-size:13px;display:flex;align-items:center;gap:6px;margin-left:auto">
+        <input type="checkbox" id="cfg-active" ${c.is_active ? 'checked' : ''} onchange="window.toggleCampaignActive(this.checked)">
+        Campaña activa
+      </label>
+    </div>
+  `
+}
+
+window.saveCampaignConfig = async function() {
+  const payload = {
+    daily_volume: parseInt(document.getElementById('cfg-volume').value) || 50,
+    daily_volume_ramp_week: parseInt(document.getElementById('cfg-ramp').value) || 1,
+    contact_hours_resto_start: document.getElementById('cfg-resto-start').value,
+    contact_hours_resto_end:   document.getElementById('cfg-resto-end').value,
+    contact_hours_local_start: document.getElementById('cfg-local-start').value,
+    contact_hours_local_end:   document.getElementById('cfg-local-end').value,
+    email_template_subject:    document.getElementById('cfg-subject').value,
+    email_template_body:       document.getElementById('cfg-body').value,
+  }
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (!r.ok) throw new Error(await r.text())
+    alert('Configuración guardada')
+    await loadSalesConfig()
+  } catch (e) {
+    alert('Error: ' + e.message)
+  }
+}
+
+window.toggleCampaignActive = async function(active) {
+  try {
+    await fetch(`${WORKER_BASE}/api/sales/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ is_active: active }),
+    })
+  } catch (e) { alert('Error: ' + e.message) }
+}
+
+window.searchProspects = async function() {
+  const btn = document.getElementById('btn-search-prospects')
+  btn.disabled = true
+  btn.textContent = 'Buscando...'
+
+  const zoneSelect = document.getElementById('f-zona')
+  let location = zoneSelect.value === 'custom'
+    ? document.getElementById('f-zona-custom').value.trim()
+    : zoneSelect.value
+  if (!location) { alert('Indicá una zona'); btn.disabled = false; btn.textContent = 'Buscar prospects →'; return }
+
+  if (!/Argentina/i.test(location)) location += ', Argentina'
+
+  const payload = {
+    location,
+    rubro:           document.getElementById('f-rubro').value,
+    minRating:       parseFloat(document.getElementById('f-rating').value) || 0,
+    minReviews:      parseInt(document.getElementById('f-reviews').value) || 0,
+    operationalOnly: document.getElementById('f-active').checked,
+    requireWebsite:  document.getElementById('f-web').checked,
+    excludeExisting: document.getElementById('f-exclude').checked,
+  }
+
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/search-restaurants`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    const data = await r.json()
+    if (!r.ok) throw new Error(data.error || 'Error')
+    lastSearchResults = data.restaurants || []
+
+    // Filtro web/IG en cliente (la búsqueda Places no devuelve esto directo)
+    if (payload.requireWebsite) {
+      // No tenemos detalles aún; el botón es opcional, mostramos warning
+      // (sería necesario pegarle a place details para confirmar website)
+    }
+    renderSearchResults(payload.rubro)
+  } catch (e) {
+    alert('Error: ' + e.message)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Buscar prospects →'
+  }
+}
+
+function renderSearchResults(rubro) {
+  document.getElementById('search-results-card').style.display = 'block'
+  document.getElementById('search-count').textContent = `(${lastSearchResults.length} encontrados)`
+  const tbody = document.getElementById('search-results-tbody')
+  if (!lastSearchResults.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-state">Sin resultados con esos filtros</td></tr>'
+    return
+  }
+  tbody.innerHTML = lastSearchResults.map((r, i) => `
+    <tr class="sales-result-row">
+      <td><input type="checkbox" class="sel-prospect" data-i="${i}"></td>
+      <td>${r.photo_url ? `<img class="sales-thumb" src="${r.photo_url}" loading="lazy">` : ''}</td>
+      <td><strong>${escapeHtml(r.name || '')}</strong><div style="font-size:11px;color:var(--muted)">${escapeHtml(rubro)}</div></td>
+      <td>${r.rating ? (r.rating.toFixed(1) + ' ⭐') : '—'}</td>
+      <td>${r.reviews_count || 0}</td>
+      <td>${r.website ? '✅' : '—'}</td>
+      <td style="font-size:12px">${escapeHtml(r.phone || '—')}</td>
+      <td style="font-size:12px">${escapeHtml(r.address || '—')}</td>
+    </tr>
+  `).join('')
+  // marcar todos default
+  document.querySelectorAll('.sel-prospect').forEach(cb => cb.checked = true)
+  document.getElementById('sel-all').checked = true
+}
+
+window.toggleSelectAll = function() {
+  const all = document.getElementById('sel-all').checked
+  document.querySelectorAll('.sel-prospect').forEach(cb => cb.checked = all)
+}
+
+window.generateCampaign = async function() {
+  const selected = Array.from(document.querySelectorAll('.sel-prospect:checked'))
+    .map(cb => lastSearchResults[parseInt(cb.dataset.i)])
+    .filter(Boolean)
+  if (!selected.length) { alert('Seleccioná al menos uno'); return }
+
+  const rubro = document.getElementById('f-rubro').value
+  const zoneSelect = document.getElementById('f-zona')
+  const city = zoneSelect.value === 'custom'
+    ? document.getElementById('f-zona-custom').value
+    : zoneSelect.value
+
+  const btn = document.getElementById('btn-generate-campaign')
+  btn.disabled = true
+  btn.textContent = 'Creando...'
+
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/batch-create-prospects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        business_type: rubro,
+        city,
+        items: selected.map(s => ({
+          place_id: s.place_id,
+          name: s.name,
+          address: s.address,
+          phone: s.phone,
+          website: s.website,
+          rating: s.rating,
+          reviews_count: s.reviews_count,
+          price_level: s.price_level,
+          types: s.types,
+          lat: s.lat, lng: s.lng,
+          business_type: rubro,
+        })),
+      }),
+    })
+    const data = await r.json()
+    if (!r.ok) throw new Error(data.error || 'Error')
+    alert(`✅ Creados: ${data.created}. Ya existían/saltados: ${data.skipped}.`)
+    await loadSalesPipeline()
+  } catch (e) {
+    alert('Error: ' + e.message)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Crear prospects con seleccionados'
+  }
+}
+
+let pmCurrent = null
+window.openProspect = function(id) {
+  const p = allProspects.find(x => x.id === id)
+  if (!p) return
+  pmCurrent = p
+  document.getElementById('pm-title').textContent = p.name
+  document.getElementById('pm-body').innerHTML = `
+    <div><strong>Rubro:</strong> ${escapeHtml(p.business_type || '—')}</div>
+    <div><strong>Zona:</strong> ${escapeHtml(p.city || '—')}</div>
+    <div><strong>Rating:</strong> ${p.google_rating || '—'} ⭐ (${p.google_reviews_count || 0} reseñas)</div>
+    <div><strong>Email:</strong> <input id="pm-email" value="${escapeHtml(p.email || '')}" style="width:100%;padding:6px;margin-top:3px;border-radius:6px;border:1px solid var(--border)"></div>
+    <div style="margin-top:4px"><strong>Tel:</strong> <input id="pm-phone" value="${escapeHtml(p.phone || '')}" style="width:100%;padding:6px;margin-top:3px;border-radius:6px;border:1px solid var(--border)"></div>
+    <div style="margin-top:8px;font-size:12px;color:var(--muted)">
+      Último contacto: ${p.last_contact_at ? new Date(p.last_contact_at).toLocaleString('es-AR') : '—'}<br>
+      Aperturas: ${p.opens_count || 0} · Clicks: ${p.clicks_count || 0}
+    </div>
+  `
+  document.getElementById('pm-notes').value = p.notes || ''
+  document.getElementById('pm-status').value = p.status || 'discovered'
+  document.getElementById('prospect-modal').classList.add('open')
+}
+
+window.savePmProspect = async function() {
+  if (!pmCurrent) return
+  const payload = {
+    prospectId: pmCurrent.id,
+    status: document.getElementById('pm-status').value,
+    notes:  document.getElementById('pm-notes').value,
+    email:  document.getElementById('pm-email').value.trim() || null,
+    phone:  document.getElementById('pm-phone').value.trim() || null,
+  }
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/update-prospect`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    if (!r.ok) throw new Error(await r.text())
+    document.getElementById('prospect-modal').classList.remove('open')
+    await loadSalesPipeline()
+  } catch (e) {
+    alert('Error: ' + e.message)
+  }
+}
+
+window.sendManualMail = async function() {
+  if (!pmCurrent) return
+  const email = document.getElementById('pm-email').value.trim()
+  if (!email) { alert('Cargá un email primero y guardá'); return }
+  if (!confirm(`Enviar mail a ${email}?`)) return
+  try {
+    const r = await fetch(`${WORKER_BASE}/api/sales/send-prospect-mail`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prospectId: pmCurrent.id }),
+    })
+    const data = await r.json()
+    if (!r.ok) throw new Error(data.error || 'Error')
+    alert(`✅ Mail enviado. Informe: ${data.report_url}`)
+    document.getElementById('prospect-modal').classList.remove('open')
+    await loadSalesPipeline()
+  } catch (e) {
+    alert('Error: ' + e.message)
+  }
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))
 }
 
 async function renderOverview() {
@@ -777,7 +1643,7 @@ async function renderOverview() {
         alertEl.innerHTML = `
           <div class="alert alert-warning" style="margin-bottom:16px">
             <strong>📱 ${pendingWA.length} cliente${pendingWA.length > 1 ? 's' : ''} solicitaron WhatsApp Business</strong>
-            <div style="margin-top:6px;font-size:13px">${pendingWA.map(r => r.name).join(', ')} — Recordá contactarlos para configurar su número dedicado.</div>
+            <div style="margin-top:6px;font-size:13px">${pendingWA.map(r => r.name).join(', ')}. Recordá contactarlos para configurar su número dedicado.</div>
           </div>`
       }
     }

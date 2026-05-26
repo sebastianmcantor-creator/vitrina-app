@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cuenta pausada — Vitrina</title>
+  <title>Cuenta pausada · Vitrina</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
   <style>
@@ -33,7 +33,7 @@
     const p = new URLSearchParams(location.search)
     const since = p.get('since')
     const name  = p.get('name')
-    if (name) document.querySelector('h1').textContent = name + ' — cuenta pausada'
+    if (name) document.querySelector('h1').textContent = name + ': cuenta pausada'
     if (since) {
       const d = new Date(since)
       document.getElementById('suspend-date').textContent = 'Venció el ' + d.toLocaleDateString('es-AR', {day:'numeric',month:'long',year:'numeric'})

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vitrina — Panel</title>
+<title>Vitrina · Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&family=Cormorant+Garamond:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1613,6 +1613,9 @@ input:checked + .toggle-slider:before {
       <button class="nav-item" data-section="campanas" onclick="switchSection('campanas', this)">
         <span class="nav-icon">📣</span> Campañas
       </button>
+      <button class="nav-item" data-section="whatsapp" onclick="switchSection('whatsapp', this)">
+        <span class="nav-icon">💬</span> WhatsApp Business
+      </button>
 
       <button class="nav-item" data-section="catalogo" onclick="switchSection('catalogo', this)">
         <span class="nav-icon">🛒</span> Mi Catálogo
@@ -1761,7 +1764,7 @@ input:checked + .toggle-slider:before {
             </svg>
           </div>
           <div class="setup-title">¿Qué tipo de negocio tenés?</div>
-          <div class="setup-subtitle">Contanos qué tipo de negocio tenés. Adaptamos todo — el lenguaje, las funciones y el asistente IA — a tu rubro.</div>
+          <div class="setup-subtitle">Contanos qué tipo de negocio tenés. Adaptamos todo (el lenguaje, las funciones y el asistente IA) a tu rubro.</div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px;margin-top:8px">
 
             <button onclick="selectBusinessType('restaurant')" class="biz-type-btn">
@@ -1779,13 +1782,13 @@ input:checked + .toggle-slider:before {
             <button onclick="selectBusinessType('services')" class="biz-type-btn">
               <span style="font-size:32px;margin-bottom:8px;display:block">💆</span>
               <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Servicios / Turnos</span>
-              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Peluquería, estética, salud, profesionales — agenda y reservas</span>
+              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Peluquería, estética, salud, profesionales: agenda y reservas</span>
             </button>
 
             <button onclick="selectBusinessType('ecommerce')" class="biz-type-btn">
               <span style="font-size:32px;margin-bottom:8px;display:block">📦</span>
               <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Vendedor online</span>
-              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">MercadoLibre y Tienda Nube — Viti gestiona publicaciones y preguntas</span>
+              <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">MercadoLibre y Tienda Nube: Viti gestiona publicaciones y preguntas</span>
             </button>
 
           </div>
@@ -1953,12 +1956,12 @@ input:checked + .toggle-slider:before {
             <div class="form-field">
               <label class="form-label">Moneda</label>
               <select class="form-select" id="f-currency">
-                <option value="ARS">ARS — Peso argentino</option>
-                <option value="USD">USD — Dólar</option>
-                <option value="CLP">CLP — Peso chileno</option>
-                <option value="COP">COP — Peso colombiano</option>
-                <option value="MXN">MXN — Peso mexicano</option>
-                <option value="BRL">BRL — Real brasileño</option>
+                <option value="ARS">ARS · Peso argentino</option>
+                <option value="USD">USD · Dólar</option>
+                <option value="CLP">CLP · Peso chileno</option>
+                <option value="COP">COP · Peso colombiano</option>
+                <option value="MXN">MXN · Peso mexicano</option>
+                <option value="BRL">BRL · Real brasileño</option>
               </select>
             </div>
           </div>
@@ -2322,7 +2325,7 @@ input:checked + .toggle-slider:before {
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
             <div>
               <div style="font-size:15px;font-weight:600;color:var(--ink)">📞 Pedidos pendientes de contacto</div>
-              <div style="font-size:12px;color:var(--muted)">Clientes que ya pagaron — contactalos para coordinar retiro o envío.</div>
+              <div style="font-size:12px;color:var(--muted)">Clientes que ya pagaron. Contactalos para coordinar retiro o envío.</div>
             </div>
             <span id="pending-contact-count" style="display:none;padding:3px 10px;background:#fde4e4;color:#a02929;border-radius:12px;font-size:12px;font-weight:600"></span>
           </div>
@@ -2457,6 +2460,111 @@ input:checked + .toggle-slider:before {
   </div>
 </div>
 
+<!-- ───────────────────────── WhatsApp Business ─────────────────────────── -->
+<div id="section-whatsapp" class="panel-section">
+  <div class="page-header">
+    <div class="page-title">WhatsApp Business</div>
+    <div class="page-subtitle">Tu número exclusivo gestionado por Vitrina, bandeja de mensajes, contactos y plantillas.</div>
+  </div>
+
+  <!-- Tabs internos -->
+  <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid var(--border);overflow-x:auto">
+    <button class="wa-tab active" data-watab="status"    onclick="waSwitchTab('status', this)">📱 Estado</button>
+    <button class="wa-tab"        data-watab="inbox"     onclick="waSwitchTab('inbox', this)">📥 Bandeja</button>
+    <button class="wa-tab"        data-watab="contacts"  onclick="waSwitchTab('contacts', this)">👥 Contactos</button>
+    <button class="wa-tab"        data-watab="templates" onclick="waSwitchTab('templates', this)">📝 Plantillas</button>
+  </div>
+
+  <style>
+    .wa-tab { padding:8px 14px; border:none; background:transparent; font-family:'Outfit',sans-serif; font-size:13.5px; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap }
+    .wa-tab.active { color:var(--terra); border-bottom-color:var(--terra); font-weight:500 }
+    .wa-bar { background:var(--border); border-radius:6px; height:8px; overflow:hidden; margin-top:4px }
+    .wa-bar-fill { height:100%; border-radius:6px; transition:width .4s }
+    .wa-pane { display:none }
+    .wa-pane.active { display:block }
+  </style>
+
+  <!-- Tab: Estado del numero + dashboard de uso -->
+  <div id="wa-pane-status" class="wa-pane active">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📱 Número asignado</div>
+      <div id="wa-status-card" style="font-size:13.5px;color:var(--muted)">Cargando...</div>
+      <div id="wa-provision-cta" style="display:none;margin-top:12px">
+        <button class="btn-secondary" onclick="waProvisionRequest()">📞 Solicitar número WhatsApp</button>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Tu número estará operativo en 24hs hábiles.</div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📊 Uso del mes</div>
+      <div id="wa-usage-card">
+        <div style="padding:20px;text-align:center;color:var(--muted)">Cargando uso...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">➕ Extender cupo</div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <button class="btn-secondary" onclick="waExtend('utility', 1)">+50 utility · USD 2</button>
+        <button class="btn-secondary" onclick="waExtend('marketing', 1)">+50 marketing · USD 3</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px">
+        Los bloques extra duran el mes corriente. Mensajes operativos (utility) nunca se pausan.
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Bandeja -->
+  <div id="wa-pane-inbox" class="wa-pane">
+    <div class="card">
+      <div class="card-title">📥 Mensajes recientes</div>
+      <div id="wa-inbox-list">
+        <div style="padding:20px;text-align:center;color:var(--muted)">Cargando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Contactos -->
+  <div id="wa-pane-contacts" class="wa-pane">
+    <div class="card">
+      <div class="card-title">👥 Contactos con opt-in</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+        Solo los contactos que alguna vez te escribieron pueden recibir mensajes de marketing.
+      </div>
+      <div id="wa-contacts-list">
+        <div style="padding:20px;text-align:center;color:var(--muted)">Cargando...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: Plantillas -->
+  <div id="wa-pane-templates" class="wa-pane">
+    <div class="card" style="margin-bottom:16px">
+      <div class="card-title">📝 Crear plantilla</div>
+      <div style="display:grid;gap:10px;max-width:520px">
+        <input id="wa-tpl-name" placeholder="Nombre interno (ej: confirmacion_reserva)" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px">
+        <select id="wa-tpl-category" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px">
+          <option value="utility">Utility (operativa)</option>
+          <option value="marketing">Marketing</option>
+          <option value="authentication">Authentication</option>
+        </select>
+        <textarea id="wa-tpl-body" placeholder="Cuerpo del mensaje. Usá {{1}}, {{2}} para variables." rows="4" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px;resize:vertical"></textarea>
+        <button class="btn-secondary" onclick="waCreateTemplate()">Enviar a aprobación</button>
+        <div style="font-size:12px;color:var(--muted)">
+          Las plantillas quedan en estado "pending" hasta que Twilio/Meta las apruebe (~24hs).
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📋 Mis plantillas</div>
+      <div id="wa-templates-list">
+        <div style="padding:20px;text-align:center;color:var(--muted)">Cargando...</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ─────────────────────── /WhatsApp Business ────────────────────────── -->
+
       <div id="section-estadisticas" class="panel-section">
         <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">
           <div>
@@ -2582,7 +2690,7 @@ input:checked + .toggle-slider:before {
         <!-- MercadoPago Pagos -->
         <div class="card" id="mp-connect-card">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
-            <span>💳 MercadoPago — Cobros de mesa</span>
+            <span>💳 MercadoPago · Cobros de mesa</span>
             <button id="btn-connect-mp" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectMercadoPago()">
               Conectar cuenta
             </button>
@@ -2700,7 +2808,7 @@ input:checked + .toggle-slider:before {
             <span id="meta-publish-status-badge" style="font-size:12px;padding:4px 10px;border-radius:20px;background:#e8f5e9;color:#2e7d32;font-weight:600">✅ Activo</span>
           </div>
           <div style="margin-top:12px;font-size:13.5px;color:var(--muted);line-height:1.65">
-            Vitrina publica directamente en Instagram y Facebook usando la API oficial de Meta — sin intermediarios. Conectá tus cuentas en la sección <strong>Análisis</strong> y las publicaciones se programan automáticamente desde el calendario.
+            Vitrina publica directamente en Instagram y Facebook usando la API oficial de Meta, sin intermediarios. Conectá tus cuentas en la sección <strong>Análisis</strong> y las publicaciones se programan automáticamente desde el calendario.
           </div>
           <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
             <div style="flex:1;min-width:140px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
@@ -2865,7 +2973,7 @@ input:checked + .toggle-slider:before {
             <!-- Resultado -->
             <div id="whisper-result" style="display:none">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
-                <label class="form-label" style="margin:0">Subtítulos generados — podés editarlos antes de descargar</label>
+                <label class="form-label" style="margin:0">Subtítulos generados. Podés editarlos antes de descargar</label>
                 <div style="display:flex;gap:6px">
                   <button class="btn-secondary" id="btn-whisper-srt" onclick="switchSubFormat('srt')" style="font-size:12px;padding:5px 12px;background:var(--terra-pale);color:var(--terra)">SRT</button>
                   <button class="btn-secondary" id="btn-whisper-txt" onclick="switchSubFormat('txt')" style="font-size:12px;padding:5px 12px">Texto</button>
@@ -2910,7 +3018,7 @@ input:checked + .toggle-slider:before {
       </div>
       <div style="display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--ink-soft)">
         <span style="background:var(--terra);color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:1px">3</span>
-        <span>Subí la captura acá abajo — Vitrina extrae los datos automáticamente. O si preferís, ingresá los números a mano.</span>
+        <span>Subí la captura acá abajo y Vitrina extrae los datos automáticamente. O si preferís, ingresá los números a mano.</span>
       </div>
     </div>
     <div style="margin-top:12px;font-size:12px;color:var(--muted);padding:8px 12px;background:var(--cream);border-radius:8px">
@@ -3049,7 +3157,7 @@ input:checked + .toggle-slider:before {
     </div>
     <div class="modal-body">
       <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.5">
-        Claude extrajo los siguientes datos de tu captura. Verificá que sean correctos antes de guardar — podés editarlos.
+        Claude extrajo los siguientes datos de tu captura. Verificá que sean correctos antes de guardar; podés editarlos.
       </p>
       <div id="delivery-review-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:10px"></div>
     </div>
@@ -3125,12 +3233,12 @@ input:checked + .toggle-slider:before {
           </div>
 
           <div id="wa-setup-alert" style="display:none;padding:12px 16px;background:#e8f5e9;border:1px solid #b2dec4;border-radius:10px;margin-bottom:16px;font-size:13.5px;color:#2e7d32">
-            ⏳ <strong>Tu número WhatsApp Business llega en 24hs hábiles.</strong> Lo activamos nosotros desde la cuenta Twilio de Vitrina — no tenés que hacer trámites con Meta ni comprar chip. Cuando esté listo te avisamos por email y queda disponible en tu panel. ¿Dudas? <a href="mailto:contacto@vitrinaapp.com.ar" style="color:#2e7d32">contacto@vitrinaapp.com.ar</a>
+            ⏳ <strong>Tu número WhatsApp Business llega en 24hs hábiles.</strong> Lo activamos nosotros desde la cuenta Twilio de Vitrina: no tenés que hacer trámites con Meta ni comprar chip. Cuando esté listo te avisamos por email y queda disponible en tu panel. ¿Dudas? <a href="mailto:contacto@vitrinaapp.com.ar" style="color:#2e7d32">contacto@vitrinaapp.com.ar</a>
           </div>
 
           <div style="display:grid;gap:16px">
             <div class="form-field">
-              <label class="form-label">📦 Canal operativo — pedidos nuevos</label>
+              <label class="form-label">📦 Canal operativo · pedidos nuevos</label>
               <input class="form-input" id="wa-operativo-input" type="tel"
                 placeholder="5491155556666 (número del encargado)"
                 style="max-width:380px">
@@ -3138,7 +3246,7 @@ input:checked + .toggle-slider:before {
             </div>
 
             <div class="form-field">
-              <label class="form-label">📊 Canal de gestión — alertas del sistema</label>
+              <label class="form-label">📊 Canal de gestión · alertas del sistema</label>
               <input class="form-input" id="wa-gestion-input" type="tel"
                 placeholder="5491155556666 (número del dueño)"
                 style="max-width:380px">
@@ -3176,7 +3284,7 @@ input:checked + .toggle-slider:before {
             <div class="form-field" style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px">
                 <div>
-                  <div style="font-size:13.5px;font-weight:600;color:var(--ink)">Mensaje 1 — Al llegar el primer plato</div>
+                  <div style="font-size:13.5px;font-weight:600;color:var(--ink)">Mensaje 1 · Al llegar el primer plato</div>
                   <div style="font-size:12px;color:var(--muted);margin-top:2px">Se envía 2 minutos después de que la cocina marca el pedido como listo</div>
                 </div>
                 <label class="toggle-switch" style="flex-shrink:0;margin-top:2px">
@@ -3191,7 +3299,7 @@ input:checked + .toggle-slider:before {
             <div class="form-field" style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px">
                 <div>
-                  <div style="font-size:13.5px;font-weight:600;color:var(--ink)">Mensaje 2 — A los 30 minutos</div>
+                  <div style="font-size:13.5px;font-weight:600;color:var(--ink)">Mensaje 2 · A los 30 minutos</div>
                   <div style="font-size:12px;color:var(--muted);margin-top:2px">Se envía 30 minutos después de que se entregaron todos los platos</div>
                 </div>
                 <label class="toggle-switch" style="flex-shrink:0;margin-top:2px">
@@ -3206,7 +3314,7 @@ input:checked + .toggle-slider:before {
             <div class="form-field" style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:12px">
               <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px">
                 <div>
-                  <div style="font-size:13.5px;font-weight:600;color:var(--ink)">Mensaje 3 — Sugerencia de postre</div>
+                  <div style="font-size:13.5px;font-weight:600;color:var(--ink)">Mensaje 3 · Sugerencia de postre</div>
                   <div style="font-size:12px;color:var(--muted);margin-top:2px">Se envía 45 minutos después del mensaje 2. Incluye automáticamente opciones de la categoría "Postres"</div>
                 </div>
                 <label class="toggle-switch" style="flex-shrink:0;margin-top:2px">
@@ -3236,9 +3344,9 @@ input:checked + .toggle-slider:before {
             <div class="form-field">
               <label class="form-label">Tono de comunicación</label>
               <select class="form-select" id="tano-tone-select" style="max-width:280px">
-                <option value="calido">🤗 Cálido e informal — cercano, como un amigo</option>
-                <option value="neutro">😊 Neutro y profesional — amigable pero formal</option>
-                <option value="sofisticado" id="tone-opt-sofisticado">🎩 Sofisticado — elegante, para negocios exclusivos</option>
+                <option value="calido">🤗 Cálido e informal: cercano, como un amigo</option>
+                <option value="neutro">😊 Neutro y profesional: amigable pero formal</option>
+                <option value="sofisticado" id="tone-opt-sofisticado">🎩 Sofisticado: elegante, para negocios exclusivos</option>
               </select>
               <div id="tano-preview" style="margin-top:10px;padding:10px 14px;background:#2a2010;border-radius:10px;font-size:12.5px;color:#d4b97a;line-height:1.55;display:none">
                 Vista previa: <span id="tano-preview-text"></span>
@@ -3398,7 +3506,7 @@ input:checked + .toggle-slider:before {
           <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:20px">
             <div>
               <div class="card-title" style="margin-bottom:8px">
-                💳 Plan actual — <span id="fact-plan-name">Free</span>
+                💳 Plan actual · <span id="fact-plan-name">Free</span>
               </div>
               <div id="fact-status" style="font-size:13.5px;color:var(--muted)"></div>
             </div>
@@ -3601,7 +3709,7 @@ input:checked + .toggle-slider:before {
       </div>
       <div class="form-field" style="margin-bottom:14px">
         <label class="form-label">Descripción corta</label>
-        <textarea class="form-textarea" id="item-desc" placeholder="1-2 líneas — aparece en el QR y en respuestas por WhatsApp" style="min-height:60px" maxlength="150" oninput="document.getElementById('item-desc-counter').textContent = this.value.length + '/150'"></textarea>
+        <textarea class="form-textarea" id="item-desc" placeholder="1-2 líneas. Aparece en el QR y en respuestas por WhatsApp" style="min-height:60px" maxlength="150" oninput="document.getElementById('item-desc-counter').textContent = this.value.length + '/150'"></textarea>
         <span class="form-hint"><span id="item-desc-counter">0/150</span> · Hasta 150 caracteres.</span>
       </div>
       <div class="form-field" style="margin-bottom:14px" id="item-full-desc-wrap">
@@ -4073,7 +4181,9 @@ function renderSidebarRestaurant(rest) {
     services:   { noun: 'negocio',     menu: 'Servicios', items: 'Servicios', catalog: 'Catálogo' },
     ecommerce:  { noun: 'tienda',      menu: 'Catálogo', items: 'Productos', catalog: 'Catálogo' },
   }
-  const btype = rest.business_type || 'restaurant'
+  const btypeRaw = rest.business_type
+  const btype = btypeRaw || 'restaurant'
+  const btypeUnset = !btypeRaw
   const terms = bizTerms[btype] || bizTerms.restaurant
   window._bizTerms = terms
 
@@ -4106,7 +4216,14 @@ function renderSidebarRestaurant(rest) {
   const mesasBtn    = document.querySelector('[data-section="mesas"]')
   const verDemoBtn  = document.querySelector('a[href="/demo.html"]')
 
-  if (btype === 'local' || btype === 'ecommerce') {
+  if (btypeUnset) {
+    // Tipo no elegido todavía: solo Información visible hasta que el dueño defina el tipo
+    if (reservasBtn) reservasBtn.style.display = 'none'
+    if (agendaBtn)   agendaBtn.style.display   = 'none'
+    if (catalogoBtn) catalogoBtn.style.display = 'none'
+    if (mesasBtn)    mesasBtn.style.display    = 'none'
+    if (verDemoBtn)  verDemoBtn.style.display  = 'none'
+  } else if (btype === 'local' || btype === 'ecommerce') {
     if (reservasBtn) reservasBtn.style.display = 'none'
     if (agendaBtn)   agendaBtn.style.display   = 'none'
     if (catalogoBtn) catalogoBtn.style.display = 'flex'
@@ -4484,13 +4601,13 @@ function updateQuickStatusUI(isOpen) {
   wrap.style.display = 'block'
   if (isOpen) {
     dot.style.background = '#44cc66'
-    label.textContent    = 'Abierto — tocar para cerrar'
+    label.textContent    = 'Abierto · tocar para cerrar'
     btn.style.background = 'rgba(68,204,102,.12)'
     btn.style.color      = '#44cc66'
     btn.style.border     = '1px solid rgba(68,204,102,.3)'
   } else {
     dot.style.background = '#e84444'
-    label.textContent    = 'Cerrado — tocar para abrir'
+    label.textContent    = 'Cerrado · tocar para abrir'
     btn.style.background = 'rgba(232,68,68,.12)'
     btn.style.color      = '#e84444'
     btn.style.border     = '1px solid rgba(232,68,68,.3)'
@@ -5060,7 +5177,7 @@ const BIZ_CONFIG = {
     btnText: 'Crear mi restaurante',
     successMsg: '¡Restaurante creado! 🎉',
     waTitle: 'Activar WhatsApp Business para reservas',
-    waDesc: 'Te asignamos un número exclusivo con el nombre de tu restaurante. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los clientes reservan, preguntan horarios y reciben recordatorios automáticos.',
+    waDesc: 'Te asignamos un número exclusivo con el nombre de tu restaurante. Lo activamos en 24hs hábiles, sin trámites con Meta y sin comprar chip. Los clientes reservan, preguntan horarios y reciben recordatorios automáticos.',
     waNote: '✓ Número asignado en 24hs · ✓ Reservas automáticas · ✓ Recordatorios 24hs antes · ✓ Todo en tu panel de Vitrina',
   },
   local: {
@@ -5073,7 +5190,7 @@ const BIZ_CONFIG = {
     btnText: 'Crear mi local',
     successMsg: '¡Local creado! 🎉',
     waTitle: 'Activar WhatsApp Business como asistente de ventas',
-    waDesc: 'Te asignamos un número exclusivo con el nombre de tu local. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los clientes escriben desde Instagram, Google o tu vitrina y el asistente responde y vende 24/7.',
+    waDesc: 'Te asignamos un número exclusivo con el nombre de tu local. Lo activamos en 24hs hábiles, sin trámites con Meta y sin comprar chip. Los clientes escriben desde Instagram, Google o tu vitrina y el asistente responde y vende 24/7.',
     waNote: '✓ Número asignado en 24hs · ✓ Responde stock y precios · ✓ Genera links de pago · ✓ Todo en tu panel de Vitrina',
   },
   services: {
@@ -5086,7 +5203,7 @@ const BIZ_CONFIG = {
     btnText: 'Crear mi negocio',
     successMsg: '¡Negocio creado! 🎉',
     waTitle: 'Activar WhatsApp Business para turnos',
-    waDesc: 'Te asignamos un número exclusivo con el nombre de tu negocio. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los clientes reservan turno por WhatsApp y reciben recordatorio automático.',
+    waDesc: 'Te asignamos un número exclusivo con el nombre de tu negocio. Lo activamos en 24hs hábiles, sin trámites con Meta y sin comprar chip. Los clientes reservan turno por WhatsApp y reciben recordatorio automático.',
     waNote: '✓ Número asignado en 24hs · ✓ Agenda automática · ✓ Recordatorios al cliente · ✓ Todo en tu panel de Vitrina',
   },
   ecommerce: {
@@ -5099,7 +5216,7 @@ const BIZ_CONFIG = {
     btnText: 'Crear mi tienda',
     successMsg: '¡Tienda creada! 🎉',
     waTitle: 'Activar WhatsApp Business como vendedor automático',
-    waDesc: 'Te asignamos un número exclusivo con tu marca. Lo activamos en 24hs hábiles — sin trámites con Meta, sin comprar chip. Los compradores preguntan por WhatsApp y el asistente responde, cotiza y genera el link de pago.',
+    waDesc: 'Te asignamos un número exclusivo con tu marca. Lo activamos en 24hs hábiles, sin trámites con Meta y sin comprar chip. Los compradores preguntan por WhatsApp y el asistente responde, cotiza y genera el link de pago.',
     waNote: '✓ Número asignado en 24hs · ✓ Cotiza y genera link de pago · ✓ Seguimiento de pedidos · ✓ Todo en tu panel de Vitrina',
   },
 }
@@ -5568,9 +5685,10 @@ window.switchSection = function (name, btn) {
     facturacion: 'Facturación', agenda: 'Agenda', reservas: 'Reservas',
     campanas: 'Campañas', crm: 'Clientes', informes: 'Informes',
     catalogo: 'Mi Catálogo', 'sales-agent': 'Agente de Ventas', delivery: 'Delivery',
+    whatsapp: 'WhatsApp Business',
   }
   const restName = currentRestaurant?.name || 'Vitrina'
-  document.title = (sectionTitles[name] || name) + ' — ' + restName
+  document.title = (sectionTitles[name] || name) + ' · ' + restName
 
   window.scrollTo({ top: 0, behavior: 'smooth' })
   if (!currentRestaurant && name !== 'setup') {
@@ -5598,6 +5716,7 @@ window.switchSection = function (name, btn) {
   if (name === 'delivery')     loadDeliveryMetrics()
   if (name === 'config')       loadConfig()
   if (name === 'facturacion')  loadFacturacion()
+  if (name === 'whatsapp')     loadWhatsappSection()
   if (name !== 'pedidos')      detachPedidosRealtime()
 }
 
@@ -5704,7 +5823,7 @@ function renderMenu() {
       : `<span style="font-size:11px;background:#e8f5e9;color:#2e7d32;padding:2px 7px;border-radius:8px;margin-left:6px">✓ completa</span>`
     const itemsHtml = items.length
       ? items.map(item => {
-        const noImg = !item.image_url ? '<span style="font-size:9px;background:#fff8e1;color:#856404;padding:1px 5px;border-radius:6px;margin-left:4px" title="Sin foto — la foto mejora la visibilidad">sin foto</span>' : ''
+        const noImg = !item.image_url ? '<span style="font-size:9px;background:#fff8e1;color:#856404;padding:1px 5px;border-radius:6px;margin-left:4px" title="Sin foto: la foto mejora la visibilidad">sin foto</span>' : ''
         return `
         <div class="item-row ${item.is_available ? '' : 'unavailable'}" id="item-row-${item.id}">
           <div class="item-emoji">${item.emoji || '🍽️'}</div>
@@ -6236,7 +6355,7 @@ function initPedidosBadge() {
       playPanelSound()
       const mesa = payload.new?.table_number
       const mesaLabel = (currentRestaurant?.business_type||'restaurant')==='restaurant'?'Mesa':'Pedido'
-      showToast('🔔 Nuevo pedido' + (mesa ? ' — ' + mesaLabel + ' ' + mesa : ''), 'default')
+      showToast('🔔 Nuevo pedido' + (mesa ? ': ' + mesaLabel + ' ' + mesa : ''), 'default')
       try { setBadgeCount((await orders.listActive(currentRestaurant.id)).length) } catch {}
     })
     .on('postgres_changes', {
@@ -6571,9 +6690,9 @@ const WORKER_URL = 'https://vitrina-tano.vitrinaapp.workers.dev'
 const PLAN_INFO = {
   'free':       { nombre: 'Free',       precioUSD: 0,  descripcion: 'Hasta 45 platos · 75 msgs Tano/mes · Sin pedidos' },
   'rest-menu':  { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado · WhatsApp' },
-  'rest-mkt':   { nombre: 'Marketing',  precioUSD: 58, descripcion: 'Viti · Redes · Google · Competidores · Informe PDF · WhatsApp' },
-  'rest-combo': { nombre: 'Combo',      precioUSD: 70, descripcion: 'Todo Solo Menú + Todo Marketing · Ahorrás USD 15 · WhatsApp' },
-  'local-mkt':  { nombre: 'Marketing',  precioUSD: 65, descripcion: 'Catálogo · ML · TN · Viti · Redes · WhatsApp' },
+  'rest-mkt':   { nombre: 'Marketing',  precioUSD: 57, descripcion: 'Viti · Redes · Google · Competidores · Informe PDF · WhatsApp' },
+  'rest-combo': { nombre: 'Combo',      precioUSD: 70, descripcion: 'Todo Solo Menú + Todo Marketing · Ahorrás USD 14 · WhatsApp' },
+  'local-mkt':  { nombre: 'Marketing',  precioUSD: 62, descripcion: 'Catálogo · ML · TN · Viti · Redes · WhatsApp' },
   // aliases legacy
   'pro':        { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado' },
   'full':       { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado' },
@@ -6770,10 +6889,10 @@ window.loadConfig = async function () {
     const defaultName = btype === 'restaurant' ? 'Tano' : 'Asistente IA'
     const name = currentRestaurant.tano_name || defaultName
     const btypeTitles = {
-      restaurant: `🤖 ${name} — Tu asistente`,
-      services:   `🤖 ${name} — Tu asistente de turnos`,
-      local:      `🤖 ${name} — Tu asistente de ventas`,
-      ecommerce:  `🤖 ${name} — Tu asistente de tienda`,
+      restaurant: `🤖 ${name} · Tu asistente`,
+      services:   `🤖 ${name} · Tu asistente de turnos`,
+      local:      `🤖 ${name} · Tu asistente de ventas`,
+      ecommerce:  `🤖 ${name} · Tu asistente de tienda`,
     }
     tanoConfigTitle.textContent = btypeTitles[btype] || btypeTitles.restaurant
   }
@@ -6787,6 +6906,263 @@ window.loadConfig = async function () {
   } catch (e) {
     showToast('Error cargando equipo: ' + e.message, 'error')
   }
+}
+
+// ── WhatsApp Business ─────────────────────────────────────────────────────────
+window.waSwitchTab = function (tab, btn) {
+  document.querySelectorAll('.wa-tab').forEach(t => t.classList.remove('active'))
+  if (btn) btn.classList.add('active')
+  document.querySelectorAll('.wa-pane').forEach(p => p.classList.remove('active'))
+  const pane = document.getElementById('wa-pane-' + tab)
+  if (pane) pane.classList.add('active')
+  if (tab === 'inbox')     loadWaInbox()
+  if (tab === 'contacts')  loadWaContacts()
+  if (tab === 'templates') loadWaTemplates()
+}
+
+window.loadWhatsappSection = async function () {
+  if (!currentRestaurant) return
+  await loadWaStatusAndUsage()
+}
+
+async function loadWaStatusAndUsage () {
+  const statusEl = document.getElementById('wa-status-card')
+  const usageEl  = document.getElementById('wa-usage-card')
+  const provCta  = document.getElementById('wa-provision-cta')
+  if (!statusEl || !usageEl) return
+  statusEl.textContent = 'Cargando...'
+  usageEl.innerHTML    = '<div style="padding:20px;text-align:center;color:var(--muted)">Cargando uso...</div>'
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/usage?restaurant_id=${currentRestaurant.id}`)
+    const data = await res.json()
+    if (!data.ok) { statusEl.textContent = 'No se pudo cargar el estado.'; return }
+
+    const statusLabel = ({
+      pending: '⏳ Pendiente de activación',
+      active:  '✅ Activo',
+      paused_marketing: '🟠 Marketing pausado',
+      paused_all: '🔴 Pausado totalmente',
+      released: '⚪ Liberado',
+    })[data.wa_status] || data.wa_status
+
+    statusEl.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;gap:24px">
+        <div><div style="font-size:12px;color:var(--muted)">Número</div><div style="font-weight:500;font-size:15px">${data.twilio_number || '—'}</div></div>
+        <div><div style="font-size:12px;color:var(--muted)">Estado</div><div style="font-weight:500;font-size:15px">${statusLabel}</div></div>
+        <div><div style="font-size:12px;color:var(--muted)">Quality rating</div><div style="font-weight:500;font-size:15px">${data.quality_rating ? data.quality_rating : '—'}</div></div>
+        <div><div style="font-size:12px;color:var(--muted)">Asignado el</div><div style="font-weight:500;font-size:15px">${data.provisioned_at ? new Date(data.provisioned_at).toLocaleDateString('es-AR') : '—'}</div></div>
+      </div>`
+
+    if (!data.twilio_number) {
+      provCta.style.display = 'block'
+    } else {
+      provCta.style.display = 'none'
+    }
+
+    const u = data.utility, m = data.marketing
+    const colorBar = pct => pct >= 100 ? '#d83b3b' : pct >= 80 ? '#f5a623' : 'var(--terra)'
+    usageEl.innerHTML = `
+      <div style="margin-bottom:18px">
+        <div style="display:flex;justify-content:space-between;font-size:13.5px">
+          <span>📨 Mensajes operativos (utility)</span>
+          <span><strong>${u.used}</strong> / ${u.cap}</span>
+        </div>
+        <div class="wa-bar"><div class="wa-bar-fill" style="width:${Math.min(u.pct,100)}%;background:${colorBar(u.pct)}"></div></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">${u.pct}% usado. Operativo nunca se pausa.</div>
+      </div>
+      <div style="margin-bottom:6px">
+        <div style="display:flex;justify-content:space-between;font-size:13.5px">
+          <span>📣 Mensajes marketing</span>
+          <span><strong>${m.used}</strong> / ${m.cap}</span>
+        </div>
+        <div class="wa-bar"><div class="wa-bar-fill" style="width:${Math.min(m.pct,100)}%;background:${colorBar(m.pct)}"></div></div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">${m.pct}% usado. Marketing se pausa al 100%.</div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:12.5px;color:var(--muted)">
+        Costo estimado del mes (Vitrina): USD ${(Number(data.cost_usd)||0).toFixed(2)}
+      </div>`
+  } catch (e) {
+    statusEl.textContent = 'Error: ' + e.message
+  }
+}
+
+window.waProvisionRequest = async function () {
+  if (!currentRestaurant) return
+  if (!confirm('Solicitar número WhatsApp para este negocio? Estará operativo en 24hs hábiles.')) return
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/provision`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: currentRestaurant.id }),
+    })
+    const data = await res.json()
+    if (data.ok) {
+      showToast('Número solicitado. Se activará en 24hs.', 'success')
+      loadWaStatusAndUsage()
+    } else {
+      showToast('Error: ' + (data.error || 'no se pudo solicitar'), 'error')
+    }
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+window.waExtend = async function (type, blocks) {
+  if (!currentRestaurant) return
+  const price = type === 'utility' ? 2 : 3
+  if (!confirm(`Agregar ${blocks * 50} mensajes ${type} por USD ${price * blocks}?`)) return
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/extend`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: currentRestaurant.id, type, blocks }),
+    })
+    const data = await res.json()
+    if (data.ok) {
+      showToast(`Listo, ${blocks * 50} ${type} añadidos.`, 'success')
+      loadWaStatusAndUsage()
+    } else {
+      showToast('Error: ' + (data.error || 'no se pudo'), 'error')
+    }
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+async function loadWaInbox () {
+  const el = document.getElementById('wa-inbox-list')
+  if (!el || !currentRestaurant) return
+  el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Cargando...</div>'
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/messages?restaurant_id=${currentRestaurant.id}&limit=200`)
+    const data = await res.json()
+    const msgs = data.messages || []
+    if (!msgs.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Sin mensajes aún.</div>'; return }
+
+    // Agrupar por contacto
+    const byContact = {}
+    for (const m of msgs) {
+      const k = m.contact_phone
+      if (!byContact[k]) byContact[k] = []
+      byContact[k].push(m)
+    }
+
+    let html = ''
+    for (const phone of Object.keys(byContact)) {
+      const list = byContact[phone].slice(0, 5)
+      html += `<div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="font-weight:500;font-size:14px">${phone}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${list.length} mensaje(s)</div>
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">`
+      for (const m of list) {
+        const arrow = m.direction === 'in' ? '←' : '→'
+        const color = m.direction === 'in' ? '#2e7d32' : 'var(--terra)'
+        html += `<div style="font-size:12.5px;color:var(--ink)"><span style="color:${color};font-weight:600">${arrow} ${m.msg_type}</span> · ${new Date(m.created_at).toLocaleString('es-AR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} · <span style="color:var(--muted)">${(m.content_preview||'').replace(/</g,'&lt;')}</span></div>`
+      }
+      html += `</div></div>`
+    }
+    el.innerHTML = html
+  } catch (e) {
+    el.innerHTML = '<div style="padding:20px;color:#c00">Error: ' + e.message + '</div>'
+  }
+}
+
+async function loadWaContacts () {
+  const el = document.getElementById('wa-contacts-list')
+  if (!el || !currentRestaurant) return
+  el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Cargando...</div>'
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/contacts?restaurant_id=${currentRestaurant.id}`)
+    const data = await res.json()
+    const list = data.contacts || []
+    if (!list.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Sin contactos aún.</div>'; return }
+
+    let html = `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="border-bottom:1px solid var(--border);text-align:left">
+        <th style="padding:8px 6px">Teléfono</th>
+        <th style="padding:8px 6px">Opt-in</th>
+        <th style="padding:8px 6px">Último inbound</th>
+        <th style="padding:8px 6px">Mkt mes</th>
+        <th style="padding:8px 6px">Último mkt</th>
+        <th style="padding:8px 6px"></th>
+      </tr></thead><tbody>`
+    for (const c of list) {
+      const optStatus = c.opted_out_at ? '🚫 Opt-out' : (c.opted_in_at ? '✅ Opt-in' : '—')
+      html += `<tr style="border-bottom:1px solid var(--border)">
+        <td style="padding:8px 6px">${c.phone}</td>
+        <td style="padding:8px 6px">${optStatus}</td>
+        <td style="padding:8px 6px">${c.last_inbound_at ? new Date(c.last_inbound_at).toLocaleDateString('es-AR') : '—'}</td>
+        <td style="padding:8px 6px">${c.marketing_count_month || 0}</td>
+        <td style="padding:8px 6px">${c.last_marketing_at ? new Date(c.last_marketing_at).toLocaleDateString('es-AR') : '—'}</td>
+        <td style="padding:8px 6px">${c.opted_out_at ? '' : `<button onclick="waOptOut('${c.phone.replace(/'/g,"\\'")}')" style="font-size:11px;padding:4px 8px;border-radius:6px;border:1px solid var(--border);background:var(--white);cursor:pointer">Opt-out</button>`}</td>
+      </tr>`
+    }
+    html += '</tbody></table></div>'
+    el.innerHTML = html
+  } catch (e) {
+    el.innerHTML = '<div style="padding:20px;color:#c00">Error: ' + e.message + '</div>'
+  }
+}
+
+window.waOptOut = async function (phone) {
+  if (!currentRestaurant) return
+  if (!confirm(`Dar de baja al contacto ${phone}?`)) return
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/contacts/optout`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: currentRestaurant.id, phone }),
+    })
+    const data = await res.json()
+    if (data.ok) { showToast('Contacto dado de baja.', 'success'); loadWaContacts() }
+    else showToast('Error: ' + (data.error || 'no se pudo'), 'error')
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+async function loadWaTemplates () {
+  const el = document.getElementById('wa-templates-list')
+  if (!el || !currentRestaurant) return
+  el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Cargando...</div>'
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/templates?restaurant_id=${currentRestaurant.id}`)
+    const data = await res.json()
+    const list = data.templates || []
+    if (!list.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Aún no creaste plantillas.</div>'; return }
+    let html = ''
+    for (const t of list) {
+      const badge = ({pending:'⏳ Pendiente', approved:'✅ Aprobada', rejected:'❌ Rechazada', paused:'⏸️ Pausada'})[t.status] || t.status
+      html += `<div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-weight:500;font-size:14px">${(t.name||'').replace(/</g,'&lt;')}</div>
+            <div style="font-size:12px;color:var(--muted)">${t.category} · ${badge}</div>
+          </div>
+        </div>
+        <div style="font-size:13px;color:var(--ink);margin-top:6px;white-space:pre-line">${(t.body||'').replace(/</g,'&lt;')}</div>
+      </div>`
+    }
+    el.innerHTML = html
+  } catch (e) {
+    el.innerHTML = '<div style="padding:20px;color:#c00">Error: ' + e.message + '</div>'
+  }
+}
+
+window.waCreateTemplate = async function () {
+  if (!currentRestaurant) return
+  const name = (document.getElementById('wa-tpl-name')?.value || '').trim()
+  const category = document.getElementById('wa-tpl-category')?.value || 'utility'
+  const body = (document.getElementById('wa-tpl-body')?.value || '').trim()
+  if (!name || !body) { showToast('Faltan nombre y cuerpo.', 'error'); return }
+  try {
+    const res = await fetch(`${WORKER_URL}/api/wa/templates`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: currentRestaurant.id, name, category, body }),
+    })
+    const data = await res.json()
+    if (data.ok) {
+      showToast('Plantilla enviada a aprobación.', 'success')
+      document.getElementById('wa-tpl-name').value = ''
+      document.getElementById('wa-tpl-body').value = ''
+      loadWaTemplates()
+    } else {
+      showToast('Error: ' + (data.error || 'no se pudo crear'), 'error')
+    }
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
 }
 
 // ── loadFacturacion ────────────────────────────────────────────────────────────
@@ -6818,11 +7194,11 @@ window.loadFacturacion = async function () {
   const statusEl = document.getElementById('fact-status')
   let statusText = ''
   if (isTrial) {
-    statusText = `Período de prueba — ${trialDays} día${trialDays !== 1 ? 's' : ''} restante${trialDays !== 1 ? 's' : ''}`
+    statusText = `Período de prueba · ${trialDays} día${trialDays !== 1 ? 's' : ''} restante${trialDays !== 1 ? 's' : ''}`
   } else if (currentRestaurant.subscription_status === 'active') {
     statusText = 'Suscripción activa'
   } else if (currentRestaurant.subscription_status === 'past_due') {
-    statusText = '⚠️ Pago pendiente — actualizá tu forma de pago'
+    statusText = '⚠️ Pago pendiente: actualizá tu forma de pago'
   } else if (currentRestaurant.subscription_status === 'cancelled') {
     statusText = 'Suscripción cancelada'
   } else {
@@ -7029,18 +7405,18 @@ window.openUpgradeModal = async function () {
       features: ['Menú QR ilimitado · ES/EN/PT', 'Asistente Tano ilimitado + agrega al carrito', 'Pedidos online + pantalla de cocina', 'Pagos con MercadoPago', '✅ WhatsApp Business incluido'],
     },
     {
-      id: 'rest-mkt', nombre: 'Marketing', precioUSD: 58,
+      id: 'rest-mkt', nombre: 'Marketing', precioUSD: 57,
       features: ['Viti: estrategia mensual IA', '30 publicaciones auto/mes', 'Google · Instagram · Facebook', 'Viti responde reseñas automáticamente', 'Análisis de competidores · Informe PDF', '✅ WhatsApp Business incluido', '🎁 Al pagar: $10 USD para tu primera campaña con Viti'],
     },
     {
       id: 'rest-combo', nombre: 'Combo', precioUSD: 70, recommended: true,
-      features: ['Todo Solo Menú +', 'Todo Marketing +', 'Asistente IA + Viti trabajando juntos', 'Panel unificado operaciones + marketing', '✅ WhatsApp Business incluido', 'Ahorrás USD 15 vs contratar separado', '🎁 Al pagar: $10 USD para tu primera campaña con Viti'],
+      features: ['Todo Solo Menú +', 'Todo Marketing +', 'Asistente IA + Viti trabajando juntos', 'Panel unificado operaciones + marketing', '✅ WhatsApp Business incluido', 'Ahorrás USD 14 vs contratar separado', '🎁 Al pagar: $10 USD para tu primera campaña con Viti'],
     },
   ]
 
   const planesLocal = [
     {
-      id: 'local-mkt', nombre: 'Marketing', precioUSD: 65, recommended: true,
+      id: 'local-mkt', nombre: 'Marketing', precioUSD: 62, recommended: true,
       features: ['Catálogo QR ilimitado', 'MercadoLibre: publicaciones y stock automático', 'Tienda Nube: sincronización bidireccional', 'Viti: estrategia, análisis y competidores ML', '30 publicaciones auto/mes en redes', '✅ WhatsApp Business incluido', '🎁 Al pagar: $10 USD para tu primera campaña con Viti'],
     },
   ]
@@ -7549,7 +7925,7 @@ window.enhanceImage = async function () {
       let attempts = 0
       const MAX = 30 // 60s max
       const poll = async () => {
-        if (attempts++ >= MAX) { reject(new Error('La mejora tardó demasiado — intentá de nuevo en unos minutos')); return }
+        if (attempts++ >= MAX) { reject(new Error('La mejora tardó demasiado. Intentá de nuevo en unos minutos')); return }
         try {
           const sr = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/replicate/prediction/' + prediction.id)
           if (!sr.ok) { reject(new Error('Error obteniendo estado')); return }
@@ -7600,9 +7976,9 @@ window.enhanceImage = async function () {
 let generatedImageBase64 = null
 
 const AI_STYLES = [
-  { key: 'professional', label: 'Fondo neutro blanco — estilo catálogo', desc: 'Producto en fondo blanco limpio, luz uniforme, sombra suave.' },
-  { key: 'warm',         label: 'Ambiente cálido — madera y luz dorada', desc: 'Contexto de restaurante, madera, luz dorada, atmósfera acogedora.' },
-  { key: 'dark',         label: 'Minimalista oscuro — premium',           desc: 'Fondo negro/gris, spotlight, estilo premium y exclusivo.' },
+  { key: 'professional', label: 'Fondo neutro blanco · estilo catálogo', desc: 'Producto en fondo blanco limpio, luz uniforme, sombra suave.' },
+  { key: 'warm',         label: 'Ambiente cálido · madera y luz dorada', desc: 'Contexto de restaurante, madera, luz dorada, atmósfera acogedora.' },
+  { key: 'dark',         label: 'Minimalista oscuro · premium',           desc: 'Fondo negro/gris, spotlight, estilo premium y exclusivo.' },
 ]
 
 window.generateImageAI = async function () {
@@ -7667,7 +8043,7 @@ window.doGenerateImage = async function () {
     previewImg.src = data.imageBase64
     previewWrap.style.display = 'block'
 
-    showToast('✨ Foto generada — aceptala para usarla', 'success')
+    showToast('✨ Foto generada. Aceptala para usarla', 'success')
   } catch (e) {
     showToast('Error: ' + e.message, 'error')
   } finally {
@@ -7733,7 +8109,7 @@ window.uploadItemImage = async function (input) {
     const img = new window.Image()
     img.onload = () => {
       if (img.width < 200 || img.height < 200) {
-        showToast('⚠️ Imagen muy pequeña (' + img.width + '×' + img.height + 'px). El resultado puede no ser óptimo — usá una imagen de al menos 400×400px.', 'error')
+        showToast('⚠️ Imagen muy pequeña (' + img.width + '×' + img.height + 'px). El resultado puede no ser óptimo: usá una imagen de al menos 400×400px.', 'error')
       }
     }
     img.src = e.target.result
@@ -7803,10 +8179,10 @@ window.loadMarketing = async function () {
     const fbMini = document.getElementById('meta-fb-status-mini')
     if (igMini) igMini.innerHTML = igConn
       ? `<span style="color:#2e7d32">✅ Conectado</span>`
-      : `<span style="color:var(--terra)">Sin conectar — <a href="#" onclick="switchSection('analisis',document.querySelector('[data-section=analisis]'));return false" style="color:var(--terra)">Conectar →</a></span>`
+      : `<span style="color:var(--terra)">Sin conectar · <a href="#" onclick="switchSection('analisis',document.querySelector('[data-section=analisis]'));return false" style="color:var(--terra)">Conectar →</a></span>`
     if (fbMini) fbMini.innerHTML = fbConn
       ? `<span style="color:#2e7d32">✅ Conectado</span>`
-      : `<span style="color:var(--terra)">Sin conectar — <a href="#" onclick="switchSection('analisis',document.querySelector('[data-section=analisis]'));return false" style="color:var(--terra)">Conectar →</a></span>`
+      : `<span style="color:var(--terra)">Sin conectar · <a href="#" onclick="switchSection('analisis',document.querySelector('[data-section=analisis]'));return false" style="color:var(--terra)">Conectar →</a></span>`
 
     // Mostrar secciones de contenido siempre (publicación directa via Meta)
     const calCard = document.getElementById('content-calendar-card')
@@ -8568,7 +8944,7 @@ window.contactProspect = async function (prospectId) {
     // Preparar mensaje personalizado
     const mensajeWA = `Hola ${prospect.name || 'Buen día'} 👋
 
-Soy Sebastián de *Vitrina* — una plataforma para que los comercios tengan presencia digital completa sin complicaciones.
+Soy Sebastián de *Vitrina*, una plataforma para que los comercios tengan presencia digital completa sin complicaciones.
 
 Vi que ${prospect.name || 'tu negocio'} está en ${prospect.address || 'la zona'} y quería contarte que en 15 minutos podés tener:
 ✅ Menú/catálogo digital con QR
@@ -8579,7 +8955,7 @@ Vi que ${prospect.name || 'tu negocio'} está en ${prospect.address || 'la zona'
 *14 días gratis, sin tarjeta.*
 
 ¿Te mando más info o pasamos a probarlo directo?
-— vitrinaapp.com.ar`
+vitrinaapp.com.ar`
     const message = mensajeWA
 
     const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/contact', {
@@ -9077,7 +9453,7 @@ function renderGettingStarted() {
 
   const stepsByType = {
     restaurant: [
-      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: '✅ Negocio creado. ¡Empezamos!',          done: true },
       { label: 'Subí el logo de tu restaurante',           done: !!(r.logo_url || r.cover_url),  action: goInfo   },
       { label: 'Agregá una descripción',                   done: !!(r.description),              action: goInfo   },
       { label: 'Cargá tu primer plato',                    done: totalMenuItems > 0,             action: goMenu   },
@@ -9086,7 +9462,7 @@ function renderGettingStarted() {
       { label: 'Configurá tus horarios de atención',       done: !!(r.opening_hours),            action: goInfo   },
     ],
     services: [
-      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: '✅ Negocio creado. ¡Empezamos!',          done: true },
       { label: 'Subí tu logo',                             done: !!(r.logo_url || r.cover_url),  action: goInfo   },
       { label: 'Agregá una descripción de tus servicios',  done: !!(r.description),              action: goInfo   },
       { label: 'Cargá tu primer servicio con precio',      done: totalMenuItems > 0,             action: goMenu   },
@@ -9095,7 +9471,7 @@ function renderGettingStarted() {
       { label: 'Conectá Instagram para tu marketing',      done: !!(r.instagram_handle),         action: goMkt    },
     ],
     local: [
-      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: '✅ Negocio creado. ¡Empezamos!',          done: true },
       { label: 'Subí tu logo',                             done: !!(r.logo_url || r.cover_url),  action: goInfo   },
       { label: 'Agregá una descripción',                   done: !!(r.description),              action: goInfo   },
       { label: 'Cargá tu primer producto',                 done: totalMenuItems > 0,             action: goMenu   },
@@ -9104,7 +9480,7 @@ function renderGettingStarted() {
       { label: 'Conectá Instagram',                        done: !!(r.instagram_handle),         action: goMkt    },
     ],
     ecommerce: [
-      { label: '✅ Negocio creado — ¡empezamos!',          done: true },
+      { label: '✅ Negocio creado. ¡Empezamos!',          done: true },
       { label: 'Subí tu logo',                             done: !!(r.logo_url || r.cover_url),  action: goInfo   },
       { label: 'Conectá MercadoLibre',                     done: false,                          action: goMkt    },
       { label: 'Conectá Tienda Nube',                      done: false,                          action: goMkt    },
@@ -9540,7 +9916,7 @@ window.loadAgenda = async function () {
         if (card && !document.getElementById('wa-status-badge')) {
           card.insertAdjacentHTML('beforeend', `
             <div id="wa-status-badge" style="margin-top:16px;padding:12px 16px;background:#fff8e1;border:1px solid #ffd54f;border-radius:10px;font-size:13px;color:#856404;display:flex;align-items:center;gap:8px">
-              ⏳ Tu número WhatsApp Business llega en 24hs hábiles. Lo activamos nosotros — sin trámites con Meta. Te avisamos por email cuando esté listo.
+              ⏳ Tu número WhatsApp Business llega en 24hs hábiles. Lo activamos nosotros, sin trámites con Meta. Te avisamos por email cuando esté listo.
             </div>`)
         }
       }, 100)
@@ -9674,7 +10050,7 @@ function getSetupSteps(btype, serviceSubtype) {
   if (btype === 'restaurant') {
     return [
       {
-        title: 'Reservas — Tu salón',
+        title: 'Reservas · Tu salón',
         render: () => `
           <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5">Contanos sobre tu salón para configurar el sistema de reservas.</p>
           <div class="form-grid">
@@ -9699,7 +10075,7 @@ function getSetupSteps(btype, serviceSubtype) {
         }
       },
       {
-        title: 'Reservas — Duración y turnos',
+        title: 'Reservas · Duración y turnos',
         render: () => `
           <p style="font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.5">Esto define cuántas reservas simultáneas puede haber y con qué anticipación se puede reservar.</p>
           <div class="form-grid">
@@ -9772,8 +10148,8 @@ function getSetupSteps(btype, serviceSubtype) {
             <div class="form-field">
               <label class="form-label">¿Tienen nombres distintos que el cliente puede elegir?</label>
               <select class="form-select" id="sf-named">
-                <option value="si">Sí — el cliente elige con quién</option>
-                <option value="no">No — cualquiera disponible</option>
+                <option value="si">Sí, el cliente elige con quién</option>
+                <option value="no">No, cualquiera disponible</option>
               </select>
             </div>
           </div>
@@ -9791,11 +10167,11 @@ function getSetupSteps(btype, serviceSubtype) {
         render: () => {
           const stype = setupData.service_subtype || 'otro'
           const durationOptions = {
-            peluqueria: [{ v:30,l:'30 min — corte rápido'},{v:45,l:'45 min — corte estándar'},{v:60,l:'1 hora — corte + peinado'},{v:90,l:'1:30 hs — coloración básica'}],
-            estetica: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora — tratamiento facial'},{v:90,l:'1:30 hs — tratamiento completo'}],
-            medico: [{v:15,l:'15 min'},{v:20,l:'20 min — control'},{v:30,l:'30 min — consulta'},{v:45,l:'45 min — primera consulta'}],
-            psicologo: [{v:45,l:'45 min'},{v:50,l:'50 min — sesión estándar'},{v:60,l:'1 hora'}],
-            gym: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora — clase estándar'}],
+            peluqueria: [{ v:30,l:'30 min · corte rápido'},{v:45,l:'45 min · corte estándar'},{v:60,l:'1 hora · corte + peinado'},{v:90,l:'1:30 hs · coloración básica'}],
+            estetica: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora · tratamiento facial'},{v:90,l:'1:30 hs · tratamiento completo'}],
+            medico: [{v:15,l:'15 min'},{v:20,l:'20 min · control'},{v:30,l:'30 min · consulta'},{v:45,l:'45 min · primera consulta'}],
+            psicologo: [{v:45,l:'45 min'},{v:50,l:'50 min · sesión estándar'},{v:60,l:'1 hora'}],
+            gym: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora · clase estándar'}],
             otro: [{v:30,l:'30 min'},{v:45,l:'45 min'},{v:60,l:'1 hora'},{v:90,l:'1:30 hs'},{v:120,l:'2 horas'}],
           }
           const opts = durationOptions[stype] || durationOptions.otro
@@ -10505,7 +10881,7 @@ window.exportOrdersCSV = async function () {
     a.download = 'vitrina-pedidos-' + restName + '-' + dateStr + '.csv'
     a.click()
     URL.revokeObjectURL(a.href)
-    showToast(`✅ CSV generado — ${(ordersData || []).length} pedidos`, 'success')
+    showToast(`✅ CSV generado · ${(ordersData || []).length} pedidos`, 'success')
   } catch (e) {
     showToast('Error exportando: ' + e.message, 'error')
   }
@@ -10720,7 +11096,7 @@ window.copiarInforme = function () {
 window.descargarInforme = function () {
   if (!window._informeText) return
   const mes = new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
-  const content = `INFORME MENSUAL — ${currentRestaurant?.name}\n${mes}\n\n${window._informeText}\n\nGenerado por Vitrina — vitrinaapp.com.ar`
+  const content = `INFORME MENSUAL · ${currentRestaurant?.name}\n${mes}\n\n${window._informeText}\n\nGenerado por Vitrina · vitrinaapp.com.ar`
   const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
@@ -11104,7 +11480,7 @@ function buildVitiSystemPrompt() {
   }
 
   return `Sos Viti, el asistente estratégico de Vitrina para "${r.name}"${r.city ? ' (' + r.city + ')' : ''}.
-Viti no tiene género. Hablás en primera persona, directo y sin adornos — como el socio de marketing del dueño, no como un bot.
+Viti no tiene género. Hablás en primera persona, directo y sin adornos, como el socio de marketing del dueño, no como un bot.
 
 DATOS DEL NEGOCIO:
 - Plan: ${plan}
@@ -11126,9 +11502,9 @@ REGLAS DE COMUNICACIÓN:
 1. Siempre usás números concretos cuando los tenés: no "aumentó bastante" sino "subió un 23% respecto al mes anterior".
 2. Una sola recomendación accionable por respuesta, no listas de 10 puntos. Una cosa bien explicada vale más.
 3. Si hay malas noticias, las decís directo: "Tu engagement bajó este mes. La razón probable: solo publicaste 2 veces."
-4. Cuando no tenés un dato específico, lo decís claramente: "No tengo datos de eso todavía — necesito que conectes Instagram para verlo."
+4. Cuando no tenés un dato específico, lo decís claramente: "No tengo datos de eso todavía. Necesito que conectes Instagram para verlo."
 5. NUNCA inventás datos ni proyecciones sin base. Si no lo sabés, lo decís.
-6. Solo respondés sobre el negocio, su marketing y Vitrina. Si te preguntan otra cosa: "Eso me queda fuera — preguntame sobre tu negocio o estrategia digital."
+6. Solo respondés sobre el negocio, su marketing y Vitrina. Si te preguntan otra cosa: "Eso me queda fuera. Preguntame sobre tu negocio o estrategia digital."
 7. Máximo 4-5 párrafos por respuesta. Párrafos cortos, sin bullet points cuando podés evitarlos.`
 }
 
@@ -11989,7 +12365,7 @@ window.uploadDeliveryScreenshot = async function (platform, input) {
     openDeliveryReviewModal(platform, result.data)
 
   } catch (e) {
-    showToast('Error: ' + e.message + ' — intentá con el formulario manual', 'error')
+    showToast('Error: ' + e.message + '. Intentá con el formulario manual', 'error')
   }
 }
 
@@ -12084,7 +12460,7 @@ async function saveDeliveryMetric(metric) {
 <div class="modal-overlay" id="modal-agenda-setup" onclick="if(event.target===this)closeModal('modal-agenda-setup')">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title" id="setup-step-title">Configurar agenda — Paso 1 de 3</div>
+      <div class="modal-title" id="setup-step-title">Configurar agenda · Paso 1 de 3</div>
       <button class="modal-close" onclick="closeModal('modal-agenda-setup')">✕</button>
     </div>
     <div class="modal-body" id="setup-step-body">
