@@ -1617,6 +1617,11 @@ input:checked + .toggle-slider:before {
         <span class="nav-icon">💬</span> WhatsApp Business
       </button>
 
+      <button class="nav-item" data-section="reminders" id="nav-reminders" onclick="switchSection('reminders', this)" style="display:none">
+        <span class="nav-icon">💌</span> Recordatorios
+        <span class="nav-badge" id="reminders-badge" style="display:none">0</span>
+      </button>
+
       <button class="nav-item" data-section="catalogo" onclick="switchSection('catalogo', this)">
         <span class="nav-icon">🛒</span> Mi Catálogo
       </button>
@@ -3494,6 +3499,128 @@ input:checked + .toggle-slider:before {
         </div>
       </div>
 
+      <!-- Sección Recordatorios de visita (solo business_type === 'services') -->
+      <div id="section-reminders" class="panel-section">
+        <div class="page-header">
+          <div class="page-title">Recordatorios de visita</div>
+          <div class="page-subtitle">Viti aprende cuánto tarda cada cliente en volver y les manda un mensaje justo antes de que llegue ese momento.</div>
+        </div>
+
+        <!-- Configuración -->
+        <div class="card" id="reminders-config-card">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <span>Configuración</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="reminders-enabled-toggle" onchange="onReminderToggleChange()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div style="font-size:13.5px;color:var(--muted);margin:-4px 0 16px">Activar recordatorios automáticos de visita</div>
+
+          <div id="reminders-config-fields" style="display:none">
+            <!-- Tipo de servicio -->
+            <div style="margin-bottom:16px">
+              <label style="font-size:13px;font-weight:500;color:var(--ink);display:block;margin-bottom:6px">Tipo de servicio</label>
+              <select id="reminders-service-type" onchange="onReminderServiceTypeChange()" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:13.5px;background:white;color:var(--ink)">
+                <option value="">— Seleccionar —</option>
+                <option value="peluqueria">Peluquería / Barbería</option>
+                <option value="manicure">Manicure / Pedicure / Uñas</option>
+                <option value="estetica">Estética / Spa / Facial</option>
+                <option value="depilacion">Depilación</option>
+                <option value="masajes">Masajes</option>
+                <option value="kinesio">Kinesiología / Fisioterapia</option>
+                <option value="veterinaria">Veterinaria</option>
+                <option value="odontologia">Odontología</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+
+            <!-- Intervalo sugerido -->
+            <div id="reminders-interval-suggestion" style="display:none;padding:10px 14px;background:var(--cream2);border-radius:8px;font-size:13px;color:var(--muted);margin-bottom:16px"></div>
+
+            <!-- Intervalo por defecto -->
+            <div style="margin-bottom:16px">
+              <label style="font-size:13px;font-weight:500;color:var(--ink);display:block;margin-bottom:6px">Días entre visitas por defecto</label>
+              <div style="display:flex;align-items:center;gap:12px">
+                <input type="range" id="reminders-default-interval" min="7" max="180" step="1" value="30" oninput="document.getElementById('reminders-interval-value').textContent=this.value" style="flex:1;accent-color:var(--terra)">
+                <span id="reminders-interval-value" style="font-size:15px;font-weight:600;color:var(--terra);min-width:40px">30</span>
+                <span style="font-size:13px;color:var(--muted)">días</span>
+              </div>
+            </div>
+
+            <!-- Avisar X días antes -->
+            <div style="margin-bottom:16px">
+              <label style="font-size:13px;font-weight:500;color:var(--ink);display:block;margin-bottom:6px">Avisar X días antes de la fecha estimada</label>
+              <div style="display:flex;align-items:center;gap:12px">
+                <input type="range" id="reminders-days-before" min="2" max="10" step="1" value="5" oninput="document.getElementById('reminders-days-before-value').textContent=this.value" style="flex:1;accent-color:var(--terra)">
+                <span id="reminders-days-before-value" style="font-size:15px;font-weight:600;color:var(--terra);min-width:24px">5</span>
+                <span style="font-size:13px;color:var(--muted)">días</span>
+              </div>
+            </div>
+
+            <!-- Tono -->
+            <div style="margin-bottom:16px">
+              <label style="font-size:13px;font-weight:500;color:var(--ink);display:block;margin-bottom:8px">Tono de los mensajes</label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="reminders-tone-btn active" data-tone="calido" onclick="selectReminderTone(this)" style="padding:8px 16px;border-radius:20px;border:1.5px solid var(--terra);background:var(--terra);color:white;font-size:13px;cursor:pointer;font-family:var(--sans)">Cálido</button>
+                <button class="reminders-tone-btn" data-tone="amigable" onclick="selectReminderTone(this)" style="padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--ink);font-size:13px;cursor:pointer;font-family:var(--sans)">Amigable</button>
+                <button class="reminders-tone-btn" data-tone="formal" onclick="selectReminderTone(this)" style="padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:white;color:var(--ink);font-size:13px;cursor:pointer;font-family:var(--sans)">Formal</button>
+              </div>
+            </div>
+
+            <!-- Nombre del servicio personalizado -->
+            <div style="margin-bottom:16px">
+              <label style="font-size:13px;font-weight:500;color:var(--ink);display:block;margin-bottom:6px">Nombre del servicio (opcional)</label>
+              <input type="text" id="reminders-custom-service-name" placeholder="ej: tu corte y barba, el turno de uñas..." style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:13.5px;box-sizing:border-box">
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">Viti va a usar este nombre en el mensaje. Si no lo completás, usa el tipo de servicio seleccionado.</div>
+            </div>
+
+            <!-- Notificarme -->
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--border)">
+              <label class="toggle-switch" style="flex-shrink:0">
+                <input type="checkbox" id="reminders-nudge-owner" checked>
+                <span class="toggle-slider"></span>
+              </label>
+              <div>
+                <div style="font-size:13.5px;font-weight:500;color:var(--ink)">Notificarme cuando haya borradores listos</div>
+                <div style="font-size:12px;color:var(--muted)">Viti te avisa por WhatsApp cuando genera mensajes para aprobar</div>
+              </div>
+            </div>
+
+            <!-- Guardar -->
+            <div style="margin-top:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+              <button class="btn-primary" onclick="saveRemindersConfig()" style="font-size:14px">Guardar configuración</button>
+              <span id="reminders-save-status" style="font-size:13px;color:var(--muted)"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de borradores pendientes -->
+        <div class="card" style="margin-top:0" id="reminders-drafts-card">
+          <div class="card-title">Clientes que necesitan un empujoncito</div>
+          <div style="font-size:13px;color:var(--muted);margin:-4px 0 16px">Viti preparó estos mensajes. Revisalos, editalos si querés, y aprobá los que te gusten.</div>
+          <div id="reminders-drafts-list">
+            <div style="text-align:center;padding:32px 0;color:var(--muted);font-size:13.5px">
+              <div style="font-size:28px;margin-bottom:12px">💌</div>
+              <div>Viti va a generar los borradores unos días antes<br>de la fecha estimada de cada cliente.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla de patrones de todos los clientes -->
+        <div class="card" style="margin-top:0">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+            <div class="card-title" style="margin:0">Patrones de visita</div>
+            <button onclick="recalcReminderPatterns()" style="padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:white;font-size:13px;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:6px">
+              <span>🔄</span> Recalcular patrones
+            </button>
+          </div>
+          <div id="reminders-customers-table">
+            <div style="text-align:center;padding:24px 0;color:var(--muted);font-size:13.5px">Cargando clientes...</div>
+          </div>
+        </div>
+      </div>
+
       <!-- Sección Facturación -->
       <div id="section-facturacion" class="panel-section">
         <div class="page-header">
@@ -4235,6 +4362,8 @@ function renderSidebarRestaurant(rest) {
     if (catalogoBtn) catalogoBtn.style.display = 'none'
     if (mesasBtn)    mesasBtn.style.display    = 'none'
     if (verDemoBtn)  { verDemoBtn.href = '/demo-servicios.html'; verDemoBtn.title = 'Ver demo de servicios' }
+    const remindersBtn = document.getElementById('nav-reminders')
+    if (remindersBtn) remindersBtn.style.display = 'flex'
   } else {
     // Restaurant: todo visible
     if (reservasBtn) reservasBtn.style.display = 'flex'
@@ -5685,7 +5814,7 @@ window.switchSection = function (name, btn) {
     facturacion: 'Facturación', agenda: 'Agenda', reservas: 'Reservas',
     campanas: 'Campañas', crm: 'Clientes', informes: 'Informes',
     catalogo: 'Mi Catálogo', 'sales-agent': 'Agente de Ventas', delivery: 'Delivery',
-    whatsapp: 'WhatsApp Business',
+    whatsapp: 'WhatsApp Business', reminders: 'Recordatorios de visita',
   }
   const restName = currentRestaurant?.name || 'Vitrina'
   document.title = (sectionTitles[name] || name) + ' · ' + restName
@@ -5717,6 +5846,7 @@ window.switchSection = function (name, btn) {
   if (name === 'config')       loadConfig()
   if (name === 'facturacion')  loadFacturacion()
   if (name === 'whatsapp')     loadWhatsappSection()
+  if (name === 'reminders')    loadRemindersSection()
   if (name !== 'pedidos')      detachPedidosRealtime()
 }
 
@@ -12454,6 +12584,371 @@ async function saveDeliveryMetric(metric) {
     showToast('Error al guardar: ' + e.message, 'error')
   }
 }
+
+// ─── SMART REMINDERS ─────────────────────────────────────────────────────────
+
+let _remindersConfig = null
+
+const REMINDER_INTERVAL_SUGGESTIONS = {
+  peluqueria: { days: 35, label: 'Peluquería/Barbería — el promedio es cada 35 días' },
+  manicure:   { days: 18, label: 'Manicure/Uñas — el promedio es cada 18 días' },
+  estetica:   { days: 40, label: 'Estética/Spa — el promedio es cada 40 días' },
+  depilacion: { days: 25, label: 'Depilación — el promedio es cada 25 días' },
+  masajes:    { days: 30, label: 'Masajes — el promedio es cada 30 días' },
+  kinesio:    { days: 14, label: 'Kinesiología — el promedio es cada 14 días' },
+  veterinaria:  { days: 60, label: 'Veterinaria — el promedio es cada 60 días' },
+  odontologia:  { days: 180, label: 'Odontología — el promedio es cada 180 días' },
+}
+
+window.loadRemindersSection = async function () {
+  if (!currentRestaurant) return
+  try {
+    const res = await fetch(`${WORKER_URL}/api/reminders/config?restaurant_id=${currentRestaurant.id}`)
+    const data = await res.json()
+    _remindersConfig = data.config || null
+    renderRemindersConfig(_remindersConfig)
+    await loadRemindersDrafts()
+    await loadRemindersPatternsTable()
+  } catch (e) {
+    console.error('[reminders] load error', e.message)
+  }
+}
+
+function renderRemindersConfig(config) {
+  const enabledToggle = document.getElementById('reminders-enabled-toggle')
+  const configFields  = document.getElementById('reminders-config-fields')
+  if (!enabledToggle || !configFields) return
+
+  const enabled = config?.enabled || false
+  enabledToggle.checked = enabled
+  configFields.style.display = enabled ? 'block' : 'none'
+
+  if (config) {
+    const svcType = document.getElementById('reminders-service-type')
+    const defInterval = document.getElementById('reminders-default-interval')
+    const intervalVal = document.getElementById('reminders-interval-value')
+    const daysBefore = document.getElementById('reminders-days-before')
+    const daysBeforeVal = document.getElementById('reminders-days-before-value')
+    const customName = document.getElementById('reminders-custom-service-name')
+    const nudge = document.getElementById('reminders-nudge-owner')
+
+    if (svcType) svcType.value = config.service_type || ''
+    if (defInterval) { defInterval.value = config.default_interval_days || 30; if (intervalVal) intervalVal.textContent = defInterval.value }
+    if (daysBefore)  { daysBefore.value  = config.days_before || 5;            if (daysBeforeVal) daysBeforeVal.textContent = daysBefore.value }
+    if (customName)  customName.value = config.custom_service_name || ''
+    if (nudge)       nudge.checked = config.nudge_owner_if_pending !== false
+
+    // Tono
+    document.querySelectorAll('.reminders-tone-btn').forEach(btn => {
+      const isActive = btn.dataset.tone === (config.tone || 'calido')
+      btn.style.background = isActive ? 'var(--terra)' : 'white'
+      btn.style.color      = isActive ? 'white'        : 'var(--ink)'
+      btn.style.borderColor = isActive ? 'var(--terra)' : 'var(--border)'
+      btn.classList.toggle('active', isActive)
+    })
+
+    if (config.service_type) onReminderServiceTypeChange()
+  }
+}
+
+window.onReminderToggleChange = function () {
+  const enabled = document.getElementById('reminders-enabled-toggle')?.checked
+  const fields  = document.getElementById('reminders-config-fields')
+  if (fields) fields.style.display = enabled ? 'block' : 'none'
+}
+
+window.onReminderServiceTypeChange = function () {
+  const svcType   = document.getElementById('reminders-service-type')?.value
+  const suggestion = REMINDER_INTERVAL_SUGGESTIONS[svcType]
+  const suggDiv    = document.getElementById('reminders-interval-suggestion')
+  const defInterval = document.getElementById('reminders-default-interval')
+  const intervalVal = document.getElementById('reminders-interval-value')
+
+  if (suggDiv) {
+    if (suggestion) {
+      suggDiv.style.display = 'block'
+      suggDiv.textContent = suggestion.label
+      if (defInterval && !_remindersConfig?.default_interval_days) {
+        defInterval.value = suggestion.days
+        if (intervalVal) intervalVal.textContent = suggestion.days
+      }
+    } else {
+      suggDiv.style.display = 'none'
+    }
+  }
+}
+
+window.selectReminderTone = function (btn) {
+  document.querySelectorAll('.reminders-tone-btn').forEach(b => {
+    const isThis = b === btn
+    b.style.background = isThis ? 'var(--terra)' : 'white'
+    b.style.color      = isThis ? 'white'        : 'var(--ink)'
+    b.style.borderColor = isThis ? 'var(--terra)' : 'var(--border)'
+    b.classList.toggle('active', isThis)
+  })
+}
+
+window.saveRemindersConfig = async function () {
+  if (!currentRestaurant) return
+  const status = document.getElementById('reminders-save-status')
+  if (status) { status.textContent = 'Guardando...'; status.style.color = 'var(--muted)' }
+
+  const payload = {
+    restaurant_id: currentRestaurant.id,
+    enabled: !!(document.getElementById('reminders-enabled-toggle')?.checked),
+    days_before: parseInt(document.getElementById('reminders-days-before')?.value || '5'),
+    default_interval_days: parseInt(document.getElementById('reminders-default-interval')?.value || '30'),
+    tone: document.querySelector('.reminders-tone-btn.active')?.dataset?.tone || 'calido',
+    service_type: document.getElementById('reminders-service-type')?.value || null,
+    custom_service_name: document.getElementById('reminders-custom-service-name')?.value?.trim() || null,
+    nudge_owner_if_pending: !!(document.getElementById('reminders-nudge-owner')?.checked),
+  }
+
+  try {
+    const res = await fetch(`${WORKER_URL}/api/reminders/config`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    })
+    const data = await res.json()
+    if (!data.ok) throw new Error('Error al guardar')
+    _remindersConfig = data.config || payload
+    if (status) { status.textContent = 'Guardado ✓'; status.style.color = '#27AE60' }
+    showToast('Configuración guardada', 'success')
+    setTimeout(() => { if (status) status.textContent = '' }, 3000)
+  } catch (e) {
+    if (status) { status.textContent = 'Error al guardar'; status.style.color = 'var(--error, #e74c3c)' }
+    showToast('Error al guardar la configuración', 'error')
+  }
+}
+
+async function loadRemindersDrafts() {
+  const list = document.getElementById('reminders-drafts-list')
+  if (!list || !currentRestaurant) return
+
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Cargando...</div>'
+
+  try {
+    const res  = await fetch(`${WORKER_URL}/api/reminders/upcoming?restaurant_id=${currentRestaurant.id}`)
+    const data = await res.json()
+    const customers = data.customers || []
+
+    // Actualizar badge del nav
+    const badge = document.getElementById('reminders-badge')
+    if (badge) {
+      if (customers.length > 0) { badge.textContent = customers.length; badge.style.display = 'inline-flex' }
+      else { badge.style.display = 'none' }
+    }
+
+    if (customers.length === 0) {
+      list.innerHTML = `
+        <div style="text-align:center;padding:32px 0;color:var(--muted);font-size:13.5px">
+          <div style="font-size:28px;margin-bottom:12px">💌</div>
+          <div>Viti va a generar los borradores unos días antes<br>de la fecha estimada de cada cliente.</div>
+        </div>`
+      return
+    }
+
+    list.innerHTML = customers.map(c => {
+      const name = c.name || c.customer_name || 'Cliente sin nombre'
+      const nextVisit = c.next_visit_estimated ? new Date(c.next_visit_estimated).toLocaleDateString('es-AR', { day:'numeric', month:'long' }) : '—'
+      const hasDraft = !!c.reminder_draft
+      return `
+        <div style="padding:16px 0;border-bottom:1px solid var(--border)" id="reminder-card-${c.id}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <div>
+              <div style="font-weight:600;font-size:14px;color:var(--ink)">${name}</div>
+              <div style="font-size:12px;color:var(--muted)">${c.phone || 'Sin teléfono'} · Próxima visita estimada: <strong>${nextVisit}</strong></div>
+            </div>
+          </div>
+          ${hasDraft ? `
+            <textarea id="reminder-draft-${c.id}" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:13.5px;resize:vertical;min-height:80px;box-sizing:border-box;background:white;color:var(--ink)">${escapeHtml(c.reminder_draft)}</textarea>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button onclick="approveReminder('${c.id}')" style="padding:8px 16px;background:var(--terra);color:white;border:none;border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--sans)">Aprobar y enviar</button>
+              <button onclick="skipReminder('${c.id}')" style="padding:8px 16px;background:white;color:var(--ink);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--sans)">Saltar este mes</button>
+              <button onclick="disableCustomerReminder('${c.id}')" style="padding:8px 16px;background:white;color:var(--muted);border:1px solid var(--border);border-radius:8px;font-size:13px;cursor:pointer;font-family:var(--sans)">Desactivar para este cliente</button>
+            </div>
+          ` : `
+            <div style="padding:10px 14px;background:var(--cream2);border-radius:8px;font-size:13px;color:var(--muted)">
+              Viti va a preparar el mensaje en los próximos días.
+            </div>
+          `}
+        </div>`
+    }).join('')
+  } catch (e) {
+    list.innerHTML = '<div style="padding:16px;color:var(--error,#e74c3c)">Error al cargar los recordatorios</div>'
+  }
+}
+
+function escapeHtml(str) {
+  if (!str) return ''
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+}
+
+window.approveReminder = async function (customerId) {
+  const textarea = document.getElementById(`reminder-draft-${customerId}`)
+  const draftText = textarea?.value?.trim()
+  if (!draftText) { showToast('El mensaje no puede estar vacío', 'error'); return }
+
+  try {
+    const res = await fetch(`${WORKER_URL}/api/reminders/approve`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer_id: customerId, draft_text: draftText }),
+    })
+    const data = await res.json()
+    if (!data.ok) throw new Error('Error al aprobar')
+    const card = document.getElementById(`reminder-card-${customerId}`)
+    if (card) card.remove()
+    showToast('Mensaje enviado', 'success')
+    // Actualizar badge
+    const badge = document.getElementById('reminders-badge')
+    if (badge) {
+      const current = parseInt(badge.textContent || '0')
+      if (current <= 1) badge.style.display = 'none'
+      else badge.textContent = current - 1
+    }
+  } catch (e) {
+    showToast('Error al enviar el mensaje', 'error')
+  }
+}
+
+window.skipReminder = async function (customerId) {
+  try {
+    const res = await fetch(`${WORKER_URL}/api/reminders/skip`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer_id: customerId }),
+    })
+    const data = await res.json()
+    if (!data.ok) throw new Error()
+    const card = document.getElementById(`reminder-card-${customerId}`)
+    if (card) card.remove()
+    showToast('Recordatorio postergado 15 días', 'success')
+  } catch {
+    showToast('Error al postponer el recordatorio', 'error')
+  }
+}
+
+window.disableCustomerReminder = async function (customerId) {
+  if (!confirm('Desactivar recordatorios automáticos para este cliente. Podés reactivarlos desde la tabla de patrones.')) return
+  try {
+    const res = await fetch(`${WORKER_URL}/api/reminders/disable-customer`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer_id: customerId }),
+    })
+    const data = await res.json()
+    if (!data.ok) throw new Error()
+    const card = document.getElementById(`reminder-card-${customerId}`)
+    if (card) card.remove()
+    showToast('Recordatorios desactivados para este cliente', 'success')
+  } catch {
+    showToast('Error al desactivar', 'error')
+  }
+}
+
+async function loadRemindersPatternsTable() {
+  const container = document.getElementById('reminders-customers-table')
+  if (!container || !currentRestaurant) return
+  container.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Cargando...</div>'
+
+  try {
+    const { data: customers, error } = await supabase
+      .from('customers')
+      .select('id, name, customer_name, phone, last_visit_at, visit_interval_days, next_visit_estimated, reminder_enabled')
+      .eq('restaurant_id', currentRestaurant.id)
+      .order('next_visit_estimated', { ascending: true })
+      .limit(100)
+
+    if (error) throw error
+    if (!customers || customers.length === 0) {
+      container.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13.5px;text-align:center">No hay clientes registrados aún. Se cargan automáticamente cuando se completan los turnos.</div>'
+      return
+    }
+
+    container.innerHTML = `
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead>
+            <tr style="border-bottom:2px solid var(--border)">
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--ink)">Cliente</th>
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--ink)">Última visita</th>
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--ink)">Cada (días)</th>
+              <th style="text-align:left;padding:8px 12px;font-weight:600;color:var(--ink)">Próxima estimada</th>
+              <th style="text-align:center;padding:8px 12px;font-weight:600;color:var(--ink)">Recordatorio</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${customers.map(c => {
+              const name = c.name || c.customer_name || 'Sin nombre'
+              const lastVisit = c.last_visit_at ? new Date(c.last_visit_at).toLocaleDateString('es-AR') : '—'
+              const interval  = c.visit_interval_days ? c.visit_interval_days + ' días' : '—'
+              const nextVisit = c.next_visit_estimated ? new Date(c.next_visit_estimated).toLocaleDateString('es-AR') : '—'
+              const isEnabled = c.reminder_enabled !== false
+              const today = new Date()
+              const isOverdue = c.next_visit_estimated && new Date(c.next_visit_estimated) < today
+              return `
+                <tr style="border-bottom:1px solid var(--border)">
+                  <td style="padding:10px 12px;font-weight:500;color:var(--ink)">${escapeHtml(name)}<br><span style="font-size:11px;color:var(--muted)">${escapeHtml(c.phone || '')}</span></td>
+                  <td style="padding:10px 12px;color:var(--muted)">${lastVisit}</td>
+                  <td style="padding:10px 12px;color:var(--muted)">${interval}</td>
+                  <td style="padding:10px 12px;${isOverdue ? 'color:#e74c3c;font-weight:500' : 'color:var(--muted)'}">${nextVisit}${isOverdue ? ' ⚠️' : ''}</td>
+                  <td style="padding:10px 12px;text-align:center">
+                    <label class="toggle-switch" style="justify-content:center">
+                      <input type="checkbox" ${isEnabled ? 'checked' : ''} onchange="toggleCustomerReminder('${c.id}', this.checked)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </td>
+                </tr>`
+            }).join('')}
+          </tbody>
+        </table>
+      </div>`
+  } catch (e) {
+    container.innerHTML = '<div style="padding:16px;color:var(--error,#e74c3c)">Error al cargar los clientes</div>'
+  }
+}
+
+window.toggleCustomerReminder = async function (customerId, enabled) {
+  try {
+    await fetch(`${WORKER_URL}/api/reminders/${enabled ? 'config' : 'disable-customer'}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ customer_id: customerId }),
+    })
+    if (enabled) {
+      // Re-enable via Supabase direct
+      await supabase.from('customers').update({ reminder_enabled: true }).eq('id', customerId)
+    }
+    showToast(enabled ? 'Recordatorio activado' : 'Recordatorio desactivado', 'success')
+  } catch {
+    showToast('Error al actualizar', 'error')
+  }
+}
+
+window.recalcReminderPatterns = async function () {
+  if (!currentRestaurant) return
+  const btn = event.target.closest('button')
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span>🔄</span> Recalculando...' }
+  try {
+    const res = await fetch(`${WORKER_URL}/api/reminders/recalc`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: currentRestaurant.id }),
+    })
+    const data = await res.json()
+    if (!data.ok) throw new Error()
+    showToast('Patrones recalculados', 'success')
+    await loadRemindersPatternsTable()
+  } catch {
+    showToast('Error al recalcular', 'error')
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '<span>🔄</span> Recalcular patrones' }
+  }
+}
+
+// ─── End SMART REMINDERS ─────────────────────────────────────────────────────
 </script>
 
 <!-- Modal setup de agenda -->
