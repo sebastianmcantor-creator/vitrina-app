@@ -472,6 +472,233 @@ tbody tr:hover {
     padding: 0 24px;
   }
 }
+
+/* ── Mi Marketing ─────────────────────────────────────────────────────────── */
+.mkt-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.mkt-form-grid label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.mkt-form-grid select,
+.mkt-form-grid textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 13px;
+  color: var(--ink);
+  font-family: inherit;
+}
+.mkt-form-grid textarea {
+  min-height: 68px;
+  resize: vertical;
+}
+.mkt-post-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+@media (max-width: 700px) {
+  .mkt-post-cards { grid-template-columns: 1fr; }
+}
+.mkt-post-card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px;
+  position: relative;
+}
+.mkt-post-card .variant-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--terra);
+  color: var(--white);
+  padding: 2px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+.mkt-post-card .post-copy {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  min-height: 60px;
+}
+.mkt-post-card .post-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.mkt-post-card .hashtags {
+  font-size: 12px;
+  color: #1565c0;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.mkt-post-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.mkt-post-actions button {
+  padding: 7px 13px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s;
+}
+.mkt-post-actions button:hover { background: var(--cream2); }
+.mkt-post-actions .btn-save {
+  background: var(--terra);
+  color: var(--white);
+  border-color: var(--terra);
+}
+.mkt-post-actions .btn-save:hover { background: var(--terra2); }
+
+/* Calendario */
+.mkt-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.mkt-cal-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+  padding: 4px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.mkt-cal-day {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 6px;
+  min-height: 72px;
+  font-size: 11px;
+}
+.mkt-cal-day .day-num {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.mkt-cal-day.today {
+  border-color: var(--terra);
+  background: var(--terra-pale);
+}
+.mkt-cal-day.today .day-num { color: var(--terra); }
+.mkt-pill {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin: 1px 1px;
+  white-space: nowrap;
+}
+.mkt-pill-feature { background: #dbeafe; color: #1e40af; }
+.mkt-pill-tip     { background: #d1fae5; color: #065f46; }
+.mkt-pill-cta     { background: #fef3c7; color: #92400e; }
+.mkt-pill-pain    { background: #fce7f3; color: #9d174d; }
+.mkt-pill-proof   { background: #ede9fe; color: #5b21b6; }
+.mkt-add-btn {
+  font-size: 16px;
+  color: var(--muted);
+  cursor: pointer;
+  display: block;
+  text-align: center;
+  margin-top: 4px;
+  line-height: 1;
+  transition: color .15s;
+}
+.mkt-add-btn:hover { color: var(--terra); }
+
+/* Ideas de Viti */
+.mkt-ideas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 6px;
+}
+.mkt-idea-card {
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  cursor: pointer;
+  transition: box-shadow .15s, border-color .15s;
+}
+.mkt-idea-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.07);
+  border-color: var(--terra2);
+}
+.mkt-idea-card .idea-type {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--terra);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 5px;
+}
+.mkt-idea-card .idea-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+  margin-bottom: 5px;
+}
+.mkt-idea-card .idea-why {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.mkt-idea-card .idea-use-btn {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--terra);
+  font-weight: 600;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.mkt-idea-card .idea-use-btn:hover { text-decoration: underline; }
+
+.mkt-spinner {
+  display: inline-block;
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: middle;
+  margin-right: 6px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
 <body>
@@ -497,6 +724,7 @@ tbody tr:hover {
     <button class="tab" data-tab="costs" onclick="switchTab('costs')">📉 Costos</button>
     <button class="tab" data-tab="sales" onclick="switchTab('sales')">🎯 Ventas</button>
     <button class="tab" data-tab="twilio" onclick="switchTab('twilio')">📡 Twilio</button>
+    <button class="tab" data-tab="marketing" onclick="switchTab('marketing')">📱 Mi Marketing</button>
   </div>
 
   <!-- Vista General -->
@@ -787,6 +1015,83 @@ tbody tr:hover {
   </div>
 </div>
 
+<!-- Tab: Mi Marketing (Vitrina brand) -->
+<div id="tab-marketing" class="tab-content">
+  <div class="container" style="padding-top:0">
+
+    <!-- Sección 1 — Generador de posts con Viti -->
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        ✨ Generador de posts con Viti
+        <span style="font-size:12px;color:var(--muted);font-weight:400">Los posts son para las redes de Vitrina (la marca), no de clientes</span>
+      </div>
+      <div class="mkt-form-grid">
+        <div>
+          <label>Tipo de contenido</label>
+          <select id="mkt-tipo">
+            <option value="feature">Feature highlight — mostrar una función</option>
+            <option value="pain">Problema que resuelve — pain points del cliente</option>
+            <option value="proof">Social proof — testimonio / caso de uso</option>
+            <option value="tip">Tips para el sector — valor para la audiencia</option>
+            <option value="cta">CTA / Conversión — llevar a registro o prueba</option>
+          </select>
+        </div>
+        <div>
+          <label>Red social</label>
+          <select id="mkt-red">
+            <option value="Instagram">Instagram</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Ambas" selected>Ambas</option>
+          </select>
+        </div>
+        <div>
+          <label>Tono</label>
+          <select id="mkt-tono">
+            <option value="Cercano/Informal" selected>Cercano / Informal</option>
+            <option value="Profesional">Profesional</option>
+            <option value="Motivacional">Motivacional</option>
+          </select>
+        </div>
+        <div>
+          <label>Contexto adicional (opcional)</label>
+          <textarea id="mkt-contexto" placeholder="Ej: mencionar la feature de WhatsApp incluido, o el precio de $27/mes…"></textarea>
+        </div>
+      </div>
+      <button id="mkt-generar-btn" onclick="window.mktGenerarPost()" style="display:flex;align-items:center;gap:6px;padding:11px 22px;border-radius:9px;border:none;background:var(--terra);color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:background .15s">
+        ✨ Generar con Viti
+      </button>
+
+      <!-- Resultado: 2 cards side-by-side -->
+      <div id="mkt-post-results" style="display:none">
+        <div class="mkt-post-cards" id="mkt-cards-container"></div>
+      </div>
+    </div>
+
+    <!-- Sección 2 — Calendario de contenido -->
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        📅 Calendario de contenido
+        <button onclick="window.mktRenderCalendar()" style="padding:6px 13px;border-radius:7px;border:1px solid var(--border);background:var(--white);font-size:12px;cursor:pointer">Actualizar</button>
+      </div>
+      <div id="mkt-calendar-container">
+        <div class="loading">Cargando calendario...</div>
+      </div>
+    </div>
+
+    <!-- Sección 3 — Ideas de Viti -->
+    <div class="card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        💡 Ideas de Viti
+        <button id="mkt-ideas-btn" onclick="window.mktGenerarIdeas()" style="padding:6px 13px;border-radius:7px;border:1px solid var(--border);background:var(--white);font-size:12px;cursor:pointer">Generar ideas nuevas</button>
+      </div>
+      <div id="mkt-ideas-container">
+        <div class="loading">Abrí el tab para que Viti genere ideas...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- Tab: Twilio (WA per cliente) -->
 <div id="tab-twilio" class="tab-content">
   <div class="metrics-grid">
@@ -1065,6 +1370,9 @@ function renderCurrentTab() {
       break
     case 'twilio':
       renderTwilio()
+      break
+    case 'marketing':
+      renderMarketing()
       break
   }
 }
@@ -1884,6 +2192,362 @@ window.switchTab = function(tabName) {
 window.refreshData = async function() {
   // Forzar recalculo eliminando el cache
   await loadDashboardData()
+}
+
+// ─────────────────────────────────────────────
+// Mi Marketing — posts de la marca Vitrina
+// ─────────────────────────────────────────────
+const MKT_STORAGE_KEY = 'vitrina_marketing_posts'
+const MKT_IDEAS_KEY   = 'vitrina_marketing_ideas'
+
+const TIPO_LABELS = {
+  feature: 'Feature',
+  pain:    'Problema',
+  proof:   'Proof',
+  tip:     'Tip',
+  cta:     'CTA',
+}
+const TIPO_PILL = {
+  feature: 'mkt-pill-feature',
+  pain:    'mkt-pill-pain',
+  proof:   'mkt-pill-proof',
+  tip:     'mkt-pill-tip',
+  cta:     'mkt-pill-cta',
+}
+
+let mktIdeasLoaded = false
+
+function renderMarketing() {
+  mktRenderCalendar()
+  if (!mktIdeasLoaded) {
+    mktIdeasLoaded = true
+    // Cargar ideas guardadas o generar nuevas si no hay
+    const saved = mktLoadIdeas()
+    if (saved && saved.length) {
+      mktRenderIdeas(saved)
+    } else {
+      mktGenerarIdeas()
+    }
+  }
+}
+
+// ── Generador de posts ───────────────────────
+window.mktGenerarPost = async function() {
+  const btn    = document.getElementById('mkt-generar-btn')
+  const tipo   = document.getElementById('mkt-tipo').value
+  const red    = document.getElementById('mkt-red').value
+  const tono   = document.getElementById('mkt-tono').value
+  const ctx    = document.getElementById('mkt-contexto').value.trim()
+  const tipoLabel = TIPO_LABELS[tipo] || tipo
+
+  btn.disabled = true
+  btn.innerHTML = '<span class="mkt-spinner"></span> Generando...'
+
+  const prompt = `Sos el asistente de marketing de Vitrina, un SaaS para restaurantes y comercios argentinos.
+
+Vitrina permite: menú QR, pedidos online, pagos MP, asistente IA (Tano/Viti), publicaciones automáticas en IG/FB, análisis de competidores, WhatsApp Business incluido en todos los planes pagos, MercadoLibre, Tienda Nube, recordatorios de visita.
+
+Precios: Solo Menú $27/mes · Marketing $57/mes · Combo $70/mes (restaurantes). Comercios Marketing $62/mes. Sin fee sobre ventas. 14 días gratis.
+
+Target: dueños de restaurantes, bares, comercios, locales y vendedores online en Argentina. Clase media emprendedora, 30-55 años, habituados a WhatsApp pero no necesariamente tech-savvy.
+
+Tono de la marca: directo, argentino, sin condescendencia, orientado a resultados concretos. Sin buzzwords vacíos. Sin "potenciar tu negocio", "llevar al siguiente nivel" ni frases genéricas.
+
+Generá 2 variantes de post para ${red} del tipo "${tipoLabel}" con tono "${tono}".
+${ctx ? 'Contexto adicional: ' + ctx : ''}
+
+Para cada variante devolvé en JSON:
+- copy: texto del post (máx 280 chars, incluir 2-3 emojis selectivos, sin saturar)
+- imagen_sugerida: descripción visual concisa para diseñar en Canva (1-2 líneas)
+- hashtags: array de 6-8 hashtags relevantes en minúsculas sin espacios
+- hora_optima: horario sugerido de publicación en ART (ej: "19:00 - 21:00")
+
+Formato de respuesta: JSON con clave "variantes" siendo un array de exactamente 2 objetos con las claves copy, imagen_sugerida, hashtags, hora_optima.
+Responder SOLO con JSON válido, sin texto previo ni posterior.`
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: prompt, context: 'maestro_marketing' }),
+    })
+    if (!res.ok) throw new Error('Error ' + res.status + ': ' + await res.text())
+    const data = await res.json()
+
+    // El worker puede devolver { reply } o { response } o directamente el texto
+    const raw = data.reply || data.response || data.message || ''
+    let parsed
+    try {
+      // Extraer JSON si viene envuelto en texto
+      const jsonMatch = raw.match(/\{[\s\S]*\}/)
+      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw)
+    } catch {
+      throw new Error('Viti no devolvió JSON válido. Intentá de nuevo.')
+    }
+
+    const variantes = parsed.variantes || []
+    if (!variantes.length) throw new Error('Sin variantes en la respuesta.')
+
+    mktRenderPostCards(variantes, tipo, red)
+
+    document.getElementById('mkt-post-results').style.display = 'block'
+  } catch (e) {
+    alert('Error generando post: ' + e.message)
+  } finally {
+    btn.disabled = false
+    btn.innerHTML = '✨ Generar con Viti'
+  }
+}
+
+function mktRenderPostCards(variantes, tipo, red) {
+  const labels = ['A', 'B']
+  const container = document.getElementById('mkt-cards-container')
+  container.innerHTML = variantes.slice(0, 2).map((v, i) => {
+    const hashtags = (v.hashtags || []).map(h => '#' + h.replace(/^#/, '')).join(' ')
+    const tipoLabel = TIPO_LABELS[tipo] || tipo
+    return `
+      <div class="mkt-post-card">
+        <span class="variant-badge">Opción ${labels[i]}</span>
+        <div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">${tipoLabel} · ${red}</div>
+        <div class="post-copy" id="mkt-copy-${i}">${escapeHtml(v.copy || '')}</div>
+        <div class="post-meta">
+          <strong>Imagen:</strong> ${escapeHtml(v.imagen_sugerida || '—')}<br>
+          <strong>Hora óptima:</strong> ${escapeHtml(v.hora_optima || '—')}
+        </div>
+        <div class="hashtags">${escapeHtml(hashtags)}</div>
+        <div class="mkt-post-actions">
+          <button onclick="window.mktCopiar(${i})">📋 Copiar texto</button>
+          <button class="btn-save" onclick="window.mktGuardarEnCalendario(${i}, '${escapeHtml(tipo)}', ${JSON.stringify(v).replace(/'/g,'&#39;')})">💾 Guardar</button>
+          <button onclick="window.mktPublicarAhora(${i})">📤 Publicar ahora</button>
+        </div>
+      </div>
+    `
+  }).join('')
+}
+
+window.mktCopiar = function(idx) {
+  const el = document.getElementById('mkt-copy-' + idx)
+  if (!el) return
+  navigator.clipboard.writeText(el.textContent).then(() => {
+    const btn = el.closest('.mkt-post-card').querySelectorAll('.mkt-post-actions button')[0]
+    const orig = btn.textContent
+    btn.textContent = '✅ Copiado'
+    setTimeout(() => btn.textContent = orig, 1800)
+  })
+}
+
+window.mktGuardarEnCalendario = function(idx, tipo, variante) {
+  // Pedir fecha
+  const fecha = prompt('Fecha para publicar (YYYY-MM-DD):', new Date().toISOString().slice(0,10))
+  if (!fecha || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return
+
+  const posts = mktLoadPosts()
+  posts.push({
+    id:        Date.now(),
+    tipo,
+    copy:      variante.copy,
+    imagen:    variante.imagen_sugerida,
+    hashtags:  variante.hashtags,
+    hora:      variante.hora_optima,
+    fecha,
+    estado:    'guardado',
+    creado_en: new Date().toISOString(),
+  })
+  mktSavePosts(posts)
+  mktRenderCalendar()
+  alert('✅ Post guardado para el ' + fecha)
+}
+
+window.mktPublicarAhora = async function(idx) {
+  const copyEl = document.getElementById('mkt-copy-' + idx)
+  if (!copyEl) return
+  const copy = copyEl.textContent.trim()
+
+  if (!confirm('Publicar este post ahora en Instagram/Facebook de Vitrina?\n\nRequiere que la cuenta esté conectada desde Panel → Integraciones.')) return
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/social/schedule-post', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caption:      copy,
+        publish_now:  true,
+        platform:     'both',
+        source:       'maestro_marketing',
+      }),
+    })
+    const data = await res.json()
+    if (!res.ok || data.error) {
+      if (data.error && /token|auth|connect/i.test(data.error)) {
+        alert('Para publicar automáticamente, conectá tu Instagram desde Panel → Integraciones → Instagram.')
+      } else {
+        throw new Error(data.error || 'Error publicando')
+      }
+      return
+    }
+    alert('✅ Post publicado correctamente.')
+  } catch (e) {
+    if (/connect|token|auth/i.test(e.message)) {
+      alert('Para publicar automáticamente, conectá tu Instagram desde Panel → Integraciones → Instagram.')
+    } else {
+      alert('Error: ' + e.message)
+    }
+  }
+}
+
+// ── Calendario ───────────────────────────────
+window.mktRenderCalendar = function() {
+  const container = document.getElementById('mkt-calendar-container')
+  if (!container) return
+
+  const posts = mktLoadPosts()
+  const postsByDate = {}
+  posts.forEach(p => {
+    if (!postsByDate[p.fecha]) postsByDate[p.fecha] = []
+    postsByDate[p.fecha].push(p)
+  })
+
+  // Semana actual + 2 semanas (21 días total, empezando el lunes)
+  const today = new Date()
+  const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1 // lunes=0
+  const startDate = new Date(today)
+  startDate.setDate(today.getDate() - dayOfWeek)
+
+  const DAY_NAMES = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+
+  let html = '<div class="mkt-calendar">'
+  // Headers
+  DAY_NAMES.forEach(d => {
+    html += `<div class="mkt-cal-header">${d}</div>`
+  })
+
+  // 21 días
+  for (let i = 0; i < 21; i++) {
+    const d = new Date(startDate)
+    d.setDate(startDate.getDate() + i)
+    const key = d.toISOString().slice(0, 10)
+    const isToday = key === today.toISOString().slice(0, 10)
+    const dayPosts = postsByDate[key] || []
+
+    html += `<div class="mkt-cal-day ${isToday ? 'today' : ''}">`
+    html += `<div class="day-num">${d.getDate()}</div>`
+    dayPosts.forEach(p => {
+      const pillClass = TIPO_PILL[p.tipo] || 'mkt-pill-feature'
+      html += `<span class="mkt-pill ${pillClass}" title="${escapeHtml(p.copy || '')}">${TIPO_LABELS[p.tipo] || p.tipo}</span>`
+    })
+    html += `<span class="mkt-add-btn" title="Agregar post en este día" onclick="window.mktAgregarEnDia('${key}')">+</span>`
+    html += `</div>`
+  }
+
+  html += '</div>'
+
+  if (!posts.length) {
+    html += '<div style="text-align:center;font-size:13px;color:var(--muted);margin-top:14px">Generá posts y guardalos en el calendario con el botón "💾 Guardar".</div>'
+  }
+
+  container.innerHTML = html
+}
+
+window.mktAgregarEnDia = function(fecha) {
+  // Scroll a la sección generadora y poner la fecha en contexto
+  document.getElementById('mkt-contexto').value = 'Fecha de publicación: ' + fecha
+  document.querySelector('#tab-marketing .card').scrollIntoView({ behavior: 'smooth', block: 'start' })
+  document.getElementById('mkt-contexto').focus()
+}
+
+// ── Ideas de Viti ────────────────────────────
+window.mktGenerarIdeas = async function() {
+  const container = document.getElementById('mkt-ideas-container')
+  const btn       = document.getElementById('mkt-ideas-btn')
+  if (!container) return
+
+  container.innerHTML = '<div class="loading"><span class="mkt-spinner" style="border-color:rgba(0,0,0,.15);border-top-color:var(--terra)"></span> Viti está pensando...</div>'
+  if (btn) { btn.disabled = true; btn.textContent = 'Generando...' }
+
+  const prompt = `Sos el asistente de marketing de Vitrina, un SaaS para restaurantes y comercios argentinos.
+
+Vitrina: menú QR, pedidos online, pagos MP, asistente IA Tano/Viti, publicaciones auto en IG/FB, WhatsApp Business incluido, análisis de competidores, ML y Tienda Nube integrados.
+
+Precios: desde $27/mes. Sin fee sobre ventas.
+Target: dueños de restaurantes, bares, comercios y locales en Argentina.
+
+Generá 5 ideas de posts para Instagram/Facebook de la marca Vitrina que sean relevantes hoy.
+Cada idea debe tener:
+- tipo: uno de [feature, pain, proof, tip, cta]
+- tema: el tema/gancho concreto del post (1 línea)
+- por_que: por qué este contenido funciona ahora mismo (1-2 líneas)
+
+Formato: JSON con clave "ideas" siendo un array de 5 objetos.
+Responder SOLO con JSON válido.`
+
+  try {
+    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/claude', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: prompt, context: 'maestro_marketing_ideas' }),
+    })
+    if (!res.ok) throw new Error('Error ' + res.status)
+    const data = await res.json()
+    const raw = data.reply || data.response || data.message || ''
+    let parsed
+    try {
+      const jsonMatch = raw.match(/\{[\s\S]*\}/)
+      parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw)
+    } catch {
+      throw new Error('No se pudo parsear la respuesta de Viti.')
+    }
+    const ideas = parsed.ideas || []
+    mktSaveIdeas(ideas)
+    mktRenderIdeas(ideas)
+  } catch (e) {
+    container.innerHTML = `<div style="color:var(--bad);font-size:13px;padding:16px">Error: ${escapeHtml(e.message)}. <button onclick="window.mktGenerarIdeas()" style="color:var(--terra);background:none;border:none;cursor:pointer;font-weight:600">Reintentar</button></div>`
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Generar ideas nuevas' }
+  }
+}
+
+function mktRenderIdeas(ideas) {
+  const container = document.getElementById('mkt-ideas-container')
+  if (!container) return
+  if (!ideas || !ideas.length) {
+    container.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:16px">Sin ideas todavía. Hacé click en "Generar ideas nuevas".</div>'
+    return
+  }
+  container.innerHTML = `<div class="mkt-ideas-grid">${ideas.map(idea => `
+    <div class="mkt-idea-card" onclick="window.mktUsarIdea('${escapeHtml(idea.tipo)}', '${escapeHtml(idea.tema).replace(/'/g,'&#39;')}')">
+      <div class="idea-type">${TIPO_LABELS[idea.tipo] || idea.tipo}</div>
+      <div class="idea-title">${escapeHtml(idea.tema)}</div>
+      <div class="idea-why">${escapeHtml(idea.por_que)}</div>
+      <button class="idea-use-btn">Usar esta idea →</button>
+    </div>
+  `).join('')}</div>`
+}
+
+window.mktUsarIdea = function(tipo, tema) {
+  // Precargar el generador con el tipo y contexto de la idea
+  const tipoSelect = document.getElementById('mkt-tipo')
+  if (tipoSelect) tipoSelect.value = tipo
+
+  const ctx = document.getElementById('mkt-contexto')
+  if (ctx) ctx.value = tema
+
+  // Scroll al generador
+  document.querySelector('#tab-marketing .card').scrollIntoView({ behavior: 'smooth', block: 'start' })
+  if (ctx) ctx.focus()
+}
+
+// ── Persistencia localStorage ────────────────
+function mktLoadPosts() {
+  try { return JSON.parse(localStorage.getItem(MKT_STORAGE_KEY) || '[]') } catch { return [] }
+}
+function mktSavePosts(posts) {
+  try { localStorage.setItem(MKT_STORAGE_KEY, JSON.stringify(posts)) } catch {}
+}
+function mktLoadIdeas() {
+  try { return JSON.parse(localStorage.getItem(MKT_IDEAS_KEY) || 'null') } catch { return null }
+}
+function mktSaveIdeas(ideas) {
+  try { localStorage.setItem(MKT_IDEAS_KEY, JSON.stringify(ideas)) } catch {}
 }
 
 window.markProducerCommissionsPaid = async function(producerId) {

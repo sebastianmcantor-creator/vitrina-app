@@ -2667,6 +2667,7 @@ input:checked + .toggle-slider:before {
         <div style="display:flex;gap:6px;margin-bottom:24px;border-bottom:1px solid var(--border);overflow-x:auto">
           <button class="anal-tab active" data-analtab="presencia" onclick="analSwitchTab('presencia',this)">📈 Presencia digital</button>
           <button class="anal-tab" data-analtab="rentabilidad" onclick="analSwitchTab('rentabilidad',this)">📊 Rentabilidad</button>
+          <button class="anal-tab" data-analtab="canales" id="anal-tab-canales" onclick="analSwitchTab('canales',this)" style="display:none">🛵 Por canal</button>
         </div>
         <style>
           .anal-tab { padding:8px 16px; border:none; background:transparent; font-family:'Outfit',sans-serif; font-size:13.5px; color:var(--muted); cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap }
@@ -2833,6 +2834,59 @@ input:checked + .toggle-slider:before {
           </div>
 
         </div><!-- /analtab-rentabilidad -->
+
+        <!-- ── Tab: Por canal ── -->
+        <div id="analtab-canales" style="display:none">
+
+          <!-- Filtro de período (comparte el mismo rango que Rentabilidad) -->
+          <div class="card" style="margin-bottom:0">
+            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <button class="filter-btn active" data-canalperiod="today"   onclick="setCanalPeriod('today',this)">Hoy</button>
+                <button class="filter-btn" data-canalperiod="week"    onclick="setCanalPeriod('week',this)">Esta semana</button>
+                <button class="filter-btn" data-canalperiod="month"   onclick="setCanalPeriod('month',this)">Este mes</button>
+                <button class="filter-btn" data-canalperiod="quarter" onclick="setCanalPeriod('quarter',this)">Últimos 3 meses</button>
+                <button class="filter-btn" data-canalperiod="custom"  onclick="setCanalPeriod('custom',this)">Personalizado</button>
+              </div>
+              <div id="canal-custom-range" style="display:none">
+                <div style="display:flex;gap:8px;align-items:center">
+                  <input class="form-input" id="canal-date-from" type="date" style="width:150px;padding:7px 10px;font-size:13px">
+                  <span style="color:var(--muted);font-size:13px">a</span>
+                  <input class="form-input" id="canal-date-to"   type="date" style="width:150px;padding:7px 10px;font-size:13px">
+                </div>
+              </div>
+              <button class="btn-primary" style="margin-left:auto;padding:8px 18px" onclick="calcularRentabilidadCanales()">Calcular</button>
+              <button class="btn-secondary" style="padding:8px 14px;font-size:13px" onclick="openModalCargaManual()">📥 Cargar ventas manuales</button>
+            </div>
+          </div>
+
+          <!-- Resultado -->
+          <div id="canales-summary" style="display:none;margin-top:16px">
+
+            <!-- Cards por canal -->
+            <div id="canales-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px">
+              <!-- Renderizado con JS -->
+            </div>
+
+            <!-- Tabla comparativa -->
+            <div class="card" style="margin-bottom:16px">
+              <div class="card-title" style="margin-bottom:14px">Comparativa de canales</div>
+              <div id="canales-table-wrap"></div>
+            </div>
+
+            <!-- Insight de Viti -->
+            <div class="card" id="canales-insight-card" style="display:none">
+              <div class="card-title" style="margin-bottom:10px">💡 Viti dice</div>
+              <div id="canales-insight-text" style="font-size:13.5px;color:var(--ink);line-height:1.65"></div>
+            </div>
+          </div>
+
+          <!-- Estado vacío -->
+          <div id="canales-empty" style="margin-top:24px;padding:40px;text-align:center;color:var(--muted);font-size:13.5px;background:var(--cream);border-radius:12px">
+            Seleccioná un período y hacé clic en <strong>Calcular</strong> para ver la rentabilidad por canal.
+          </div>
+
+        </div><!-- /analtab-canales -->
 
       </div><!-- /section-analisis -->
 
@@ -3654,6 +3708,56 @@ input:checked + .toggle-slider:before {
           <div style="margin-top:20px;display:flex;align-items:center;gap:12px">
             <button class="btn-primary" onclick="saveTanoConfig()" id="tano-save-btn">Guardar configuración del asistente</button>
             <span id="tano-config-status" style="font-size:13px;color:var(--muted)"></span>
+          </div>
+        </div>
+
+        <!-- Canales de venta — solo restaurant y local -->
+        <div class="card" id="delivery-channels-card" style="display:none">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+            <span>🛵 Canales de venta</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="delivery-channels-enabled" onchange="onDeliveryChannelsToggle()">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <div style="font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.6">
+            Activá esta opción para ver cuánto ganás realmente por cada canal, descontando las comisiones de Rappi, PedidosYa u otros.
+          </div>
+
+          <div id="delivery-channels-config" style="display:none">
+            <div style="overflow-x:auto">
+              <table style="width:100%;border-collapse:collapse;font-size:13.5px" id="delivery-channels-table">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--border)">
+                    <th style="padding:8px 10px;text-align:left;font-weight:600;color:var(--muted)">Canal</th>
+                    <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--muted);width:120px">Comisión %</th>
+                    <th style="padding:8px 10px;text-align:center;font-weight:600;color:var(--muted);width:80px">Activo</th>
+                  </tr>
+                </thead>
+                <tbody id="delivery-channels-tbody">
+                  <!-- Renderizado con JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <div id="delivery-channels-otro-row" style="display:none;margin-top:14px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+              <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:10px">Otro canal</div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+                <div class="form-field" style="margin:0;flex:1;min-width:160px">
+                  <label class="form-label" style="font-size:12px">Nombre</label>
+                  <input class="form-input" id="delivery-otro-nombre" type="text" placeholder="Ej: Pedidos propios" style="font-size:13px">
+                </div>
+                <div class="form-field" style="margin:0;width:110px">
+                  <label class="form-label" style="font-size:12px">Comisión %</label>
+                  <input class="form-input" id="delivery-otro-pct" type="number" min="0" max="100" step="0.1" placeholder="0" style="font-size:13px">
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:18px;display:flex;align-items:center;gap:12px">
+              <button class="btn-primary" onclick="saveDeliveryChannelsConfig()">Guardar configuración de canales</button>
+              <span id="delivery-channels-save-status" style="font-size:13px;color:var(--muted)"></span>
+            </div>
           </div>
         </div>
 
@@ -14217,9 +14321,605 @@ window.calcularRentabilidad = async function () {
 }
 
 // ─── End Proveedores + Rentabilidad ──────────────────────────────────────────
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE: Rentabilidad por canal (Rappi / PedidosYa / App propia)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── Default channels ────────────────────────────────────────────────────────
+const DEFAULT_DELIVERY_CHANNELS = [
+  { id: 'propio',       name: 'App propia / QR',  commission_pct: 0,  active: true  },
+  { id: 'rappi',        name: 'Rappi',             commission_pct: 27, active: false },
+  { id: 'pedidosya',    name: 'PedidosYa',         commission_pct: 30, active: false },
+  { id: 'mercadolibre', name: 'MercadoLibre',      commission_pct: 18, active: false },
+]
+
+// ─── Show / hide card based on business type ─────────────────────────────────
+function initDeliveryChannelsCard () {
+  const btype = currentRestaurant?.business_type
+  const card  = document.getElementById('delivery-channels-card')
+  if (!card) return
+  const visible = btype === 'restaurant' || btype === 'local'
+  card.style.display = visible ? '' : 'none'
+  if (visible) renderDeliveryChannelsTable()
+}
+
+// ─── Render the editable table ───────────────────────────────────────────────
+function renderDeliveryChannelsTable () {
+  const cfg     = getDeliveryChannelsCfg()
+  const toggle  = document.getElementById('delivery-channels-enabled')
+  const cfgDiv  = document.getElementById('delivery-channels-config')
+  if (toggle) toggle.checked = cfg.enabled
+  if (cfgDiv) cfgDiv.style.display = cfg.enabled ? '' : 'none'
+
+  const tbody   = document.getElementById('delivery-channels-tbody')
+  if (!tbody) return
+
+  const channels = cfg.channels || DEFAULT_DELIVERY_CHANNELS
+  const otroRow  = document.getElementById('delivery-channels-otro-row')
+  const otroObj  = channels.find(c => c.id === 'otro')
+
+  tbody.innerHTML = channels.filter(c => c.id !== 'otro').map(ch => `
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 10px;font-size:13.5px;font-weight:500;color:var(--ink)">${_escHtml(ch.name)}</td>
+      <td style="padding:10px 10px;text-align:center">
+        ${ch.id === 'propio'
+          ? '<span style="font-size:13px;color:var(--muted)">0% (sin comisión)</span>'
+          : `<input type="number" class="form-input" data-channel-id="${ch.id}" data-field="commission_pct"
+               value="${ch.commission_pct ?? ''}" min="0" max="100" step="0.1"
+               style="width:80px;text-align:center;padding:6px 8px;font-size:13px"
+               placeholder="0">`
+        }
+      </td>
+      <td style="padding:10px 10px;text-align:center">
+        <label class="toggle-switch" style="transform:scale(.85)">
+          <input type="checkbox" data-channel-id="${ch.id}" data-field="active"
+            ${ch.active ? 'checked' : ''} ${ch.id === 'propio' ? 'disabled' : ''}>
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+    </tr>
+  `).join('')
+
+  // "Otro" row visibility toggle
+  const otroCheckbox = `
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px 10px;font-size:13.5px;font-weight:500;color:var(--ink)">Otro</td>
+      <td style="padding:10px 10px;text-align:center">
+        <span style="font-size:12px;color:var(--muted)">ver abajo</span>
+      </td>
+      <td style="padding:10px 10px;text-align:center">
+        <label class="toggle-switch" style="transform:scale(.85)">
+          <input type="checkbox" data-channel-id="otro" data-field="active"
+            id="delivery-otro-active-toggle"
+            ${otroObj?.active ? 'checked' : ''}
+            onchange="document.getElementById('delivery-channels-otro-row').style.display=this.checked?'':'none'">
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+    </tr>
+  `
+  tbody.innerHTML += otroCheckbox
+
+  if (otroRow) {
+    otroRow.style.display = otroObj?.active ? '' : 'none'
+    if (otroObj) {
+      const nEl = document.getElementById('delivery-otro-nombre')
+      const pEl = document.getElementById('delivery-otro-pct')
+      if (nEl) nEl.value = otroObj.name !== 'otro' ? otroObj.name : ''
+      if (pEl) pEl.value = otroObj.commission_pct ?? ''
+    }
+  }
+
+  // Show/hide tab based on whether any non-propio channel is active
+  updateCanalTab(cfg)
+}
+
+function updateCanalTab (cfg) {
+  const tab = document.getElementById('anal-tab-canales')
+  if (!tab) return
+  const anyActive = (cfg?.channels || []).some(c => c.id !== 'propio' && c.active)
+  tab.style.display = (cfg?.enabled && anyActive) ? '' : 'none'
+}
+
+// ─── Toggle enabled ───────────────────────────────────────────────────────────
+window.onDeliveryChannelsToggle = function () {
+  const enabled = document.getElementById('delivery-channels-enabled')?.checked
+  const cfgDiv  = document.getElementById('delivery-channels-config')
+  if (cfgDiv) cfgDiv.style.display = enabled ? '' : 'none'
+  if (!enabled) {
+    const tab = document.getElementById('anal-tab-canales')
+    if (tab) tab.style.display = 'none'
+  }
+}
+
+// ─── Read current config from restaurant or localStorage ─────────────────────
+function getDeliveryChannelsCfg () {
+  if (currentRestaurant?.delivery_channels_config) return currentRestaurant.delivery_channels_config
+  try {
+    const raw = localStorage.getItem('delivery_channels_cfg_' + currentRestaurant?.id)
+    if (raw) return JSON.parse(raw)
+  } catch {}
+  return { enabled: false, channels: JSON.parse(JSON.stringify(DEFAULT_DELIVERY_CHANNELS)) }
+}
+
+// ─── Collect table values into config object ──────────────────────────────────
+function collectDeliveryChannelsForm () {
+  const base     = getDeliveryChannelsCfg()
+  const enabled  = document.getElementById('delivery-channels-enabled')?.checked ?? false
+  const channels = JSON.parse(JSON.stringify(base.channels || DEFAULT_DELIVERY_CHANNELS))
+
+  // Update from inputs
+  document.querySelectorAll('[data-channel-id][data-field]').forEach(el => {
+    const id    = el.dataset.channelId
+    const field = el.dataset.field
+    let ch = channels.find(c => c.id === id)
+    if (!ch) { ch = { id, name: id, commission_pct: 0, active: false }; channels.push(ch) }
+    if (field === 'commission_pct') ch.commission_pct = parseFloat(el.value) || 0
+    if (field === 'active')         ch.active = el.checked
+  })
+
+  // "Otro" channel
+  const otroActive = document.getElementById('delivery-otro-active-toggle')?.checked ?? false
+  const otroNombre = document.getElementById('delivery-otro-nombre')?.value?.trim() || 'Otro'
+  const otroPct    = parseFloat(document.getElementById('delivery-otro-pct')?.value) || 0
+  const otroIdx    = channels.findIndex(c => c.id === 'otro')
+  const otroObj    = { id: 'otro', name: otroNombre, commission_pct: otroPct, active: otroActive }
+  if (otroIdx >= 0) channels[otroIdx] = otroObj
+  else              channels.push(otroObj)
+
+  return { enabled, channels }
+}
+
+// ─── Save config ──────────────────────────────────────────────────────────────
+window.saveDeliveryChannelsConfig = async function () {
+  const cfg    = collectDeliveryChannelsForm()
+  const restId = currentRestaurant?.id
+  const status = document.getElementById('delivery-channels-save-status')
+
+  if (!restId) { showToast('No hay restaurante activo', 'error'); return }
+  if (status) status.textContent = 'Guardando…'
+
+  // Try Supabase first, fallback localStorage
+  let saved = false
+  try {
+    const { error } = await supabase.from('restaurants').update({ delivery_channels_config: cfg }).eq('id', restId)
+    if (!error) {
+      currentRestaurant.delivery_channels_config = cfg
+      saved = true
+    }
+  } catch {}
+
+  if (!saved) {
+    // Column might not exist yet — use localStorage as fallback
+    try { localStorage.setItem('delivery_channels_cfg_' + restId, JSON.stringify(cfg)) } catch {}
+    currentRestaurant.delivery_channels_config = cfg
+  }
+
+  if (status) { status.textContent = '✓ Guardado'; setTimeout(() => { status.textContent = '' }, 2500) }
+  updateCanalTab(cfg)
+  showToast('Configuración de canales guardada', 'success')
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function _escHtml (s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+
+function fmtARS2 (n) { return '$' + parseFloat(n || 0).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }
+
+// ─── Period selector for "Por canal" tab ─────────────────────────────────────
+window._canalPeriod = 'today'
+window.setCanalPeriod = function (period, btn) {
+  window._canalPeriod = period
+  document.querySelectorAll('[data-canalperiod]').forEach(b => b.classList.remove('active'))
+  if (btn) btn.classList.add('active')
+  const cr = document.getElementById('canal-custom-range')
+  if (cr) cr.style.display = period === 'custom' ? 'block' : 'none'
+}
+
+function getCanalDateRange () {
+  const now   = new Date()
+  const today = now.toISOString().slice(0, 10)
+  let desde, hasta = today + 'T23:59:59'
+  const p = window._canalPeriod
+  if (p === 'today') {
+    desde = today + 'T00:00:00'
+  } else if (p === 'week') {
+    const d = new Date(now); d.setDate(d.getDate() - 6)
+    desde = d.toISOString().slice(0, 10) + 'T00:00:00'
+  } else if (p === 'month') {
+    desde = today.slice(0, 7) + '-01T00:00:00'
+  } else if (p === 'quarter') {
+    const d = new Date(now); d.setMonth(d.getMonth() - 3)
+    desde = d.toISOString().slice(0, 10) + 'T00:00:00'
+  } else if (p === 'custom') {
+    const from = document.getElementById('canal-date-from')?.value
+    const to   = document.getElementById('canal-date-to')?.value
+    if (!from || !to) return null
+    desde = from + 'T00:00:00'; hasta = to + 'T23:59:59'
+  }
+  return { desde, hasta }
+}
+
+// ─── Main calculation ─────────────────────────────────────────────────────────
+window.calcularRentabilidadCanales = async function () {
+  const restId = currentRestaurant?.id
+  if (!restId) return
+  const range = getCanalDateRange()
+  if (!range) { showToast('Seleccioná un rango de fechas válido', 'error'); return }
+  const { desde, hasta } = range
+
+  const summaryDiv = document.getElementById('canales-summary')
+  const emptyDiv   = document.getElementById('canales-empty')
+  if (summaryDiv) summaryDiv.style.display = 'none'
+  if (emptyDiv)   { emptyDiv.style.display = ''; emptyDiv.innerHTML = '⏳ Calculando…' }
+
+  const cfg      = getDeliveryChannelsCfg()
+  const channels = (cfg.channels || DEFAULT_DELIVERY_CHANNELS).filter(c => c.active)
+
+  try {
+    // ── 1. Load orders from Vitrina (channel column may or may not exist) ───
+    let ordersVitrina = []
+    try {
+      const { data } = await supabase.from('orders')
+        .select('id, total, channel')
+        .eq('restaurant_id', restId)
+        .gte('created_at', desde)
+        .lte('created_at', hasta)
+        .neq('status', 'cancelled')
+      ordersVitrina = data || []
+    } catch {
+      // channel column doesn't exist yet — treat all as 'propio'
+      const { data } = await supabase.from('orders')
+        .select('id, total')
+        .eq('restaurant_id', restId)
+        .gte('created_at', desde)
+        .lte('created_at', hasta)
+        .neq('status', 'cancelled')
+      ordersVitrina = (data || []).map(o => ({ ...o, channel: 'propio' }))
+    }
+
+    // ── 2. Load delivery_metrics (manual loads for Rappi/PY) ────────────────
+    const { data: deliveryData } = await supabase.from('delivery_metrics')
+      .select('platform, gross_sales, commission_pct, commission_amount, order_count')
+      .eq('restaurant_id', restId)
+      .gte('period_start', desde.slice(0, 10))
+      .lte('period_end',   hasta.slice(0, 10))
+    const deliveryRows = deliveryData || []
+
+    // ── 3. Load cost map for margin calculation ──────────────────────────────
+    const { data: productosData } = await supabase.from('menu_items')
+      .select('id, cost_price').eq('restaurant_id', restId)
+    const costMap = {}
+    ;(productosData || []).forEach(p => { costMap[p.id] = parseFloat(p.cost_price) || 0 })
+
+    // ── 4. Load order_items for cost calculation (only propio channel) ───────
+    const propioOrderIds = ordersVitrina
+      .filter(o => (o.channel || 'propio') === 'propio')
+      .map(o => o.id)
+    let costByOrder = {}
+    if (propioOrderIds.length) {
+      const { data: itemsData } = await supabase.from('order_items')
+        .select('order_id, menu_item_id, quantity, price')
+        .in('order_id', propioOrderIds)
+      ;(itemsData || []).forEach(it => {
+        if (!costByOrder[it.order_id]) costByOrder[it.order_id] = { revenue: 0, cost: 0 }
+        const qty  = parseFloat(it.quantity) || 0
+        const px   = parseFloat(it.price) || 0
+        const cost = it.menu_item_id ? (costMap[it.menu_item_id] || 0) : 0
+        costByOrder[it.order_id].revenue += qty * px
+        costByOrder[it.order_id].cost    += qty * cost
+      })
+    }
+
+    // ── 5. Aggregate Vitrina orders by channel ───────────────────────────────
+    const channelAgg = {}
+    channels.forEach(ch => {
+      channelAgg[ch.id] = { gross: 0, cost: 0, orders: 0, commission: 0, commissionPct: ch.commission_pct || 0 }
+    })
+
+    ordersVitrina.forEach(o => {
+      const ch = o.channel || 'propio'
+      if (!channelAgg[ch]) return
+      const total = parseFloat(o.total) || 0
+      channelAgg[ch].gross  += total
+      channelAgg[ch].orders += 1
+      if (ch === 'propio' && costByOrder[o.id]) {
+        channelAgg[ch].cost += costByOrder[o.id].cost
+      }
+    })
+
+    // ── 6. Add delivery_metrics for rappi/pedidosya ──────────────────────────
+    deliveryRows.forEach(row => {
+      const ch = row.platform // 'rappi' or 'pedidosya'
+      if (!channelAgg[ch]) return
+      const gross = parseFloat(row.gross_sales) || 0
+      const commAmt = parseFloat(row.commission_amount) ||
+                      (gross * (parseFloat(row.commission_pct) || channelAgg[ch].commissionPct) / 100)
+      channelAgg[ch].gross      += gross
+      channelAgg[ch].commission += commAmt
+      channelAgg[ch].orders     += parseInt(row.order_count) || 0
+    })
+
+    // ── 7. Apply commissions ─────────────────────────────────────────────────
+    Object.keys(channelAgg).forEach(id => {
+      const a   = channelAgg[id]
+      const pct = a.commissionPct / 100
+      // If commission already set (from delivery_metrics), keep it; else calculate
+      if (!a.commission) a.commission = a.gross * pct
+      a.net    = a.gross - a.commission
+      a.profit = a.net - a.cost
+      a.marginBruto = a.gross   > 0 ? ((a.gross   - a.cost) / a.gross   * 100) : 0
+      a.marginNeto  = a.net     > 0 ? ((a.net      - a.cost) / a.net     * 100) : 0
+    })
+
+    const totalGross = Object.values(channelAgg).reduce((s, a) => s + a.gross, 0)
+    if (totalGross === 0 && deliveryRows.length === 0) {
+      if (emptyDiv) emptyDiv.innerHTML = 'No hay ventas en el período seleccionado.'
+      return
+    }
+
+    // ── 8. Render cards ──────────────────────────────────────────────────────
+    const cardsGrid = document.getElementById('canales-cards-grid')
+    if (cardsGrid) {
+      cardsGrid.innerHTML = channels.map(ch => {
+        const a = channelAgg[ch.id] || {}
+        if (!a.gross && !a.orders) return ''
+        const icon = ch.id === 'propio' ? '🏠' : ch.id === 'rappi' ? '🟠' : ch.id === 'pedidosya' ? '🟡' : '🛒'
+        const marginColor = (a.marginNeto || 0) >= 20 ? '#155724' : (a.marginNeto || 0) >= 0 ? 'var(--gold)' : '#721c24'
+        return `
+          <div class="card" style="padding:18px 16px">
+            <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:12px">${icon} ${_escHtml(ch.name)}</div>
+            <div style="display:grid;gap:7px;font-size:13px">
+              <div style="display:flex;justify-content:space-between">
+                <span style="color:var(--muted)">Ventas brutas</span>
+                <span style="font-weight:500">${fmtARS2(a.gross)}</span>
+              </div>
+              ${ch.id !== 'propio' ? `
+              <div style="display:flex;justify-content:space-between">
+                <span style="color:var(--muted)">Comisión (${ch.commission_pct}%)</span>
+                <span style="font-weight:500;color:#721c24">-${fmtARS2(a.commission)}</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding-top:6px;border-top:1px solid var(--border)">
+                <span style="color:var(--muted)">Neto</span>
+                <span style="font-weight:600">${fmtARS2(a.net)}</span>
+              </div>` : ''}
+              <div style="display:flex;justify-content:space-between">
+                <span style="color:var(--muted)">Margen${ch.id !== 'propio' ? ' neto' : ''}</span>
+                <span style="font-weight:600;color:${marginColor}">${(a.marginNeto || 0).toFixed(1)}%</span>
+              </div>
+              ${ch.id !== 'propio' && a.marginBruto ? `
+              <div style="display:flex;justify-content:space-between">
+                <span style="color:var(--muted)">Margen bruto</span>
+                <span style="color:var(--muted)">${(a.marginBruto || 0).toFixed(1)}%</span>
+              </div>` : ''}
+              <div style="display:flex;justify-content:space-between">
+                <span style="color:var(--muted)">Pedidos</span>
+                <span>${a.orders}</span>
+              </div>
+            </div>
+          </div>
+        `
+      }).join('')
+    }
+
+    // ── 9. Render comparison table ───────────────────────────────────────────
+    const tableWrap = document.getElementById('canales-table-wrap')
+    if (tableWrap) {
+      const activeChannels = channels.filter(ch => {
+        const a = channelAgg[ch.id]
+        return a && (a.gross > 0 || a.orders > 0)
+      })
+      if (activeChannels.length === 0) {
+        tableWrap.innerHTML = '<div style="color:var(--muted);font-size:13.5px;padding:12px">Sin datos en el período.</div>'
+      } else {
+        tableWrap.innerHTML = `<div style="overflow-x:auto"><table class="prov-table">
+          <thead><tr>
+            <th>Canal</th>
+            <th style="text-align:right">Ventas</th>
+            <th style="text-align:right">Comisión</th>
+            <th style="text-align:right">Neto</th>
+            <th>Margen neto</th>
+            <th style="text-align:right">% del total</th>
+          </tr></thead>
+          <tbody>
+            ${activeChannels.map(ch => {
+              const a   = channelAgg[ch.id]
+              const pct = totalGross > 0 ? (a.gross / totalGross * 100) : 0
+              const mg  = a.marginNeto || 0
+              const bc  = mg >= 20 ? '#28a745' : mg >= 0 ? '#ffc107' : '#dc3545'
+              const bw  = Math.min(100, Math.max(0, mg))
+              return `<tr>
+                <td style="font-weight:500">${_escHtml(ch.name)}</td>
+                <td style="text-align:right">${fmtARS2(a.gross)}</td>
+                <td style="text-align:right;color:${a.commission > 0 ? '#721c24' : 'var(--muted)'}">${a.commission > 0 ? '-' + fmtARS2(a.commission) : '—'}</td>
+                <td style="text-align:right;font-weight:600">${fmtARS2(a.net || a.gross)}</td>
+                <td><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;background:var(--border);border-radius:4px;height:8px;overflow:hidden"><div style="height:100%;width:${bw}%;background:${bc};border-radius:4px"></div></div><span style="font-size:12px;color:var(--muted);min-width:36px;text-align:right">${mg.toFixed(1)}%</span></div></td>
+                <td style="text-align:right;color:var(--muted)">${pct.toFixed(1)}%</td>
+              </tr>`
+            }).join('')}
+          </tbody>
+        </table></div>`
+      }
+    }
+
+    // ── 10. Insight de Viti ──────────────────────────────────────────────────
+    const insightCard = document.getElementById('canales-insight-card')
+    const insightText = document.getElementById('canales-insight-text')
+    if (insightCard && insightText) {
+      insightCard.style.display = 'none'
+      const activeWithData = channels.filter(ch => channelAgg[ch.id]?.gross > 0)
+      if (activeWithData.length >= 2) {
+        const sorted  = [...activeWithData].sort((a, b) => (channelAgg[b.id]?.marginNeto || 0) - (channelAgg[a.id]?.marginNeto || 0))
+        const best    = sorted[0]
+        const worst   = sorted[sorted.length - 1]
+        const bestA   = channelAgg[best.id]
+        const worstA  = channelAgg[worst.id]
+        const diff    = ((bestA.marginNeto || 0) - (worstA.marginNeto || 0)).toFixed(1)
+        insightText.textContent = `El canal más rentable es ${best.name} con un margen neto del ${(bestA.marginNeto || 0).toFixed(1)}%. ` +
+          (diff > 0 ? `La diferencia con ${worst.name} (${(worstA.marginNeto || 0).toFixed(1)}%) es de ${diff} puntos porcentuales — cada venta en ${best.name} te deja proporcionalmente más después de comisiones.` : '')
+        insightCard.style.display = ''
+      } else if (activeWithData.length === 1) {
+        const only = activeWithData[0]
+        const a    = channelAgg[only.id]
+        insightText.textContent = `Solo hay datos para ${only.name} en este período. Cargá ventas de otros canales para comparar la rentabilidad real.`
+        insightCard.style.display = ''
+      }
+    }
+
+    if (emptyDiv)   emptyDiv.style.display = 'none'
+    if (summaryDiv) summaryDiv.style.display = ''
+  } catch (e) {
+    if (emptyDiv) emptyDiv.innerHTML = 'Error al calcular: ' + (e.message || 'Error desconocido')
+  }
+}
+
+// ─── Modal: cargar ventas manuales ───────────────────────────────────────────
+window.openModalCargaManual = function () {
+  // Pre-fill date range from current canal period
+  const range = getCanalDateRange()
+  if (range) {
+    const df = document.getElementById('carga-canal-desde')
+    const dt = document.getElementById('carga-canal-hasta')
+    if (df) df.value = range.desde.slice(0, 10)
+    if (dt) dt.value = range.hasta.slice(0, 10)
+  }
+  // Pre-select channels from config
+  const cfg = getDeliveryChannelsCfg()
+  const activeExternal = (cfg.channels || []).filter(c => c.id !== 'propio' && c.active)
+  const sel = document.getElementById('carga-canal-select')
+  if (sel && activeExternal.length) {
+    // Remove options not in active channels (keep rappi/pedidosya/ml always)
+    sel.value = activeExternal[0].id
+  }
+  openModal('modal-carga-canal')
+}
+
+window.guardarVentasCanal = async function () {
+  const restId = currentRestaurant?.id
+  if (!restId) { showToast('No hay restaurante activo', 'error'); return }
+
+  const canal    = document.getElementById('carga-canal-select')?.value
+  const desde    = document.getElementById('carga-canal-desde')?.value
+  const hasta    = document.getElementById('carga-canal-hasta')?.value
+  const total    = parseFloat(document.getElementById('carga-canal-total')?.value) || 0
+  const pedidos  = parseInt(document.getElementById('carga-canal-pedidos')?.value) || 0
+
+  if (!canal || !desde || !hasta || total <= 0) {
+    showToast('Completá canal, período y total vendido', 'error')
+    return
+  }
+
+  // Only rappi/pedidosya go to delivery_metrics (existing table)
+  // For other channels (mercadolibre, otro) we use the worker endpoint
+  const usePlatform = canal === 'rappi' || canal === 'pedidosya'
+  const cfg = getDeliveryChannelsCfg()
+  const chCfg = (cfg.channels || []).find(c => c.id === canal) || {}
+  const commPct = chCfg.commission_pct || 0
+
+  try {
+    if (usePlatform) {
+      const { error } = await supabase.from('delivery_metrics').insert({
+        restaurant_id:     restId,
+        platform:          canal,
+        period_start:      desde,
+        period_end:        hasta,
+        gross_sales:       total,
+        commission_pct:    commPct,
+        commission_amount: parseFloat((total * commPct / 100).toFixed(2)),
+        order_count:       pedidos || null,
+        source:            'manual',
+      })
+      if (error) throw new Error(error.message)
+    } else {
+      // Worker endpoint for other channels
+      const workerBase = 'https://vitrina-tano.vitrinaapp.workers.dev'
+      const res = await fetch(`${workerBase}/api/rentabilidad/canales/manual`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurant_id:  restId,
+          channel:        canal,
+          period_start:   desde,
+          period_end:     hasta,
+          gross_sales:    total,
+          commission_pct: commPct,
+          order_count:    pedidos || null,
+        }),
+      })
+      if (!res.ok) throw new Error('Error guardando en worker')
+    }
+    closeModal('modal-carga-canal')
+    showToast('Ventas guardadas correctamente', 'success')
+    // Reset form
+    ;['carga-canal-total','carga-canal-pedidos'].forEach(id => {
+      const el = document.getElementById(id)
+      if (el) el.value = ''
+    })
+  } catch (e) {
+    showToast('Error al guardar: ' + (e.message || 'Error desconocido'), 'error')
+  }
+}
+
+// ─── Hook into existing section load to init card ────────────────────────────
+;(function () {
+  const _orig = window.switchSection
+  window.switchSection = function (section, btn) {
+    _orig(section, btn)
+    if (section === 'config') setTimeout(initDeliveryChannelsCard, 100)
+  }
+})()
+
+// ─── End Rentabilidad por canal ───────────────────────────────────────────────
 </script>
 
 <!-- Modal setup de agenda -->
+<!-- Modal: cargar ventas manuales por canal (tab Rentabilidad > Por canal) -->
+<div class="modal-overlay" id="modal-carga-canal" onclick="if(event.target===this)closeModal('modal-carga-canal')">
+  <div class="modal-box" style="max-width:480px">
+    <div class="modal-header">
+      <div class="modal-title">📥 Cargar ventas manuales</div>
+      <button class="modal-close" onclick="closeModal('modal-carga-canal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label class="form-label">Canal</label>
+        <select class="form-select" id="carga-canal-select">
+          <option value="rappi">Rappi</option>
+          <option value="pedidosya">PedidosYa</option>
+          <option value="mercadolibre">MercadoLibre</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="form-field">
+          <label class="form-label">Período desde</label>
+          <input type="date" class="form-input" id="carga-canal-desde">
+        </div>
+        <div class="form-field">
+          <label class="form-label">Período hasta</label>
+          <input type="date" class="form-input" id="carga-canal-hasta">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Total vendido en el período (ARS)</label>
+        <input type="number" class="form-input" id="carga-canal-total" placeholder="0" min="0" step="1">
+        <div class="form-hint">Usá el total bruto que muestra el dashboard de la plataforma.</div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Cantidad de pedidos (opcional)</label>
+        <input type="number" class="form-input" id="carga-canal-pedidos" placeholder="0" min="0" step="1">
+      </div>
+      <div style="padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border);font-size:13px;color:var(--muted);line-height:1.55">
+        💡 En la próxima versión, Viti puede leer la captura de pantalla del dashboard automáticamente.
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('modal-carga-canal')">Cancelar</button>
+      <button class="btn-primary" onclick="guardarVentasCanal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modal-agenda-setup" onclick="if(event.target===this)closeModal('modal-agenda-setup')">
   <div class="modal">
     <div class="modal-header">
