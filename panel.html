@@ -3147,13 +3147,15 @@ input:checked + .toggle-slider:before {
             Vitrina publica directamente en Instagram y Facebook usando la API oficial de Meta, sin intermediarios. Conectá tus cuentas en la sección <strong>Análisis</strong> y las publicaciones se programan automáticamente desde el calendario.
           </div>
           <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-            <div style="flex:1;min-width:140px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+            <div style="flex:1;min-width:140px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border);cursor:pointer" onclick="connectInstagram()">
               <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Instagram</div>
               <div id="meta-ig-status-mini" style="font-size:13px;color:var(--ink)">Verificando...</div>
+              <div style="font-size:11px;color:var(--terra);margin-top:4px;font-weight:600">Conectar →</div>
             </div>
-            <div style="flex:1;min-width:140px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
+            <div style="flex:1;min-width:140px;padding:12px 14px;background:var(--cream);border-radius:10px;border:1px solid var(--border);cursor:pointer" onclick="connectFacebook()">
               <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Facebook</div>
               <div id="meta-fb-status-mini" style="font-size:13px;color:var(--ink)">Verificando...</div>
+              <div style="font-size:11px;color:var(--terra);margin-top:4px;font-weight:600">Conectar →</div>
             </div>
           </div>
         </div>
@@ -3266,7 +3268,7 @@ input:checked + .toggle-slider:before {
         <div class="card" style="margin-top:20px">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
             <span>🎙️ Subtítulos automáticos para videos</span>
-            <span style="font-size:11px;font-weight:500;color:var(--muted);background:var(--cream2);padding:3px 10px;border-radius:20px">~$0,006 USD / minuto</span>
+            <span style="font-size:11px;font-weight:500;color:var(--muted);background:var(--cream2);padding:3px 10px;border-radius:20px">Incluido en tu plan</span>
           </div>
           <p style="font-size:13.5px;color:var(--muted);margin:8px 0 16px;line-height:1.5">
             Subí un video y Vitrina genera subtítulos en formato .SRT con marcas de tiempo, listos para agregar a tus Reels.
@@ -3296,7 +3298,7 @@ input:checked + .toggle-slider:before {
               <div id="whisper-meta" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:13px;color:var(--muted)"></div>
               <div id="whisper-cost-estimate" style="margin-top:10px;padding:10px 14px;background:var(--cream);border-radius:8px;border:1px solid var(--border);font-size:13px;display:none">
                 <strong style="color:var(--ink)">Costo estimado:</strong> <span id="whisper-cost-val"></span>
-                <span style="color:var(--muted);margin-left:8px">· Whisper cobra $0,006 USD por minuto de audio</span>
+                <span style="color:var(--muted);margin-left:8px">· Incluido en tu plan (hasta 10 videos/mes)</span>
               </div>
               <button class="btn-primary" id="btn-whisper-start" onclick="transcribeWithWhisper()" style="margin-top:12px;font-size:13px;padding:9px 20px;min-height:40px">
                 🤖 Generar subtítulos con IA
