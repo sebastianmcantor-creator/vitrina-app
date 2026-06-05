@@ -1821,12 +1821,13 @@ input:checked + .toggle-slider:before {
                   <input type="text" class="form-input" id="setup-name" placeholder="Ej: La Panera Rosa" oninput="autoSlug();setupNameChanged()" autofocus style="font-size:16px;padding:14px" aria-required="true" autocomplete="organization">
                 </div>
                 <div class="form-field">
-                  <label class="form-label" style="color:var(--muted);font-size:11px">Tu link público</label>
+                  <label class="form-label" style="color:var(--muted);font-size:11px">Tu dirección web en Vitrina (opcional)</label>
                   <div class="slug-preview">
-                    <span class="slug-prefix">vitrinaapp.com.ar/</span>
+                    <span class="slug-prefix">vitrinaapp.com.ar/m/</span>
                     <input type="text" class="slug-input" id="setup-slug" placeholder="mi-negocio" oninput="checkSlug()">
                     <span class="slug-status" id="setup-slug-status"></span>
                   </div>
+                  <div id="setup-slug-preview" style="font-size:12px;color:var(--muted);margin-top:4px">vitrinaapp.com.ar/m/tu-negocio</div>
                   <span class="form-hint">Se genera automático. Podés cambiarlo.</span>
                 </div>
               </div>
@@ -1876,13 +1877,14 @@ input:checked + .toggle-slider:before {
               <textarea class="form-textarea" id="f-description" placeholder="Contá de qué se trata tu negocio…"></textarea>
             </div>
             <div class="form-field col-2">
-              <label class="form-label">URL pública <span>*</span></label>
+              <label class="form-label">Tu dirección web en Vitrina (opcional)</label>
               <div class="slug-preview">
-                <span class="slug-prefix">vitrinaapp.com.ar/</span>
+                <span class="slug-prefix">vitrinaapp.com.ar/m/</span>
                 <input type="text" class="slug-input" id="f-slug" oninput="checkSlugEdit()">
                 <span class="slug-status" id="f-slug-status"></span>
               </div>
-              <span class="form-hint" id="f-slug-hint">Solo letras minúsculas, números y guiones.</span>
+              <div id="f-slug-preview" style="font-size:12px;color:var(--muted);margin-top:4px">vitrinaapp.com.ar/m/tu-negocio</div>
+              <span class="form-hint" id="f-slug-hint">Se auto-convierte a formato válido.</span>
             </div>
           </div>
         </div>
@@ -5355,6 +5357,7 @@ function fillForm(rest) {
   document.getElementById('f-tagline').value     = rest.tagline     || ''
   document.getElementById('f-description').value = rest.description || ''
   document.getElementById('f-slug').value        = rest.slug        || ''
+  updateSlugPreview('f-slug', 'f-slug-preview')
   document.getElementById('f-phone').value       = rest.phone       || ''
   document.getElementById('f-email').value       = rest.email       || ''
   document.getElementById('f-address').value     = rest.address     || ''
@@ -5990,22 +5993,24 @@ window.createRestaurant = async function () {
     document.getElementById('setup-name')?.focus()
     return
   }
-  if (!slug) {
-    showToast('La URL es obligatoria.', 'error')
-    return
-  }
 
-  if (!/^[a-z0-9-]+$/.test(slug)) {
-    showToast('La URL solo puede tener letras minúsculas, números y guiones.', 'error')
+  // Auto-limpiar el slug: si está vacío o tiene caracteres inválidos, generar desde el nombre
+  let cleanSlug = slugify(slug)
+  if (!cleanSlug) {
+    cleanSlug = slugify(name)
+  }
+  if (!cleanSlug) {
+    showToast('El nombre del negocio no genera una URL válida. Probá con otro nombre.', 'error')
     return
   }
+  document.getElementById('setup-slug').value = cleanSlug
 
   const btn = document.getElementById('btn-create-rest')
   btn.disabled = true
   btn.textContent = 'Creando...'
 
   try {
-    const available = await restaurants.isSlugAvailable(slug)
+    const available = await restaurants.isSlugAvailable(cleanSlug)
     if (!available) {
       showToast('Esa URL ya está en uso. Elegí otra.', 'error')
       btn.disabled = false
@@ -6014,7 +6019,7 @@ window.createRestaurant = async function () {
     }
 
     currentRestaurant = await restaurants.create({
-      name, slug, city, phone,
+      name, slug: cleanSlug, city, phone,
       owner_id: currentUser.id,
       business_type: selectedBusinessType,
       website_url: website,
@@ -6079,14 +6084,20 @@ window.createRestaurant = async function () {
 window.saveRestaurant = async function () {
   if (!currentRestaurant) return
 
-  const slug = document.getElementById('f-slug').value.trim()
+  // Auto-limpiar el slug en lugar de mostrar error
+  let slug = slugify(document.getElementById('f-slug').value.trim())
+  if (!slug) {
+    // Si queda vacío después de limpiar, generar desde el nombre
+    slug = slugify(document.getElementById('f-name').value.trim())
+  }
+  document.getElementById('f-slug').value = slug
 
   if (!document.getElementById('f-name').value.trim()) {
     showToast('El nombre no puede estar vacío.', 'error')
     return
   }
-  if (!/^[a-z0-9-]+$/.test(slug)) {
-    showToast('La URL solo puede tener letras minúsculas, números y guiones.', 'error')
+  if (!slug) {
+    showToast('El nombre del negocio no genera una URL válida.', 'error')
     return
   }
 
@@ -6284,31 +6295,49 @@ window.uploadRestaurantImage = async function (type, input) {
 // ─────────────────────────────────────────────
 // Slug helpers
 // ─────────────────────────────────────────────
-function toSlug(str) {
-  return str
+function slugify(text) {
+  return (text || '')
     .toLowerCase()
     .normalize('NFD').replace(/[̀-ͯ]/g, '') // quitar acentos
-    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')  // quitar especiales
     .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(/\s+/g, '-')           // espacios a guiones
+    .replace(/-+/g, '-')            // múltiples guiones a uno
+    .replace(/^-|-$/g, '')          // quitar guiones del inicio/fin
+    .substring(0, 50)               // máximo 50 chars
+}
+// Alias para compatibilidad interna
+const toSlug = slugify
+
+function updateSlugPreview(inputId, previewId) {
+  const input = document.getElementById(inputId)
+  const preview = document.getElementById(previewId)
+  if (input && preview) {
+    preview.textContent = 'vitrinaapp.com.ar/m/' + (slugify(input.value) || 'tu-negocio')
+  }
 }
 
 window.autoSlug = function () {
   const name = document.getElementById('setup-name').value
   const slugInput = document.getElementById('setup-slug')
-  slugInput.value = toSlug(name)
+  slugInput.value = slugify(name)
+  updateSlugPreview('setup-slug', 'setup-slug-preview')
   window.checkSlug()
 }
 
 async function checkSlugField(inputId, statusId, excludeId = null) {
-  const val = document.getElementById(inputId).value.trim()
+  const raw = document.getElementById(inputId).value.trim()
+  const val = slugify(raw)
   const statusEl = document.getElementById(statusId)
 
   clearTimeout(slugCheckTimer)
 
-  if (!val || !/^[a-z0-9-]+$/.test(val)) {
-    statusEl.textContent = val ? '✗' : ''
+  // Update preview for whichever field is being edited
+  const previewId = inputId === 'setup-slug' ? 'setup-slug-preview' : 'f-slug-preview'
+  updateSlugPreview(inputId, previewId)
+
+  if (!val) {
+    statusEl.textContent = ''
     return
   }
 
