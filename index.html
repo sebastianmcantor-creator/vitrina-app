@@ -1807,7 +1807,7 @@
       </div>
       <div class="guarantee-card">
         <h3>🔓 Sin permanencia</h3>
-        <p>Cancelás desde el panel cuando querés. Tu catálogo queda en el plan free con todos los datos. Sin trámites.</p>
+        <p>Cancelás desde el panel cuando querés. Tu catálogo y todos tus datos se conservan. Sin trámites.</p>
       </div>
     </div>
   </div>
@@ -1889,7 +1889,7 @@
     ¿Qué pasa con mis datos si cancelo?
     <span class="faq-icon">+</span>
   </button>
-  <div class="faq-a">Tu menú o catálogo queda visible en el plan gratuito. Todo el historial de pedidos, clientes y estadísticas se conserva. Sin trámites, sin llamadas. Podés volver a un plan pago cuando quieras y encontrás todo como lo dejaste.</div>
+  <div class="faq-a">Tu menú o catálogo y todos tus datos se conservan: pedidos, clientes y estadísticas. Sin trámites, sin llamadas. Podés volver a un plan pago cuando quieras y encontrás todo como lo dejaste.</div>
 </div>
     </div>
   </div>
@@ -2369,11 +2369,11 @@ function showPricing(type) {
     // Caso negativo
     if (neto < 0 || recuperado <= 0) {
       headline.className = 'roi-result-headline negative';
-      headline.innerHTML = 'Tu negocio capaz no necesita Vitrina todavía.<br><span style="font-size:.7em;color:var(--muted)">Probá la versión <strong>Free</strong> y volvé cuando crezcas.</span>';
+      headline.innerHTML = 'Tu negocio capaz no necesita Vitrina todavía.<br><span style="font-size:.7em;color:var(--muted)">Revisá los números y volvé cuando crezcas.</span>';
       barsBox.innerHTML = '';
       roiPill.className = 'roi-roi-pill negative';
       roiPill.textContent = 'ROI actual: bajo';
-      if (cta) { cta.textContent = 'Probar Vitrina Free →'; cta.setAttribute('href', '/panel.html'); }
+      if (cta) { cta.textContent = 'Probar 14 días gratis →'; cta.setAttribute('href', '/panel.html'); }
     } else {
       headline.className = 'roi-result-headline';
       headline.innerHTML = 'Vitrina te suma <strong>' + fmtARS(recuperado) + '</strong>/mes en ingresos extra.<br><em>Neto después del plan: ' + fmtARS(neto) + '/mes</em>';

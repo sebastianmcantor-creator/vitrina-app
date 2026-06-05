@@ -67,7 +67,6 @@ Restaurante/Bar/Café · Heladería/Pastelería · Rotisería/Delivery · Dieté
 
 | Plan | USD/mes | Incluye |
 |------|---------|---------|
-| Free | $0 | Menú QR, Tano 75 msg/mes, 1 idioma, máx 45 platos, marca de agua |
 | **Solo Menú** | **$27** | Pedidos online, cocina, pagos MP, Tano ilimitado ES/EN/PT, fotos IA. WA operativo (Tano responde consultas del menú + recordatorios de reserva + pedido listo). SIN campañas marketing por WA. |
 | **Marketing** | **$57** | Viti estrategia mensual, 30 publicaciones auto/mes API Meta (IG+FB+Google), análisis competidores, informe PDF, WA con campañas (50/mes incluidas). |
 | **Combo** | **$70** | Solo Menú + Marketing en un solo plan. Ahorra $14 vs separado. |
@@ -76,8 +75,26 @@ Restaurante/Bar/Café · Heladería/Pastelería · Rotisería/Delivery · Dieté
 
 | Plan | USD/mes | Incluye |
 |------|---------|---------|
-| Free | $0 | Catálogo QR, asistente con 75 msg/mes |
 | **Marketing** | **$62** | Catálogo digital, asistente IA, ML + TN sync bidireccional, Viti, 30 publicaciones/mes, análisis competidores, WA con campañas. |
+
+### Plan Free — solo para retención (no se ofrece al público)
+
+El plan Free **NO es un plan de entrada**. No aparece en la landing ni en precios.html. Se activa automáticamente como red de seguridad cuando un cliente deja de pagar:
+
+- **Día 4** (después de 3 días de gracia): plan pasa a Free automáticamente
+- **30 días adicionales** con acceso básico (menú QR limitado, Tano 75 msg/mes, sin WA Business, sin campañas, marca de agua)
+- **Pasados esos 30 días** sin renovación: cuenta suspendida
+
+**Restricciones del Free:**
+- Menú QR con marca de agua de Vitrina
+- Tano: máx 75 mensajes/mes
+- 1 idioma
+- Máx 45 platos/productos
+- Sin WA Business
+- Sin publicaciones automáticas
+- Sin análisis ni informes
+
+El objetivo es no dejar al negocio completamente sin servicio de un día para el otro, dándole tiempo adicional para renovar.
 
 ### WhatsApp incluido — qué incluye por plan
 
