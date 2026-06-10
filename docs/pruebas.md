@@ -4,21 +4,23 @@
 
 ---
 
-## QA ronda 2 (10/06/2026) — BUGS PENDIENTES DE ARREGLAR
+## QA ronda 2 (10/06/2026) — estado de los bugs
 
-QA externo navegando producción (vitrinaapp.com.ar). Estos bugs están SIN RESOLVER y son la prioridad actual:
+QA externo navegando producción (vitrinaapp.com.ar). Fixes aplicados el 10/06 (commit `1355589` frontend + deploy worker):
 
-| # | Severidad | Área | Problema |
-|---|-----------|------|----------|
-| 1 | 🔴 Crítico | Panel/BD | `column orders.customer_phone does not exist` → sección Historial rota |
-| 2 | 🔴 Crítico | Panel/BD | `permission denied for table integrations` → sección Análisis rota (falta GRANT a anon/authenticated o falta policy RLS) |
-| 3 | 🔴 Crítico | Panel/BD | `permission denied for table subscription_payments` → historial de pagos en Facturación roto |
-| 4 | 🔴 Crítico | Status | `/status.html` no puede verificar estado — todos los servicios quedan en "Verificando" (endpoint health o CORS) |
-| 5 | 🟡 Medio | Panel | Sidebar muestra plan "Combo" pero Facturación dice "MENÚ FREE" — datos contradictorios |
-| 6 | 🟡 Medio | Panel | El tipo de negocio no persiste correctamente entre sesiones (eligió Restaurante, recarga y muestra Servicios) |
-| 7 | 🟡 Medio | Demo | No hay flujo de carrito/pago completo en la demo pública (oportunidad de conversión) |
-| 8 | 🟢 Menor | Frontend | Warning GSAP en consola: `Invalid property fromVars` — plugin no registrado |
-| 9 | 🟢 Menor | Demo | Precio empanadas $2.800 inconsistente vs $14.500-22.000 del resto (datos demo) |
+| # | Severidad | Área | Problema | Estado |
+|---|-----------|------|----------|--------|
+| 1 | 🔴 Crítico | Panel/BD | `column orders.customer_phone does not exist` → Historial roto | ⏳ **Migración 039 lista — falta correrla en Supabase SQL editor** (la 019 nunca llegó a producción) |
+| 2 | 🔴 Crítico | Panel/BD | `permission denied for table integrations` → Análisis rota | ⏳ Idem: migración 039 agrega GRANT + RLS con `has_restaurant_access` (las tablas de 011/012 quedaron sin grants ni RLS) |
+| 3 | 🔴 Crítico | Panel/BD | `permission denied for table subscription_payments` → Facturación rota | ⏳ Idem: migración 039 (SELECT para authenticated; el worker escribe con service key) |
+| 4 | 🔴 Crítico | Status | `/status.html` quedaba en "Verificando" | ✅ Resuelto y verificado. Causa: el worker mandaba CORS fijo al apex y bloqueaba `www.` en TODOS los endpoints. Wrapper de CORS por request en el worker (deployado) + el catch de status.html ya no cuelga los servicios |
+| 5 | 🟡 Medio | Panel | Sidebar "Combo" vs Facturación "MENÚ FREE" | ✅ Resuelto. `lib/plans.js` tenía el catálogo viejo (menu-free/basico/pro/full); ahora tiene el definitivo + `getPlanKey()` como fuente única para sidebar, Facturación y sección Plan |
+| 6 | 🟡 Medio | Panel | Tipo de negocio "no persiste" entre sesiones | ✅ Resuelto. No era el tipo: al recargar siempre cargaba `restaurantList[0]` (el negocio más viejo de la cuenta). Ahora recuerda el último negocio seleccionado (localStorage) |
+| 7 | 🟡 Medio | Demo | Sin flujo de carrito/pago completo en demo pública | 📋 Pendiente — es feature, no fix. Definir alcance con Sebastián |
+| 8 | 🟢 Menor | Frontend | Warning GSAP `Invalid property fromVars` | ✅ Resuelto. Era un `.to()` con propiedad inexistente `fromVars` en index.html → `.fromTo()` |
+| 9 | 🟢 Menor | Demo | Precio empanadas $2.800 inconsistente | ✅ Resuelto. $7.800 (HTML + objeto MENU + prompt de Tano) |
+
+**Para cerrar los bugs 1-3:** correr `migrations/039_qa2_db_fixes.sql` en Supabase → SQL editor (es idempotente) y recargar el panel.
 
 **Lo que funciona bien según el mismo QA:** onboarding, checklist primeros pasos, edición de información, toggle abierto/cerrado, agenda, pedidos, estadísticas, informes, configuración, chat Viti, navegación, demo menú completa (filtros dieta, categorías, cards, mesa, Tano flotante, mobile-first).
 
