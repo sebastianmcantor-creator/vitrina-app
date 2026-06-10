@@ -1,23 +1,54 @@
 # Vitrina — Fases de implementación y pendientes
 
-**Última actualización: 2026-06-01**
+**Última actualización: 2026-06-10**
 
 ---
 
-## Pendientes técnicos prioritarios
+## ESTADO ACTUAL (10/06/2026) — dónde estamos parados
 
-| # | Pendiente | Quién |
-|---|-----------|-------|
-| 1 | Verificar Business Verification Meta en Business Manager | Sebastián |
-| 2 | Grabar video screencast para App Review (script preparado) | Sebastián |
-| 3 | Migrar código Twilio a modelo "número por cliente" (asignación automática + webhook routing) | Claude |
-| 4 | Implementar sistema de límites Twilio (150 utility, 50 marketing, extensiones, tope 500) | Claude |
-| 5 | Construir vista CRM en maestro.html + completar sales agent | Claude |
-| 6 | Agregar columnas descripción_corta + descripción_completa en menu_items | Claude |
-| 7 | Implementar flujo "comercio sin TN/ML" (notificación dual local + cliente) | Claude |
-| 8 | Cargar credenciales ML (App ID + Client Secret) en wrangler secrets | Sebastián |
-| 9 | Hacer `npx wrangler deploy` para activar los crons recién agregados | Sebastián |
-| 10 | Sincronizar CLAUDE.md con la skill del plugin Vitrina | Claude |
+### Prioridad inmediata
+1. **Arreglar los 9 bugs del QA ronda 2** (ver /docs/pruebas.md sección "QA ronda 2") — 4 críticos de BD/permisos
+2. **Completar revisión de /docs/**: Sebastián aprobó REGLAS.md y contexto_funcional.md (con corrección: plan Free es solo retención interna, ya quitado de páginas públicas). arquitectura.md mostrado pero falta aprobar (tiene dato viejo: dice 27 migraciones, van 38). Faltan revisar: fases_implementacion.md, decisiones.md, pruebas.md.
+3. **Instagram OAuth de Vitrina**: scopes corregidos a los válidos de Facebook Login (`pages_show_list,pages_read_engagement,pages_manage_posts,instagram_manage_insights,instagram_content_publish,instagram_manage_comments`), worker deployado. Sebastián necesita: cuenta IG Business + Página de Facebook vinculada. Iba a probar con la cuenta de Chikpi (negocio conocido). El login SIEMPRE pasa por Facebook (es el flujo de Meta, no hay alternativa).
+4. **Callback de Instagram**: verificar que `/api/instagram/callback` intercambie el code vía `graph.facebook.com/oauth/access_token` (puede estar usando el endpoint viejo de Basic Display).
+
+### Hecho recientemente (commits e3474b1, 144a175, c30b903, 6c16061, 469cf16)
+- Sistema de documentación /docs + CLAUDE.md nuevo
+- Plan Free quitado de precios.html, index.html (solo retención interna)
+- Migración 038 opening_hours + slug opcional con auto-convert y preview
+- Subtítulos: precio interno oculto + cards Instagram/FB clickeables
+- Mi Marketing en maestro.html + Rappi/PY en rentabilidad
+- Features Kiboo: etiquetas barcode, arqueo caja, proveedores/OC, rentabilidad
+- Twilio: número +14482315343 comprado y registrado como sender WA "Vitrina" (Online)
+- Vitrina como restaurante propio en Supabase (ID 779d4db8-66b0-44f9-b6c8-639932a41400, plan combo)
+- Seguridad: JWT admin, CORS allowlist, firma Twilio, rate limiting
+
+### Pendientes que dependen de Sebastián
+| Pendiente | Estado |
+|-----------|--------|
+| Business Verification Meta (constancia nueva Yatay 241 lista) | Retomar trámite |
+| Video screencast App Review Meta | Grabar cuando esté listo |
+| Chip AR para WA prospección de Vitrina | Comprar en estos días |
+| Cuenta Calendly para demos | Crear cuenta |
+| Credenciales ML en wrangler secrets | Cargar |
+| Activar campaña de mails del CRM de ventas | Después de conectar Instagram |
+
+---
+
+## Pendientes técnicos históricos
+
+| # | Pendiente | Quién | Estado |
+|---|-----------|-------|--------|
+| 1 | Verificar Business Verification Meta en Business Manager | Sebastián | Pendiente |
+| 2 | Grabar video screencast para App Review (script preparado) | Sebastián | Pendiente |
+| 3 | Migrar código Twilio a modelo "número por cliente" | Claude | ✅ Hecho |
+| 4 | Implementar sistema de límites Twilio | Claude | ✅ Hecho |
+| 5 | Construir vista CRM en maestro.html + completar sales agent | Claude | ✅ Hecho |
+| 6 | Agregar descripción corta + completa en menu_items | Claude | ✅ Hecho |
+| 7 | Implementar flujo "comercio sin TN/ML" | Claude | ✅ Hecho |
+| 8 | Cargar credenciales ML en wrangler secrets | Sebastián | Pendiente |
+| 9 | `npx wrangler deploy` para crons | Sebastián | ✅ Hecho |
+| 10 | Sincronizar CLAUDE.md con skill del plugin | Claude | ✅ Hecho |
 
 ---
 
