@@ -94,6 +94,12 @@ async function checkStatus() {
   } catch {
     document.getElementById('overall-text').textContent = 'No se pudo verificar el estado'
     document.getElementById('overall-status').className = 'overall degraded'
+    document.getElementById('overall-icon').textContent = '⚠️'
+    serviceEls.forEach(el => {
+      const statusEl = el.querySelector('.service-status')
+      statusEl.textContent = 'Sin datos'
+      statusEl.className = 'service-status status-checking'
+    })
   }
 
   const now = new Date()

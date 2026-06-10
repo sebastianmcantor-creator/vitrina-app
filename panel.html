@@ -4709,6 +4709,7 @@ input:checked + .toggle-slider:before {
 import { requireAuth, signOut } from './lib/auth.js'
 import { profiles, restaurants, menuCategories, menuItems, restaurantTables, orders, restaurantStaff, menuItemPriceHistory, scheduledPosts, contentTemplates, salesProspects, salesContacts, salesAgentConfig, salesMetrics } from './lib/db.js'
 import { supabase } from './lib/supabase.js'
+import { getPlanKey, getPlanName } from './lib/plans.js'
 
 // ── Estado global ──
 let currentUser = null
@@ -4818,26 +4819,20 @@ function renderSidebarRestaurant(rest) {
   const el = document.getElementById('sidebar-restaurant')
   el.style.display = 'block'
   document.getElementById('sidebar-rest-name').textContent = rest.name
+  // Fuente única del plan (bug QA2 #5): misma key que Facturación y sección Plan
+  const sidebarPlanKey = getPlanKey(rest)
   document.getElementById('sidebar-rest-plan').textContent =
-    ({
-      free: 'Plan Free', 'menu-free': 'Plan Free',
-      'rest-menu': 'Solo Menú', 'menu-basico': 'Solo Menú', 'menu-pro': 'Solo Menú', 'menu-full': 'Solo Menú',
-      'rest-mkt': 'Marketing', marketing: 'Marketing',
-      'rest-combo': 'Combo', combo: 'Combo',
-      'local-mkt': 'Marketing',
-      pro: 'Solo Menú', full: 'Solo Menú', starter: 'Solo Menú',
-    })[rest.plan] ?? (rest.plan ?? 'Plan Free')
+    sidebarPlanKey === 'free' ? 'Plan Free' : getPlanName(rest)
   // Color del badge de plan
   const planEl = document.getElementById('sidebar-rest-plan')
   if (planEl) {
     const colors = {
-      free: '#8a7e74', 'menu-free': '#8a7e74',
-      'rest-menu': '#22863a', 'menu-basico': '#22863a', 'menu-pro': '#22863a', 'menu-full': '#22863a', pro: '#22863a', full: '#22863a',
-      'rest-mkt': '#4a90d9', marketing: '#4a90d9', 'local-mkt': '#4a90d9',
-      'rest-combo': '#b85a30', combo: '#b85a30',
+      free: '#8a7e74',
+      'rest-menu': '#22863a',
+      'rest-mkt': '#4a90d9', 'local-mkt': '#4a90d9',
+      'rest-combo': '#b85a30',
     }
-    const planKey = (rest.plan || 'free').toLowerCase()
-    planEl.style.color = colors[planKey] || '#8a7e74'
+    planEl.style.color = colors[sidebarPlanKey] || '#8a7e74'
   }
   // Badge de estado del trial junto al nombre
   const sidebarPlan = document.getElementById('sidebar-rest-plan')
@@ -5562,7 +5557,10 @@ window.loadRestaurant = async function () {
       return
     }
 
-    currentRestaurant = restaurantList[0]
+    // Restaurar el último negocio seleccionado (bug QA2 #6: al recargar siempre
+    // se tomaba restaurantList[0], el más viejo, aunque el usuario estuviera en otro)
+    const savedRestId = localStorage.getItem('vitrina_last_restaurant')
+    currentRestaurant = restaurantList.find(r => r.id === savedRestId) || restaurantList[0]
     if (checkAccountStatus(currentRestaurant)) return
     renderSidebarRestaurant(currentRestaurant)
     renderRestSwitcher()
@@ -5825,6 +5823,7 @@ window.switchRestaurant = async function (id) {
   pedidosMap = {}
 
   currentRestaurant = restaurantList.find(r => r.id === id)
+  try { localStorage.setItem('vitrina_last_restaurant', id) } catch {}
   renderSidebarRestaurant(currentRestaurant)
   renderRestSwitcher()
   fillForm(currentRestaurant)
@@ -6035,6 +6034,7 @@ window.createRestaurant = async function () {
     }).catch(() => {})
 
     restaurantList.push(currentRestaurant)
+    try { localStorage.setItem('vitrina_last_restaurant', currentRestaurant.id) } catch {}
     renderSidebarRestaurant(currentRestaurant)
     renderRestSwitcher()
     fillForm(currentRestaurant)
@@ -7425,7 +7425,7 @@ const PLAN_FEATURES = {
 
 function renderPlanSection() {
   if (!currentRestaurant) return
-  const plan = currentRestaurant.plan ?? 'free'
+  const plan = getPlanKey(currentRestaurant)
   const status = currentRestaurant.plan_status ?? 'active'
 
   // Badge del plan actual
@@ -7896,10 +7896,9 @@ window.loadFacturacion = async function () {
   const planNameEl = document.getElementById('fact-plan-name')
   if (planNameEl) planNameEl.textContent = planName
 
-  // Renderizar badge del plan
+  // Renderizar badge del plan (misma key canónica que sidebar y sección Plan)
   const badgeWrap = document.getElementById('fact-badge-wrap')
-  const tier = currentRestaurant.subscription_tier || 'free'
-  const badgeClass = tier === 'free' ? 'free' : tier === 'basico' ? 'basico' : tier === 'pro' ? 'pro' : 'full'
+  const badgeClass = getPlanKey(currentRestaurant)
   if (badgeWrap) {
     badgeWrap.innerHTML = `<span class="plan-badge ${badgeClass}">${planName}</span>`
   }
@@ -8010,7 +8009,7 @@ window.loadFacturacion = async function () {
   const btnUpgrade = document.getElementById('btn-upgrade-plan')
   const btnCancel = document.getElementById('btn-cancel-plan')
 
-  if (tier === 'free') {
+  if (badgeClass === 'free') {
     btnUpgrade.style.display = 'inline-flex'
     btnCancel.style.display = 'none'
   } else {

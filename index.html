@@ -2620,8 +2620,9 @@ function waRestart(scriptKey) {
   /* ── HERO entrance ─────────────────────────────── */
   var heroTl = gsap.timeline({ delay: 0.15 });
   heroTl
-    .to('#hero-eyebrow', { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
-        fromVars: { opacity: 0, y: 24 } })
+    .fromTo('#hero-eyebrow',
+        { opacity: 0, y: 24 },
+        { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' })
     .fromTo('#hero-title',
         { opacity: 0, y: 54 },
         { opacity: 1, y: 0, duration: 0.85, ease: 'power3.out' }, '-=0.35')
