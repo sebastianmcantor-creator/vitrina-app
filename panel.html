@@ -1777,29 +1777,31 @@ input:checked + .toggle-slider:before {
               <path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="setup-title">¿Qué tipo de negocio tenés?</div>
-          <div class="setup-subtitle">Contanos qué tipo de negocio tenés. Adaptamos todo (el lenguaje, las funciones y el asistente IA) a tu rubro.</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%;max-width:520px;margin-top:8px">
+          <div class="setup-title">Creá tu restaurante</div>
+          <div class="setup-subtitle">Vitrina está enfocado 100% en gastronomía: menú QR, pedidos, cocina, reservas y marketing con IA.</div>
+          <!-- Lanzamiento restaurante-only: las cards de local/services/ecommerce
+               quedan ocultas (display:none). Para reactivar rubros, sacar el style. -->
+          <div style="display:grid;grid-template-columns:1fr;gap:14px;width:100%;max-width:340px;margin-top:8px">
 
             <button onclick="selectBusinessType('restaurant')" class="biz-type-btn">
               <span style="font-size:32px;margin-bottom:8px;display:block">🍽️</span>
-              <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Restaurante / Bar</span>
+              <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Restaurante / Bar / Café</span>
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Menú QR, pedidos, cocina, reservas y Tano como asistente</span>
             </button>
 
-            <button onclick="selectBusinessType('local')" class="biz-type-btn">
+            <button onclick="selectBusinessType('local')" class="biz-type-btn" style="display:none">
               <span style="font-size:32px;margin-bottom:8px;display:block">🏪</span>
               <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Local / Comercio</span>
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Catálogo QR, MercadoLibre, Tienda Nube y asistente de ventas</span>
             </button>
 
-            <button onclick="selectBusinessType('services')" class="biz-type-btn">
+            <button onclick="selectBusinessType('services')" class="biz-type-btn" style="display:none">
               <span style="font-size:32px;margin-bottom:8px;display:block">💆</span>
               <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Servicios / Turnos</span>
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Peluquería, estética, salud, profesionales: agenda y reservas</span>
             </button>
 
-            <button onclick="selectBusinessType('ecommerce')" class="biz-type-btn">
+            <button onclick="selectBusinessType('ecommerce')" class="biz-type-btn" style="display:none">
               <span style="font-size:32px;margin-bottom:8px;display:block">📦</span>
               <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Vendedor online</span>
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">MercadoLibre y Tienda Nube: Viti gestiona publicaciones y preguntas</span>
@@ -8412,12 +8414,79 @@ window.connectGoogleBusiness = function () {
 
 window.connectInstagram = function () {
   if (!currentRestaurant) return
-  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/instagram/auth?restaurant_id=${currentRestaurant.id}`
+  showBetaGate('instagram')
 }
 
 window.connectFacebook = function () {
   if (!currentRestaurant) return
-  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/facebook/auth?restaurant_id=${currentRestaurant.id}`
+  showBetaGate('facebook')
+}
+
+// ─── Beta privada Meta: gate antes del OAuth de IG/FB ────────────────────────
+// Hasta que Meta apruebe los permisos avanzados (App Review), la conexión solo
+// funciona para usuarios invitados como testers de la app. Este modal pide los
+// datos para mandar la invitación y deja pasar a quien ya fue habilitado.
+function startMetaOAuth(provider) {
+  window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/${provider}/auth?restaurant_id=${currentRestaurant.id}`
+}
+
+window.showBetaGate = function (provider) {
+  // Si ya pasó por el gate una vez, va directo al OAuth
+  if (localStorage.getItem('vitrina_meta_beta_ok') === '1') { startMetaOAuth(provider); return }
+
+  const prev = document.getElementById('beta-gate-overlay')
+  if (prev) prev.remove()
+  const ov = document.createElement('div')
+  ov.id = 'beta-gate-overlay'
+  ov.style.cssText = 'position:fixed;inset:0;background:rgba(28,18,8,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px'
+  ov.innerHTML = `
+    <div style="background:var(--cream,#FAF7F2);border-radius:18px;max-width:460px;width:100%;padding:28px;box-shadow:0 30px 80px rgba(0,0,0,.35)">
+      <div style="font-size:11px;letter-spacing:2px;color:var(--terra,#B85A30);font-weight:700;margin-bottom:10px">🔑 BETA PRIVADA</div>
+      <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--ink,#1C1208)">Conectar Instagram y Facebook</div>
+      <p style="font-size:13.5px;color:var(--ink-soft,#4A3828);line-height:1.6;margin:12px 0 18px">
+        La publicación automática está en beta privada: te habilitamos personalmente
+        en menos de 24hs hábiles. Dejanos los datos del usuario de Facebook que
+        administra tu página y te mandamos la invitación.
+      </p>
+      <input id="beta-fb-name" placeholder="Nombre del usuario de Facebook *" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:10px;background:white">
+      <input id="beta-fb-email" placeholder="Email asociado a ese Facebook" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:10px;background:white">
+      <input id="beta-ig-handle" placeholder="@ de tu Instagram (opcional)" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:16px;background:white">
+      <button id="beta-submit" style="width:100%;padding:13px;background:var(--terra,#B85A30);color:white;border:none;border-radius:11px;font-size:14.5px;font-weight:600;cursor:pointer">Pedir acceso a la beta</button>
+      <button id="beta-already" style="width:100%;padding:11px;background:none;border:none;color:var(--muted,#8A7A6A);font-size:13px;cursor:pointer;margin-top:8px;text-decoration:underline">Ya me habilitaron → conectar ahora</button>
+      <button id="beta-close" style="position:absolute;top:18px;right:22px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted,#8A7A6A)">✕</button>
+    </div>`
+  document.body.appendChild(ov)
+  ov.addEventListener('click', e => { if (e.target === ov) ov.remove() })
+  document.getElementById('beta-close').onclick = () => ov.remove()
+  document.getElementById('beta-already').onclick = () => {
+    localStorage.setItem('vitrina_meta_beta_ok', '1')
+    ov.remove()
+    startMetaOAuth(provider)
+  }
+  document.getElementById('beta-submit').onclick = async () => {
+    const fbName = document.getElementById('beta-fb-name').value.trim()
+    if (!fbName) { showToast('Completá el nombre del usuario de Facebook.', 'error'); return }
+    const btn = document.getElementById('beta-submit')
+    btn.disabled = true; btn.textContent = 'Enviando…'
+    try {
+      await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notify/beta-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          restaurantId: currentRestaurant.id,
+          restName: currentRestaurant.name,
+          fbName,
+          fbEmail: document.getElementById('beta-fb-email').value.trim(),
+          igHandle: document.getElementById('beta-ig-handle').value.trim(),
+        }),
+      })
+      ov.remove()
+      showToast('✅ Listo. Te habilitamos en menos de 24hs hábiles y te avisamos por email.', 'success')
+    } catch (e) {
+      btn.disabled = false; btn.textContent = 'Pedir acceso a la beta'
+      showToast('Error de red. Probá de nuevo.', 'error')
+    }
+  }
 }
 
 // ─── ML / TN ─────────────────────────────────────────────────────────────────
