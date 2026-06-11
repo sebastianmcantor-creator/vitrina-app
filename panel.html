@@ -2147,6 +2147,18 @@ div:has(> #trial-banner-text) {
                   style="font-size:12px;padding:4px 12px;margin-top:6px">⬇️ Descargar</button>
               </div>
             </div>
+            <div style="flex:1;min-width:210px">
+              <div style="font-size:13px;font-weight:500;color:var(--ink);margin-bottom:6px">Todas las mesas</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <input type="number" id="qr-mesas-cantidad" placeholder="¿Cuántas?" min="1" max="200"
+                  style="width:90px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;background:var(--cream2)">
+                <button class="btn-secondary" onclick="descargarQrsTodasLasMesas()"
+                  style="font-size:12px;padding:6px 14px">🖨️ Descargar todas</button>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5">
+                Se abre una hoja con todos los QRs numerados (Mesa 1 a N), lista para imprimir o guardar como PDF.
+              </div>
+            </div>
           </div>
           <div style="margin-top:14px;padding:12px 16px;background:var(--cream2);border-radius:10px;font-size:13px;color:var(--muted);line-height:1.6">
             💡 <strong style="color:var(--ink)">Tip:</strong> Imprimí el QR del menú y ponelo en cada mesa. Imprimí el QR del asistente y ponelo en la caja o en la entrada para que los clientes puedan preguntar antes de sentarse.
@@ -5599,20 +5611,102 @@ window.downloadMenuQr = function (type) {
   } else if (type === 'mozo') {
     img = document.getElementById('mozo-qr-img'); filename = 'qr-tano.png'
   } else {
-    img = document.getElementById('mesa-qr-preview-img')
+    // Mesa específica: tarjeta PNG con nombre del restaurante y "MESA N" abajo
     const num = document.getElementById('qr-mesa-num').value
-    filename = 'qr-mesa-' + num + '.png'
+    const url = document.getElementById('mesa-qr-preview-img')?.dataset?.url
+    if (!num || !url) return
+    descargarTarjetaQrMesa(url, num)
+    return
   }
   if (!img || !img.dataset.url) return
-  // Download hi-res version
-  const hiResUrl = img.dataset.url.replace(/size=\d+x\d+/, 'size=400x400')
-    || qrUrl(img.dataset.url, 400)
   const a = document.createElement('a')
   a.href = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data='
     + encodeURIComponent(img.dataset.url) + '&margin=8&color=1c1612&bgcolor=fdfaf6'
   a.download = filename
   a.target = '_blank'
   a.click()
+}
+
+// Tarjeta PNG de una mesa: nombre arriba, QR al medio, "MESA N" abajo
+function descargarTarjetaQrMesa(url, num) {
+  const qrImg = new Image()
+  qrImg.crossOrigin = 'anonymous'
+  qrImg.onload = () => {
+    const W = 480, H = 610
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H
+    const x = cv.getContext('2d')
+    x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, W, H)
+    x.textAlign = 'center'
+    x.fillStyle = '#1C1208'; x.font = '600 30px Fraunces, Georgia, serif'
+    x.fillText(currentRestaurant?.name || 'Menú', W / 2, 58, W - 40)
+    x.drawImage(qrImg, 40, 88, 400, 400)
+    x.fillStyle = '#B85A30'; x.font = '700 42px "Plus Jakarta Sans", sans-serif'
+    x.fillText('MESA ' + num, W / 2, 548)
+    x.fillStyle = '#8A7A6A'; x.font = '400 16px "Plus Jakarta Sans", sans-serif'
+    x.fillText('Escaneá para ver el menú y pedir', W / 2, 580)
+    cv.toBlob(b => {
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(b)
+      a.download = 'qr-mesa-' + num + '.png'
+      a.click()
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000)
+    }, 'image/png')
+  }
+  qrImg.onerror = () => {
+    // Fallback: QR pelado como antes (si el proveedor bloquea CORS)
+    const a = document.createElement('a')
+    a.href = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data='
+      + encodeURIComponent(url) + '&margin=8&color=1c1612&bgcolor=fdfaf6'
+    a.download = 'qr-mesa-' + num + '.png'
+    a.target = '_blank'
+    a.click()
+  }
+  qrImg.src = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=8&color=1c1612&bgcolor=ffffff&data=' + encodeURIComponent(url)
+}
+
+// Hoja imprimible con los QRs de TODAS las mesas (1 a N), cada uno numerado.
+// Se guarda como PDF desde el diálogo de impresión del navegador.
+window.descargarQrsTodasLasMesas = function () {
+  const n = parseInt(document.getElementById('qr-mesas-cantidad').value, 10)
+  if (!n || n < 1 || n > 200) { showToast('Ingresá cuántas mesas tenés (1 a 200).', 'error'); return }
+  if (!currentRestaurant) return
+  const base = 'https://vitrinaapp.com.ar/menu.html?slug=' + currentRestaurant.slug + '&mesa='
+  const name = (currentRestaurant.name || '').replace(/</g, '&lt;')
+  const cards = Array.from({ length: n }, (_, i) => {
+    const mesa = i + 1
+    const qr = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=8&color=1c1612&bgcolor=ffffff&data='
+      + encodeURIComponent(base + mesa)
+    return `<div class="qr-card">
+      <div class="rest">${name}</div>
+      <img src="${qr}" alt="QR mesa ${mesa}" loading="lazy">
+      <div class="mesa">MESA ${mesa}</div>
+      <div class="hint">Escaneá para ver el menú y pedir</div>
+    </div>`
+  }).join('')
+  const w = window.open('', '_blank')
+  if (!w) { showToast('Permití las ventanas emergentes para generar la hoja de QRs.', 'error'); return }
+  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>QRs de mesas · ${name}</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff; margin: 0; padding: 22px; color: #1C1208; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .top b { font-size: 15px; }
+  .top button { background: #B85A30; color: #fff; border: none; border-radius: 10px; padding: 11px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; }
+  .qr-card { border: 1.5px dashed #C9BCAC; border-radius: 12px; padding: 16px 10px 14px; text-align: center; page-break-inside: avoid; break-inside: avoid; }
+  .rest { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; margin-bottom: 8px; }
+  .qr-card img { width: 130px; height: 130px; }
+  .mesa { font-size: 21px; font-weight: 700; letter-spacing: 2px; color: #B85A30; margin-top: 8px; }
+  .hint { font-size: 9.5px; color: #8A7A6A; margin-top: 3px; }
+  @media print { .top { display: none; } body { padding: 0; } }
+</style></head><body>
+<div class="top">
+  <b>${n} QR${n > 1 ? 's' : ''} listos · ${name}</b>
+  <button onclick="print()">🖨️ Imprimir / Guardar como PDF</button>
+</div>
+<div class="grid">${cards}</div>
+</body></html>`)
+  w.document.close()
 }
 
 function renderColorPresets() {
