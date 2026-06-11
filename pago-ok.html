@@ -159,13 +159,35 @@
 
   // Leer params de URL con fallback a localStorage
   const p = new URLSearchParams(location.search)
-  const slug       = p.get('slug')     || p.get('restaurant') || localStorage.getItem('vt_slug') || ''
-  const mesa       = p.get('mesa')     || p.get('table')      || localStorage.getItem('vt_mesa') || '—'
-  const orderId    = p.get('order_id') || p.get('order')      || localStorage.getItem('vt_last_order') || ''
+
+  // Modo DEMO: viene de demo.html (pago simulado). No usar NUNCA el fallback
+  // de localStorage acá — si el visitante pasó antes por un menú real, esos
+  // datos (vt_slug / vt_last_order) son de OTRO restaurante (bug QA).
+  const isDemo = p.get('demo') === '1'
+  if (isDemo) {
+    const back = document.getElementById('back-link')
+    back.href = 'demo.html'
+    back.textContent = '← Volver a la demo'
+    // CTA de conversión: el prospect acaba de ver el flujo completo
+    back.insertAdjacentHTML('afterend',
+      '<a href="/panel.html" class="btn-back" style="margin-top:10px;background:#B85A30;border-color:#B85A30;color:#fff">Quiero esto en mi restaurante →</a>')
+    // Después del render genérico (que escribe order-num/table-num con los
+    // valores crudos), pisamos con los datos de la demo
+    const pintarDemo = () => {
+      document.getElementById('order-num').textContent = 'Pedido de prueba'
+      document.getElementById('table-num').textContent = 'Mesa 5 · Casa Lucía'
+    }
+    pintarDemo()
+    setTimeout(pintarDemo, 150)
+  }
+
+  const slug       = isDemo ? '' : (p.get('slug')     || p.get('restaurant') || localStorage.getItem('vt_slug') || '')
+  const mesa       = isDemo ? '5' : (p.get('mesa')     || p.get('table')      || localStorage.getItem('vt_mesa') || '—')
+  const orderId    = isDemo ? '' : (p.get('order_id') || p.get('order')      || localStorage.getItem('vt_last_order') || '')
   const pagoStatus = p.get('pago_status') || 'success'
 
   // Modo consolidado: viene de pago de mesa (restaurant)
-  const isConsolidado = p.get('consolidated') === '1'
+  const isConsolidado = !isDemo && p.get('consolidated') === '1'
   const orderIdsParam = p.get('order_ids') || ''
   const orderIds      = orderIdsParam ? orderIdsParam.split(',').filter(Boolean) : []
 
