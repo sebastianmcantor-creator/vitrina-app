@@ -5683,30 +5683,40 @@ window.descargarQrsTodasLasMesas = function () {
       <div class="hint">Escaneá para ver el menú y pedir</div>
     </div>`
   }).join('')
-  const w = window.open('', '_blank')
-  if (!w) { showToast('Permití las ventanas emergentes para generar la hoja de QRs.', 'error'); return }
-  w.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>QRs de mesas · ${name}</title>
+  // Iframe oculto + print(): un click abre el diálogo de imprimir/guardar PDF.
+  // Sin ventanas emergentes (los bloqueadores de popups no lo pueden frenar).
+  const viejo = document.getElementById('qr-print-frame')
+  if (viejo) viejo.remove()
+  const frame = document.createElement('iframe')
+  frame.id = 'qr-print-frame'
+  frame.style.cssText = 'position:fixed;width:0;height:0;border:0;visibility:hidden'
+  frame.srcdoc = `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>QRs de mesas · ${name}</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff; margin: 0; padding: 22px; color: #1C1208; }
-  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
-  .top b { font-size: 15px; }
-  .top button { background: #B85A30; color: #fff; border: none; border-radius: 10px; padding: 11px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: #fff; margin: 0; padding: 0; color: #1C1208; }
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8mm; }
   .qr-card { border: 1.5px dashed #C9BCAC; border-radius: 12px; padding: 16px 10px 14px; text-align: center; page-break-inside: avoid; break-inside: avoid; }
   .rest { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; margin-bottom: 8px; }
   .qr-card img { width: 130px; height: 130px; }
   .mesa { font-size: 21px; font-weight: 700; letter-spacing: 2px; color: #B85A30; margin-top: 8px; }
   .hint { font-size: 9.5px; color: #8A7A6A; margin-top: 3px; }
-  @media print { .top { display: none; } body { padding: 0; } }
-</style></head><body>
-<div class="top">
-  <b>${n} QR${n > 1 ? 's' : ''} listos · ${name}</b>
-  <button onclick="print()">🖨️ Imprimir / Guardar como PDF</button>
-</div>
-<div class="grid">${cards}</div>
-</body></html>`)
-  w.document.close()
+</style></head><body><div class="grid">${cards}</div></body></html>`
+  document.body.appendChild(frame)
+  showToast('⏳ Preparando ' + n + ' QRs…', 'info')
+
+  frame.onload = () => {
+    // Esperar a que los QRs (imágenes remotas) terminen de cargar antes de imprimir
+    const doc = frame.contentDocument
+    const t0 = Date.now()
+    const listo = () => [...doc.images].every(i => i.complete)
+    const intentar = () => {
+      if (listo() || Date.now() - t0 > 12000) {
+        try { frame.contentWindow.focus(); frame.contentWindow.print() } catch (e) {}
+        setTimeout(() => frame.remove(), 60000)
+      } else setTimeout(intentar, 300)
+    }
+    intentar()
+  }
 }
 
 function renderColorPresets() {
