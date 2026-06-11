@@ -210,6 +210,18 @@ BEGIN
 END $$;
 
 -- ---------------------------------------------------------------------------
--- 8) Refrescar el schema cache de PostgREST
+-- 8) REALTIME — la tabla orders no estaba en la publicación supabase_realtime:
+--    la cocina, el tracking del comensal y los badges del panel NO recibían
+--    eventos (la "cocina en tiempo real" solo funcionaba recargando la página).
+-- ---------------------------------------------------------------------------
+DO $$
+BEGIN
+  ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+EXCEPTION
+  WHEN duplicate_object THEN NULL; -- ya estaba publicada
+END $$;
+
+-- ---------------------------------------------------------------------------
+-- 9) Refrescar el schema cache de PostgREST
 -- ---------------------------------------------------------------------------
 NOTIFY pgrst, 'reload schema';
