@@ -4344,19 +4344,47 @@ input:checked + .toggle-slider:before {
     </div>
     <div class="modal-body">
       <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-        <span id="import-menu-desc">Subí una foto de tu lista de precios, pizarrón o menú impreso. Vitrina detecta los ítems y precios automáticamente con IA.</span>
+        <span id="import-menu-desc">Subí tu menú como lo tengas: una foto, el PDF de la imprenta o una captura. Vitrina detecta los platos y precios automáticamente con IA — sin cargar uno por uno.</span>
       </p>
       <div style="border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;cursor:pointer" onclick="document.getElementById('import-menu-file').click()">
-        <div style="font-size:32px;margin-bottom:8px">📷</div>
-        <div style="font-size:14px;color:var(--muted)">Tocá para seleccionar una imagen</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:4px">JPG, PNG · máx 5MB</div>
-        <input type="file" id="import-menu-file" accept="image/*" style="display:none" onchange="processMenuPhoto(this)">
+        <div style="font-size:32px;margin-bottom:8px">📄</div>
+        <div style="font-size:14px;color:var(--muted)">Tocá para seleccionar una foto o un PDF</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:4px">JPG, PNG o PDF · máx 10MB</div>
+        <input type="file" id="import-menu-file" accept="image/*,application/pdf" style="display:none" onchange="processMenuPhoto(this)">
       </div>
       <div id="import-menu-status" style="display:none;margin-top:16px"></div>
       <div id="import-menu-results" style="margin-top:16px;display:none">
         <div class="card-title" style="margin-bottom:10px" id="import-detected-title">Ítems detectados</div>
         <div id="import-menu-items"></div>
-        <button class="btn-primary" onclick="confirmImportMenu()" id="btn-confirm-import" style="margin-top:12px;width:100%">
+
+        <div class="card-title" style="margin:18px 0 8px">Fotos de los platos</div>
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:var(--ink)">
+          <label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer">
+            <input type="radio" name="import-photo-mode" value="none" checked style="margin-top:3px;accent-color:var(--terra)" onchange="document.getElementById('import-style-picker').style.display='none'">
+            <span>Sin fotos por ahora<br><span style="font-size:12px;color:var(--muted)">Si ya tenés fotos propias, las subís después desde cada plato (botón Subir).</span></span>
+          </label>
+          <label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer">
+            <input type="radio" name="import-photo-mode" value="ai" style="margin-top:3px;accent-color:var(--terra)" onchange="document.getElementById('import-style-picker').style.display='block'">
+            <span>Generar una foto profesional con IA para cada plato<br><span style="font-size:12px;color:var(--muted)">Gratis, incluido en tu plan. Elegí el estilo abajo.</span></span>
+          </label>
+        </div>
+        <div id="import-style-picker" style="display:none;margin:10px 0 0 26px;padding:12px;background:var(--cream2);border:1px solid var(--border);border-radius:10px">
+          <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">Elegí el estilo para todo tu menú:</div>
+          <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;cursor:pointer">
+            <input type="radio" name="import-photo-style" value="professional" style="margin-top:3px;accent-color:var(--terra)">
+            <span style="font-size:12.5px"><b>Catálogo claro</b> — fondo blanco limpio, luz uniforme</span>
+          </label>
+          <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;cursor:pointer">
+            <input type="radio" name="import-photo-style" value="warm" checked style="margin-top:3px;accent-color:var(--terra)">
+            <span style="font-size:12.5px"><b>Cálido de bodegón</b> — madera, luz dorada, acogedor</span>
+          </label>
+          <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer">
+            <input type="radio" name="import-photo-style" value="dark">
+            <span style="font-size:12.5px"><b>Premium oscuro</b> — fondo negro, spotlight, exclusivo</span>
+          </label>
+        </div>
+
+        <button class="btn-primary" onclick="confirmImportMenu()" id="btn-confirm-import" style="margin-top:14px;width:100%">
           <span id="btn-confirm-import-label">✓ Importar todos los ítems</span>
         </button>
       </div>
@@ -11371,11 +11399,12 @@ window.openImportMenuModal = function () {
 window.processMenuPhoto = async function (input) {
   if (!input.files || !input.files[0]) return
   const file = input.files[0]
-  if (file.size > 5 * 1024 * 1024) { showToast('La imagen debe ser menor a 5MB', 'error'); return }
+  const esPdf = file.type === 'application/pdf'
+  if (file.size > 10 * 1024 * 1024) { showToast('El archivo debe ser menor a 10MB', 'error'); return }
 
   const statusEl = document.getElementById('import-menu-status')
   statusEl.style.display = 'block'
-  statusEl.innerHTML = '<div style="text-align:center;padding:12px;color:var(--muted)">⏳ Analizando imagen con IA... puede tardar unos segundos.</div>'
+  statusEl.innerHTML = '<div style="text-align:center;padding:12px;color:var(--muted)">⏳ Analizando ' + (esPdf ? 'PDF' : 'imagen') + ' con IA... puede tardar unos segundos.</div>'
 
   try {
     // Convertir a base64
@@ -11386,13 +11415,18 @@ window.processMenuPhoto = async function (input) {
       reader.readAsDataURL(file)
     })
 
+    // PDF → bloque document; imagen → bloque image (la API acepta ambos)
+    const mediaBlock = esPdf
+      ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64 } }
+      : { type: 'image', source: { type: 'base64', media_type: file.type, data: base64 } }
+
     const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/claude', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        system: 'Sos un asistente que extrae información de menús y listas de precios desde imágenes. Respondé SOLO con un JSON válido, sin texto adicional, con el formato: {"items": [{"name": "Nombre del plato", "price": 1500, "description": "descripción si hay", "category": "categoría si se puede inferir"}]}. Si no podés identificar precios claros, igualá price a 0. Extraé todos los platos que encuentres.',
-        messages: [{ role: 'user', content: [{ type: 'image', source: { type: 'base64', media_type: file.type, data: base64 } }, { type: 'text', text: 'Extraé todos los platos y precios de esta imagen de menú.' }] }],
-        max_tokens: 2048,
+        system: 'Sos un asistente que extrae información de menús y listas de precios desde imágenes o PDFs. Respondé SOLO con un JSON válido, sin texto adicional, con el formato: {"items": [{"name": "Nombre del plato", "price": 1500, "description": "descripción si hay", "category": "categoría si se puede inferir"}]}. Si no podés identificar precios claros, igualá price a 0. Extraé todos los platos que encuentres, de todas las páginas.',
+        messages: [{ role: 'user', content: [mediaBlock, { type: 'text', text: 'Extraé todos los platos y precios de este menú.' }] }],
+        max_tokens: 4096,
       }),
     })
 
@@ -11455,6 +11489,7 @@ window.confirmImportMenu = async function () {
   }
 
   let created = 0
+  const createdItems = []
   for (const item of importedMenuItems) {
     if (!item.name?.trim() || !item.price) continue
     try {
@@ -11469,14 +11504,62 @@ window.confirmImportMenu = async function () {
       })
       if (!menuItemsMap[targetCatId]) menuItemsMap[targetCatId] = []
       menuItemsMap[targetCatId].push(newItem)
+      createdItems.push(newItem)
       created++
     } catch {}
   }
 
-  closeModal('modal-import-menu')
-  renderMenu()
-  showToast(`✅ ${created} platos importados a la categoría "Importados"`, 'success')
+  // Fotos con IA para todo el lote (si el dueño lo eligió)
+  const fotoMode = document.querySelector('input[name="import-photo-mode"]:checked')?.value
+  if (fotoMode === 'ai' && createdItems.length) {
+    const styleKey = document.querySelector('input[name="import-photo-style"]:checked')?.value || 'warm'
+    const r = await generarFotosImportadas(createdItems, styleKey)
+    closeModal('modal-import-menu')
+    renderMenu()
+    showToast(`✅ ${created} platos importados · ${r.done} fotos generadas${r.fails ? ' (' + r.fails + ' fallaron, regenerables desde cada plato)' : ''}`, 'success')
+  } else {
+    closeModal('modal-import-menu')
+    renderMenu()
+    showToast(`✅ ${created} platos importados a la categoría "Importados"`, 'success')
+  }
   btn.disabled = false; btn.textContent = '✓ Importar todos los platos'
+}
+
+// Genera una foto IA por cada plato importado, la sube a Storage y la asocia.
+// Secuencial a propósito: no satura el worker y permite mostrar progreso.
+async function generarFotosImportadas(items, styleKey) {
+  const statusEl = document.getElementById('import-menu-status')
+  const total = items.length
+  let done = 0, fails = 0
+  for (const it of items) {
+    if (statusEl) {
+      statusEl.style.display = 'block'
+      statusEl.innerHTML = `<div style="text-align:center;padding:10px;font-size:13px;color:var(--muted)">
+        🎨 Generando fotos con IA… <b>${done + fails + 1} de ${total}</b><br>
+        <span style="font-size:11.5px">"${escHtml(it.name)}" — no cierres esta ventana</span></div>`
+    }
+    try {
+      const prompt = it.name + (it.description ? ', ' + it.description : '') + '. Comida argentina, plato de restaurante.'
+      const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/cf-ai/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt, style: styleKey }),
+      })
+      const data = await res.json()
+      if (!data.imageBase64) throw new Error('sin imagen')
+      const blob = await (await fetch(data.imageBase64)).blob()
+      const path = currentRestaurant.id + '/items/import-' + it.id + '.jpg'
+      const { error: upErr } = await supabase.storage.from('restaurant-images')
+        .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
+      if (upErr) throw upErr
+      const { data: urlData } = supabase.storage.from('restaurant-images').getPublicUrl(path)
+      await menuItems.update(it.id, { image_url: urlData.publicUrl })
+      const arr = menuItemsMap[it.category_id]
+      if (arr) menuItemsMap[it.category_id] = arr.map(x => x.id === it.id ? { ...x, image_url: urlData.publicUrl } : x)
+      done++
+    } catch (e) { fails++ }
+  }
+  return { done, fails }
 }
 
 window.openReservaModal = function () {

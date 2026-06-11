@@ -17,52 +17,111 @@
   <meta name="twitter:image" content="https://vitrinaapp.com.ar/og-image.png">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://vitrinaapp.com.ar/para-restaurantes.html">
-  <meta name="theme-color" content="#E8521A">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <meta name="theme-color" content="#141009">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fragment+Mono&display=swap" rel="stylesheet">
   <style>
+    /* Estética "Brasa de Domingo" — coherente con index.html */
+    :root {
+      --terra: #B85A30; --terra-dark: #9A4827; --terra-pale: #F4E8DF;
+      --ink: #1C1208; --ink-soft: #4A3828; --muted: #8A7A6A;
+      --cream: #FAF7F2; --border: #E8DDD0; --gold: #C8963C; --green: #3D8C5A;
+      --carbon: #141009; --carbon-2: #1E1710;
+      --cream-dim: rgba(250,247,242,.72); --cream-faint: rgba(250,247,242,.45);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: #FAF7F2; color: #1C1208; overflow-x: hidden; }
-    .nav { background: rgba(250,247,242,.95); backdrop-filter: blur(12px); border-bottom: 1px solid #E8DDD0; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; gap: 16px; }
-    .logo { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: #B85A30; text-decoration: none; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-    .nav-links { display: flex; gap: 22px; list-style: none; margin: 0; padding: 0; align-items: center; }
-    .nav-links a { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #4A3828; text-decoration: none; font-weight: 500; transition: color .15s; }
-    .nav-links a:hover { color: #B85A30; }
-    .nav-links a.active { color: #B85A30; font-weight: 600; }
-    .cta-nav { padding: 8px 18px; background: #B85A30; color: white; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600; flex-shrink: 0; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+    .mono { font-family: 'Fragment Mono', monospace; }
+
+    .nav { background: rgba(20,16,9,.85); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid rgba(250,247,242,.07); padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; gap: 16px; }
+    .logo { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; color: var(--cream); text-decoration: none; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; }
+    .nav-links a { font-size: 13.5px; color: var(--cream-dim); text-decoration: none; font-weight: 500; transition: color .15s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--cream); }
+    .cta-nav { padding: 8px 18px; background: var(--terra); color: white; border-radius: 9px; text-decoration: none; font-size: 13.5px; font-weight: 600; flex-shrink: 0; }
+    .cta-nav:hover { background: var(--terra-dark); }
     @media (max-width: 720px) { .nav-links { display: none; } }
-    .hero { padding: 80px 24px 64px; text-align: center; background: linear-gradient(160deg, #FAF7F2, #F4EDE4); }
-    .badge { display: inline-block; background: #F4E8DF; color: #B85A30; padding: 5px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-bottom: 20px; }
-    h1 { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.2rem, 5vw, 3.5rem); margin-bottom: 16px; line-height: 1.15; }
-    h1 em { font-style: normal; color: #B85A30; }
-    .sub { font-size: 16px; color: #4A3828; max-width: 540px; margin: 0 auto 32px; line-height: 1.7; }
+
+    /* Hero nocturno */
+    .hero {
+      position: relative; padding: 90px 24px 80px; text-align: center; color: var(--cream); overflow: hidden;
+      background: var(--carbon) url('https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/hero-poster.jpg') center/cover no-repeat;
+    }
+    .hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,16,9,.82) 0%, rgba(20,16,9,.9) 100%); }
+    .hero > * { position: relative; }
+    .badge { display: inline-block; font-family: 'Fragment Mono', monospace; font-size: 11.5px; letter-spacing: 2.5px; color: var(--gold); margin-bottom: 22px; }
+    h1 { font-family: 'Fraunces', serif; font-size: clamp(2.4rem, 5.5vw, 4rem); font-weight: 600; margin-bottom: 18px; line-height: 1.08; }
+    h1 em { font-style: italic; background: linear-gradient(92deg, var(--terra), var(--gold)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+    .sub { font-size: 16px; font-weight: 300; color: var(--cream-dim); max-width: 540px; margin: 0 auto 32px; line-height: 1.7; }
     .cta-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-    .btn-primary { padding: 13px 28px; background: #B85A30; color: white; border-radius: 10px; text-decoration: none; font-size: 15px; font-weight: 600; box-shadow: 0 4px 14px rgba(184,90,48,.3); transition: all .2s; display: inline-block; }
-    .btn-primary:hover { background: #9A4827; transform: translateY(-2px); }
-    .btn-ghost { padding: 13px 22px; border: 1.5px solid #E8DDD0; border-radius: 10px; text-decoration: none; font-size: 14px; font-weight: 500; color: #4A3828; display: inline-block; transition: all .2s; }
-    .btn-ghost:hover { border-color: #B85A30; color: #B85A30; }
-    .features { max-width: 1000px; margin: 0 auto; padding: 64px 24px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
-    .feat { background: white; border: 1px solid #E8DDD0; border-radius: 16px; padding: 24px; }
-    .feat-icon { font-size: 32px; margin-bottom: 14px; }
-    .feat h3 { font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-    .feat p { font-size: 14px; color: #8A7A6A; line-height: 1.6; }
-    .divider { height: 1px; background: #E8DDD0; margin: 0 24px; }
+    .btn-primary { padding: 14px 28px; background: var(--terra); color: white; border-radius: 11px; text-decoration: none; font-size: 15px; font-weight: 600; box-shadow: 0 6px 24px rgba(184,90,48,.4); transition: all .2s; display: inline-block; }
+    .btn-primary:hover { background: var(--terra-dark); transform: translateY(-2px); }
+    .btn-ghost { padding: 14px 22px; border: 1px solid rgba(250,247,242,.3); border-radius: 11px; text-decoration: none; font-size: 14px; font-weight: 500; color: var(--cream-dim); display: inline-block; transition: all .2s; }
+    .btn-ghost:hover { border-color: var(--cream-faint); color: var(--cream); }
+    .hero-trust { margin-top: 24px; font-family: 'Fragment Mono', monospace; font-size: 11px; letter-spacing: 1px; color: var(--cream-faint); }
+
+    /* Features editoriales (sin cards de emojis) */
+    .features { max-width: 1000px; margin: 0 auto; padding: 70px 24px 30px; display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; }
+    .feat { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 26px 24px; box-shadow: 0 10px 26px rgba(28,18,8,.05); }
+    .feat .feat-tag { font-family: 'Fragment Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--terra); display: block; margin-bottom: 10px; }
+    .feat h3 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; margin-bottom: 8px; color: var(--ink); }
+    .feat p { font-size: 13.5px; font-weight: 300; color: var(--ink-soft); line-height: 1.65; }
+
+    /* Banda de fotos reales del producto */
+    .fotos-strip { max-width: 1000px; margin: 0 auto; padding: 20px 24px 50px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    @media (max-width: 720px) { .fotos-strip { grid-template-columns: 1fr; } }
+    .fotos-strip figure { position: relative; border-radius: 14px; overflow: hidden; box-shadow: 0 14px 34px rgba(28,18,8,.14); }
+    .fotos-strip img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block; }
+    .fotos-strip figcaption { position: absolute; bottom: 10px; left: 10px; background: rgba(20,16,9,.78); color: var(--cream); font-family: 'Fragment Mono', monospace; font-size: 9.5px; letter-spacing: 1px; padding: 6px 10px; border-radius: 7px; }
+
+    .divider { height: 1px; background: var(--border); margin: 0 24px; }
+
+    /* Conexión Meta */
+    .meta-connect { max-width: 880px; margin: 0 auto; padding: 70px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; }
+    @media (max-width: 760px) { .meta-connect { grid-template-columns: 1fr; } }
+    .meta-connect h2 { font-family: 'Fraunces', serif; font-size: 1.9rem; font-weight: 600; line-height: 1.18; margin-bottom: 14px; }
+    .meta-connect p { font-size: 14.5px; font-weight: 300; color: var(--ink-soft); line-height: 1.7; margin-bottom: 12px; }
+    .meta-card { background: var(--carbon); border-radius: 18px; padding: 26px; color: var(--cream); box-shadow: 0 24px 56px rgba(28,18,8,.25); }
+    .meta-row { display: flex; align-items: center; gap: 13px; padding: 13px 0; border-bottom: 1px solid rgba(250,247,242,.08); }
+    .meta-row:last-child { border-bottom: none; }
+    .meta-row .ic { width: 38px; height: 38px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: rgba(250,247,242,.07); flex-shrink: 0; }
+    .meta-row .tt { font-size: 13.5px; font-weight: 600; }
+    .meta-row .dd { font-family: 'Fragment Mono', monospace; font-size: 10px; color: var(--cream-faint); letter-spacing: .5px; margin-top: 2px; }
+    .meta-row .ok { margin-left: auto; font-family: 'Fragment Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: var(--green); white-space: nowrap; }
+    .meta-nota { font-family: 'Fragment Mono', monospace; font-size: 10px; letter-spacing: .8px; color: var(--muted); margin-top: 14px; line-height: 1.6; }
+
+    /* Pasos */
     .flow { max-width: 800px; margin: 0 auto; padding: 64px 24px; }
-    .flow h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; text-align: center; margin-bottom: 40px; }
+    .flow h2 { font-family: 'Fraunces', serif; font-size: 2rem; font-weight: 600; text-align: center; margin-bottom: 40px; }
     .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px; }
     .step { text-align: center; }
-    .step-num { width: 44px; height: 44px; border-radius: 50%; background: #F4E8DF; color: #B85A30; font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .step-num { width: 44px; height: 44px; border-radius: 50%; background: var(--terra-pale); color: var(--terra); font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
     .step h4 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
-    .step p { font-size: 13px; color: #8A7A6A; line-height: 1.5; }
-    .pricing-banner { background: #1C1208; color: white; padding: 48px 24px; text-align: center; }
-    .pricing-banner h2 { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #e8c87a; margin-bottom: 12px; }
-    .pricing-banner p { font-size: 15px; color: rgba(255,255,255,.65); margin-bottom: 28px; line-height: 1.7; }
+    .step p { font-size: 13px; font-weight: 300; color: var(--muted); line-height: 1.55; }
+
+    /* FAQ */
+    .faq-wrap { max-width: 640px; margin: 0 auto; padding: 30px 24px 64px; }
+    .faq-wrap h2 { font-family: 'Fraunces', serif; font-size: 1.8rem; font-weight: 600; text-align: center; margin-bottom: 28px; }
+    .faq-wrap details { border-bottom: 1px solid var(--border); padding: 16px 0; }
+    .faq-wrap details:first-of-type { border-top: 1px solid var(--border); }
+    .faq-wrap summary { cursor: pointer; font-size: 14px; font-weight: 600; color: var(--ink); list-style: none; display: flex; justify-content: space-between; }
+    .faq-wrap summary span { color: var(--terra); }
+    .faq-wrap details p { margin-top: 10px; font-size: 13.5px; font-weight: 300; color: var(--ink-soft); line-height: 1.65; }
+
+    /* Banner de precios nocturno */
+    .pricing-banner { background: linear-gradient(180deg, var(--cream) 0%, #6e3a20 18%, var(--carbon) 55%); color: white; padding: 110px 24px 64px; text-align: center; }
+    .pricing-banner h2 { font-family: 'Fraunces', serif; font-size: 2.1rem; font-weight: 600; color: var(--gold); margin-bottom: 12px; }
+    .pricing-banner > p { font-size: 15px; font-weight: 300; color: var(--cream-dim); margin-bottom: 28px; line-height: 1.7; }
     .price-cards { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
-    .price-card { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); border-radius: 14px; padding: 20px 24px; min-width: 160px; text-align: center; }
-    .price-val { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: #e8c87a; margin-bottom: 4px; }
-    .price-label { font-size: 12px; color: rgba(255,255,255,.5); }
-    footer { padding: 24px; text-align: center; font-size: 13px; color: #8A7A6A; }
-    footer a { color: #B85A30; text-decoration: none; }
-    .sticky-cta { display: none; position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: #B85A30; z-index: 90; }
+    .price-card { background: rgba(250,247,242,.06); border: 1px solid rgba(250,247,242,.14); border-radius: 14px; padding: 20px 24px; min-width: 170px; text-align: center; }
+    .price-card.star { border-color: rgba(200,150,60,.5); }
+    .price-val { font-family: 'Fraunces', serif; font-size: 28px; font-weight: 600; color: var(--gold); margin-bottom: 4px; }
+    .price-label { font-family: 'Fragment Mono', monospace; font-size: 10.5px; color: var(--cream-faint); letter-spacing: .5px; line-height: 1.6; }
+
+    footer { background: var(--carbon); padding: 24px; text-align: center; font-size: 12.5px; color: var(--cream-faint); }
+    footer a { color: var(--gold); text-decoration: none; }
+    .sticky-cta { display: none; position: fixed; bottom: 0; left: 0; right: 0; padding: 12px 20px; background: var(--terra); z-index: 90; }
     .sticky-cta a { display: block; text-align: center; color: white; text-decoration: none; font-weight: 600; font-size: 15px; }
     @media (max-width: 640px) { .sticky-cta { display: block; } body { padding-bottom: 56px; } }
   </style>
@@ -77,30 +136,65 @@
   <ul class="nav-links">
     <li><a href="/">Inicio</a></li>
     <li><a href="/para-restaurantes.html" class="active">Restaurantes</a></li>
-    <li><a href="/para-comercios.html">Comercios</a></li>
-    <li><a href="/para-servicios.html">Servicios</a></li>
+    <li><a href="/demo.html">Demo</a></li>
     <li><a href="/precios.html">Precios</a></li>
   </ul>
   <a href="/panel.html" class="cta-nav">Empezar gratis →</a>
 </nav>
 
 <section class="hero">
-  <div class="badge">🍽️ Para restaurantes y bares</div>
+  <div class="badge">MENÚ · PEDIDOS · COCINA · MARKETING</div>
   <h1>Tu restaurante digital,<br><em>listo en 15 minutos</em></h1>
-  <p class="sub">Menú QR, pedidos online con MercadoPago, pantalla de cocina en tiempo real y Tano, el asistente que atiende a tus clientes.</p>
+  <p class="sub">Menú QR, pedidos online con MercadoPago, pantalla de cocina en tiempo real y Tano, el mozo IA que atiende a tus clientes en 3 idiomas.</p>
   <div class="cta-group">
     <a href="/panel.html" class="btn-primary">Probarlo 14 días gratis →</a>
-    <a href="/demo.html" class="btn-ghost">Ver demo 🍽️</a>
+    <a href="/demo.html" class="btn-ghost">Ver la demo en vivo</a>
   </div>
+  <div class="hero-trust">SIN TARJETA · SIN PERMANENCIA · SIN COMISIONES POR VENTA</div>
 </section>
 
 <div class="features">
-  <div class="feat"><div class="feat-icon">📱</div><h3>Menú QR por mesa</h3><p>Un QR único por mesa. El cliente lo escanea, ve el menú en su celular, elige y paga. En español, inglés y portugués.</p></div>
-  <div class="feat"><div class="feat-icon">🍳</div><h3>Cocina en tiempo real</h3><p>El pedido aparece en la pantalla de cocina en 2 segundos. Sin papel, sin llamados. Con alerta si algo tarda más de 20 minutos.</p></div>
-  <div class="feat"><div class="feat-icon">💬</div><h3>Tano, tu mozo IA</h3><p>Responde preguntas del menú, ingredientes y alérgenos. En 3 idiomas. Disponible mientras el local está abierto.</p></div>
-  <div class="feat"><div class="feat-icon">📅</div><h3>Reservas por WhatsApp</h3><p>Los clientes reservan mesa por WhatsApp. Confirmación automática y recordatorio 24hs antes. Vos no hacés nada.</p></div>
-  <div class="feat"><div class="feat-icon">💳</div><h3>Pagos con MercadoPago</h3><p>El cliente paga desde su celular antes de que llegue la cuenta. Sin contacto con la tarjeta, sin esperar al mozo.</p></div>
-  <div class="feat"><div class="feat-icon">📊</div><h3>Estadísticas reales</h3><p>Plato más pedido, horario pico, ticket promedio, ingresos por día. Datos de tu negocio, actualizados en tiempo real.</p></div>
+  <div class="feat"><span class="feat-tag">EL MENÚ</span><h3>QR por mesa, vivo</h3><p>El cliente escanea, ve el menú con fotos en su celular, pide y paga. En español, inglés y portugués automático.</p></div>
+  <div class="feat"><span class="feat-tag">LA COCINA</span><h3>Comandas en 2 segundos</h3><p>El pedido aparece en la pantalla de cocina al instante, con aviso sonoro. Sin papelitos, sin gritos, sin errores de mozo.</p></div>
+  <div class="feat"><span class="feat-tag">EL MOZO IA</span><h3>Tano nunca descansa</h3><p>Responde ingredientes, alérgenos y recomendaciones con la voz de tu equipo. Por el QR y por WhatsApp, 24/7.</p></div>
+  <div class="feat"><span class="feat-tag">LAS RESERVAS</span><h3>WhatsApp que se maneja solo</h3><p>Tus clientes reservan por WhatsApp, reciben confirmación automática y recordatorio 24hs antes. Vos no hacés nada.</p></div>
+  <div class="feat"><span class="feat-tag">LOS PAGOS</span><h3>MercadoPago directo a tu cuenta</h3><p>El cliente paga desde su celular sin esperar la cuenta. La plata va a TU MercadoPago — nosotros no tocamos un peso.</p></div>
+  <div class="feat"><span class="feat-tag">LOS NÚMEROS</span><h3>Tu negocio, en datos</h3><p>Plato más pedido, horario pico, ticket promedio, ingresos del día. Actualizado en tiempo real, sin planillas.</p></div>
+</div>
+
+<div class="fotos-strip">
+  <figure><img src="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/plato-bife.jpg" alt="Foto de plato generada con la IA de Vitrina" loading="lazy"><figcaption>FOTO GENERADA CON LA IA DE VITRINA</figcaption></figure>
+  <figure><img src="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/plato-pasta.jpg" alt="Foto de pasta generada con la IA de Vitrina" loading="lazy"><figcaption>100 FOTOS AL INICIAR + 20/MES</figcaption></figure>
+  <figure><img src="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/bodegon.jpg" alt="Salón de restaurante" loading="lazy"><figcaption>TU SALÓN, LLENO — ESE ES EL PLAN</figcaption></figure>
+</div>
+
+<div class="divider"></div>
+
+<!-- Conexión real con Meta -->
+<div class="meta-connect">
+  <div>
+    <h2>Conectado de verdad a tu Instagram y Facebook.</h2>
+    <p>Con los planes Marketing y Combo, conectás tus cuentas con el <b>login oficial de Meta Business</b> — el mismo botón azul de siempre, sin compartir tu contraseña con nadie.</p>
+    <p>Desde ahí, Viti publica en tu feed real, responde comentarios y reseñas, y lee tus métricas con permisos oficiales de Meta. Vos aprobás cada publicación hasta que le tengas confianza.</p>
+  </div>
+  <div class="meta-card">
+    <div class="meta-row">
+      <span class="ic">📸</span>
+      <div><div class="tt">Instagram Business</div><div class="dd">PUBLICACIONES + COMENTARIOS + MÉTRICAS</div></div>
+      <span class="ok">● OAUTH META</span>
+    </div>
+    <div class="meta-row">
+      <span class="ic">📘</span>
+      <div><div class="tt">Página de Facebook</div><div class="dd">POSTS + RESPUESTAS AUTOMÁTICAS</div></div>
+      <span class="ok">● OAUTH META</span>
+    </div>
+    <div class="meta-row">
+      <span class="ic">🔍</span>
+      <div><div class="tt">Google Business</div><div class="dd">RESEÑAS + BÚSQUEDAS + FICHA</div></div>
+      <span class="ok">● OAUTH GOOGLE</span>
+    </div>
+    <div class="meta-nota">PUBLICACIÓN AUTOMÁTICA EN IG/FB EN BETA PRIVADA: TE HABILITAMOS EN MENOS DE 24HS HÁBILES AL ACTIVAR TU PLAN.</div>
+  </div>
 </div>
 
 <div class="divider"></div>
@@ -109,41 +203,43 @@
   <h2>¿Cómo arrancás?</h2>
   <div class="steps">
     <div class="step"><div class="step-num">1</div><h4>Registrate con Google</h4><p>Un click, sin formularios largos.</p></div>
-    <div class="step"><div class="step-num">2</div><h4>Cargá el menú</h4><p>Con fotos, precios y categorías. O importá desde una foto del menú impreso.</p></div>
+    <div class="step"><div class="step-num">2</div><h4>Subí tu menú como esté</h4><p>El PDF de la imprenta o una foto de la carta: la IA lee los platos y precios sola. Y si querés, te genera las fotos.</p></div>
     <div class="step"><div class="step-num">3</div><h4>Imprimí los QR</h4><p>Un QR por mesa. Los ponés y ya.</p></div>
     <div class="step"><div class="step-num">4</div><h4>Recibís pedidos</h4><p>Los clientes piden, la cocina ve todo, vos cobrás.</p></div>
   </div>
 </div>
 
-<div style="max-width:640px;margin:0 auto;padding:48px 24px">
-  <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;text-align:center;margin-bottom:28px">Preguntas frecuentes</h2>
-  <div style="display:flex;flex-direction:column;gap:0;border-top:1px solid #E8DDD0">
-    <details style="border-bottom:1px solid #E8DDD0;padding:16px 0">
-      <summary style="cursor:pointer;font-size:14px;font-weight:600;color:#1C1208;list-style:none;display:flex;justify-content:space-between">¿Necesito instalar algo? <span style="color:#B85A30">+</span></summary>
-      <p style="margin-top:10px;font-size:13.5px;color:#8A7A6A;line-height:1.65">No. Todo funciona desde el navegador del celular del cliente. No hay app que descargar. Vos gestionás desde tu computadora o celular.</p>
-    </details>
-    <details style="border-bottom:1px solid #E8DDD0;padding:16px 0">
-      <summary style="cursor:pointer;font-size:14px;font-weight:600;color:#1C1208;list-style:none;display:flex;justify-content:space-between">¿Cuánto tarda en estar listo? <span style="color:#B85A30">+</span></summary>
-      <p style="margin-top:10px;font-size:13.5px;color:#8A7A6A;line-height:1.65">15 minutos para tener el primer QR activo. Cargas el menú, generás el QR y lo imprimís. Si tenés muchos platos, puede tardar más, pero el mismo día ya estás operativo.</p>
-    </details>
-    <details style="border-bottom:1px solid #E8DDD0;padding:16px 0">
-      <summary style="cursor:pointer;font-size:14px;font-weight:600;color:#1C1208;list-style:none;display:flex;justify-content:space-between">¿Puedo probarlo antes de pagar? <span style="color:#B85A30">+</span></summary>
-      <p style="margin-top:10px;font-size:13.5px;color:#8A7A6A;line-height:1.65">Sí. 14 días gratis con acceso completo al plan que elijas. Sin tarjeta de crédito. Si no te convence, no pagás nada.</p>
-    </details>
-  </div>
+<div class="faq-wrap">
+  <h2>Preguntas frecuentes</h2>
+  <details>
+    <summary>¿Necesito instalar algo? <span>+</span></summary>
+    <p>No. Todo funciona desde el navegador del celular del cliente. No hay app que descargar. Vos gestionás desde tu computadora o celular.</p>
+  </details>
+  <details>
+    <summary>¿Cuánto tarda en estar listo? <span>+</span></summary>
+    <p>15 minutos para tener el primer QR activo. Subís el PDF o una foto de tu carta, la IA carga los platos, generás el QR y lo imprimís. El mismo día ya estás operativo.</p>
+  </details>
+  <details>
+    <summary>¿Cómo se conecta con mi Instagram? <span>+</span></summary>
+    <p>Con el login oficial de Meta: tocás "Conectar Instagram" en el panel, te logueás con tu Facebook (el que administra tu página) y listo. Nunca te pedimos tu contraseña. La publicación automática está en beta privada: te habilitamos personalmente en menos de 24hs hábiles.</p>
+  </details>
+  <details>
+    <summary>¿Puedo probarlo antes de pagar? <span>+</span></summary>
+    <p>Sí. 14 días gratis con acceso completo, sin tarjeta de crédito. Si no te convence, no pagás nada.</p>
+  </details>
 </div>
 
 <div class="pricing-banner">
   <h2>Precios claros</h2>
   <p>Sin comisión sobre tus ventas. Precio fijo mensual en pesos al tipo de cambio oficial.</p>
   <div class="price-cards">
-    <div class="price-card"><div class="price-val" id="p-r1">$38k</div><div class="price-label">Solo Menú · USD 27/mes</div></div>
-    <div class="price-card"><div class="price-val" id="p-r3">$81k</div><div class="price-label">Marketing · USD 57/mes<br><span style="color:#e8c87a;font-size:10px">🎁 Al pagar: $10 USD para tu primera campaña con Viti</span></div></div>
-    <div class="price-card" style="border-color:rgba(200,168,74,.4)"><div class="price-val" id="p-r5">$99k</div><div class="price-label">Combo · USD 70/mes · <span style="color:#e8c87a;font-weight:600">Ahorrás USD 14</span><br><span style="color:#e8c87a;font-size:10px">🎁 Al pagar: $10 USD para tu primera campaña con Viti</span></div></div>
+    <div class="price-card"><div class="price-val" id="p-r1">$38k</div><div class="price-label">SOLO MENÚ · USD 27/MES</div></div>
+    <div class="price-card star"><div class="price-val" id="p-r5">$99k</div><div class="price-label">COMBO · USD 70/MES<br>AHORRÁS USD 14</div></div>
+    <div class="price-card"><div class="price-val" id="p-r3">$81k</div><div class="price-label">MARKETING · USD 57/MES</div></div>
   </div>
-  <p style="color:rgba(255,255,255,.5);font-size:12px;margin-bottom:8px">📱 WhatsApp Business incluido. Te asignamos un número exclusivo, lo activamos en 24hs y el asistente responde 24/7. Sin trámites con Meta.</p>
+  <p style="color:var(--cream-faint);font-size:12px;margin-bottom:18px">📱 WhatsApp Business incluido en todos los planes: número exclusivo, activado en 24hs, asistente 24/7. Sin trámites con Meta.</p>
   <a href="/panel.html" class="btn-primary">Empezar 14 días gratis →</a>
-  <p style="margin-top:16px;font-size:12px;color:rgba(255,255,255,.35)">Sin tarjeta · Sin contrato · Cancelás cuando querés</p>
+  <p style="margin-top:16px;font-size:12px;color:var(--cream-faint)">Sin tarjeta · Sin contrato · Cancelás cuando querés</p>
 </div>
 
 <footer>
