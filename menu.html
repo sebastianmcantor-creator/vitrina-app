@@ -827,9 +827,11 @@
       localStorage.removeItem(cartKey()); localStorage.removeItem(cartKey() + '_ts')
     }
     function syncTanoFab() {
-      const count = Object.values(cart).reduce((a,b) => a+b, 0)
+      // Bug QA: ocultaba a Tano cuando había items en el carrito — justo cuando
+      // el comensal más consulta (alergias, guarniciones) antes de confirmar.
+      // El fab ya vive en bottom:80px, arriba de la barra del carrito.
       const fab = document.getElementById('mozo-fab')
-      if (fab) fab.style.display = count > 0 ? 'none' : ''
+      if (fab) fab.style.display = ''
     }
 
     // ─── Cart ──────────────────────────────────────────────────────────────────

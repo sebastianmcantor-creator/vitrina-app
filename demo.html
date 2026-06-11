@@ -36,61 +36,85 @@
       min-height: 100vh;
     }
 
-    /* Banner */
+    /* Banner — carbón con acento brasa, a juego con la landing */
     .demo-banner {
-      background: linear-gradient(135deg, var(--terra), var(--sand));
-      color: white;
+      background: #141009;
+      color: rgba(250,247,242,.85);
       text-align: center;
-      padding: 0.7rem 1rem;
+      padding: 0.75rem 1rem;
       font-size: 0.8rem;
       font-weight: 500;
+      border-bottom: 1px solid rgba(200,150,60,.25);
     }
-    .demo-banner a { color: white; text-decoration: underline; }
+    .demo-banner a { color: #C8963C; text-decoration: underline; text-underline-offset: 3px; font-weight: 600; }
 
-    /* Header restaurante */
+    /* Header restaurante — foto real con overlay nocturno */
     .rest-header {
-      background: var(--brown);
-      color: white;
-      padding: 2rem 1.5rem 1.5rem;
-      text-align: center;
       position: relative;
+      color: white;
+      padding: 4.2rem 1.5rem 2.4rem;
+      text-align: center;
+      overflow: hidden;
+      background: #141009 url('https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/bodegon.jpg') center 40%/cover no-repeat;
     }
-    .rest-header .cover-emoji {
-      font-size: 3rem;
+    .rest-header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(20,16,9,.55) 0%, rgba(20,16,9,.72) 60%, rgba(20,16,9,.88) 100%);
+    }
+    .rest-header > * { position: relative; }
+    .rest-eyebrow {
       display: block;
-      margin-bottom: 0.5rem;
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      color: #C8963C;
+      margin-bottom: 0.7rem;
+      text-transform: uppercase;
     }
     .rest-header h1 {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 2rem;
-      font-weight: 700;
+      font-size: 2.7rem;
+      font-weight: 600;
       letter-spacing: 0.5px;
+      line-height: 1.05;
+      text-shadow: 0 2px 24px rgba(0,0,0,.45);
     }
     .rest-header p {
       font-size: 0.85rem;
-      opacity: 0.8;
-      margin-top: 0.3rem;
+      opacity: 0.85;
+      margin-top: 0.45rem;
+      font-weight: 300;
+      letter-spacing: 0.3px;
     }
     .rest-tags {
       display: flex;
       gap: 0.5rem;
       justify-content: center;
-      margin-top: 0.8rem;
+      margin-top: 1rem;
       flex-wrap: wrap;
     }
     .rest-tags span {
-      background: rgba(255,255,255,0.2);
-      padding: 0.2rem 0.7rem;
+      background: rgba(20,16,9,.45);
+      border: 1px solid rgba(250,247,242,.22);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 0.28rem 0.8rem;
       border-radius: 20px;
       font-size: 0.75rem;
     }
     .mesa-tag {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 8px;
-      padding: 0.4rem 1rem;
+      background: rgba(184,90,48,.32);
+      border: 1px solid rgba(200,150,60,.55);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      color: #F4E8DF;
+      border-radius: 10px;
+      padding: 0.45rem 1.1rem;
       font-size: 0.8rem;
-      margin-top: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-top: 1.1rem;
       display: inline-block;
     }
 
@@ -1347,7 +1371,7 @@
 
 <!-- Header -->
 <div class="rest-header">
-  <span class="cover-emoji">🏡</span>
+  <span class="rest-eyebrow">Restaurante · San Telmo</span>
   <h1>Casa Lucía</h1>
   <p>Cocina casera de autor · San Telmo, CABA</p>
   <div class="rest-tags">
@@ -1399,7 +1423,7 @@
     <div class="section-title">Para picar</div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-picar-1" data-prompt="rustic charcuterie board with sliced cured ham, salami, brie and manchego cheese, artisan bread slices, fig jam, wooden board, restaurant menu photography">🍖</div>
+      <div class="item-img-wrap" id="img-picar-1" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/picar-1.jpg" data-prompt="rustic charcuterie board with sliced cured ham, salami, brie and manchego cheese, artisan bread slices, fig jam, wooden board, restaurant menu photography">🍖</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tabla de fiambres y quesos</div>
@@ -1414,7 +1438,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-picar-2" data-prompt="three golden baked Argentine beef empanadas on white plate, crispy dough, professional food photography, top view">🥟</div>
+      <div class="item-img-wrap" id="img-picar-2" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/picar-2.jpg" data-prompt="three golden baked Argentine beef empanadas on white plate, crispy dough, professional food photography, top view">🥟</div>
       <div class="item-info">
         <div>
           <div class="item-name">Empanadas de carne (x3)</div>
@@ -1428,7 +1452,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-picar-3" data-prompt="melted grilled provolone cheese on black cast iron pan, oregano sprinkled on top, olive oil drizzle, bread slices on side, rustic restaurant style">🧀</div>
+      <div class="item-img-wrap" id="img-picar-3" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/picar-3.jpg" data-prompt="melted grilled provolone cheese on black cast iron pan, oregano sprinkled on top, olive oil drizzle, bread slices on side, rustic restaurant style">🧀</div>
       <div class="item-info">
         <div>
           <div class="item-name">Provoleta a la parrilla</div>
@@ -1443,7 +1467,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-picar-4" data-prompt="crispy fried calamari rings pile on white plate, served with aioli dip sauce and lemon wedge, golden batter, restaurant food photography">🦑</div>
+      <div class="item-img-wrap" id="img-picar-4" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/picar-4.jpg" data-prompt="crispy fried calamari rings pile on white plate, served with aioli dip sauce and lemon wedge, golden batter, restaurant food photography">🦑</div>
       <div class="item-info">
         <div>
           <div class="item-name">Rabas fritas</div>
@@ -1463,7 +1487,7 @@
     <div class="section-title">Pastas</div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-pastas-1" data-prompt="penne rigate pasta with rich slow-cooked beef ragu bolognese sauce, grated parmesan cheese on top, fresh basil leaves, white deep plate, Italian restaurant photography">🍝</div>
+      <div class="item-img-wrap" id="img-pastas-1" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/pastas-1.jpg" data-prompt="penne rigate pasta with rich slow-cooked beef ragu bolognese sauce, grated parmesan cheese on top, fresh basil leaves, white deep plate, Italian restaurant photography">🍝</div>
       <div class="item-info">
         <div>
           <div class="item-name">Penne Rigate con Ragú de Carne</div>
@@ -1478,7 +1502,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-pastas-2" data-prompt="potato gnocchi with vibrant green basil pesto sauce, toasted pistachios, shaved parmesan cheese, white plate, Italian restaurant close up food photography">🥔</div>
+      <div class="item-img-wrap" id="img-pastas-2" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/pastas-2.jpg" data-prompt="potato gnocchi with vibrant green basil pesto sauce, toasted pistachios, shaved parmesan cheese, white plate, Italian restaurant close up food photography">🥔</div>
       <div class="item-info">
         <div>
           <div class="item-name">Ñoquis al pesto de albahaca</div>
@@ -1493,7 +1517,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-pastas-3" data-prompt="fettuccine pasta in creamy white sauce with prosciutto ham strips, sauteed mushrooms, nutmeg, parmesan, elegant restaurant plate, warm lighting">🍜</div>
+      <div class="item-img-wrap" id="img-pastas-3" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/pastas-3.jpg" data-prompt="fettuccine pasta in creamy white sauce with prosciutto ham strips, sauteed mushrooms, nutmeg, parmesan, elegant restaurant plate, warm lighting">🍜</div>
       <div class="item-info">
         <div>
           <div class="item-name">Fettuccine crema y jamón</div>
@@ -1507,7 +1531,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-pastas-4" data-prompt="tagliatelle pasta with red sun-dried tomato pesto sauce, toasted almonds, ricotta cheese dollops, fresh arugula leaves, lemon zest, white plate restaurant photography">🍝</div>
+      <div class="item-img-wrap" id="img-pastas-4" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/pastas-4.jpg" data-prompt="tagliatelle pasta with red sun-dried tomato pesto sauce, toasted almonds, ricotta cheese dollops, fresh arugula leaves, lemon zest, white plate restaurant photography">🍝</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tallarines al pesto rojo</div>
@@ -1527,7 +1551,7 @@
     <div class="section-title">Principales</div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-principales-1" data-prompt="Argentine milanesa napolitana breaded veal cutlet topped with tomato sauce, melted ham and cheese, served with golden crispy french fries, restaurant plate, appetizing food photography">🥩</div>
+      <div class="item-img-wrap" id="img-principales-1" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/principales-1.jpg" data-prompt="Argentine milanesa napolitana breaded veal cutlet topped with tomato sauce, melted ham and cheese, served with golden crispy french fries, restaurant plate, appetizing food photography">🥩</div>
       <div class="item-info">
         <div>
           <div class="item-name">Milanesa napolitana con papas fritas</div>
@@ -1542,7 +1566,7 @@
     </div>
 
     <div class="menu-item" data-tags="tacc">
-      <div class="item-img-wrap" id="img-principales-2" data-prompt="thick juicy Argentine ribeye bife de chorizo steak grilled on barbecue, perfect grill marks, served with chimichurri sauce and mixed salad, restaurant food photography">🥩</div>
+      <div class="item-img-wrap" id="img-principales-2" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/principales-2.jpg" data-prompt="thick juicy Argentine ribeye bife de chorizo steak grilled on barbecue, perfect grill marks, served with chimichurri sauce and mixed salad, restaurant food photography">🥩</div>
       <div class="item-info">
         <div>
           <div class="item-name">Bife de chorizo a la parrilla</div>
@@ -1557,7 +1581,7 @@
     </div>
 
     <div class="menu-item" data-tags="">
-      <div class="item-img-wrap" id="img-principales-3" data-prompt="stuffed chicken breast supreme sliced open showing spinach and cream cheese filling, sauteed in clarified butter, served with rustic mashed potatoes, elegant plate restaurant photography">🍗</div>
+      <div class="item-img-wrap" id="img-principales-3" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/principales-3.jpg" data-prompt="stuffed chicken breast supreme sliced open showing spinach and cream cheese filling, sauteed in clarified butter, served with rustic mashed potatoes, elegant plate restaurant photography">🍗</div>
       <div class="item-info">
         <div>
           <div class="item-name">Suprema de pollo rellena</div>
@@ -1571,7 +1595,7 @@
     </div>
 
     <div class="menu-item" data-tags="tacc">
-      <div class="item-img-wrap" id="img-principales-4" data-prompt="fried hake fish fillet in light tempura batter, golden crispy, on bed of arugula with cherry tomatoes and lemon wedge, white plate, Mediterranean restaurant food photography">🐟</div>
+      <div class="item-img-wrap" id="img-principales-4" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/principales-4.jpg" data-prompt="fried hake fish fillet in light tempura batter, golden crispy, on bed of arugula with cherry tomatoes and lemon wedge, white plate, Mediterranean restaurant food photography">🐟</div>
       <div class="item-info">
         <div>
           <div class="item-name">Merluza romana</div>
@@ -1591,7 +1615,7 @@
     <div class="section-title">Postres</div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-postres-1" data-prompt="classic tiramisu served in individual glass cup, layers of mascarpone cream and coffee-soaked ladyfingers, cocoa powder dusted on top, elegant dessert photography, dark background">🍰</div>
+      <div class="item-img-wrap" id="img-postres-1" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/postres-1.jpg" data-prompt="classic tiramisu served in individual glass cup, layers of mascarpone cream and coffee-soaked ladyfingers, cocoa powder dusted on top, elegant dessert photography, dark background">🍰</div>
       <div class="item-info">
         <div>
           <div class="item-name">Tiramisú de la casa</div>
@@ -1609,7 +1633,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg">
-      <div class="item-img-wrap" id="img-postres-2" data-prompt="chocolate lava cake molten fondant cut open revealing liquid chocolate center flowing out, vanilla ice cream scoop on side, dark elegant plate, restaurant dessert photography">🍫</div>
+      <div class="item-img-wrap" id="img-postres-2" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/postres-2.jpg" data-prompt="chocolate lava cake molten fondant cut open revealing liquid chocolate center flowing out, vanilla ice cream scoop on side, dark elegant plate, restaurant dessert photography">🍫</div>
       <div class="item-info">
         <div>
           <div class="item-name">Volcán de chocolate</div>
@@ -1624,7 +1648,7 @@
     </div>
 
     <div class="menu-item" data-tags="veg tacc">
-      <div class="item-img-wrap" id="img-postres-3" data-prompt="homemade vanilla flan upturned on white plate with golden caramel sauce, dulce de leche drizzled on top, whipped cream, Argentine dessert restaurant food photography">🍮</div>
+      <div class="item-img-wrap" id="img-postres-3" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/postres-3.jpg" data-prompt="homemade vanilla flan upturned on white plate with golden caramel sauce, dulce de leche drizzled on top, whipped cream, Argentine dessert restaurant food photography">🍮</div>
       <div class="item-info">
         <div>
           <div class="item-name">Flan casero con dulce de leche</div>
@@ -1642,7 +1666,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-postres-4" data-prompt="colorful fresh seasonal fruit salad in elegant glass bowl, strawberries, kiwi, mango, blueberries, honey drizzle, fresh mint leaves, ginger, vibrant colors food photography">🍓</div>
+      <div class="item-img-wrap" id="img-postres-4" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/postres-4.jpg" data-prompt="colorful fresh seasonal fruit salad in elegant glass bowl, strawberries, kiwi, mango, blueberries, honey drizzle, fresh mint leaves, ginger, vibrant colors food photography">🍓</div>
       <div class="item-info">
         <div>
           <div class="item-name">Ensalada de frutas de estación</div>
@@ -1665,7 +1689,7 @@
     <div class="section-title">Bebidas</div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-1" data-prompt="clear sparkling mineral water bottle with condensation drops, glass with ice and lemon slice, white background, clean minimal beverage photography">💧</div>
+      <div class="item-img-wrap" id="img-bebidas-1" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/bebidas-1.jpg" data-prompt="clear sparkling mineral water bottle with condensation drops, glass with ice and lemon slice, white background, clean minimal beverage photography">💧</div>
       <div class="item-info">
         <div>
           <div class="item-name">Agua mineral</div>
@@ -1683,7 +1707,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-2" data-prompt="cold cola Coca-Cola drink in glass with ice cubes, condensation on glass, dark bubbling soda, restaurant beverage photography, close up">🥤</div>
+      <div class="item-img-wrap" id="img-bebidas-2" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/bebidas-2.jpg" data-prompt="cold cola Coca-Cola drink in glass with ice cubes, condensation on glass, dark bubbling soda, restaurant beverage photography, close up">🥤</div>
       <div class="item-info">
         <div>
           <div class="item-name">Gaseosa</div>
@@ -1701,7 +1725,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-3" data-prompt="elegant wine glass with deep red Malbec Argentine wine, swirling in glass, dark moody restaurant background, fine dining wine photography, bokeh lights">🍷</div>
+      <div class="item-img-wrap" id="img-bebidas-3" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/bebidas-3.jpg" data-prompt="elegant wine glass with deep red Malbec Argentine wine, swirling in glass, dark moody restaurant background, fine dining wine photography, bokeh lights">🍷</div>
       <div class="item-info">
         <div>
           <div class="item-name">Vino por copa</div>
@@ -1719,7 +1743,7 @@
     </div>
 
     <div class="menu-item" data-tags="vegan tacc">
-      <div class="item-img-wrap" id="img-bebidas-4" data-prompt="craft artisan beer pint glass with golden amber liquid, thick white foam head, condensation drops on glass, rustic bar background, appetizing beverage photography">🍺</div>
+      <div class="item-img-wrap" id="img-bebidas-4" data-img="https://zigtqvwerrtyuunayduh.supabase.co/storage/v1/object/public/restaurant-images/landing/demo/bebidas-4.jpg" data-prompt="craft artisan beer pint glass with golden amber liquid, thick white foam head, condensation drops on glass, rustic bar background, appetizing beverage photography">🍺</div>
       <div class="item-info">
         <div>
           <div class="item-name">Cerveza artesanal</div>
@@ -1995,9 +2019,11 @@ function renderCtrl(id) {
 }
 
 function syncTanoFab() {
-  var count = getCount();
+  // Bug QA: antes ocultaba a Tano cuando había items en el carrito — justo
+  // cuando el comensal más consulta. El solapamiento con la barra "Ver pedido"
+  // ya lo resuelve .with-cart-banner (sube el fab a bottom:96px).
   var fab = document.getElementById('tanoFab');
-  if (fab) fab.style.display = count > 0 ? 'none' : '';
+  if (fab) fab.style.display = '';
 }
 
 function addItem(id) {
@@ -2342,6 +2368,28 @@ async function generateImage(id) {
   if (!wrap) return;
   var prompt = wrap.getAttribute('data-prompt');
   if (!prompt) return;
+
+  // Primero la foto fija pre-generada (Supabase Storage): instantánea y
+  // consistente entre visitas. La generación con IA queda como fallback.
+  var fixedUrl = wrap.getAttribute('data-img');
+  if (fixedUrl) {
+    generatingQueue.add(id);
+    var okFija = await new Promise(function(resolve) {
+      var im = new Image();
+      im.onload = function() {
+        wrap.innerHTML = '';
+        wrap.appendChild(im);
+        wrap.classList.add('done');
+        requestAnimationFrame(function() { im.classList.add('ready'); });
+        resolve(true);
+      };
+      im.onerror = function() { resolve(false); };
+      im.alt = '';
+      im.src = fixedUrl;
+    });
+    generatingQueue.delete(id);
+    if (okFija) { generatedCache[id] = fixedUrl; return; }
+  }
 
   generatingQueue.add(id);
 
