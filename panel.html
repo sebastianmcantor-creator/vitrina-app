@@ -6024,14 +6024,25 @@ window.createRestaurant = async function () {
       website_url: website,
       wants_whatsapp: setupWAEnabled,
       trial_end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+      // El trial arranca activo y con pedidos habilitados desde el INSERT.
+      // No depende del worker (set-trial fallaba en silencio y la cuenta
+      // quedaba 'free' + can_take_orders=false: checkout del QR bloqueado).
+      subscription_status: 'trialing',
+      can_take_orders: true,
     })
 
-    // Setear trial_end en el worker (que tiene service key)
-    fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/restaurants/set-trial', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ restaurantId: currentRestaurant.id }),
-    }).catch(() => {})
+    // Setear trial_end + subscription_status='trialing' en el worker (service key).
+    // Va con el token del dueño: el worker valida owner_id (antes era admin-only → 403).
+    supabase.auth.getSession().then(({ data: { session } }) =>
+      fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/restaurants/set-trial', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(session ? { 'Authorization': 'Bearer ' + session.access_token } : {}),
+        },
+        body: JSON.stringify({ restaurantId: currentRestaurant.id }),
+      })
+    ).catch(() => {})
 
     restaurantList.push(currentRestaurant)
     try { localStorage.setItem('vitrina_last_restaurant', currentRestaurant.id) } catch {}
@@ -6039,6 +6050,9 @@ window.createRestaurant = async function () {
     renderRestSwitcher()
     fillForm(currentRestaurant)
     showSection('info')
+    // Re-evaluar el checklist con el negocio nuevo (bug QA: quedaba el del
+    // negocio anterior, con su terminología y sus ítems marcados)
+    renderGettingStarted()
     if (badgeChannel) { supabase.removeChannel(badgeChannel); badgeChannel = null }
     initPedidosBadge()
     updateAgendaBadge()
