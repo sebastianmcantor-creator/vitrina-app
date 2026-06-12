@@ -2633,15 +2633,19 @@ div:has(> #trial-banner-text) {
       <div class="card-title">📝 Crear plantilla</div>
       <div style="display:grid;gap:10px;max-width:520px">
         <input id="wa-tpl-name" placeholder="Nombre interno (ej: confirmacion_reserva)" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px">
-        <select id="wa-tpl-category" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px">
-          <option value="utility">Utility (operativa)</option>
-          <option value="marketing">Marketing</option>
-          <option value="authentication">Authentication</option>
+        <!-- Los values son las categorías oficiales de Meta/Twilio (no traducir).
+             "authentication" (códigos OTP) se omite: sin caso de uso gastronómico. -->
+        <select id="wa-tpl-category" onchange="waTplHint()" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px">
+          <option value="utility">📋 Aviso de servicio — pedidos, reservas y confirmaciones</option>
+          <option value="marketing">📣 Promoción — ofertas, eventos y novedades</option>
         </select>
-        <textarea id="wa-tpl-body" placeholder="Cuerpo del mensaje. Usá {{1}}, {{2}} para variables." rows="4" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px;resize:vertical"></textarea>
+        <div id="wa-tpl-hint" style="font-size:12px;color:var(--muted);background:var(--cream2);border-radius:8px;padding:9px 12px;line-height:1.55">
+          Para avisarle algo de su pedido o reserva: "tu pedido está listo", "te esperamos mañana a las 21hs". Es la opción más económica y Meta la aprueba fácil.
+        </div>
+        <textarea id="wa-tpl-body" placeholder="Texto del mensaje. Usá {{1}}, {{2}} donde va un dato que cambia. Ej: Hola {{1}}! Tu pedido está listo para retirar." rows="4" style="padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:13.5px;resize:vertical"></textarea>
         <button class="btn-secondary" onclick="waCreateTemplate()">Enviar a aprobación</button>
         <div style="font-size:12px;color:var(--muted)">
-          Las plantillas quedan en estado "pending" hasta que Twilio/Meta las apruebe (~24hs).
+          Meta revisa cada plantilla antes de habilitarla (~24hs). Te avisamos cuando esté aprobada y lista para usar.
         </div>
       </div>
     </div>
@@ -8081,6 +8085,16 @@ async function loadWaTemplates () {
   } catch (e) {
     el.innerHTML = '<div style="padding:20px;color:#c00">Error: ' + e.message + '</div>'
   }
+}
+
+// Ayuda contextual según el tipo de plantilla elegido
+window.waTplHint = function () {
+  const hint = document.getElementById('wa-tpl-hint')
+  if (!hint) return
+  const cat = document.getElementById('wa-tpl-category')?.value
+  hint.textContent = cat === 'marketing'
+    ? 'Para promocionar: descuentos, eventos, platos nuevos. Solo llega a clientes que aceptaron recibir promos, y descuenta de tus 50 campañas mensuales incluidas.'
+    : 'Para avisarle algo de su pedido o reserva: "tu pedido está listo", "te esperamos mañana a las 21hs". Es la opción más económica y Meta la aprueba fácil.'
 }
 
 window.waCreateTemplate = async function () {
