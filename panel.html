@@ -5002,45 +5002,41 @@ function renderSidebarRestaurant(rest) {
   const menuNavBtn = document.querySelector('[data-section="menu"]')
   if (menuNavBtn) menuNavBtn.innerHTML = menuNavBtn.innerHTML.replace('Menú', terms.menu)
 
-  // Mostrar/ocultar nav items según tipo de negocio
-  const reservasBtn = document.querySelector('[data-section="reservas"]')
-  const agendaBtn   = document.querySelector('[data-section="agenda"]')
-  const catalogoBtn = document.querySelector('[data-section="catalogo"]')
-  const mesasBtn    = document.querySelector('[data-section="mesas"]')
-  const verDemoBtn  = document.querySelector('a[href="/demo.html"]')
+  // Mostrar/ocultar nav items según tipo de negocio — DECLARATIVO.
+  // Cada cambio de negocio setea TODOS los condicionales (antes, secciones
+  // como Recordatorios quedaban "pegadas" al pasar de services a restaurant).
+  const esResto = btype === 'restaurant'
+  const esLocal = btype === 'local' || btype === 'ecommerce'
+  const esServ  = btype === 'services'
+  const navVis = btypeUnset ? {
+    reservas: false, agenda: false, mesas: false, catalogo: false,
+    reminders: false, etiquetas: false, proveedores: false,
+    'sales-agent': false, delivery: false, caja: false,
+  } : {
+    reservas:      esResto,
+    agenda:        esResto || esServ,
+    mesas:         esResto,
+    catalogo:      esLocal,
+    reminders:     esServ,             // recordatorios de visita (peluquería etc.)
+    etiquetas:     esLocal,
+    proveedores:   esLocal,
+    'sales-agent': esLocal,            // auto-respuestas MercadoLibre
+    delivery:      esResto || esLocal, // rentabilidad Rappi/PedidosYa
+    caja:          esResto || esLocal,
+  }
+  Object.entries(navVis).forEach(([section, visible]) => {
+    const btn = document.querySelector(`[data-section="${section}"]`)
+    if (btn) btn.style.display = visible ? 'flex' : 'none'
+  })
 
-  if (btypeUnset) {
-    // Tipo no elegido todavía: solo Información visible hasta que el dueño defina el tipo
-    if (reservasBtn) reservasBtn.style.display = 'none'
-    if (agendaBtn)   agendaBtn.style.display   = 'none'
-    if (catalogoBtn) catalogoBtn.style.display = 'none'
-    if (mesasBtn)    mesasBtn.style.display    = 'none'
-    if (verDemoBtn)  verDemoBtn.style.display  = 'none'
-  } else if (btype === 'local' || btype === 'ecommerce') {
-    if (reservasBtn) reservasBtn.style.display = 'none'
-    if (agendaBtn)   agendaBtn.style.display   = 'none'
-    if (catalogoBtn) catalogoBtn.style.display = 'flex'
-    if (mesasBtn)    mesasBtn.style.display    = 'none'
-    if (verDemoBtn)  verDemoBtn.style.display  = 'none'
-    const proveedoresBtn = document.getElementById('nav-proveedores')
-    if (proveedoresBtn) proveedoresBtn.style.display = 'flex'
-    const etiquetasBtn = document.getElementById('nav-etiquetas')
-    if (etiquetasBtn) etiquetasBtn.style.display = 'flex'
-  } else if (btype === 'services') {
-    if (reservasBtn) reservasBtn.style.display = 'none'
-    if (agendaBtn)   agendaBtn.style.display   = 'flex'
-    if (catalogoBtn) catalogoBtn.style.display = 'none'
-    if (mesasBtn)    mesasBtn.style.display    = 'none'
-    if (verDemoBtn)  { verDemoBtn.href = '/demo-servicios.html'; verDemoBtn.title = 'Ver demo de servicios' }
-    const remindersBtn = document.getElementById('nav-reminders')
-    if (remindersBtn) remindersBtn.style.display = 'flex'
-  } else {
-    // Restaurant: todo visible
-    if (reservasBtn) reservasBtn.style.display = 'flex'
-    if (agendaBtn)   agendaBtn.style.display   = 'flex'
-    if (catalogoBtn) catalogoBtn.style.display = 'none'
-    if (mesasBtn)    mesasBtn.style.display    = 'flex'
-    if (verDemoBtn)  { verDemoBtn.href = '/demo.html'; verDemoBtn.style.display = '' }
+  const verDemoBtn = document.querySelector('a[href="/demo.html"], a[href="/demo-servicios.html"]')
+  if (verDemoBtn) {
+    if (btypeUnset || esLocal) verDemoBtn.style.display = 'none'
+    else {
+      verDemoBtn.style.display = ''
+      verDemoBtn.href = esServ ? '/demo-servicios.html' : '/demo.html'
+      verDemoBtn.title = esServ ? 'Ver demo de servicios' : 'Ver demo'
+    }
   }
 
   // Adaptar Links Rápidos y QR según tipo de negocio
@@ -5791,11 +5787,12 @@ window.loadRestaurant = async function () {
     renderGettingStarted()
     initPedidosBadge()
     updateAgendaBadge()
-    // Restaurar última sección si existe
+    // Restaurar última sección si existe (salvo que esté oculta para este
+    // tipo de negocio — ej: Recordatorios guardada desde un negocio services)
     const lastSection = sessionStorage.getItem('vitrina_last_section')
     if (lastSection && lastSection !== 'setup' && document.getElementById('section-' + lastSection)) {
       const lastBtn = document.querySelector(`[data-section="${lastSection}"]`)
-      if (lastBtn) switchSection(lastSection, lastBtn)
+      if (lastBtn && getComputedStyle(lastBtn).display !== 'none') switchSection(lastSection, lastBtn)
     }
   } catch (e) {
     showToast('Error cargando restaurante: ' + e.message, 'error')
