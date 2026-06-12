@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html lang="es">
+<!-- translate="no": el traductor automático de Chrome mutilaba marcas
+     (Rappi → "rapero"). El panel es una app es-AR; no se auto-traduce. -->
+<html lang="es" translate="no">
 <head>
 <meta charset="UTF-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vitrina · Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:wght@400;500&family=Cormorant+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fragment+Mono&display=swap" rel="stylesheet">
@@ -14735,9 +14738,28 @@ function renderDeliveryChannelsTable () {
   const otroRow  = document.getElementById('delivery-channels-otro-row')
   const otroObj  = channels.find(c => c.id === 'otro')
 
+  // Los canales conocidos SIEMPRE muestran su nombre canónico (bug QA: una
+  // config guardada con "rapero" pisaba el nombre real). Solo "otro" es libre.
+  normalizarNombresCanales(channels)
+
+  // Chip de marca con inicial y color de cada plataforma
+  const BRAND_CHIP = {
+    propio:       ['V', '#B85A30', '#fff'],
+    rappi:        ['R', '#FF441F', '#fff'],
+    pedidosya:    ['P', '#E9043C', '#fff'],
+    mercadolibre: ['M', '#FFE600', '#1C1208'],
+  }
+  const chip = id => {
+    const b = BRAND_CHIP[id]
+    if (!b) return ''
+    return `<span style="display:inline-flex;width:22px;height:22px;border-radius:6px;background:${b[1]};color:${b[2]};font-size:12px;font-weight:800;align-items:center;justify-content:center;margin-right:8px;vertical-align:middle">${b[0]}</span>`
+  }
+
+  // translate="no": el traductor automático de Chrome convertía "Rappi" en
+  // "rapero" (bug QA — las marcas no se traducen)
   tbody.innerHTML = channels.filter(c => c.id !== 'otro').map(ch => `
     <tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:10px 10px;font-size:13.5px;font-weight:500;color:var(--ink)">${_escHtml(ch.name)}</td>
+      <td translate="no" style="padding:10px 10px;font-size:13.5px;font-weight:500;color:var(--ink)">${chip(ch.id)}${_escHtml(ch.name)}</td>
       <td style="padding:10px 10px;text-align:center">
         ${ch.id === 'propio'
           ? '<span style="font-size:13px;color:var(--muted)">0% (sin comisión)</span>'
@@ -14810,6 +14832,13 @@ window.onDeliveryChannelsToggle = function () {
 }
 
 // ─── Read current config from restaurant or localStorage ─────────────────────
+// Nombres oficiales de los canales conocidos — el dato guardado no los pisa
+function normalizarNombresCanales (channels) {
+  const CANON = { propio: 'App propia / QR', rappi: 'Rappi', pedidosya: 'PedidosYa', mercadolibre: 'MercadoLibre' }
+  ;(channels || []).forEach(c => { if (CANON[c.id]) c.name = CANON[c.id] })
+  return channels
+}
+
 function getDeliveryChannelsCfg () {
   if (currentRestaurant?.delivery_channels_config) return currentRestaurant.delivery_channels_config
   try {
@@ -14843,6 +14872,9 @@ function collectDeliveryChannelsForm () {
   const otroObj    = { id: 'otro', name: otroNombre, commission_pct: otroPct, active: otroActive }
   if (otroIdx >= 0) channels[otroIdx] = otroObj
   else              channels.push(otroObj)
+
+  // Autocura: al guardar, los nombres canónicos quedan corregidos en el dato
+  normalizarNombresCanales(channels)
 
   return { enabled, channels }
 }
