@@ -2002,6 +2002,7 @@ async function renderClients() {
             <a href="/panel.html" onclick="localStorage.setItem('maestro_view_rest','${r.id}')" target="_blank" style="font-size:12px;color:var(--terra);text-decoration:none;font-weight:500">Ver →</a>
             ${r.wants_whatsapp ? '<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;white-space:nowrap">📱 WA</span>' : ''}
             ${(r.subscription_status !== 'active' && r.subscription_status !== 'trialing') ? `<button onclick="activarCortesia('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;color:#92400e;font-family:'DM Sans',sans-serif;font-weight:600" title="Activar mes gratis">🎁 Cortesía</button>` : ''}
+            <button onclick="entrarComoSoporte('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:#e8f0fe;border:1px solid #4a90d9;border-radius:6px;cursor:pointer;color:#1a5fb4;font-family:'DM Sans',sans-serif;font-weight:600" title="Entrar al panel de este cliente para asistirlo">🛠 Soporte</button>
             <button onclick="deleteRestaurant('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid #ddd;border-radius:6px;cursor:pointer;color:#aaa;font-family:'DM Sans',sans-serif" title="Eliminar">🗑️</button>
           </td>
         </tr>
@@ -2157,6 +2158,25 @@ window.activarCortesia = async function (id, name) {
     await renderClients()
   } catch (e) {
     alert('Error: ' + e.message)
+  }
+}
+
+// Modo soporte: te agrega como staff (rol 'support') del restaurante del
+// cliente y abre su panel. Salís desde el banner que muestra el panel.
+// Requiere la policy staff_admin_all (migración 041).
+window.entrarComoSoporte = async function (id, name) {
+  if (!confirm(`🛠 ¿Entrar al panel de "${name}" como soporte?\n\nTe agrega temporalmente al equipo del restaurante para poder asistirlo.\nAcordate de salir desde el banner cuando termines.`)) return
+  try {
+    const { data: { user } } = await supabase.auth.getUser()
+    const { error } = await supabase.from('restaurant_staff').upsert(
+      { restaurant_id: id, user_id: user.id, role: 'support', invited_by: user.id },
+      { onConflict: 'restaurant_id,user_id' }
+    )
+    if (error) throw error
+    localStorage.setItem('vitrina_last_restaurant', id)
+    window.open('/panel.html', '_blank')
+  } catch (e) {
+    alert('Error: ' + e.message + '\n\n¿Corriste la migración 041 en Supabase?')
   }
 }
 
