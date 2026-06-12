@@ -954,12 +954,9 @@ heroTl
   .fromTo('#h-ctas',  { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .6, ease: 'power3.out' }, '-=.45')
   .to('#h-trust', { opacity: 1, duration: .6 }, '-=.3');
 
-/* ── Sonido: ambiente de restaurante + campanita de cocina ──
-   El ambiente (murmullo de sala, cubiertos, vasos) se genera con WebAudio:
-   sin archivos, sin licencias, loop imperceptible. Si algún día querés una
-   grabación real, subí /assets/ambiente-restaurante.mp3 y la usa sola. */
+/* ── Sonido: campanita de cocina al entrar cada comanda (WebAudio) ── */
 let soundOn = false;
-let actx = null, ambNodes = null, ambTimers = [], ambAudioEl = null;
+let actx = null;
 function audioCtx() {
   if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
   if (actx.state === 'suspended') actx.resume();
@@ -973,7 +970,7 @@ function bell() {
     [{ f: 523.25, s: 0, d: .15 }, { f: 659.25, s: .12, d: .15 }, { f: 783.99, s: .24, d: .3 }].forEach(n => {
       const o = c.createOscillator(), g = c.createGain();
       o.type = 'sine'; o.frequency.value = n.f;
-      g.gain.setValueAtTime(.13, c.currentTime + n.s);
+      g.gain.setValueAtTime(.14, c.currentTime + n.s);
       g.gain.exponentialRampToValueAtTime(.001, c.currentTime + n.s + n.d + .25);
       o.connect(g); g.connect(c.destination);
       o.start(c.currentTime + n.s); o.stop(c.currentTime + n.s + n.d + .3);
@@ -981,97 +978,13 @@ function bell() {
   } catch (e) {}
 }
 
-// Cubierto contra plato: dos parciales metálicos con decay rápido
-function clink(c, master) {
-  const t = c.currentTime + Math.random() * .03;
-  [2350 + Math.random() * 600, 3700 + Math.random() * 800].forEach((f, i) => {
-    const o = c.createOscillator(), g = c.createGain();
-    o.type = 'sine'; o.frequency.value = f;
-    g.gain.setValueAtTime(.0001, t);
-    g.gain.exponentialRampToValueAtTime(.045 / (i + 1), t + .006);
-    g.gain.exponentialRampToValueAtTime(.0001, t + .16 + Math.random() * .12);
-    o.connect(g); g.connect(master);
-    o.start(t); o.stop(t + .4);
-  });
-}
-
-// Vaso/copa apoyada: parcial más grave y redondo
-function glassTap(c, master) {
-  const t = c.currentTime;
-  const o = c.createOscillator(), g = c.createGain();
-  o.type = 'triangle'; o.frequency.value = 880 + Math.random() * 320;
-  g.gain.setValueAtTime(.0001, t);
-  g.gain.exponentialRampToValueAtTime(.03, t + .008);
-  g.gain.exponentialRampToValueAtTime(.0001, t + .35);
-  o.connect(g); g.connect(master);
-  o.start(t); o.stop(t + .5);
-}
-
-function startAmbience() {
-  try {
-    const c = audioCtx();
-    const master = c.createGain();
-    master.gain.setValueAtTime(0, c.currentTime);
-    master.gain.linearRampToValueAtTime(1, c.currentTime + 1.8); // fade in suave
-    master.connect(c.destination);
-
-    // Murmullo de sala: ruido marrón filtrado, con vaivén lento como
-    // conversaciones que suben y bajan
-    const len = c.sampleRate * 2;
-    const buf = c.createBuffer(1, len, c.sampleRate);
-    const d = buf.getChannelData(0);
-    let last = 0;
-    for (let i = 0; i < len; i++) { const w = Math.random() * 2 - 1; last = (last + .02 * w) / 1.02; d[i] = last * 3.5; }
-    const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
-    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 470; bp.Q.value = .7;
-    const g = c.createGain(); g.gain.value = .055;
-    const lfo = c.createOscillator(); lfo.frequency.value = .11;
-    const lfoG = c.createGain(); lfoG.gain.value = .022;
-    lfo.connect(lfoG); lfoG.connect(g.gain);
-    src.connect(bp); bp.connect(g); g.connect(master);
-    src.start(); lfo.start();
-    ambNodes = { master, src, lfo };
-
-    // Cubiertos y vasos a intervalos irregulares (como un salón de verdad)
-    const schedule = () => {
-      if (!soundOn) return;
-      Math.random() < .75 ? clink(c, master) : glassTap(c, master);
-      ambTimers.push(setTimeout(schedule, 1600 + Math.random() * 4400));
-    };
-    ambTimers.push(setTimeout(schedule, 1000));
-  } catch (e) {}
-}
-
-function stopAmbience() {
-  ambTimers.forEach(clearTimeout); ambTimers = [];
-  if (ambAudioEl) { try { ambAudioEl.pause(); } catch (e) {} ambAudioEl = null; }
-  if (ambNodes) {
-    const n = ambNodes; ambNodes = null;
-    try {
-      n.master.gain.linearRampToValueAtTime(0, audioCtx().currentTime + .5);
-      setTimeout(() => { try { n.src.stop(); n.lfo.stop(); n.master.disconnect(); } catch (e) {} }, 700);
-    } catch (e) {}
-  }
-}
-
 document.getElementById('sound-toggle').addEventListener('click', function () {
   soundOn = !soundOn;
   this.classList.toggle('on', soundOn);
   this.setAttribute('aria-pressed', soundOn);
   document.getElementById('st-icon').textContent = soundOn ? '🔔' : '🔕';
-  document.getElementById('st-label').textContent = soundOn ? 'SONIDO AMBIENTE: ON' : 'SONIDO AMBIENTE: OFF';
-  if (!soundOn) { stopAmbience(); return; }
-  // Si hay una grabación real subida al repo, usarla; si no, ambiente generado
-  fetch('/assets/ambiente-restaurante.mp3', { method: 'HEAD' })
-    .then(r => {
-      if (!soundOn) return;
-      if (r.ok) {
-        ambAudioEl = new Audio('/assets/ambiente-restaurante.mp3');
-        ambAudioEl.loop = true; ambAudioEl.volume = .22;
-        ambAudioEl.play().catch(() => { ambAudioEl = null; startAmbience(); });
-      } else startAmbience();
-    })
-    .catch(() => { if (soundOn) startAmbience(); });
+  document.getElementById('st-label').textContent = soundOn ? 'SONIDO DE COCINA: ON' : 'SONIDO DE COCINA: OFF';
+  if (soundOn) bell();
 });
 
 /* ── Ticket del hero: entra, se va, vuelve con otra comanda ── */
