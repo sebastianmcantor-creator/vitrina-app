@@ -114,7 +114,7 @@ El objetivo es no dejar al negocio completamente sin servicio de un día para el
 | Mensajes operativos WA | 150/mes | +50 mensajes | $2 USD |
 | Campañas marketing WA | 50/mes | +50 mensajes | $3 USD |
 | Tope marketing por línea (anti-baneo) | 500/mes | No extendible | — |
-| Fotos IA del menú | 100 al iniciar + 20/mes | +10 fotos | 1.000 ARS |
+| Fotos IA del menú | Ilimitadas | — | — |
 | Subtítulos Whisper | 10 videos/mes | +10 videos | $2 USD |
 | Publicaciones auto | 30/mes | +15 publicaciones | $3 USD |
 
