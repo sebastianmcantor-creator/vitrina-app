@@ -1725,6 +1725,11 @@ div:has(> #trial-banner-text) {
     </button>
 
     <div style="margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.06)">
+  <a href="/maestro.html" target="_blank" rel="noopener noreferrer" id="nav-maestro-link" style="display:none;align-items:center;gap:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;color:#D4A24C;text-decoration:none;border-radius:8px;transition:background .15s"
+     onmouseover="this.style.background='rgba(212,162,76,.10)'"
+     onmouseout="this.style.background=''">
+    <span style="font-size:14px">🎛️</span> Centro de control ↗
+  </a>
   <a href="mailto:contacto@vitrinaapp.com.ar" style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:13px;color:rgba(255,255,255,.4);text-decoration:none;border-radius:8px;transition:background .15s"
      onmouseover="this.style.background='rgba(255,255,255,.05)';this.style.color='rgba(255,255,255,.7)'"
      onmouseout="this.style.background='';this.style.color='rgba(255,255,255,.4)'">
@@ -4844,14 +4849,18 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     currentUser = await requireAuth('/login.html')
     renderUser(currentUser)
-    // Link al panel maestro solo para Sebastián
-    if (currentUser.email === 'sebastianmcantor@gmail.com') {
+    // Acceso al Centro de control (Panel Maestro) — solo administradores
+    const ADMIN_EMAILS = ['sebastianmcantor@gmail.com', 'contacto@vitrinaapp.com.ar']
+    if (ADMIN_EMAILS.includes((currentUser.email || '').toLowerCase())) {
+      // Link visible en el footer del sidebar
+      const maestroLink = document.getElementById('nav-maestro-link')
+      if (maestroLink) maestroLink.style.display = 'flex'
+      // Atajo extra: clic en el logo
       const logo = document.getElementById('sidebar-logo-wrap')
       if (logo) {
         logo.style.cursor = 'pointer'
-        logo.title = 'Panel Maestro'
+        logo.title = 'Centro de control'
         logo.addEventListener('click', () => { window.open('/maestro.html', '_blank') })
-        logo.insertAdjacentHTML('beforeend', '<div style="font-size:9px;color:rgba(255,255,255,.3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px">Maestro ↗</div>')
       }
     }
     // Guardar email en profiles para que sea buscable por otros dueños

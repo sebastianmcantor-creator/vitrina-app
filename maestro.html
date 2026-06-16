@@ -1189,15 +1189,16 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     currentUser = await requireAuth('/login.html')
 
-    // Verificar admin via worker — con fallback al email hardcodeado
-    const FALLBACK_ADMINS = ['sebastianmcantor@gmail.com']
-    let isAdmin = FALLBACK_ADMINS.includes(currentUser.email)
+    // Verificar admin via worker — con fallback a emails hardcodeados
+    const FALLBACK_ADMINS = ['sebastianmcantor@gmail.com', 'contacto@vitrinaapp.com.ar']
+    const adminEmail = (currentUser.email || '').toLowerCase()
+    let isAdmin = FALLBACK_ADMINS.includes(adminEmail)
 
     try {
       const adminCheck = await fetch(`https://vitrina-tano.vitrinaapp.workers.dev/api/admin/verify?email=${encodeURIComponent(currentUser.email)}`)
       if (adminCheck.ok) {
         const adminData = await adminCheck.json()
-        isAdmin = adminData.isAdmin || FALLBACK_ADMINS.includes(currentUser.email)
+        isAdmin = adminData.isAdmin || FALLBACK_ADMINS.includes(adminEmail)
       }
     } catch {
       // Si falla el worker, usar fallback
