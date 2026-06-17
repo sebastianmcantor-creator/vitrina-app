@@ -13176,6 +13176,7 @@ function closeNewPostModal() {
   document.getElementById('btn-enhance-img').style.display = 'none'
   var sg = document.getElementById('sug-img-gallery'); if (sg) sg.style.display = 'none'
   sugImagesLoaded = false
+  uploadedIsVideo = false
   // Resetear plataformas
   selectedPlatforms = ['instagram', 'facebook']
   document.getElementById('ptf-instagram').classList.add('active')
@@ -13188,17 +13189,23 @@ window.closeNewPostModal = closeNewPostModal
 function updatePreview() {
   var caption = document.getElementById('post-caption').value
   var imgUrl = uploadedImageUrl || document.getElementById('img-url-input').value.trim()
+  var isVid = /\.(mp4|mov|m4v|webm)(\?|$)/i.test(imgUrl || '')
   document.getElementById('caption-chars').textContent = caption.length
 
   var previewImg = document.getElementById('preview-image')
   var noImg = document.getElementById('preview-no-img')
-  if (imgUrl) {
+  if (imgUrl && !isVid) {
     previewImg.src = imgUrl
     previewImg.style.display = 'block'
     noImg.style.display = 'none'
+  } else if (isVid) {
+    previewImg.style.display = 'none'
+    noImg.style.display = 'flex'
+    noImg.innerHTML = '🎬<div style="font-size:12px;margin-top:6px;color:rgba(255,255,255,.6)">Video listo (Reel)</div>'
   } else {
     previewImg.style.display = 'none'
     noImg.style.display = 'flex'
+    noImg.innerHTML = '🖼️'
   }
   document.getElementById('preview-caption-text').textContent = caption || 'Tu texto aparecerá acá...'
 }
@@ -13378,6 +13385,38 @@ async function generarImagenIA() {
 }
 window.generarImagenIA = generarImagenIA
 
+// Subida de video propio (el cliente le pone música donde quiera y lo sube) -> se publica como Reel
+var uploadedIsVideo = false
+async function handleVideoUpload(input) {
+  var file = input.files[0]
+  if (!file || !currentRestaurant) return
+  if (file.size > 100 * 1024 * 1024) { alert('El video supera los 100MB'); input.value = ''; return }
+  var zone = document.getElementById('img-upload-zone')
+  zone.style.display = ''
+  zone.innerHTML = '⏳ Subiendo video…'
+  try {
+    var ext = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4'
+    var path = 'posts/' + currentRestaurant.id + '/video-' + Date.now() + '.' + ext
+    var up = await supabase.storage.from('restaurant-images').upload(path, file, { upsert: true, contentType: file.type || 'video/mp4' })
+    if (up.error) throw up.error
+    uploadedImageUrl = supabase.storage.from('restaurant-images').getPublicUrl(path).data.publicUrl
+    uploadedIsVideo = true
+    document.getElementById('img-url-input').value = ''
+    document.getElementById('btn-enhance-img').style.display = 'none'
+    document.getElementById('img-preview-thumb').style.display = 'none'
+    zone.style.display = 'none'
+    updatePreview()
+    showToast('🎬 Video cargado — se publica como Reel', 'success')
+  } catch (e) {
+    uploadedImageUrl = null; uploadedIsVideo = false
+    zone.innerHTML = '📷 Hacé clic para subir una imagen<br><span style="font-size:11px">JPG, PNG · Máx 8MB</span>'
+    zone.style.display = ''
+    alert('No se pudo subir el video: ' + (e.message || e))
+  }
+  input.value = ''
+}
+window.handleVideoUpload = handleVideoUpload
+
 async function submitPost(schedule) {
   if (!currentRestaurant) return
   var caption = document.getElementById('post-caption').value.trim()
@@ -13401,6 +13440,22 @@ async function submitPost(schedule) {
   btn.disabled = true
 
   try {
+    // Video -> se inserta directo en social_posts; el cron lo publica como Reel (procesamiento async)
+    if (/\.(mp4|mov|m4v|webm)(\?|$)/i.test(imageUrl || '')) {
+      var ins = await supabase.from('social_posts').insert({
+        restaurant_id: currentRestaurant.id,
+        caption: caption,
+        image_url: imageUrl,
+        platforms: ['instagram'],
+        scheduled_at: scheduledAt || new Date().toISOString(),
+        status: 'scheduled',
+      })
+      if (ins.error) throw ins.error
+      closeNewPostModal()
+      await loadPublicaciones()
+      showToast('🎬 Video en cola — se procesa y se publica como Reel en unos minutos', 'success')
+      return
+    }
     var res = await fetch(WORKER_URL + '/api/social/schedule-post', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -15625,6 +15680,8 @@ window.guardarVentasCanal = async function () {
             <button id="btn-ai-gen-img" onclick="generarImagenIA()" class="btn-primary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🎨 Generar imagen con IA</button>
             <button id="btn-sug-img" onclick="toggleImagenesSugeridas()" class="btn-secondary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🖼️ Mis imágenes</button>
           </div>
+          <button id="btn-upload-video" onclick="document.getElementById('video-file-input').click()" class="btn-secondary" style="width:100%;margin-top:8px;font-size:12.5px;padding:7px 12px">📹 Subir un video (se publica como Reel)</button>
+          <input type="file" id="video-file-input" accept="video/*" style="display:none" onchange="handleVideoUpload(this)">
           <div id="sug-img-gallery" style="display:none;margin-top:10px"></div>
         </div>
         <div class="post-form-field">
