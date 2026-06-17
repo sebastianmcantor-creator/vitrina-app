@@ -13315,7 +13315,7 @@ async function cargarImagenesSugeridas() {
   } catch (e) {}
   sugImagesLoaded = true
   if (!urls.length) {
-    g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px;line-height:1.5">Todavía no tenés fotos para sugerir. Subí fotos a tu menú/catálogo (sección Menú) o conectá Instagram, y van a aparecer acá automáticamente.</div>'
+    g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px;line-height:1.5">Todavía no tenés fotos cargadas. Usá <strong>🎨 Generar imagen con IA</strong> para crear una al instante, o subí fotos a tu menú/catálogo y van a aparecer acá.</div>'
     return
   }
   g.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Tocá una para usarla:</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px">' + urls.map(function(u) {
@@ -13335,6 +13335,48 @@ function usarImagenSugerida(url) {
   updatePreview()
 }
 window.usarImagenSugerida = usarImagenSugerida
+
+// Genera una imagen con IA (Cloudflare Flux) a partir de una descripción y la sube
+// a Storage para tener una URL pública (Instagram no acepta base64).
+async function generarImagenIA() {
+  if (!currentRestaurant) return
+  var base = (document.getElementById('post-caption').value || '').split('\n')[0].replace(/[#@]\S+/g, '').trim().slice(0, 90)
+  var sugerencia = base || ((currentRestaurant.name || 'mi negocio') + ' — imagen para redes')
+  var prompt = window.prompt('¿Qué imagen querés que genere la IA? (describila)', sugerencia)
+  if (!prompt) return
+  var btn = document.getElementById('btn-ai-gen-img')
+  btn.disabled = true
+  var orig = btn.textContent
+  btn.textContent = '🎨 Generando...'
+  try {
+    var res = await fetch(WORKER_URL + '/api/cf-ai/generate-image', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: prompt, style: 'marketing' })
+    })
+    var data = await res.json()
+    if (data.error || !data.imageBase64) throw new Error(data.error || 'No se generó la imagen')
+    // base64 -> blob -> Supabase Storage (URL pública)
+    var blob = await (await fetch(data.imageBase64)).blob()
+    var path = 'posts/' + currentRestaurant.id + '/ai-' + Date.now() + '.jpg'
+    var up = await supabase.storage.from('restaurant-images').upload(path, blob, { contentType: 'image/jpeg', upsert: true })
+    if (up.error) throw up.error
+    uploadedImageUrl = supabase.storage.from('restaurant-images').getPublicUrl(path).data.publicUrl
+    document.getElementById('img-upload-zone').style.display = 'none'
+    var thumb = document.getElementById('img-preview-thumb')
+    thumb.src = uploadedImageUrl
+    thumb.style.display = 'block'
+    document.getElementById('btn-enhance-img').style.display = ''
+    document.getElementById('img-url-input').value = ''
+    updatePreview()
+    showToast('🎨 Imagen generada con IA', 'success')
+  } catch (e) {
+    alert('No se pudo generar la imagen: ' + (e.message || e))
+  } finally {
+    btn.disabled = false
+    btn.textContent = orig
+  }
+}
+window.generarImagenIA = generarImagenIA
 
 async function submitPost(schedule) {
   if (!currentRestaurant) return
@@ -15579,7 +15621,10 @@ window.guardarVentasCanal = async function () {
           <button id="btn-enhance-img" onclick="enhanceUploadedImage()" class="btn-secondary" style="display:none;margin-top:8px;font-size:12.5px;padding:7px 12px">✨ Mejorar con IA</button>
           <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
           <input type="text" id="img-url-input" class="post-form-input" placeholder="O pegá una URL de imagen..." style="margin-top:8px" oninput="updatePreview()">
-          <button id="btn-sug-img" onclick="toggleImagenesSugeridas()" class="btn-secondary" style="margin-top:8px;font-size:12.5px;padding:7px 12px;width:100%">🖼️ Elegir de mis imágenes</button>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button id="btn-ai-gen-img" onclick="generarImagenIA()" class="btn-primary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🎨 Generar imagen con IA</button>
+            <button id="btn-sug-img" onclick="toggleImagenesSugeridas()" class="btn-secondary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🖼️ Mis imágenes</button>
+          </div>
           <div id="sug-img-gallery" style="display:none;margin-top:10px"></div>
         </div>
         <div class="post-form-field">
