@@ -13347,18 +13347,18 @@ window.usarImagenSugerida = usarImagenSugerida
 // a Storage para tener una URL pública (Instagram no acepta base64).
 async function generarImagenIA() {
   if (!currentRestaurant) return
-  var base = (document.getElementById('post-caption').value || '').split('\n')[0].replace(/[#@]\S+/g, '').trim().slice(0, 90)
-  var sugerencia = base || ((currentRestaurant.name || 'mi negocio') + ' — imagen para redes')
-  var prompt = window.prompt('¿Qué imagen querés que genere la IA? (describila)', sugerencia)
-  if (!prompt) return
+  // Viti diseña la imagen EN BASE AL POST (estrategia + marca + posts anteriores).
+  // Por eso necesita el texto del post primero — no es una imagen al azar.
+  var caption = (document.getElementById('post-caption').value || '').trim()
+  if (!caption) { alert('Primero escribí o elegí el texto del post. Viti diseña la imagen en base a eso, con estrategia — no es algo aleatorio.'); return }
   var btn = document.getElementById('btn-ai-gen-img')
   btn.disabled = true
   var orig = btn.textContent
-  btn.textContent = '🎨 Generando...'
+  btn.textContent = '🎨 Viti está diseñando...'
   try {
-    var res = await fetch(WORKER_URL + '/api/cf-ai/generate-image', {
+    var res = await fetch(WORKER_URL + '/api/marketing/post-image', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: prompt, style: 'marketing' })
+      body: JSON.stringify({ restaurantId: currentRestaurant.id, caption: caption })
     })
     var data = await res.json()
     if (data.error || !data.imageBase64) throw new Error(data.error || 'No se generó la imagen')
@@ -13368,6 +13368,7 @@ async function generarImagenIA() {
     var up = await supabase.storage.from('restaurant-images').upload(path, blob, { contentType: 'image/jpeg', upsert: true })
     if (up.error) throw up.error
     uploadedImageUrl = supabase.storage.from('restaurant-images').getPublicUrl(path).data.publicUrl
+    uploadedIsVideo = false
     document.getElementById('img-upload-zone').style.display = 'none'
     var thumb = document.getElementById('img-preview-thumb')
     thumb.src = uploadedImageUrl
@@ -13375,7 +13376,7 @@ async function generarImagenIA() {
     document.getElementById('btn-enhance-img').style.display = ''
     document.getElementById('img-url-input').value = ''
     updatePreview()
-    showToast('🎨 Imagen generada con IA', 'success')
+    showToast('🎨 Viti diseñó la imagen para este post', 'success')
   } catch (e) {
     alert('No se pudo generar la imagen: ' + (e.message || e))
   } finally {
