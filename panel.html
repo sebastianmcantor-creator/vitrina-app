@@ -3260,6 +3260,18 @@ div:has(> #trial-banner-text) {
           </div>
         </div>
 
+        <!-- ─── VITI: CALENDARIO CON IA (cerebro de agencia) ───── -->
+        <div class="card" id="card-viti-calendario" style="margin-top:20px">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <span>🪄 Viti — tu agencia de marketing</span>
+            <button class="btn-primary" style="font-size:13px;padding:8px 16px" onclick="vitiGenerarCalendario()" id="btn-viti-gen">✨ Armá mi mes con IA</button>
+          </div>
+          <p style="font-size:13.5px;color:var(--muted);margin:8px 0 0;line-height:1.5">
+            Viti analiza tu negocio y te arma un plan de publicaciones del mes — con el copy listo, la categoría y el <strong>por qué</strong> de cada post. Vos revisás, le ponés una foto y lo publicás con un clic.
+          </p>
+          <div id="viti-suggestions-list" style="margin-top:16px"></div>
+        </div>
+
         <!-- Calendario de contenido -->
         <div class="card" id="content-calendar-card" style="display:none">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
@@ -9420,24 +9432,10 @@ window.copyWhisperText = function () {
   navigator.clipboard.writeText(text).then(() => showToast('Texto copiado ✓', 'success'))
 }
 
+// Unificado: el modal viejo (scheduled_posts, daba "permission denied") redirige al
+// modal bueno (post-modal-overlay → /api/social/schedule-post → social_posts + cron).
 window.openCreatePostModal = function () {
-  // Set default date to tomorrow at 12:00
-  const tomorrow = new Date()
-  tomorrow.setDate(tomorrow.getDate() + 1)
-  tomorrow.setHours(12, 0, 0, 0)
-  const dateString = tomorrow.toISOString().slice(0, 16)
-  document.getElementById('post-scheduled-for').value = dateString
-
-  // Reset form
-  document.getElementById('post-caption').value = ''
-  document.getElementById('post-instagram').checked = true
-  document.getElementById('post-facebook').checked = true
-  document.getElementById('post-google').checked = false
-  document.getElementById('post-media-url-1').value = ''
-  document.getElementById('post-media-url-2').value = ''
-  document.getElementById('caption-char-count').textContent = '0'
-
-  openModal('modal-create-post')
+  if (typeof openNewPostModal === 'function') return openNewPostModal()
 }
 
 // Character counter para caption
@@ -13075,6 +13073,79 @@ async function cancelPost(postId) {
 }
 window.cancelPost = cancelPost
 
+// ── VITI: CALENDARIO CON IA (cerebro de agencia) ────────
+var vitiSuggestions = []
+
+async function vitiGenerarCalendario() {
+  if (!currentRestaurant) return
+  var btn = document.getElementById('btn-viti-gen')
+  btn.disabled = true
+  var orig = btn.textContent
+  btn.textContent = '⏳ Viti está pensando...'
+  var list = document.getElementById('viti-suggestions-list')
+  list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:30px;font-size:13.5px">🧠 Viti está armando tu calendario del mes…<br><span style="font-size:12px">(puede tardar unos segundos)</span></div>'
+  try {
+    var res = await fetch(WORKER_URL + '/api/marketing/generate-calendar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id, count: 12 })
+    })
+    var data = await res.json()
+    if (!data.ok) throw new Error(data.error || 'No se pudo generar')
+    vitiSuggestions = data.suggestions || []
+    renderVitiSuggestions()
+  } catch (e) {
+    list.innerHTML = '<div style="color:#ef4444;font-size:13px;padding:20px;text-align:center">No se pudo generar: ' + escHtml(e.message || String(e)) + '</div>'
+  } finally {
+    btn.disabled = false
+    btn.textContent = orig
+  }
+}
+window.vitiGenerarCalendario = vitiGenerarCalendario
+
+function renderVitiSuggestions() {
+  var list = document.getElementById('viti-suggestions-list')
+  if (!list) return
+  if (!vitiSuggestions.length) {
+    list.innerHTML = '<div style="text-align:center;color:var(--muted);padding:16px;font-size:13px">No quedan sugerencias. Tocá "Armá mi mes con IA" para generar un plan nuevo.</div>'
+    return
+  }
+  list.innerHTML = vitiSuggestions.map(function(s, i) {
+    var fecha = ''
+    try { fecha = s.suggested_date ? new Date(s.suggested_date + 'T12:00:00').toLocaleDateString('es-AR', { weekday: 'short', day: '2-digit', month: 'short' }) : '' } catch (e) {}
+    var cap = (s.caption || '')
+    return '<div style="border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px;background:var(--card)">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px">' +
+        '<span style="font-size:12px;font-weight:600;color:var(--terra)">📅 ' + escHtml(fecha) + '</span>' +
+        (s.category ? '<span style="font-size:10px;background:var(--cream2);color:var(--muted);padding:2px 8px;border-radius:20px">' + escHtml(s.category) + '</span>' : '') +
+      '</div>' +
+      '<div style="font-size:13px;font-weight:600;margin-bottom:4px">' + escHtml(s.topic || '') + '</div>' +
+      '<div style="font-size:12.5px;color:var(--ink-soft);white-space:pre-wrap;margin-bottom:8px;line-height:1.5">' + escHtml(cap.slice(0, 180)) + (cap.length > 180 ? '…' : '') + '</div>' +
+      (s.reasoning ? '<div style="font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:10px;line-height:1.45">💡 ' + escHtml(s.reasoning) + '</div>' : '') +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap">' +
+        '<button class="btn-primary" style="font-size:12px;padding:6px 12px" onclick="usarSugerencia(' + i + ')">📅 Usar este post</button>' +
+        '<button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="descartarSugerencia(' + i + ')">✕ Descartar</button>' +
+      '</div>' +
+    '</div>'
+  }).join('')
+}
+
+function usarSugerencia(i) {
+  var s = vitiSuggestions[i]
+  if (!s) return
+  openNewPostModal()
+  document.getElementById('post-caption').value = s.caption || ''
+  if (s.suggested_date) document.getElementById('post-date').value = s.suggested_date
+  document.getElementById('caption-chars').textContent = (s.caption || '').length
+  updatePreview()
+}
+window.usarSugerencia = usarSugerencia
+
+function descartarSugerencia(i) {
+  vitiSuggestions.splice(i, 1)
+  renderVitiSuggestions()
+}
+window.descartarSugerencia = descartarSugerencia
+
 // ── MODAL NUEVA PUBLICACIÓN ─────────────────────────────
 function openNewPostModal() {
   document.getElementById('post-modal-overlay').classList.add('open')
@@ -13139,20 +13210,72 @@ window.togglePlatform = togglePlatform
 
 async function handleImageUpload(input) {
   var file = input.files[0]
-  if (!file) return
-  // FileReader para preview local; en producción subir a Supabase Storage y usar URL pública
-  var reader = new FileReader()
-  reader.onload = function(e) {
-    uploadedImageUrl = e.target.result
-    document.getElementById('img-upload-zone').style.display = 'none'
+  if (!file || !currentRestaurant) return
+  if (file.size > 8 * 1024 * 1024) { alert('La imagen supera los 8MB'); input.value = ''; return }
+  var zone = document.getElementById('img-upload-zone')
+  zone.style.display = ''
+  zone.innerHTML = '⏳ Subiendo imagen...'
+  try {
+    // Subir a Supabase Storage para obtener una URL PÚBLICA (Instagram no acepta base64)
+    var ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
+    var path = 'posts/' + currentRestaurant.id + '/' + Date.now() + '.' + ext
+    var up = await supabase.storage.from('restaurant-images').upload(path, file, { upsert: true, contentType: file.type || 'image/jpeg' })
+    if (up.error) throw up.error
+    var pub = supabase.storage.from('restaurant-images').getPublicUrl(path)
+    uploadedImageUrl = pub.data.publicUrl
+    document.getElementById('img-url-input').value = ''
+    zone.style.display = 'none'
     var thumb = document.getElementById('img-preview-thumb')
-    thumb.src = e.target.result
+    thumb.src = uploadedImageUrl
     thumb.style.display = 'block'
+    document.getElementById('btn-enhance-img').style.display = ''
     updatePreview()
+  } catch (e) {
+    uploadedImageUrl = null
+    zone.innerHTML = '📷 Hacé clic para subir una imagen<br><span style="font-size:11px">JPG, PNG · Máx 8MB</span>'
+    zone.style.display = ''
+    alert('No se pudo subir la imagen: ' + (e.message || e))
   }
-  reader.readAsDataURL(file)
+  input.value = ''
 }
 window.handleImageUpload = handleImageUpload
+
+// Mejora la imagen ya subida con IA (upscaling vía Replicate). Requiere URL pública.
+async function enhanceUploadedImage() {
+  if (!uploadedImageUrl || uploadedImageUrl.startsWith('data:')) { alert('Primero subí una imagen'); return }
+  var btn = document.getElementById('btn-enhance-img')
+  btn.disabled = true
+  var orig = btn.textContent
+  btn.textContent = '✨ Mejorando...'
+  try {
+    var res = await fetch(WORKER_URL + '/api/replicate/enhance-image', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageUrl: uploadedImageUrl })
+    })
+    var data = await res.json()
+    if (data.error) throw new Error(data.error)
+    var output = data.output, id = data.id, tries = 0
+    while (!output && id && tries < 30) {
+      await new Promise(function(r) { setTimeout(r, 2000) })
+      var pr = await fetch(WORKER_URL + '/api/replicate/prediction/' + id)
+      var pd = await pr.json()
+      if (pd.status === 'succeeded') { output = pd.output; break }
+      if (pd.status === 'failed' || pd.status === 'canceled') throw new Error('La mejora falló')
+      tries++
+    }
+    if (!output) throw new Error('Tardó demasiado, probá de nuevo')
+    uploadedImageUrl = Array.isArray(output) ? output[0] : output
+    document.getElementById('img-preview-thumb').src = uploadedImageUrl
+    updatePreview()
+    showToast('✨ Imagen mejorada con IA', 'success')
+  } catch (e) {
+    alert('No se pudo mejorar la imagen: ' + (e.message || e))
+  } finally {
+    btn.disabled = false
+    btn.textContent = orig
+  }
+}
+window.enhanceUploadedImage = enhanceUploadedImage
 
 async function submitPost(schedule) {
   if (!currentRestaurant) return
@@ -15394,6 +15517,7 @@ window.guardarVentasCanal = async function () {
             <span style="font-size:11px">JPG, PNG · Máx 8MB</span>
           </div>
           <img id="img-preview-thumb" class="image-preview-thumb" alt="">
+          <button id="btn-enhance-img" onclick="enhanceUploadedImage()" class="btn-secondary" style="display:none;margin-top:8px;font-size:12.5px;padding:7px 12px">✨ Mejorar con IA</button>
           <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
           <input type="text" id="img-url-input" class="post-form-input" placeholder="O pegá una URL de imagen..." style="margin-top:8px" oninput="updatePreview()">
         </div>

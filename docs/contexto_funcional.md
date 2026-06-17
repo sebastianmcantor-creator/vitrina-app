@@ -16,6 +16,52 @@ Menú/catálogo QR con Tano (asistente IA), sistema de pedidos, pantalla de coci
 
 ---
 
+## Vitrina = el cerebro de una agencia de marketing profesional
+
+**Principio rector del producto.** Vitrina no es "una carta QR con redes". Para el negocio, **Viti piensa y trabaja como una agencia de marketing**: conoce el negocio (rubro, menú/catálogo, precios, temporada, eventos, datos de ventas), arma la estrategia, escribe el contenido, lo programa, lo publica y mide los resultados — todo en un solo lugar, sin que el dueño tenga que saber nada de marketing.
+
+### El Motor de Marketing (content engine)
+
+Una **única estructura** que une generación con IA, contenido propio del dueño y publicación automática:
+
+**1. Viti genera el plan mensual (el cerebro).**
+- Viti arma un **calendario mensual** de publicaciones (default ~3-4 posts/semana, ajustable) basado en: tipo de negocio, menú/catálogo, fechas relevantes (fines de semana, feriados, efemérides del rubro), y datos de performance previos.
+- Cada sugerencia incluye: **fecha sugerida**, **tema**, **copy listo** (en la voz del negocio), **categoría** (promoción / menú del día / evento / tip / detrás de escena / producto), **razón** ("por qué Viti sugiere este post" — qué objetivo cumple) y **recomendación táctica** (mejor horario, formato sugerido — foto/carrusel/reel —, y hashtags).
+- Se guarda en `content_calendar_suggestions` (estado `pending`).
+
+**2. El dueño revisa y decide (siempre valida Sebastián / el dueño).**
+- Ve el calendario visual del mes. Por cada post puede: **aceptar**, **editar el copy**, **cambiar la fecha/hora**, **rechazar**, o **regenerar** con IA.
+- Aplica la regla de **5 aprobaciones** (ver sección correspondiente): tras 5 aprobaciones seguidas, Viti ofrece programar el calendario solo.
+
+**3. Las imágenes — todo bajo la misma estructura.**
+Cada post puede tener su imagen por cualquiera de estas vías, intercambiables:
+- **Foto propia del dueño** (sube la suya).
+- **Foto propia mejorada con IA** (upscaling/calidad vía Replicate `/api/replicate/enhance-image`).
+- **Foto generada por la IA de Vitrina** (las "fotos IA" del menú/catálogo, ilimitadas).
+El dueño elige por post; la estructura del post (`scheduled_posts.media_urls`) es la misma sin importar el origen.
+
+**4. Se programa y se publica solo.**
+- Al aceptar, la sugerencia pasa a `scheduled_posts` (estado `scheduled`) con su fecha/hora.
+- Un **cron** publica los posts cuyo horario llegó, a las redes destino (Instagram primero; Facebook/Google cuando estén conectados), vía la API correspondiente. Marca `published` o `failed` con el motivo.
+
+**5. Se mide por post (estadísticas).**
+- Tras publicar, se registran las métricas por post (likes, comentarios, alcance/engagement) leídas de la API de la red.
+- Alimentan el informe y el próximo plan mensual de Viti (qué funcionó → más de eso).
+
+### Estado de implementación del motor
+
+| Pieza | Estado |
+|-------|--------|
+| Esquema BD (`scheduled_posts`, `content_templates`, `content_calendar_suggestions`) | ✅ migración 013 (+ grants 042) |
+| Conexión + publicación a Instagram (Instagram Login API, app `995611043196298`) | ✅ funcionando |
+| Generación del plan mensual con IA (`/api/marketing/generate-calendar`) | 🟢 en construcción |
+| Cron de auto-publicación de `scheduled_posts` | 🟢 en construcción |
+| Mejora de fotos con IA (`/api/replicate/enhance-image`) | ✅ existe, se integra al composer |
+| Calendario visual mensual en el panel | 🟢 en construcción |
+| Estadísticas por post | 🟢 en construcción |
+
+---
+
 ## Los dos asistentes IA
 
 ### Tano
