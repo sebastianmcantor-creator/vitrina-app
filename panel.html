@@ -13171,7 +13171,11 @@ function closeNewPostModal() {
   document.getElementById('caption-chars').textContent = '0'
   uploadedImageUrl = null
   document.getElementById('img-upload-zone').style.display = ''
+  document.getElementById('img-upload-zone').innerHTML = '📷 Hacé clic para subir una imagen<br><span style="font-size:11px">JPG, PNG · Máx 8MB</span>'
   document.getElementById('img-preview-thumb').style.display = 'none'
+  document.getElementById('btn-enhance-img').style.display = 'none'
+  var sg = document.getElementById('sug-img-gallery'); if (sg) sg.style.display = 'none'
+  sugImagesLoaded = false
   // Resetear plataformas
   selectedPlatforms = ['instagram', 'facebook']
   document.getElementById('ptf-instagram').classList.add('active')
@@ -13276,6 +13280,61 @@ async function enhanceUploadedImage() {
   }
 }
 window.enhanceUploadedImage = enhanceUploadedImage
+
+// Imágenes sugeridas: junta las fotos del menú/catálogo + los posts de Instagram conectado
+var sugImagesLoaded = false
+async function toggleImagenesSugeridas() {
+  var g = document.getElementById('sug-img-gallery')
+  if (g.style.display === 'none') {
+    g.style.display = 'block'
+    if (!sugImagesLoaded) await cargarImagenesSugeridas()
+  } else {
+    g.style.display = 'none'
+  }
+}
+window.toggleImagenesSugeridas = toggleImagenesSugeridas
+
+async function cargarImagenesSugeridas() {
+  var g = document.getElementById('sug-img-gallery')
+  g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px">Buscando tus imágenes…</div>'
+  var urls = []
+  try {
+    // 1) Fotos del menú/catálogo (URLs estables de Supabase)
+    var r1 = await supabase.from('menu_items').select('name,image_url').eq('restaurant_id', currentRestaurant.id).not('image_url', 'is', null).limit(40)
+    ;(r1.data || []).forEach(function(it) { if (it.image_url) urls.push({ url: it.image_url, label: it.name || '' }) })
+  } catch (e) {}
+  try {
+    // 2) Posts recientes de tu Instagram conectado
+    var res = await fetch(WORKER_URL + '/api/instagram/metrics?restaurant_id=' + currentRestaurant.id)
+    if (res.ok) {
+      var d = await res.json()
+      ;(d.recent_media || []).forEach(function(m) {
+        if (m.media_url && (m.media_type === 'IMAGE' || m.media_type === 'CAROUSEL_ALBUM')) urls.push({ url: m.media_url, label: 'Instagram' })
+      })
+    }
+  } catch (e) {}
+  sugImagesLoaded = true
+  if (!urls.length) {
+    g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px;line-height:1.5">Todavía no tenés fotos para sugerir. Subí fotos a tu menú/catálogo (sección Menú) o conectá Instagram, y van a aparecer acá automáticamente.</div>'
+    return
+  }
+  g.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Tocá una para usarla:</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px">' + urls.map(function(u) {
+    var safe = u.url.replace(/'/g, "\\'")
+    return '<img src="' + u.url + '" title="' + escHtml(u.label) + '" onclick="usarImagenSugerida(\'' + safe + '\')" style="width:72px;height:72px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .15s" onmouseover="this.style.borderColor=\'var(--terra)\'" onmouseout="this.style.borderColor=\'transparent\'">'
+  }).join('') + '</div>'
+}
+
+function usarImagenSugerida(url) {
+  uploadedImageUrl = url
+  document.getElementById('img-upload-zone').style.display = 'none'
+  var thumb = document.getElementById('img-preview-thumb')
+  thumb.src = url
+  thumb.style.display = 'block'
+  document.getElementById('btn-enhance-img').style.display = ''
+  document.getElementById('img-url-input').value = ''
+  updatePreview()
+}
+window.usarImagenSugerida = usarImagenSugerida
 
 async function submitPost(schedule) {
   if (!currentRestaurant) return
@@ -15520,6 +15579,8 @@ window.guardarVentasCanal = async function () {
           <button id="btn-enhance-img" onclick="enhanceUploadedImage()" class="btn-secondary" style="display:none;margin-top:8px;font-size:12.5px;padding:7px 12px">✨ Mejorar con IA</button>
           <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleImageUpload(this)">
           <input type="text" id="img-url-input" class="post-form-input" placeholder="O pegá una URL de imagen..." style="margin-top:8px" oninput="updatePreview()">
+          <button id="btn-sug-img" onclick="toggleImagenesSugeridas()" class="btn-secondary" style="margin-top:8px;font-size:12.5px;padding:7px 12px;width:100%">🖼️ Elegir de mis imágenes</button>
+          <div id="sug-img-gallery" style="display:none;margin-top:10px"></div>
         </div>
         <div class="post-form-field">
           <label class="post-form-label">Texto del post</label>
