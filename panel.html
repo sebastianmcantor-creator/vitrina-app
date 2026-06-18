@@ -13418,6 +13418,58 @@ async function handleVideoUpload(input) {
 }
 window.handleVideoUpload = handleVideoUpload
 
+// Genera un video corto (Reel) animando la imagen del post con IA (Kling). Async.
+async function generarVideoIA() {
+  if (!currentRestaurant) return
+  var baseImg = uploadedImageUrl
+  if (!baseImg || uploadedIsVideo || /\.(mp4|mov|m4v|webm)(\?|$)/i.test(baseImg)) {
+    alert('Primero poné una imagen (generala con "🎨 Generar imagen con IA" o subila). El video se crea animando esa imagen.')
+    return
+  }
+  var btn = document.getElementById('btn-ai-gen-video')
+  btn.disabled = true
+  var orig = btn.textContent
+  btn.textContent = '🎬 Iniciando...'
+  try {
+    var res = await fetch(WORKER_URL + '/api/marketing/generate-video', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id, imageUrl: baseImg })
+    })
+    var data = await res.json()
+    if (data.error || !data.predictionId) throw new Error(data.error || 'No se pudo iniciar el video')
+    var output = null, tries = 0
+    while (!output && tries < 60) {
+      await new Promise(function (r) { setTimeout(r, 5000) })
+      btn.textContent = '🎬 Generando... ' + (tries * 5) + 's'
+      var pr = await fetch(WORKER_URL + '/api/replicate/prediction/' + data.predictionId)
+      var pd = await pr.json()
+      if (pd.status === 'succeeded') { output = Array.isArray(pd.output) ? pd.output[0] : pd.output; break }
+      if (pd.status === 'failed' || pd.status === 'canceled') throw new Error('La generación del video falló')
+      tries++
+    }
+    if (!output) throw new Error('El video tardó demasiado, probá de nuevo')
+    btn.textContent = '🎬 Guardando...'
+    var vblob = await (await fetch(output)).blob()
+    var path = 'posts/' + currentRestaurant.id + '/ai-video-' + Date.now() + '.mp4'
+    var up = await supabase.storage.from('restaurant-images').upload(path, vblob, { contentType: 'video/mp4', upsert: true })
+    if (up.error) throw up.error
+    uploadedImageUrl = supabase.storage.from('restaurant-images').getPublicUrl(path).data.publicUrl
+    uploadedIsVideo = true
+    document.getElementById('img-upload-zone').style.display = 'none'
+    document.getElementById('img-preview-thumb').style.display = 'none'
+    document.getElementById('btn-enhance-img').style.display = 'none'
+    document.getElementById('img-url-input').value = ''
+    updatePreview()
+    showToast('🎬 Video generado con IA — se publicará como Reel', 'success')
+  } catch (e) {
+    alert('No se pudo generar el video: ' + (e.message || e))
+  } finally {
+    btn.disabled = false
+    btn.textContent = orig
+  }
+}
+window.generarVideoIA = generarVideoIA
+
 async function submitPost(schedule) {
   if (!currentRestaurant) return
   var caption = document.getElementById('post-caption').value.trim()
@@ -15681,7 +15733,10 @@ window.guardarVentasCanal = async function () {
             <button id="btn-ai-gen-img" onclick="generarImagenIA()" class="btn-primary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🎨 Generar imagen con IA</button>
             <button id="btn-sug-img" onclick="toggleImagenesSugeridas()" class="btn-secondary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🖼️ Mis imágenes</button>
           </div>
-          <button id="btn-upload-video" onclick="document.getElementById('video-file-input').click()" class="btn-secondary" style="width:100%;margin-top:8px;font-size:12.5px;padding:7px 12px">📹 Subir un video (se publica como Reel)</button>
+          <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+            <button id="btn-ai-gen-video" onclick="generarVideoIA()" class="btn-secondary" style="flex:1;min-width:140px;font-size:12.5px;padding:7px 12px">🎬 Generar video con IA</button>
+            <button id="btn-upload-video" onclick="document.getElementById('video-file-input').click()" class="btn-secondary" style="flex:1;min-width:140px;font-size:12.5px;padding:7px 12px">📹 Subir un video</button>
+          </div>
           <input type="file" id="video-file-input" accept="video/*" style="display:none" onchange="handleVideoUpload(this)">
           <div id="sug-img-gallery" style="display:none;margin-top:10px"></div>
         </div>
