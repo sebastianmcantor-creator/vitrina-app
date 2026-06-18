@@ -13129,13 +13129,25 @@ function renderVitiSuggestions() {
   }).join('')
 }
 
+function sanitizarCopy(txt) {
+  return (txt || '')
+    .replace(/\bal toque\b/gi, 'al instante')
+    .replace(/\btu tiempo es oro\b/gi, '')
+    .replace(/\bcorre por (nuestra|tu) cuenta\b/gi, 'lo hacemos nosotros')
+    .replace(/\bnos encargamos de todo\b/gi, 'lo resolvemos nosotros')
+    .replace(/\bdecile adiós a\b/gi, 'olvidate de')
+    .replace(/\bpotenciá tu negocio\b/gi, 'hacé crecer tu negocio')
+    .replace(/[ \t]{2,}/g, ' ').replace(/\s+([.,!?])/g, '$1').trim()
+}
+
 function usarSugerencia(i) {
   var s = vitiSuggestions[i]
   if (!s) return
+  var cap = sanitizarCopy(s.caption || '')
   openNewPostModal()
-  document.getElementById('post-caption').value = s.caption || ''
+  document.getElementById('post-caption').value = cap
   if (s.suggested_date) document.getElementById('post-date').value = s.suggested_date
-  document.getElementById('caption-chars').textContent = (s.caption || '').length
+  document.getElementById('caption-chars').textContent = cap.length
   updatePreview()
 }
 window.usarSugerencia = usarSugerencia
