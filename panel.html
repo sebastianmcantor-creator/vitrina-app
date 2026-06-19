@@ -13241,7 +13241,7 @@ async function handleImageUpload(input) {
   try {
     // Subir a Supabase Storage para obtener una URL PÚBLICA (Instagram no acepta base64)
     var ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg'
-    var path = 'posts/' + currentRestaurant.id + '/' + Date.now() + '.' + ext
+    var path = 'library/' + currentRestaurant.id + '/' + Date.now() + '.' + ext
     var up = await supabase.storage.from('restaurant-images').upload(path, file, { upsert: true, contentType: file.type || 'image/jpeg' })
     if (up.error) throw up.error
     var pub = supabase.storage.from('restaurant-images').getPublicUrl(path)
@@ -13315,45 +13315,96 @@ window.toggleImagenesSugeridas = toggleImagenesSugeridas
 
 async function cargarImagenesSugeridas() {
   var g = document.getElementById('sug-img-gallery')
-  g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px">Buscando tus imágenes…</div>'
-  var urls = []
+  g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px">Buscando tu biblioteca…</div>'
+  var items = []
+  // 1) Biblioteca de la empresa (todo lo que subiste/generaste — imágenes y videos)
   try {
-    // 1) Fotos del menú/catálogo (URLs estables de Supabase)
-    var r1 = await supabase.from('menu_items').select('name,image_url').eq('restaurant_id', currentRestaurant.id).not('image_url', 'is', null).limit(40)
-    ;(r1.data || []).forEach(function(it) { if (it.image_url) urls.push({ url: it.image_url, label: it.name || '' }) })
+    var lib = await supabase.storage.from('restaurant-images').list('library/' + currentRestaurant.id, { limit: 100, sortBy: { column: 'name', order: 'desc' } })
+    ;(lib.data || []).forEach(function(f) {
+      if (!f.name || f.name === '.emptyFolderPlaceholder') return
+      var url = supabase.storage.from('restaurant-images').getPublicUrl('library/' + currentRestaurant.id + '/' + f.name).data.publicUrl
+      items.push({ url: url, label: 'Tu biblioteca', isVideo: /\.(mp4|mov|m4v|webm)$/i.test(f.name) })
+    })
   } catch (e) {}
+  // 2) Fotos del menú/catálogo
   try {
-    // 2) Posts recientes de tu Instagram conectado
+    var r1 = await supabase.from('menu_items').select('name,image_url').eq('restaurant_id', currentRestaurant.id).not('image_url', 'is', null).limit(40)
+    ;(r1.data || []).forEach(function(it) { if (it.image_url) items.push({ url: it.image_url, label: it.name || 'Menú', isVideo: false }) })
+  } catch (e) {}
+  // 3) Posts recientes del Instagram conectado
+  try {
     var res = await fetch(WORKER_URL + '/api/instagram/metrics?restaurant_id=' + currentRestaurant.id)
     if (res.ok) {
       var d = await res.json()
       ;(d.recent_media || []).forEach(function(m) {
-        if (m.media_url && (m.media_type === 'IMAGE' || m.media_type === 'CAROUSEL_ALBUM')) urls.push({ url: m.media_url, label: 'Instagram' })
+        if (m.media_url && (m.media_type === 'IMAGE' || m.media_type === 'CAROUSEL_ALBUM')) items.push({ url: m.media_url, label: 'Instagram', isVideo: false })
       })
     }
   } catch (e) {}
   sugImagesLoaded = true
-  if (!urls.length) {
-    g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px;line-height:1.5">Todavía no tenés fotos cargadas. Usá <strong>🎨 Generar imagen con IA</strong> para crear una al instante, o subí fotos a tu menú/catálogo y van a aparecer acá.</div>'
+  if (!items.length) {
+    g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px;line-height:1.5">Tu biblioteca está vacía. Subí una foto o video, generá una imagen con IA, o cargá fotos al menú/catálogo — y quedan guardadas acá para reusar cuando quieras.</div>'
     return
   }
-  g.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Tocá una para usarla:</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px">' + urls.map(function(u) {
+  g.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Tu biblioteca — tocá uno para usarlo:</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px">' + items.map(function(u) {
     var safe = u.url.replace(/'/g, "\\'")
-    return '<img src="' + u.url + '" title="' + escHtml(u.label) + '" onclick="usarImagenSugerida(\'' + safe + '\')" style="width:72px;height:72px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .15s" onmouseover="this.style.borderColor=\'var(--terra)\'" onmouseout="this.style.borderColor=\'transparent\'">'
+    var base = 'width:72px;height:72px;border-radius:8px;cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .15s'
+    var ev = 'onclick="usarImagenSugerida(\'' + safe + '\')" onmouseover="this.style.borderColor=\'var(--terra)\'" onmouseout="this.style.borderColor=\'transparent\'"'
+    if (u.isVideo) {
+      return '<div title="Video" ' + ev + ' style="' + base + ';background:#1a1208;color:#e8c87a;display:flex;align-items:center;justify-content:center;font-size:24px">🎬</div>'
+    }
+    return '<img src="' + u.url + '" title="' + escHtml(u.label) + '" ' + ev + ' style="' + base + ';object-fit:cover">'
   }).join('') + '</div>'
 }
 
 function usarImagenSugerida(url) {
   uploadedImageUrl = url
+  uploadedIsVideo = /\.(mp4|mov|m4v|webm)(\?|$)/i.test(url)
   document.getElementById('img-upload-zone').style.display = 'none'
   var thumb = document.getElementById('img-preview-thumb')
-  thumb.src = url
-  thumb.style.display = 'block'
-  document.getElementById('btn-enhance-img').style.display = ''
+  if (uploadedIsVideo) {
+    thumb.style.display = 'none'
+    document.getElementById('btn-enhance-img').style.display = 'none'
+  } else {
+    thumb.src = url
+    thumb.style.display = 'block'
+    document.getElementById('btn-enhance-img').style.display = ''
+  }
   document.getElementById('img-url-input').value = ''
   updatePreview()
 }
 window.usarImagenSugerida = usarImagenSugerida
+
+// Viti mira la imagen cargada y escribe el post (visión)
+async function vitiEscribePost() {
+  if (!currentRestaurant) return
+  if (!uploadedImageUrl || uploadedIsVideo || /\.(mp4|mov|m4v|webm)(\?|$)/i.test(uploadedImageUrl)) {
+    alert('Primero poné una imagen (subila, elegila de tu biblioteca o generala con IA). Viti escribe el post mirando esa imagen.')
+    return
+  }
+  var btn = document.getElementById('btn-caption-from-img')
+  btn.disabled = true
+  var orig = btn.textContent
+  btn.textContent = '✍️ Viti está escribiendo...'
+  try {
+    var res = await fetch(WORKER_URL + '/api/marketing/caption-from-image', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id, imageUrl: uploadedImageUrl })
+    })
+    var data = await res.json()
+    if (data.error || !data.caption) throw new Error(data.error || 'No se pudo escribir el post')
+    document.getElementById('post-caption').value = data.caption
+    document.getElementById('caption-chars').textContent = data.caption.length
+    updatePreview()
+    showToast('✍️ Viti escribió el post para tu imagen', 'success')
+  } catch (e) {
+    alert('No se pudo escribir el post: ' + (e.message || e))
+  } finally {
+    btn.disabled = false
+    btn.textContent = orig
+  }
+}
+window.vitiEscribePost = vitiEscribePost
 
 // Genera una imagen con IA (Cloudflare Flux) a partir de una descripción y la sube
 // a Storage para tener una URL pública (Instagram no acepta base64).
@@ -13376,7 +13427,7 @@ async function generarImagenIA() {
     if (data.error || !data.imageBase64) throw new Error(data.error || 'No se generó la imagen')
     // base64 -> blob -> Supabase Storage (URL pública)
     var blob = await (await fetch(data.imageBase64)).blob()
-    var path = 'posts/' + currentRestaurant.id + '/ai-' + Date.now() + '.jpg'
+    var path = 'library/' + currentRestaurant.id + '/ai-' + Date.now() + '.jpg'
     var up = await supabase.storage.from('restaurant-images').upload(path, blob, { contentType: 'image/jpeg', upsert: true })
     if (up.error) throw up.error
     uploadedImageUrl = supabase.storage.from('restaurant-images').getPublicUrl(path).data.publicUrl
@@ -13409,7 +13460,7 @@ async function handleVideoUpload(input) {
   zone.innerHTML = '⏳ Subiendo video…'
   try {
     var ext = (file.name.split('.').pop() || 'mp4').toLowerCase().replace(/[^a-z0-9]/g, '') || 'mp4'
-    var path = 'posts/' + currentRestaurant.id + '/video-' + Date.now() + '.' + ext
+    var path = 'library/' + currentRestaurant.id + '/video-' + Date.now() + '.' + ext
     var up = await supabase.storage.from('restaurant-images').upload(path, file, { upsert: true, contentType: file.type || 'video/mp4' })
     if (up.error) throw up.error
     uploadedImageUrl = supabase.storage.from('restaurant-images').getPublicUrl(path).data.publicUrl
@@ -13462,7 +13513,7 @@ async function generarVideoIA() {
     if (!output) throw new Error('El video tardó demasiado, probá de nuevo')
     btn.textContent = '🎬 Guardando...'
     var vblob = await (await fetch(output)).blob()
-    var path = 'posts/' + currentRestaurant.id + '/ai-video-' + Date.now() + '.mp4'
+    var path = 'library/' + currentRestaurant.id + '/ai-video-' + Date.now() + '.mp4'
     var up = await supabase.storage.from('restaurant-images').upload(path, vblob, { contentType: 'video/mp4', upsert: true })
     if (up.error) throw up.error
     uploadedImageUrl = supabase.storage.from('restaurant-images').getPublicUrl(path).data.publicUrl
@@ -15751,6 +15802,7 @@ window.guardarVentasCanal = async function () {
           </div>
           <input type="file" id="video-file-input" accept="video/*" style="display:none" onchange="handleVideoUpload(this)">
           <div id="sug-img-gallery" style="display:none;margin-top:10px"></div>
+          <button id="btn-caption-from-img" onclick="vitiEscribePost()" class="btn-secondary" style="width:100%;margin-top:8px;font-size:12.5px;padding:7px 12px">✍️ Que Viti escriba el post para esta imagen</button>
         </div>
         <div class="post-form-field">
           <label class="post-form-label">Texto del post</label>
