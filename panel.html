@@ -8694,12 +8694,12 @@ window.showBetaGate = function (provider) {
       <div style="font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--ink,#1C1208)">Conectar Instagram y Facebook</div>
       <p style="font-size:13.5px;color:var(--ink-soft,#4A3828);line-height:1.6;margin:12px 0 18px">
         La publicación automática está en beta privada: te habilitamos personalmente
-        en menos de 24hs hábiles. Dejanos los datos del usuario de Facebook que
-        administra tu página y te mandamos la invitación.
+        en menos de 24hs hábiles. Dejanos tu usuario de Instagram (tiene que ser cuenta
+        <b>Business</b> o <b>Creator</b>) y te mandamos la invitación.
       </p>
-      <input id="beta-fb-name" placeholder="Nombre del usuario de Facebook *" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:10px;background:white">
-      <input id="beta-fb-email" placeholder="Email asociado a ese Facebook" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:10px;background:white">
-      <input id="beta-ig-handle" placeholder="@ de tu Instagram (opcional)" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:16px;background:white">
+      <input id="beta-ig-handle" placeholder="@ de tu Instagram *" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:10px;background:white">
+      <input id="beta-fb-email" placeholder="Email para avisarte (opcional)" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:10px;background:white">
+      <input id="beta-fb-name" placeholder="Tu nombre (opcional)" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:16px;background:white">
       <button id="beta-submit" style="width:100%;padding:13px;background:var(--terra,#B85A30);color:white;border:none;border-radius:11px;font-size:14.5px;font-weight:600;cursor:pointer">Pedir acceso a la beta</button>
       <button id="beta-already" style="width:100%;padding:11px;background:none;border:none;color:var(--muted,#8A7A6A);font-size:13px;cursor:pointer;margin-top:8px;text-decoration:underline">Ya me habilitaron → conectar ahora</button>
       <button id="beta-close" style="position:absolute;top:18px;right:22px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted,#8A7A6A)">✕</button>
@@ -8713,8 +8713,8 @@ window.showBetaGate = function (provider) {
     startMetaOAuth(provider)
   }
   document.getElementById('beta-submit').onclick = async () => {
-    const fbName = document.getElementById('beta-fb-name').value.trim()
-    if (!fbName) { showToast('Completá el nombre del usuario de Facebook.', 'error'); return }
+    const igHandle = document.getElementById('beta-ig-handle').value.trim()
+    if (!igHandle) { showToast('Completá tu usuario de Instagram.', 'error'); return }
     const btn = document.getElementById('beta-submit')
     btn.disabled = true; btn.textContent = 'Enviando…'
     try {
@@ -8724,9 +8724,9 @@ window.showBetaGate = function (provider) {
         body: JSON.stringify({
           restaurantId: currentRestaurant.id,
           restName: currentRestaurant.name,
-          fbName,
+          igHandle,
           fbEmail: document.getElementById('beta-fb-email').value.trim(),
-          igHandle: document.getElementById('beta-ig-handle').value.trim(),
+          fbName: document.getElementById('beta-fb-name').value.trim(),
         }),
       })
       ov.remove()
