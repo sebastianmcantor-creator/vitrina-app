@@ -3272,6 +3272,23 @@ div:has(> #trial-banner-text) {
           <div id="viti-suggestions-list" style="margin-top:16px"></div>
         </div>
 
+        <!-- ─── CAMPAÑA PAGA CON VITI (beta) ─────────────────── -->
+        <div class="card" id="card-viti-ads" style="margin-top:20px">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+            <span>💰 Campaña paga con Viti</span>
+            <span style="font-size:10px;background:var(--cream2);color:var(--muted);padding:3px 10px;border-radius:20px">BETA</span>
+          </div>
+          <p style="font-size:13.5px;color:var(--muted);margin:8px 0 14px;line-height:1.5">
+            Decile a Viti tu objetivo y tu presupuesto, y te arma la campaña de Meta Ads completa: audiencia, presupuesto diario, copy y creativo — lista para revisar.
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+            <input id="ads-goal" placeholder="¿Qué querés lograr? (ej: más reservas el finde)" style="flex:2;min-width:200px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13.5px">
+            <input id="ads-budget" type="number" placeholder="Presupuesto mensual $ (ARS)" style="flex:1;min-width:150px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13.5px">
+          </div>
+          <button class="btn-primary" style="font-size:13px;padding:8px 16px" onclick="vitiArmarCampania()" id="btn-viti-ads">💰 Armá mi campaña</button>
+          <div id="viti-ads-result" style="margin-top:16px"></div>
+        </div>
+
         <!-- Calendario de contenido -->
         <div class="card" id="content-calendar-card" style="display:none">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
@@ -13157,6 +13174,53 @@ function descartarSugerencia(i) {
   renderVitiSuggestions()
 }
 window.descartarSugerencia = descartarSugerencia
+
+// ── Campaña paga con Viti (plan de Meta Ads) ────────────
+async function vitiArmarCampania() {
+  if (!currentRestaurant) return
+  var goal = document.getElementById('ads-goal').value.trim()
+  if (!goal) { showToast('Escribí qué querés lograr con la campaña.', 'error'); return }
+  var budget = parseInt(document.getElementById('ads-budget').value, 10) || null
+  var btn = document.getElementById('btn-viti-ads')
+  btn.disabled = true
+  var orig = btn.textContent
+  btn.textContent = '⏳ Viti está armando la campaña...'
+  var box = document.getElementById('viti-ads-result')
+  box.innerHTML = '<div style="text-align:center;color:var(--muted);padding:20px;font-size:13.5px">Viti está diseñando la campaña…</div>'
+  try {
+    var res = await fetch(WORKER_URL + '/api/marketing/ads-campaign-plan', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id, goal: goal, monthlyBudgetArs: budget })
+    })
+    var data = await res.json()
+    if (!data.ok || !data.plan) throw new Error(data.error || 'No se pudo armar la campaña')
+    box.innerHTML = renderCampaniaPlan(data.plan)
+  } catch (e) {
+    box.innerHTML = '<div style="color:#ef4444;font-size:13px;padding:16px;text-align:center">No se pudo armar: ' + escHtml(e.message || String(e)) + '</div>'
+  } finally {
+    btn.disabled = false
+    btn.textContent = orig
+  }
+}
+window.vitiArmarCampania = vitiArmarCampania
+
+function renderCampaniaPlan(p) {
+  var a = p.audiencia || {}, b = p.presupuesto || {}, c = p.creativo || {}
+  function row(label, val) { return val ? '<div style="margin-bottom:9px"><span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">' + label + '</span><div style="font-size:13.5px;line-height:1.4">' + escHtml(String(val)) + '</div></div>' : '' }
+  return '<div style="border:1px solid var(--border);border-radius:12px;padding:16px;background:var(--card)">' +
+    row('Objetivo de Meta', (p.objetivo_meta || '') + (p.por_que_objetivo ? ' — ' + p.por_que_objetivo : '')) +
+    row('Audiencia', [a.ubicacion, a.radio_km ? ('radio ' + a.radio_km + ' km') : '', a.edad ? ('edad ' + a.edad) : '', a.genero, (a.intereses || []).join(', ')].filter(Boolean).join(' · ')) +
+    row('Presupuesto', (b.diario_ars ? ('$' + b.diario_ars + '/día') : '') + (b.duracion_dias ? (' × ' + b.duracion_dias + ' días') : '') + (b.total_ars ? (' = $' + b.total_ars + ' total') : '')) +
+    row('Formato', c.formato) +
+    row('Qué mostrar', c.direccion) +
+    (c.texto_principal ? '<div style="margin-bottom:9px"><span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Copy del anuncio</span><div style="font-size:13.5px;white-space:pre-wrap;background:var(--cream2);padding:10px;border-radius:8px;margin-top:4px;line-height:1.45">' + escHtml(c.texto_principal) + '</div></div>' : '') +
+    row('Titular', c.titular) +
+    row('Botón (CTA)', c.cta) +
+    row('Resultado esperado', p.metricas_esperadas) +
+    (p.tip ? '<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:8px">💡 ' + escHtml(p.tip) + '</div>' : '') +
+    '<div style="margin-top:14px;font-size:12px;color:var(--muted);border-top:1px solid var(--border);padding-top:10px">⚠️ Por ahora Viti te arma el plan. <b>Ejecutarla en Meta</b> (con tu cuenta de anuncios) es la próxima etapa.</div>' +
+  '</div>'
+}
 
 // ── MODAL NUEVA PUBLICACIÓN ─────────────────────────────
 function openNewPostModal() {
