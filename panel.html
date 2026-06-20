@@ -13470,6 +13470,46 @@ async function vitiEscribePost() {
 }
 window.vitiEscribePost = vitiEscribePost
 
+// Trae imágenes e info de la web del negocio para usarlas en posts
+async function importarDeWeb() {
+  if (!currentRestaurant) return
+  var urlWeb = window.prompt('Pegá la URL de tu página web (o carta online) para traer imágenes e info:', currentRestaurant.website_url || 'https://')
+  if (!urlWeb || urlWeb.trim() === 'https://' || !urlWeb.trim()) return
+  var btn = document.getElementById('btn-import-web')
+  btn.disabled = true
+  var orig = btn.textContent
+  btn.textContent = '🌐 Trayendo...'
+  try {
+    var res = await fetch(WORKER_URL + '/api/marketing/import-from-web', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ websiteUrl: urlWeb.trim() })
+    })
+    var data = await res.json()
+    if (!data.ok) throw new Error(data.error || 'No se pudo traer la info')
+    var g = document.getElementById('sug-img-gallery')
+    g.style.display = 'block'
+    sugImagesLoaded = true
+    var imgs = data.images || []
+    if (!imgs.length) {
+      g.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:10px;line-height:1.5">No encontré imágenes en esa página (puede ser un sitio que carga con JavaScript). Si tenés la info de texto, igual la usé para las ideas de posts.</div>'
+    } else {
+      g.innerHTML = '<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Imágenes de tu web — tocá una para usarla:</div><div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:6px">' + imgs.map(function (u) {
+        var safe = u.replace(/'/g, "\\'")
+        return '<img src="' + u + '" onclick="usarImagenSugerida(\'' + safe + '\')" style="width:72px;height:72px;object-fit:cover;border-radius:8px;cursor:pointer;flex-shrink:0;border:2px solid transparent;transition:border-color .15s" onmouseover="this.style.borderColor=\'var(--terra)\'" onmouseout="this.style.borderColor=\'transparent\'">'
+      }).join('') + '</div>'
+    }
+    var temas = (data.data && data.data.temas_para_posts) || []
+    var nItems = ((data.data && data.data.items) || []).length
+    showToast('🌐 Traje ' + imgs.length + ' imágenes' + (nItems ? ' y ' + nItems + ' productos' : '') + ' de tu web' + (temas.length ? '. Ideas: ' + temas.slice(0, 2).join(' · ') : ''), 'success')
+  } catch (e) {
+    alert('No se pudo traer de la web: ' + (e.message || e))
+  } finally {
+    btn.disabled = false
+    btn.textContent = orig
+  }
+}
+window.importarDeWeb = importarDeWeb
+
 // Genera una imagen con IA (Cloudflare Flux) a partir de una descripción y la sube
 // a Storage para tener una URL pública (Instagram no acepta base64).
 async function generarImagenIA() {
@@ -15859,6 +15899,7 @@ window.guardarVentasCanal = async function () {
           <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
             <button id="btn-ai-gen-img" onclick="generarImagenIA()" class="btn-primary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🎨 Generar imagen con IA</button>
             <button id="btn-sug-img" onclick="toggleImagenesSugeridas()" class="btn-secondary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🖼️ Mis imágenes</button>
+            <button id="btn-import-web" onclick="importarDeWeb()" class="btn-secondary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🌐 Traer de mi web</button>
           </div>
           <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
             <button id="btn-ai-gen-video" onclick="generarVideoIA()" class="btn-secondary" style="flex:1;min-width:140px;font-size:12.5px;padding:7px 12px">🎬 Generar video con IA</button>
