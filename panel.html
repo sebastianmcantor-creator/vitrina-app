@@ -1840,10 +1840,10 @@ div:has(> #trial-banner-text) {
               <path d="M2.5 8 Q9 1 15.5 8" stroke="#B85A30" stroke-width="2.5" fill="none" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="setup-title">Creá tu restaurante</div>
-          <div class="setup-subtitle">Vitrina está enfocado 100% en gastronomía: menú QR, pedidos, cocina, reservas y marketing con IA.</div>
-          <!-- Lanzamiento restaurante-only: las cards de local/services/ecommerce
-               quedan ocultas (display:none). Para reactivar rubros, sacar el style. -->
+          <div class="setup-title">Creá tu negocio</div>
+          <div class="setup-subtitle">Elegí tu rubro y adaptamos todo el panel: menú QR y pedidos para gastronomía, o catálogo, MercadoLibre, Tienda Nube y links de pago para comercios y ventas online.</div>
+          <!-- Rubros activos: restaurante, local/comercio y vendedor online.
+               'services' (turnos) queda oculto hasta habilitarlo. -->
           <div style="display:grid;grid-template-columns:1fr;gap:14px;width:100%;max-width:340px;margin-top:8px">
 
             <button onclick="selectBusinessType('restaurant')" class="biz-type-btn">
@@ -1852,7 +1852,7 @@ div:has(> #trial-banner-text) {
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Menú QR, pedidos, cocina, reservas y Tano como asistente</span>
             </button>
 
-            <button onclick="selectBusinessType('local')" class="biz-type-btn" style="display:none">
+            <button onclick="selectBusinessType('local')" class="biz-type-btn">
               <span style="font-size:32px;margin-bottom:8px;display:block">🏪</span>
               <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Local / Comercio</span>
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Catálogo QR, MercadoLibre, Tienda Nube y asistente de ventas</span>
@@ -1864,7 +1864,7 @@ div:has(> #trial-banner-text) {
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">Peluquería, estética, salud, profesionales: agenda y reservas</span>
             </button>
 
-            <button onclick="selectBusinessType('ecommerce')" class="biz-type-btn" style="display:none">
+            <button onclick="selectBusinessType('ecommerce')" class="biz-type-btn">
               <span style="font-size:32px;margin-bottom:8px;display:block">📦</span>
               <span style="font-size:15px;font-weight:600;display:block;margin-bottom:4px">Vendedor online</span>
               <span style="font-size:12px;color:var(--muted);display:block;line-height:1.4">MercadoLibre y Tienda Nube: Viti gestiona publicaciones y preguntas</span>
@@ -2808,7 +2808,7 @@ div:has(> #trial-banner-text) {
         <!-- MercadoPago Pagos -->
         <div class="card" id="mp-connect-card">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
-            <span>💳 MercadoPago · Cobros de mesa</span>
+            <span id="mp-card-title">💳 MercadoPago · Cobros de mesa</span>
             <button id="btn-connect-mp" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectMercadoPago()">
               Conectar cuenta
             </button>
@@ -5040,7 +5040,7 @@ function renderSidebarRestaurant(rest) {
   const navVis = btypeUnset ? {
     reservas: false, agenda: false, mesas: false, catalogo: false,
     reminders: false, etiquetas: false, proveedores: false,
-    'sales-agent': false, delivery: false, caja: false,
+    delivery: false, caja: false,
   } : {
     reservas:      esResto,
     agenda:        esResto || esServ,
@@ -5049,7 +5049,6 @@ function renderSidebarRestaurant(rest) {
     reminders:     esServ,             // recordatorios de visita (peluquería etc.)
     etiquetas:     esLocal,
     proveedores:   esLocal,
-    'sales-agent': esLocal,            // auto-respuestas MercadoLibre
     delivery:      esResto || esLocal, // rentabilidad Rappi/PedidosYa
     caja:          esResto || esLocal,
   }
@@ -10377,14 +10376,20 @@ function renderMpCard() {
   const card = document.getElementById('mp-connect-card')
   if (!card) return
 
-  // Solo para restaurantes
+  // Disponible para gastronomía y comercios/ventas (no para 'services')
   const btype = currentRestaurant?.business_type || 'restaurant'
-  if (btype !== 'restaurant') { card.style.display = 'none'; return }
+  if (btype === 'services') { card.style.display = 'none'; return }
   card.style.display = 'block'
+  const esGastro = btype === 'restaurant'
+
+  const titleEl = document.getElementById('mp-card-title')
+  if (titleEl) titleEl.textContent = esGastro ? '💳 MercadoPago · Cobros de mesa' : '💳 MercadoPago · Cobros y links de pago'
 
   const btn     = document.getElementById('btn-connect-mp')
   const content = document.getElementById('mp-connect-content')
   const isConn  = !!(currentRestaurant.mp_connected && currentRestaurant.mp_access_token)
+  const quienesOk = esGastro ? 'Los comensales pueden pagar la cuenta' : 'Tus clientes pueden pagar'
+  const quienesNo = esGastro ? 'los comensales puedan pagar la cuenta' : 'tus clientes puedan pagar'
 
   if (isConn) {
     if (btn) { btn.textContent = 'Desconectar'; btn.onclick = disconnectMercadoPago; btn.className = 'btn-secondary' }
@@ -10393,12 +10398,12 @@ function renderMpCard() {
         <span style="font-size:20px">✅</span>
         <div>
           <div style="font-size:14px;font-weight:600;color:#2e7d32">Cuenta conectada</div>
-          <div style="font-size:12px;color:#4a7a55;margin-top:2px">Los comensales pueden pagar la cuenta desde su celular. La plata va directo a tu MP.</div>
+          <div style="font-size:12px;color:#4a7a55;margin-top:2px">${quienesOk} desde su celular. La plata va directo a tu MP.</div>
         </div>
       </div>`
   } else {
     if (btn) { btn.textContent = 'Conectar cuenta'; btn.onclick = connectMercadoPago; btn.className = 'btn-secondary' }
-    if (content) content.innerHTML = `<div style="color:var(--muted);font-size:13.5px;line-height:1.6">Conectá tu cuenta de MercadoPago para que los comensales puedan pagar la cuenta desde su celular. La plata va directo a tu cuenta, sin intermediarios.</div>`
+    if (content) content.innerHTML = `<div style="color:var(--muted);font-size:13.5px;line-height:1.6">Conectá tu cuenta de MercadoPago para que ${quienesNo} desde su celular. La plata va directo a tu cuenta, sin intermediarios.</div>`
   }
 }
 

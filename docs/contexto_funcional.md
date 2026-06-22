@@ -101,6 +101,12 @@ Todo el panel, menú público y onboarding se adaptan automáticamente:
 ### Rubros disponibles en onboarding
 Restaurante/Bar/Café · Heladería/Pastelería · Rotisería/Delivery · Dietética/Almacén natural · Ropa/Calzado/Accesorios · Ferretería/Bazar/Herramientas · Peluquería/Barbería · Estética/Spa/Uñas · Veterinaria · Librería/Papelería · Kiosco/Minimarket · Servicios profesionales · Vendedor online puro · Otro (genérico)
 
+**Estado ACTIVO en el panel (reactivado 2026-06-22):** el selector de onboarding (`panel.html`, PASO 1) ofrece **Restaurante**, **Local/Comercio** y **Vendedor online (ecommerce)**. El rubro **`services` (Servicios/Turnos) sigue oculto** (su botón tiene `display:none`); para habilitarlo, sacar ese `style`.
+- Hasta el 2026-06-22 el onboarding fue "restaurante-only": los botones local/ecommerce/services tenían `display:none`. Se reactivaron **local + ecommerce**. La infraestructura (BIZ_CONFIG, navVis por `esLocal`, planes `local-mkt`, secciones Catálogo/Etiquetas/Proveedores/Caja/Delivery) ya existía completa.
+- **MercadoPago** (conectar cuenta + cobros/links de pago) ahora está disponible para restaurante, local y ecommerce (NO para services). Antes estaba gateado a `business_type === 'restaurant'` en `renderMpCard`.
+- La sección **"Agente de Ventas"** del panel es una **herramienta interna de prospección de Vitrina** (encontrar/contactar restaurantes potenciales), NO una función del cliente. Visible solo para admins (`nav-sales-agent` con `display:none` + reveal por email admin). El comentario viejo del código que decía "auto-respuestas MercadoLibre" era incorrecto.
+- Las **respuestas automáticas de MercadoLibre** (preguntas de compradores) viven en Catálogo → "Preguntas de MercadoLibre por aprobar" (tabla `ml_pending_answers`, migración 043). Viti sugiere, el dueño aprueba.
+
 ---
 
 ## Planes y precios DEFINITIVOS
