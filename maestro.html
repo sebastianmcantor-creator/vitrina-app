@@ -1255,7 +1255,7 @@ async function calculateDashboardMetrics(periodMonth) {
   // Cargar restaurantes via worker (usa service key, bypasa RLS)
   let allRestaurants = []
   try {
-    const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
+    const adminRes = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
     const adminData = await adminRes.json()
     allRestaurants = adminData.restaurants || []
   } catch {}
@@ -1389,7 +1389,7 @@ async function renderTwilio () {
   if (!tbody) return
   tbody.innerHTML = '<tr><td colspan="9" class="loading">Cargando...</td></tr>'
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/wa-lines')
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/wa-lines')
     const data = await res.json()
     const lines = data.lines || []
 
@@ -1443,7 +1443,7 @@ async function renderTwilio () {
 window.adminProvisionWa = async function (restaurantId) {
   if (!confirm('Provisionar número Twilio (modo stub) para este cliente?')) return
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/wa/provision', {
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/wa/provision', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ restaurant_id: restaurantId }),
     })
@@ -1456,7 +1456,7 @@ window.adminProvisionWa = async function (restaurantId) {
 window.adminReleaseWa = async function (restaurantId) {
   if (!confirm('Liberar el número Twilio de este cliente?')) return
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/wa/release', {
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/wa/release', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ restaurant_id: restaurantId }),
     })
@@ -1470,6 +1470,17 @@ window.adminReleaseWa = async function (restaurantId) {
 // CRM Ventas
 // ─────────────────────────────────────────────
 const WORKER_BASE = 'https://vitrina-tano.vitrinaapp.workers.dev'
+
+// (C6/C7/C8) Todas las llamadas al worker que son acciones de admin tienen que mandar
+// el Bearer token de la sesión; el worker las valida con isAdminRequest. Sin esto el
+// worker responde 403 y el panel maestro queda vacío.
+async function adminFetch(url, opts = {}) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const headers = { ...(opts.headers || {}) }
+  if (session) headers['Authorization'] = 'Bearer ' + session.access_token
+  return fetch(url, { ...opts, headers })
+}
+
 let lastSearchResults = []
 let allProspects = []
 let salesConfig = null
@@ -1505,7 +1516,7 @@ async function renderSales() {
 
 async function loadSalesMetrics() {
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/metrics?days=30`)
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/metrics?days=30`)
     const data = r.ok ? await r.json() : { metrics: [], totals: {} }
     const t = data.totals || {}
 
@@ -1565,7 +1576,7 @@ function renderBarChart(data) {
 
 async function loadSalesPipeline() {
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/prospects`)
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/prospects`)
     const data = r.ok ? await r.json() : { prospects: [] }
     allProspects = data.prospects || []
     renderKanban()
@@ -1601,7 +1612,7 @@ function renderKanban() {
 
 async function loadSalesConfig() {
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/config`)
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/config`)
     const data = r.ok ? await r.json() : { config: null }
     salesConfig = data.config || {}
     renderCampaignConfig()
@@ -1668,7 +1679,7 @@ window.saveCampaignConfig = async function() {
     email_template_body:       document.getElementById('cfg-body').value,
   }
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/config`, {
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/config`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -1683,7 +1694,7 @@ window.saveCampaignConfig = async function() {
 
 window.toggleCampaignActive = async function(active) {
   try {
-    await fetch(`${WORKER_BASE}/api/sales/config`, {
+    await adminFetch(`${WORKER_BASE}/api/sales/config`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_active: active }),
@@ -1715,7 +1726,7 @@ window.searchProspects = async function() {
   }
 
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/search-restaurants`, {
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/search-restaurants`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -1785,7 +1796,7 @@ window.generateCampaign = async function() {
   btn.textContent = 'Creando...'
 
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/batch-create-prospects`, {
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/batch-create-prospects`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1850,7 +1861,7 @@ window.savePmProspect = async function() {
     phone:  document.getElementById('pm-phone').value.trim() || null,
   }
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/update-prospect`, {
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/update-prospect`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
@@ -1869,7 +1880,7 @@ window.sendManualMail = async function() {
   if (!email) { alert('Cargá un email primero y guardá'); return }
   if (!confirm(`Enviar mail a ${email}?`)) return
   try {
-    const r = await fetch(`${WORKER_BASE}/api/sales/send-prospect-mail`, {
+    const r = await adminFetch(`${WORKER_BASE}/api/sales/send-prospect-mail`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ prospectId: pmCurrent.id }),
@@ -1944,7 +1955,7 @@ async function renderOverview() {
 
   // Alerta de clientes que solicitaron WhatsApp Business
   try {
-    const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
+    const adminRes = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
     const adminData = await adminRes.json()
     const allRestaurants = adminData.restaurants || []
     const pendingWA = allRestaurants.filter(r => r.wants_whatsapp)
@@ -1967,7 +1978,7 @@ async function renderClients() {
   tbody.innerHTML = '<tr><td colspan="7" class="loading">Cargando clientes...</td></tr>'
 
   try {
-    const adminRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
+    const adminRes = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/admin/restaurants')
     const adminData = await adminRes.json()
     const allRestaurants = adminData.restaurants || []
 

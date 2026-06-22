@@ -1698,7 +1698,7 @@ div:has(> #trial-banner-text) {
       <button class="nav-item" data-section="proveedores" id="nav-proveedores" onclick="switchSection('proveedores', this)" style="display:none">
         <span class="nav-icon">🏭</span> Proveedores
       </button>
-      <button class="nav-item" data-section="sales-agent" onclick="switchSection('sales-agent', this)">
+      <button class="nav-item" id="nav-sales-agent" data-section="sales-agent" onclick="switchSection('sales-agent', this)" style="display:none">
         <span class="nav-icon">🤖</span> Agente de Ventas
       </button>
 
@@ -2586,12 +2586,12 @@ div:has(> #trial-banner-text) {
         <button class="btn-secondary" onclick="waProvisionRequest()">📞 Solicitar número WhatsApp</button>
         <div style="font-size:12px;color:var(--muted);margin-top:6px">Tu número estará operativo en 24hs hábiles.</div>
       </div>
-      <div class="wa-lifecycle-info" style="background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.3);border-radius:10px;padding:14px 16px;margin-top:16px;font-size:13px;color:var(--text2,#aaa);line-height:1.6;">
-        <strong style="color:var(--text1,#fff)">📱 Tu número WhatsApp</strong><br>
+      <div class="wa-lifecycle-info" style="background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.3);border-radius:10px;padding:14px 16px;margin-top:16px;font-size:13px;color:var(--ink-soft,#5a5048);line-height:1.6;">
+        <strong style="color:var(--ink)">📱 Tu número WhatsApp</strong><br>
         Este número es exclusivo de tu negocio mientras tengas el plan activo.
         Si cancelás, lo reservamos 30 días: si renovás en ese período, recuperás el mismo número.
         Pasados los 30 días puede ser reasignado.
-        <a href="/terms.html#whatsapp" style="color:var(--brand,#E8521A);text-decoration:none">Ver términos →</a>
+        <a href="/terms.html#whatsapp" style="color:var(--terra);text-decoration:none">Ver términos →</a>
       </div>
     </div>
 
@@ -4713,63 +4713,9 @@ div:has(> #trial-banner-text) {
   </div>
 </div>
 
-<!-- Modal: crear post -->
-<div class="modal-overlay" id="modal-create-post" onclick="if(event.target===this)closeModal('modal-create-post')">
-  <div class="modal-box" style="max-width:600px">
-    <div class="modal-header">
-      <div class="modal-title">📱 Nueva publicación</div>
-      <button class="modal-close" onclick="closeModal('modal-create-post')">✕</button>
-    </div>
-    <div class="modal-body">
-      <!-- Caption -->
-      <div class="form-row">
-        <label class="form-label">Texto del post *</label>
-        <textarea id="post-caption" class="input-field" rows="4" placeholder="Escribí el texto de tu publicación..." maxlength="2200"></textarea>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;text-align:right">
-          <span id="caption-char-count">0</span>/2200
-        </div>
-      </div>
-
-      <!-- Fecha y hora -->
-      <div class="form-row">
-        <label class="form-label">Fecha y hora de publicación *</label>
-        <input type="datetime-local" id="post-scheduled-for" class="input-field">
-      </div>
-
-      <!-- Redes sociales -->
-      <div class="form-row">
-        <label class="form-label">Publicar en:</label>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="post-instagram" checked>
-            <span style="font-size:14px">📸 Instagram</span>
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="post-facebook" checked>
-            <span style="font-size:14px">👥 Facebook</span>
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="post-google">
-            <span style="font-size:14px">🏢 Google Business</span>
-          </label>
-        </div>
-      </div>
-
-      <!-- URLs de medios (opcional) -->
-      <div class="form-row">
-        <label class="form-label">URLs de imágenes/videos (opcional)</label>
-        <input type="text" id="post-media-url-1" class="input-field" placeholder="https://...">
-        <input type="text" id="post-media-url-2" class="input-field" placeholder="https://..." style="margin-top:8px">
-      </div>
-
-      <div style="margin-top:20px;display:flex;gap:12px">
-        <button class="btn-primary" onclick="saveScheduledPost()">Programar publicación</button>
-        <button class="btn-secondary" onclick="closeModal('modal-create-post')">Cancelar</button>
-        <span id="post-save-status" style="font-size:13px;color:var(--muted);display:flex;align-items:center"></span>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- Modal viejo "crear post" ELIMINADO (C1): tenía un id="post-caption" duplicado que
+     aparecía primero en el DOM y rompía el composer real. El botón usa openCreatePostModal()
+     que redirige a openNewPostModal (composer post-modal-overlay). -->
 
 <!-- Modal: crear template -->
 <div class="modal-overlay" id="modal-create-template" onclick="if(event.target===this)closeModal('modal-create-template')">
@@ -4904,6 +4850,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       // Link visible en el footer del sidebar
       const maestroLink = document.getElementById('nav-maestro-link')
       if (maestroLink) maestroLink.style.display = 'flex'
+      // (C9) El Agente de Ventas es herramienta interna de prospección — solo admin
+      const salesNav = document.getElementById('nav-sales-agent')
+      if (salesNav) salesNav.style.display = 'flex'
       // Atajo extra: clic en el logo
       const logo = document.getElementById('sidebar-logo-wrap')
       if (logo) {
@@ -4929,7 +4878,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const planNombre = PLAN_INFO[planActivado]?.nombre ?? planActivado
       showToast(`🎉 ¡Suscripción activada! Bienvenido al plan ${planNombre}.`, 'success')
       history.replaceState({}, '', '/panel.html')
-      setTimeout(() => navigate('config'), 800)
+      setTimeout(() => switchSection('config', document.querySelector('[data-section="config"]')), 800)
     }
     if (qp.get('oauth') === 'ml_ok') {
       showToast('✅ MercadoLibre conectado correctamente.', 'success')
@@ -7734,6 +7683,15 @@ const ROLE_LABELS = { cook: 'Cocinero', waiter: 'Mozo', manager: 'Gerente', owne
 // ── Plan / Suscripción ────────────────────────────────────────────────────────
 const WORKER_URL = 'https://vitrina-tano.vitrinaapp.workers.dev'
 
+// (C7/C8) Helper para acciones de admin/ventas: manda el Bearer token de la sesión.
+// El worker valida con isAdminRequest; sin token responde 403.
+async function adminFetch(url, opts = {}) {
+  const { data: { session } } = await supabase.auth.getSession()
+  const headers = { ...(opts.headers || {}) }
+  if (session) headers['Authorization'] = 'Bearer ' + session.access_token
+  return fetch(url, { ...opts, headers })
+}
+
 const PLAN_INFO = {
   'free':       { nombre: 'Free',       precioUSD: 0,  descripcion: 'Hasta 45 platos · 75 msgs Tano/mes · Sin pedidos' },
   'rest-menu':  { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado · WhatsApp' },
@@ -8037,7 +7995,7 @@ window.waProvisionRequest = async function () {
   if (!currentRestaurant) return
   if (!confirm('Solicitar número WhatsApp para este negocio? Estará operativo en 24hs hábiles.')) return
   try {
-    const res = await fetch(`${WORKER_URL}/api/wa/provision`, {
+    const res = await adminFetch(`${WORKER_URL}/api/wa/provision`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ restaurant_id: currentRestaurant.id }),
@@ -9516,108 +9474,10 @@ window.openCreatePostModal = function () {
   if (typeof openNewPostModal === 'function') return openNewPostModal()
 }
 
-// Character counter para caption
-document.addEventListener('DOMContentLoaded', () => {
-  const captionInput = document.getElementById('post-caption')
-  if (captionInput) {
-    captionInput.addEventListener('input', (e) => {
-      document.getElementById('caption-char-count').textContent = e.target.value.length
-    })
-  }
-})
+// (C1) Char-counter del modal viejo eliminado: apuntaba a caption-char-count, que ya no existe.
 
-window.saveScheduledPost = async function () {
-  const caption = document.getElementById('post-caption').value.trim()
-  const scheduledFor = document.getElementById('post-scheduled-for').value
-  const instagram = document.getElementById('post-instagram').checked
-  const facebook = document.getElementById('post-facebook').checked
-  const google = document.getElementById('post-google').checked
-  const mediaUrl1 = document.getElementById('post-media-url-1').value.trim()
-  const mediaUrl2 = document.getElementById('post-media-url-2').value.trim()
-
-  if (!caption) {
-    showToast('El texto del post es obligatorio', 'error')
-    return
-  }
-
-  if (!scheduledFor) {
-    showToast('La fecha de publicación es obligatoria', 'error')
-    return
-  }
-
-  const selectedDate = new Date(scheduledFor)
-  if (selectedDate <= new Date()) {
-    showToast('La fecha debe ser futura', 'error')
-    return
-  }
-
-  if (!instagram && !facebook && !google) {
-    showToast('Seleccioná al menos una red social', 'error')
-    return
-  }
-
-  const statusEl = document.getElementById('post-save-status')
-  statusEl.textContent = 'Programando...'
-
-  try {
-    const { scheduledPosts } = await import('./lib/db.js')
-
-    const mediaUrls = []
-    if (mediaUrl1) mediaUrls.push(mediaUrl1)
-    if (mediaUrl2) mediaUrls.push(mediaUrl2)
-
-    const payload = {
-      restaurant_id: currentRestaurant.id,
-      caption,
-      scheduled_for: new Date(scheduledFor).toISOString(),
-      publish_instagram: instagram,
-      publish_facebook: facebook,
-      publish_google: google,
-      media_urls: mediaUrls.length > 0 ? mediaUrls : null,
-      status: 'scheduled',
-      created_by: currentUser.id,
-    }
-
-    const newPost = await scheduledPosts.create(payload)
-
-    // Programar en Metricool
-    const networks = []
-    if (instagram) networks.push('instagram')
-    if (facebook) networks.push('facebook')
-    if (google) networks.push('google')
-
-    const metricoolRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/metricool/schedule-post', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        restaurantId: currentRestaurant.id,
-        caption,
-        mediaUrls: mediaUrls.length > 0 ? mediaUrls : null,
-        scheduledFor: new Date(scheduledFor).toISOString(),
-        networks,
-      }),
-    })
-
-    if (metricoolRes.ok) {
-      const data = await metricoolRes.json()
-      // Actualizar con ID de Metricool
-      if (data.metricoolPostId) {
-        await scheduledPosts.update(newPost.id, {
-          metricool_post_id: data.metricoolPostId,
-        })
-      }
-    }
-
-    showToast('✅ Publicación programada correctamente', 'success')
-    closeModal('modal-create-post')
-    loadMarketing()
-  } catch (e) {
-    console.error('Error programando post:', e)
-    showToast('Error: ' + e.message, 'error')
-  } finally {
-    statusEl.textContent = ''
-  }
-}
+// (C1) saveScheduledPost ELIMINADA: era el submit del modal viejo (scheduled_posts +
+// Metricool). Código muerto tras unificar en el composer real (/api/social/schedule-post).
 
 window.filterPosts = function (filter) {
   currentPostFilter = filter
@@ -9814,7 +9674,7 @@ window.loadSalesAgent = async function () {
 
   try {
     // Cargar configuración
-    const configRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config')
+    const configRes = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config')
     const configData = await configRes.json()
     agentConfig = configData.config
 
@@ -9853,7 +9713,7 @@ function updateAgentStatusText() {
 
 async function loadAgentMetrics() {
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/metrics?days=30')
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/metrics?days=30')
     const data = await res.json()
 
     if (data.totals) {
@@ -9872,7 +9732,7 @@ async function loadAgentMetrics() {
 
 async function loadProspects() {
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/prospects')
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/prospects')
     const data = await res.json()
     prospectsList = data.prospects || []
     renderProspects()
@@ -10067,7 +9927,7 @@ Vi que ${prospect.name || 'tu negocio'} está en ${prospect.address || 'la zona'
 vitrinaapp.com.ar`
     const message = mensajeWA
 
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/contact', {
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -10156,7 +10016,7 @@ window.markProspectInvalid = async function (prospectId) {
 
 window.toggleAgent = async function (isActive) {
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config', {
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ is_active: isActive }),
@@ -10188,7 +10048,7 @@ window.saveAgentConfig = async function () {
   }
 
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config', {
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -10228,7 +10088,7 @@ window.searchRestaurants = async function () {
   }
 
   try {
-    const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/search-restaurants', {
+    const res = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/search-restaurants', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ location, radius }),
@@ -10263,7 +10123,7 @@ window.searchRestaurants = async function () {
     for (const r of restaurants) {
       try {
         // Generar diagnóstico
-        const diagnosisRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/generate-diagnosis', {
+        const diagnosisRes = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/generate-diagnosis', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ placeId: r.place_id }),
@@ -10272,7 +10132,7 @@ window.searchRestaurants = async function () {
         const diagnosisData = await diagnosisRes.json()
 
         // Crear prospecto
-        const createRes = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/create-prospect', {
+        const createRes = await adminFetch('https://vitrina-tano.vitrinaapp.workers.dev/api/sales/create-prospect', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

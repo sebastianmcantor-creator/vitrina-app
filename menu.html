@@ -1088,7 +1088,7 @@
             body: JSON.stringify({
               to: clienteEmail,
               restaurantName: rest.name,
-              tableNumber: mesa,
+              tableNumber: mesaFinal,
               items: itemsParaEmail,
               total,
               currency: rest.currency || 'ARS',
@@ -1103,7 +1103,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             restaurantId: rest.id,
-            tableNumber: mesa,
+            tableNumber: mesaFinal,
             items: ids.map(id => ({ name: itemsById[id].name, quantity: cart[id] })),
             total,
             currency: rest.currency || 'ARS',
@@ -1128,7 +1128,7 @@
         const waWrap = document.getElementById('wa-confirm-wrap')
         const waBtn  = document.getElementById('wa-confirm-btn')
         if (waWrap && waBtn && rest.phone) {
-          const mesaStr = mesa != null ? ` - Mesa ${mesa}` : ''
+          const mesaStr = mesaFinal != null ? ` - Mesa ${mesaFinal}` : ''
           const itemsStr = ids.map(id => `${cartSnapshot[id]}x ${itemsById[id].name}`).join(', ')
           const pedidoStr = `Pedido #${order.id.slice(-6).toUpperCase()}${mesaStr}: ${itemsStr}. Total: $${total.toLocaleString('es-AR')}`
           const phone = rest.phone.replace(/[\s\-\+\(\)]/g, '')
@@ -1327,7 +1327,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             restaurantId: rest.id,
-            tableNumber:  mesa,
+            tableNumber:  mesaEfectiva(),
             orderIds:     pedidosSesion,
             currency:     rest.currency || 'ARS',
           }),
