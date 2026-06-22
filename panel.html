@@ -810,6 +810,8 @@ html, body {
 }
 .item-row:last-child { border-bottom:none; }
 .item-row:hover { background:var(--cream); }
+.item-row.hidden-item { opacity:.55; }
+.item-row.hidden-item .item-name-text { text-decoration:line-through; text-decoration-color:var(--muted); }
 .item-emoji { font-size:18px; width:24px; text-align:center; flex-shrink:0; }
 .item-info { flex:1; min-width:0; }
 .item-name-text { font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -3873,6 +3875,24 @@ div:has(> #trial-banner-text) {
           </div>
         </div>
 
+        <!-- Zona peligrosa: eliminar cuenta -->
+        <div class="card" style="margin-top:28px;border:1px solid #f3c2b8;background:#fff8f6">
+          <div class="card-title" style="color:#b3261e">⚠️ Eliminar mi cuenta</div>
+          <p style="font-size:13.5px;color:var(--muted);line-height:1.6;margin:8px 0 4px">
+            Esto borra <strong>definitivamente</strong> tu cuenta, tu negocio, tu menú, tus publicaciones,
+            tu biblioteca de imágenes y todas tus integraciones (Instagram, WhatsApp, MercadoPago).
+            <strong>No se puede deshacer</strong> y no hay forma de recuperarlo.
+          </p>
+          <p style="font-size:12.5px;color:var(--muted);line-height:1.6;margin:0 0 14px">
+            Si solo querés pausar el servicio o desconectar una red, no hace falta borrar la cuenta —
+            escribinos a <a href="mailto:contacto@vitrinaapp.com.ar" style="color:var(--terra)">contacto@vitrinaapp.com.ar</a>.
+          </p>
+          <button id="btn-delete-account" onclick="eliminarMiCuenta()"
+            style="background:#fff;border:1px solid #b3261e;color:#b3261e;font-size:13.5px;font-weight:600;padding:9px 16px;border-radius:9px;cursor:pointer">
+            Eliminar mi cuenta y todos mis datos
+          </button>
+        </div>
+
       </div>
 
       <!-- Sección Agente de Ventas -->
@@ -6810,11 +6830,12 @@ function renderMenu() {
     const itemsHtml = items.length
       ? items.map(item => {
         const noImg = !item.image_url ? '<span style="font-size:9px;background:#fff8e1;color:#856404;padding:1px 5px;border-radius:6px;margin-left:4px" title="Sin foto: la foto mejora la visibilidad">sin foto</span>' : ''
+        const hiddenBadge = item.is_visible === false ? '<span style="font-size:9px;background:#ECEFF1;color:#546E7A;padding:1px 5px;border-radius:6px;margin-left:4px" title="No se muestra en el menú público">oculto</span>' : ''
         return `
-        <div class="item-row ${item.is_available ? '' : 'unavailable'}" id="item-row-${item.id}">
+        <div class="item-row ${item.is_available ? '' : 'unavailable'}${item.is_visible === false ? ' hidden-item' : ''}" id="item-row-${item.id}">
           <div class="item-emoji">${item.emoji || '🍽️'}</div>
           <div class="item-info">
-            <div class="item-name-text">${item.is_featured ? `<span title="${window._newItemLabel?.replace('Nuevo','') || ' ítem'} destacado" style="margin-right:4px">⭐</span>` : ''}${escHtml(item.name)}${noImg}</div>
+            <div class="item-name-text">${item.is_featured ? `<span title="${window._newItemLabel?.replace('Nuevo','') || ' ítem'} destacado" style="margin-right:4px">⭐</span>` : ''}${escHtml(item.name)}${noImg}${hiddenBadge}</div>
             ${item.tags?.length ? `<div class="item-tags-row">${item.tags.map(t=>`<span class="item-tag">${TAGS.find(x=>x.key===t)?.label||t}</span>`).join('')}</div>` : ''}
           </div>
           <div class="item-price-text">${formatPrice(item.price)}</div>
@@ -6825,6 +6846,7 @@ function renderMenu() {
           <div class="item-actions">
             <button class="btn-reorder" onclick="moveItem('${item.id}','${cat.id}',-1)" title="Subir">↑</button>
             <button class="btn-reorder" onclick="moveItem('${item.id}','${cat.id}',1)"  title="Bajar">↓</button>
+            <button class="btn-icon" onclick="toggleItemVisible('${item.id}',${item.is_visible === false})" title="${item.is_visible === false ? 'Oculto del menú — tocá para mostrar' : 'Visible — tocá para ocultar del menú'}">${item.is_visible === false ? '🙈' : '👁️'}</button>
             <button class="btn-icon" onclick="openItemModal('${cat.id}','${item.id}')" title="Editar">✏️</button>
             <button class="btn-icon danger" onclick="deleteItem('${item.id}','${cat.id}')" title="Eliminar">🗑️</button>
           </div>
@@ -7126,6 +7148,45 @@ window.toggleItemAvail = async function (itemId, available) {
       menuItemsMap[catId] = menuItemsMap[catId].map(i => i.id === itemId ? { ...i, is_available: available } : i)
     document.getElementById(`item-row-${itemId}`)?.classList.toggle('unavailable', !available)
   } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+// Ocultar/mostrar el plato del menú público (is_visible). Distinto de "no disponible":
+// oculto = no aparece; no disponible = aparece grisado "no disponible".
+window.toggleItemVisible = async function (itemId, makeVisible) {
+  try {
+    await menuItems.update(itemId, { is_visible: makeVisible })
+    for (const catId in menuItemsMap)
+      menuItemsMap[catId] = menuItemsMap[catId].map(i => i.id === itemId ? { ...i, is_visible: makeVisible } : i)
+    renderMenu()
+    showToast(makeVisible ? 'Plato visible en el menú ✓' : 'Plato oculto del menú', 'success')
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+// Eliminar la propia cuenta y todos los datos (autoservicio, requisito Meta). Doble confirmación.
+window.eliminarMiCuenta = async function () {
+  const r = prompt('⚠️ Vas a borrar DEFINITIVAMENTE tu cuenta y todos tus datos (negocio, menú, publicaciones, integraciones). No se puede deshacer.\n\nPara confirmar, escribí: ELIMINAR')
+  if (r === null) return
+  if (r.trim().toUpperCase() !== 'ELIMINAR') { showToast('Cancelado — no escribiste ELIMINAR', 'info'); return }
+  if (!confirm('Última confirmación: ¿borrar tu cuenta y todos tus datos para siempre?')) return
+  const btn = document.getElementById('btn-delete-account')
+  const orig = btn.textContent
+  btn.disabled = true; btn.textContent = 'Eliminando...'
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) { showToast('Sesión no válida, volvé a iniciar sesión', 'error'); btn.disabled = false; btn.textContent = orig; return }
+    const res = await fetch(WORKER_URL + '/api/account/delete', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data.ok) throw new Error(data.error || 'No se pudo eliminar la cuenta')
+    alert('Tu cuenta y tus datos fueron eliminados. Te llevamos al inicio.')
+    await signOut().catch(() => {})
+    window.location.href = '/'
+  } catch (e) {
+    showToast('Error: ' + (e.message || e), 'error')
+    btn.disabled = false; btn.textContent = orig
+  }
 }
 
 // ═══════════════════════════════════════════
