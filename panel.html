@@ -13436,6 +13436,190 @@ function usarImagenSugerida(url) {
 }
 window.usarImagenSugerida = usarImagenSugerida
 
+// ═══════════════════════════════════════════
+// DISEÑADOR DE PLANTILLAS — motor propio (render con canvas, texto real)
+// ═══════════════════════════════════════════
+var tplPhoto = null
+
+window.abrirDisenadorPlantillas = async function () {
+  if (!uploadedImageUrl || uploadedIsVideo) {
+    alert('Primero subí o elegí una foto del plato (con los botones de arriba). Después diseñás la plantilla con esa foto.')
+    return
+  }
+  document.getElementById('tpl-designer-overlay').classList.add('open')
+  var msg = document.getElementById('tpl-msg')
+  msg.textContent = 'Cargando tu foto...'
+  tplPhoto = await tplLoadImage(uploadedImageUrl).catch(() => null)
+  msg.textContent = tplPhoto ? '' : 'No pude cargar la foto para diseñar (permisos de la imagen). Probá con una foto subida desde tu compu.'
+  try { await document.fonts.ready } catch (e) {}
+  tplRender()
+}
+window.cerrarDisenadorPlantillas = function () {
+  document.getElementById('tpl-designer-overlay').classList.remove('open')
+}
+
+function tplLoadImage(url) {
+  return new Promise(function (resolve, reject) {
+    var img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = function () { resolve(img) }
+    img.onerror = reject
+    img.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'cors=1'
+  })
+}
+
+function tplData() {
+  return {
+    name:  (document.getElementById('tpl-name').value || 'Tu plato').trim(),
+    price: (document.getElementById('tpl-price').value || '').trim(),
+    badge: (document.getElementById('tpl-badge').value || '').trim(),
+    color: document.getElementById('tpl-color').value || '#993C1D',
+    cream: '#FAF3EC',
+    logo:  (currentRestaurant && currentRestaurant.name) ? currentRestaurant.name : 'Tu marca',
+    photo: tplPhoto,
+  }
+}
+
+window.tplRender = function () {
+  var grid = document.getElementById('tpl-grid')
+  if (!grid) return
+  var d = tplData()
+  var labels = ['1 · Foto completa', '2 · Mitad y mitad', '3 · Elegante', '4 · Promo']
+  grid.innerHTML = ''
+  for (var i = 0; i < 4; i++) {
+    (function (idx) {
+      var wrap = document.createElement('div')
+      var cv = document.createElement('canvas')
+      var S = 540
+      cv.width = S; cv.height = S
+      cv.style.cssText = 'width:100%;aspect-ratio:1;border-radius:10px;cursor:pointer;border:2px solid transparent;transition:border-color .15s'
+      cv.onmouseover = function () { cv.style.borderColor = 'var(--terra)' }
+      cv.onmouseout = function () { cv.style.borderColor = 'transparent' }
+      cv.onclick = function () { tplUsar(idx) }
+      try { tplDraw(cv.getContext('2d'), idx, S, d) } catch (e) {}
+      var lab = document.createElement('div')
+      lab.style.cssText = 'font-size:11.5px;color:var(--muted);text-align:center;margin-top:4px'
+      lab.textContent = labels[idx]
+      wrap.appendChild(cv); wrap.appendChild(lab)
+      grid.appendChild(wrap)
+    })(i)
+  }
+}
+
+window.tplUsar = async function (idx) {
+  var msg = document.getElementById('tpl-msg')
+  msg.textContent = 'Generando tu imagen...'
+  try {
+    var S = 1080
+    var cv = document.createElement('canvas')
+    cv.width = S; cv.height = S
+    tplDraw(cv.getContext('2d'), idx, S, tplData())
+    var blob = await new Promise(function (res) { cv.toBlob(res, 'image/jpeg', 0.92) })
+    if (!blob) throw new Error('No se pudo generar (permisos de la foto). Probá con una foto subida desde tu compu.')
+    var path = 'library/' + currentRestaurant.id + '/tpl-' + Date.now() + '.jpg'
+    var up = await supabase.storage.from('restaurant-images').upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
+    if (up.error) throw up.error
+    var pub = supabase.storage.from('restaurant-images').getPublicUrl(path)
+    usarImagenSugerida(pub.data.publicUrl)
+    cerrarDisenadorPlantillas()
+    showToast('Diseño listo y aplicado al post ✓', 'success')
+  } catch (e) {
+    msg.textContent = 'Error: ' + (e.message || e)
+  }
+}
+
+// ── Helpers de dibujo ──
+function tplShade(hex, pct) {
+  var h = hex.replace('#', '')
+  var r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16)
+  var f = pct < 0 ? 0 : 255, t = Math.abs(pct) / 100
+  r = Math.round((f - r) * t + r); g = Math.round((f - g) * t + g); b = Math.round((f - b) * t + b)
+  return 'rgb(' + r + ',' + g + ',' + b + ')'
+}
+function tplRoundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath(); ctx.moveTo(x + r, y)
+  ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r)
+  ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath()
+}
+function tplCover(ctx, img, x, y, w, h) {
+  if (!img) { ctx.fillStyle = '#E3D6C6'; ctx.fillRect(x, y, w, h); return }
+  var ir = img.width / img.height, rr = w / h, sw, sh, sx, sy
+  if (ir > rr) { sh = img.height; sw = sh * rr; sx = (img.width - sw) / 2; sy = 0 }
+  else { sw = img.width; sh = sw / rr; sx = 0; sy = (img.height - sh) / 2 }
+  ctx.drawImage(img, sx, sy, sw, sh, x, y, w, h)
+}
+function tplWrap(ctx, text, x, y, maxW, lineH, maxLines) {
+  var words = String(text).split(' '), line = '', lines = []
+  for (var i = 0; i < words.length; i++) {
+    var test = line ? line + ' ' + words[i] : words[i]
+    if (ctx.measureText(test).width > maxW && line) { lines.push(line); line = words[i] }
+    else line = test
+  }
+  if (line) lines.push(line)
+  if (maxLines) lines = lines.slice(0, maxLines)
+  for (var j = 0; j < lines.length; j++) ctx.fillText(lines[j], x, y + j * lineH)
+}
+
+function tplDraw(ctx, idx, S, d) {
+  var color = d.color, cream = d.cream, dark = tplShade(color, -35), hi = '#F6C26B'
+  var sans = "'Outfit', system-ui, sans-serif", serif = "'Cormorant Garamond', Georgia, serif"
+  ctx.clearRect(0, 0, S, S); ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'
+
+  if (idx === 0) {
+    tplCover(ctx, d.photo, 0, 0, S, S)
+    var ph = S * 0.30
+    ctx.fillStyle = dark; ctx.fillRect(0, S - ph, S, ph)
+    ctx.font = '500 ' + (S * 0.028) + "px " + sans
+    var lw = ctx.measureText(d.logo).width + S * 0.05
+    ctx.fillStyle = dark; tplRoundRect(ctx, S * 0.04, S * 0.04, lw, S * 0.06, S * 0.03); ctx.fill()
+    ctx.fillStyle = cream; ctx.textBaseline = 'middle'; ctx.fillText(d.logo, S * 0.065, S * 0.072); ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = cream; ctx.font = '500 ' + (S * 0.062) + "px " + sans
+    tplWrap(ctx, d.name, S * 0.06, S - ph + S * 0.11, S * 0.88, S * 0.072, 2)
+    if (d.price) {
+      ctx.font = '500 ' + (S * 0.05) + "px " + sans
+      var pw = ctx.measureText(d.price).width + S * 0.06
+      ctx.fillStyle = cream; tplRoundRect(ctx, S * 0.06, S - S * 0.11, pw, S * 0.075, S * 0.018); ctx.fill()
+      ctx.fillStyle = dark; ctx.textBaseline = 'middle'; ctx.fillText(d.price, S * 0.09, S - S * 0.072); ctx.textBaseline = 'alphabetic'
+    }
+  } else if (idx === 1) {
+    tplCover(ctx, d.photo, 0, 0, S / 2, S)
+    ctx.fillStyle = color; ctx.fillRect(S / 2, 0, S / 2, S)
+    var cx = S / 2 + S * 0.05
+    ctx.fillStyle = cream; ctx.font = '400 ' + (S * 0.03) + "px " + sans; ctx.fillText(d.logo, cx, S * 0.12)
+    ctx.font = '500 ' + (S * 0.055) + "px " + sans
+    tplWrap(ctx, d.name, cx, S * 0.44, S * 0.40, S * 0.064, 3)
+    if (d.price) { ctx.font = '500 ' + (S * 0.085) + "px " + sans; ctx.fillText(d.price, cx, S * 0.74) }
+  } else if (idx === 2) {
+    ctx.fillStyle = cream; ctx.fillRect(0, 0, S, S)
+    ctx.fillStyle = color; ctx.font = '400 ' + (S * 0.028) + "px " + sans; ctx.textAlign = 'center'
+    ctx.fillText(String(d.logo).toUpperCase(), S / 2, S * 0.14)
+    var R = S * 0.20, ax = S / 2, ay = S * 0.42
+    ctx.save(); ctx.beginPath(); ctx.arc(ax, ay, R, 0, Math.PI * 2); ctx.closePath(); ctx.clip()
+    tplCover(ctx, d.photo, ax - R, ay - R, R * 2, R * 2); ctx.restore()
+    ctx.lineWidth = S * 0.006; ctx.strokeStyle = color; ctx.beginPath(); ctx.arc(ax, ay, R, 0, Math.PI * 2); ctx.stroke()
+    ctx.fillStyle = dark
+    var efs = S * 0.075; ctx.font = '500 ' + efs + "px " + serif
+    while (ctx.measureText(d.name).width > S * 0.86 && efs > S * 0.04) { efs -= S * 0.004; ctx.font = '500 ' + efs + "px " + serif }
+    ctx.fillText(d.name, S / 2, S * 0.76)
+    if (d.price) { ctx.fillStyle = color; ctx.font = '500 ' + (S * 0.06) + "px " + sans; ctx.fillText(d.price, S / 2, S * 0.86) }
+    ctx.textAlign = 'left'
+  } else {
+    ctx.fillStyle = color; ctx.fillRect(0, 0, S, S)
+    var badge = d.badge || 'HOY · PROMO'
+    ctx.font = '500 ' + (S * 0.034) + "px " + sans
+    var bw = ctx.measureText(badge).width + S * 0.06
+    ctx.fillStyle = cream; tplRoundRect(ctx, S * 0.06, S * 0.08, bw, S * 0.078, S * 0.02); ctx.fill()
+    ctx.fillStyle = color; ctx.textBaseline = 'middle'; ctx.fillText(badge, S * 0.09, S * 0.119); ctx.textBaseline = 'alphabetic'
+    ctx.fillStyle = cream; ctx.font = '500 ' + (S * 0.06) + "px " + sans
+    tplWrap(ctx, d.name, S * 0.06, S * 0.50, S * 0.88, S * 0.07, 2)
+    if (d.price) { ctx.fillStyle = hi; ctx.font = '500 ' + (S * 0.14) + "px " + sans; ctx.fillText(d.price, S * 0.055, S * 0.71) }
+    ctx.fillStyle = cream; ctx.font = '400 ' + (S * 0.03) + "px " + sans; ctx.textBaseline = 'middle'; ctx.fillText(d.logo, S * 0.06, S * 0.92); ctx.textBaseline = 'alphabetic'
+    var sq = S * 0.14
+    ctx.save(); tplRoundRect(ctx, S - sq - S * 0.06, S - sq - S * 0.06, sq, sq, S * 0.02); ctx.clip()
+    tplCover(ctx, d.photo, S - sq - S * 0.06, S - sq - S * 0.06, sq, sq); ctx.restore()
+  }
+}
+
 // Viti mira la imagen cargada y escribe el post (visión)
 async function vitiEscribePost() {
   if (!currentRestaurant) return
@@ -15867,6 +16051,41 @@ window.guardarVentasCanal = async function () {
 </div>
 
 <!-- Modal nueva publicación -->
+<!-- Diseñador de plantillas de post (motor propio, render con canvas) -->
+<div class="post-modal-overlay" id="tpl-designer-overlay">
+  <div class="post-modal">
+    <div class="post-modal-header">
+      <h3>🎨 Diseñar con plantilla</h3>
+      <button onclick="cerrarDisenadorPlantillas()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">&#x2715;</button>
+    </div>
+    <div class="post-modal-body">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="post-form-field" style="flex:1;min-width:160px">
+          <label class="post-form-label">Nombre del plato</label>
+          <input id="tpl-name" class="post-form-input" placeholder="Ej: Milanesa napolitana" oninput="tplRender()">
+        </div>
+        <div class="post-form-field" style="width:120px">
+          <label class="post-form-label">Precio</label>
+          <input id="tpl-price" class="post-form-input" placeholder="$7.900" oninput="tplRender()">
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <div class="post-form-field" style="flex:1;min-width:160px">
+          <label class="post-form-label">Etiqueta (opcional)</label>
+          <input id="tpl-badge" class="post-form-input" placeholder="Ej: HOY · PROMO" oninput="tplRender()">
+        </div>
+        <div class="post-form-field">
+          <label class="post-form-label">Color de tu marca</label>
+          <input id="tpl-color" type="color" value="#993C1D" oninput="tplRender()" style="width:52px;height:38px;border:1px solid var(--border);border-radius:8px;background:none;cursor:pointer;padding:2px">
+        </div>
+      </div>
+      <label class="post-form-label">Elegí un diseño (tocá para usarlo en el post):</label>
+      <div id="tpl-grid" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:8px"></div>
+      <div id="tpl-msg" style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.5"></div>
+    </div>
+  </div>
+</div>
+
 <div class="post-modal-overlay" id="post-modal-overlay">
   <div class="post-modal">
     <div class="post-modal-header">
@@ -15903,6 +16122,7 @@ window.guardarVentasCanal = async function () {
             <button id="btn-upload-video" onclick="document.getElementById('video-file-input').click()" class="btn-secondary" style="flex:1;min-width:140px;font-size:12.5px;padding:7px 12px">📹 Subir un video</button>
           </div>
           <input type="file" id="video-file-input" accept="video/*" style="display:none" onchange="handleVideoUpload(this)">
+          <button id="btn-disenar-plantilla" onclick="abrirDisenadorPlantillas()" class="btn-secondary" style="width:100%;margin-top:8px;font-size:12.5px;padding:7px 12px">🎨 Diseñar con plantilla (4 opciones)</button>
           <div id="sug-img-gallery" style="display:none;margin-top:10px"></div>
           <button id="btn-caption-from-img" onclick="vitiEscribePost()" class="btn-secondary" style="width:100%;margin-top:8px;font-size:12.5px;padding:7px 12px">✍️ Que Viti escriba el post para esta imagen</button>
         </div>
