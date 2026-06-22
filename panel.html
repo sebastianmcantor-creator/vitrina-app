@@ -3172,6 +3172,18 @@ div:has(> #trial-banner-text) {
           </div>
         </div>
 
+        <!-- (C3) Preguntas ML pendientes de aprobación -->
+        <div class="card" id="ml-pending-card" style="display:none;border:1px solid #ffe0b2;background:#fffaf3">
+          <div class="card-title" style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">💬</span>
+            <div>
+              <div style="font-weight:600;font-size:15px">Preguntas de MercadoLibre por aprobar</div>
+              <div class="form-hint" style="margin:0">Viti sugiere la respuesta — vos la revisás y aprobás antes de publicarla.</div>
+            </div>
+          </div>
+          <div id="ml-pending-list" style="margin-top:14px;display:flex;flex-direction:column;gap:12px"></div>
+        </div>
+
         <!-- Tienda Nube -->
         <div class="card">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -3203,7 +3215,7 @@ div:has(> #trial-banner-text) {
               <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px">¿Qué incluye la integración?</div>
               <ul style="font-size:13px;color:var(--muted);list-style:none;padding:0;display:flex;flex-direction:column;gap:4px">
                 <li>✅ Publicar productos en ML con fotos mejoradas con IA y descripciones optimizadas</li>
-                <li>✅ Responder preguntas de compradores automáticamente (tras 5 aprobaciones)</li>
+                <li>✅ Viti sugiere la respuesta a cada pregunta de compradores y vos la aprobás antes de publicar</li>
                 <li>✅ Sincronizar stock entre ML y Tienda Nube bidireccional</li>
                 <li>✅ Alertas WhatsApp por cada venta con ganancia neta calculada</li>
                 <li>✅ Análisis de top 10 competidores en tu categoría de ML</li>
@@ -8785,8 +8797,72 @@ window.connectTN = function () {
   window.location.href = `https://vitrina-tano.vitrinaapp.workers.dev/api/tn/auth?restaurant_id=${currentRestaurant.id}`
 }
 
+// (C3) Preguntas de ML pendientes de aprobación
+window.loadMLPending = async function () {
+  const card = document.getElementById('ml-pending-card')
+  const list = document.getElementById('ml-pending-list')
+  if (!card || !list || !currentRestaurant) return
+  try {
+    const { data, error } = await supabase
+      .from('ml_pending_answers')
+      .select('*')
+      .eq('restaurant_id', currentRestaurant.id)
+      .eq('status', 'pending')
+      .order('created_at', { ascending: false })
+      .limit(50)
+    if (error || !data || !data.length) { card.style.display = 'none'; return }
+    card.style.display = 'block'
+    list.innerHTML = data.map(q => `
+      <div class="ml-pending-item" style="border:1px solid var(--border);border-radius:10px;padding:12px;background:#fff">
+        ${q.item_title ? `<div style="font-size:12px;color:var(--muted);margin-bottom:4px">${escHtml(q.item_title)}</div>` : ''}
+        <div style="font-size:13.5px;color:var(--ink);margin-bottom:8px"><strong>Pregunta:</strong> ${escHtml(q.question_text || '')}</div>
+        <label style="font-size:12px;color:var(--muted)">Respuesta sugerida (editala si querés):</label>
+        <textarea class="input-field" style="width:100%;min-height:64px;margin-top:4px" id="ml-ans-${q.id}">${escHtml(q.suggested_answer || '')}</textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="btn-primary" style="font-size:13px;padding:7px 14px" onclick="approveMLPending('${q.id}')">✓ Aprobar y publicar</button>
+          <button class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="rejectMLPending('${q.id}')">Rechazar</button>
+        </div>
+      </div>`).join('')
+  } catch (e) { card.style.display = 'none' }
+}
+
+window.approveMLPending = async function (id) {
+  const ta = document.getElementById('ml-ans-' + id)
+  const answer = ta ? ta.value.trim() : ''
+  if (!answer) { showToast('La respuesta no puede estar vacía', 'error'); return }
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch(WORKER_URL + '/api/ml/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (session?.access_token || '') },
+      body: JSON.stringify({ id, answer }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data.ok) throw new Error(data.error || 'No se pudo publicar')
+    showToast('Respuesta publicada en MercadoLibre ✓', 'success')
+    loadMLPending()
+  } catch (e) { showToast('Error: ' + (e.message || e), 'error') }
+}
+
+window.rejectMLPending = async function (id) {
+  if (!confirm('¿Descartar esta respuesta sugerida? No se publica nada en ML.')) return
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    const res = await fetch(WORKER_URL + '/api/ml/reject', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (session?.access_token || '') },
+      body: JSON.stringify({ id }),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data.ok) throw new Error(data.error || 'No se pudo rechazar')
+    showToast('Pregunta descartada', 'success')
+    loadMLPending()
+  } catch (e) { showToast('Error: ' + (e.message || e), 'error') }
+}
+
 window.loadCatalogo = async function () {
   if (!currentRestaurant) return
+  loadMLPending()
   try {
     const { integrations } = await import('./lib/db.js')
     const list = await integrations.listByRestaurant(currentRestaurant.id)
