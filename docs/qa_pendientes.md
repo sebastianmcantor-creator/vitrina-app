@@ -3,6 +3,24 @@
 > Generado el 2026-06-22 por un QA multi-agente (9 agentes: bugs frontend/worker, integraciones, política de mensajes, login, UX de 3 personas). Consolidado y deduplicado.
 > **Mandan los docs y Sebastián decide qué se arregla y en qué orden.** Esto es el backlog, no una orden de ejecución.
 
+## ✅ ARREGLADOS el 2026-06-22 (sesión de fixes)
+Verificados en código + endpoints del worker probados con curl (falta el click-through en navegador):
+- **C1** ✓ eliminado el modal viejo con `post-caption` duplicado → el composer real funciona.
+- **C2** ✓ `path`/`method` declarados + try/catch global con CORS (M3). Verificado: la zona 7640+ responde 400/404, ya no 500.
+- **C4** ✓ el handler recibe `ctx` real (auto-respuesta ML en background no se cancela).
+- **C5** ✓ order-webhook resuelve el token del restaurante vía `?rest=` → los pagos de mesa se marcan "paid".
+- **C6** ✓ `adminFetch` manda Bearer token en maestro → panel maestro carga.
+- **C7+C8** ✓ guard `isAdminRequest` en `/api/sales/*` (salvo públicos) y en `/api/wa/provision|release`. Verificado: 403 sin token, unsubscribe sigue 200.
+- **C9** ✓ "Agente de Ventas" oculto, visible solo para admin.
+- **C10** ✓ notificaciones usan `mesaFinal`/`mesaEfectiva()`.
+- **A1** ✓ `switchSection('config')` tras pago MP. **A2/M1** ✓ tier guardado como `planId` completo. **A12** ✓ CSS de la caja WhatsApp con tokens reales.
+
+### Quedan de la lista "antes de vender" (NO arreglados — más grandes):
+- **C3** — sistema de 5 aprobaciones inexistente; ML auto-responde sin aprobación. Es un **feature** a construir, no un fix. Mínimo urgente: que ML guarde como `pending`.
+- **A5** — el número Twilio comprado no es sender WhatsApp válido (requiere alta de sender aprobado por Meta en Twilio — **infra externa**, no solo código).
+
+---
+
 ## Estado al cierre de la sesión del 2026-06-22
 Lo que SÍ se construyó/arregló en esta sesión (no está en la lista de abajo):
 - ✅ "Traer de mi web" (importa imágenes + info del sitio del negocio) — worker `/api/marketing/import-from-web` + botón en composer.
