@@ -15,8 +15,9 @@ Verificados en código + endpoints del worker probados con curl (falta el click-
 - **C10** ✓ notificaciones usan `mesaFinal`/`mesaEfectiva()`.
 - **A1** ✓ `switchSection('config')` tras pago MP. **A2/M1** ✓ tier guardado como `planId` completo. **A12** ✓ CSS de la caja WhatsApp con tokens reales.
 
-### Quedan de la lista "antes de vender" (NO arreglados — más grandes):
-- **C3** — sistema de 5 aprobaciones inexistente; ML auto-responde sin aprobación. Es un **feature** a construir, no un fix. Mínimo urgente: que ML guarde como `pending`.
+- **C3** ✓ (mínimo) — ML ya NO auto-publica: guarda la sugerencia en `ml_pending_answers` y el dueño aprueba/rechaza en Catálogo. Endpoints `/api/ml/approve|reject`. **Requiere correr la migración `043_ml_pending_answers.sql` en Supabase.** Falta (fase futura): la máquina real de 5 aprobaciones → modo automático (`ml_auto_answer`).
+
+### Queda de la lista "antes de vender" (NO arreglado — infra externa):
 - **A5** — el número Twilio comprado no es sender WhatsApp válido (requiere alta de sender aprobado por Meta en Twilio — **infra externa**, no solo código).
 
 ---
