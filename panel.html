@@ -2773,6 +2773,7 @@ div:has(> #trial-banner-text) {
               Conectá tu cuenta de Google Business para ver análisis de búsquedas, vistas y reseñas.
             </div>
           </div>
+          <div id="google-reviews-content" style="margin-top:8px"></div>
         </div>
 
         <!-- Instagram -->
@@ -8532,6 +8533,7 @@ window.loadAnalisis = async function () {
     if (googleIntegration && googleIntegration.is_active) {
       document.getElementById('btn-connect-google').textContent = 'Desconectar'
       document.getElementById('btn-connect-google').onclick = () => disconnectIntegration('google_business')
+      loadGoogleReviews()
 
       // Cargar datos de Google Business
       try {
@@ -8702,6 +8704,72 @@ async function loadCompetitors() {
   } catch (e) {
     console.error('Error cargando competidores:', e)
   }
+}
+
+// Reseñas de Google: listar + Viti sugiere respuesta + responder
+window.loadGoogleReviews = async function () {
+  var c = document.getElementById('google-reviews-content')
+  if (!c || !currentRestaurant) return
+  c.innerHTML = '<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Cargando reseñas...</div>'
+  try {
+    var res = await fetch(WORKER_URL + '/api/google/reviews?restaurant_id=' + currentRestaurant.id)
+    var data = await res.json()
+    if (data.connected === false) { c.innerHTML = ''; return }
+    if (!data.ok) {
+      c.innerHTML = '<div style="font-size:12.5px;color:var(--muted);background:var(--cream2);border-radius:8px;padding:10px 12px">⏳ ' + escHtml(data.error || 'Reseñas todavía no disponibles (esperando aprobación de Google).') + '</div>'
+      return
+    }
+    var reviews = data.reviews || []
+    window._googleReviews = reviews
+    if (!reviews.length) { c.innerHTML = '<div style="font-size:12.5px;color:var(--muted);padding:8px 0">Todavía no hay reseñas.</div>'; return }
+    var starMap = { ONE: '⭐', TWO: '⭐⭐', THREE: '⭐⭐⭐', FOUR: '⭐⭐⭐⭐', FIVE: '⭐⭐⭐⭐⭐' }
+    c.innerHTML = '<div style="font-size:13px;font-weight:600;margin:6px 0 10px">💬 Reseñas de Google — Viti te ayuda a responder</div>' + reviews.map(function (r, i) {
+      var stars = starMap[r.rating] || ''
+      var safeName = (r.name || '').replace(/'/g, "\\'")
+      return '<div style="border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px;background:#fff">'
+        + '<div style="font-size:12.5px;margin-bottom:4px"><strong>' + escHtml(r.reviewer || 'Cliente') + '</strong> ' + stars + '</div>'
+        + '<div style="font-size:13px;color:var(--ink);margin-bottom:8px">' + escHtml(r.comment || '(sin texto)') + '</div>'
+        + (r.reply
+          ? '<div style="font-size:12px;color:var(--sage);background:#eef5ef;border-radius:8px;padding:8px 10px">✓ Ya respondiste: ' + escHtml(r.reply) + '</div>'
+          : '<textarea id="gr-ans-' + i + '" class="input-field" style="width:100%;min-height:56px;font-size:12.5px" placeholder="Escribí tu respuesta o pedile a Viti..."></textarea>'
+          + '<div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">'
+          + '<button onclick="vitiSugiereResena(' + i + ')" class="btn-secondary" style="font-size:12px;padding:6px 12px">✨ Viti sugiere</button>'
+          + '<button onclick="responderResena(\'' + safeName + '\',' + i + ')" class="btn-primary" style="font-size:12px;padding:6px 12px">Responder en Google</button>'
+          + '</div>')
+        + '</div>'
+    }).join('')
+  } catch (e) { c.innerHTML = '' }
+}
+
+window.vitiSugiereResena = async function (i) {
+  var r = (window._googleReviews || [])[i]; if (!r) return
+  var ta = document.getElementById('gr-ans-' + i); if (!ta) return
+  var prev = ta.value; ta.value = 'Viti está pensando...'
+  try {
+    var res = await fetch(WORKER_URL + '/api/google/suggest-reply', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ businessName: currentRestaurant.name, reviewText: r.comment, rating: r.rating, reviewer: r.reviewer }),
+    })
+    var data = await res.json()
+    ta.value = data.ok ? data.reply : prev
+    if (!data.ok) showToast('No se pudo sugerir', 'error')
+  } catch (e) { ta.value = prev; showToast('Error', 'error') }
+}
+
+window.responderResena = async function (reviewName, i) {
+  var ta = document.getElementById('gr-ans-' + i)
+  var comment = (ta ? ta.value : '').trim()
+  if (!comment) { showToast('Escribí o pedí una respuesta primero', 'error'); return }
+  try {
+    var res = await fetch(WORKER_URL + '/api/google/reply-review', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant_id: currentRestaurant.id, reviewName: reviewName, comment: comment }),
+    })
+    var data = await res.json()
+    if (!data.ok) throw new Error(data.error || 'No se pudo')
+    showToast('Respuesta publicada en Google ✓', 'success')
+    loadGoogleReviews()
+  } catch (e) { showToast('Error: ' + (e.message || e), 'error') }
 }
 
 window.connectGoogleBusiness = function () {
