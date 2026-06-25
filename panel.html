@@ -8332,13 +8332,13 @@ window.loadFacturacion = async function () {
   const btnUpgrade = document.getElementById('btn-upgrade-plan')
   const btnCancel = document.getElementById('btn-cancel-plan')
 
-  if (badgeClass === 'free') {
-    btnUpgrade.style.display = 'inline-flex'
-    btnCancel.style.display = 'none'
-  } else {
-    btnUpgrade.style.display = 'none'
-    btnCancel.style.display = 'inline-flex'
-  }
+  const subSt = currentRestaurant.subscription_status
+  const sinPlanPago = (badgeClass === 'free' || !subSt || subSt === 'cancelled' || subSt === 'past_due')
+  // Pagar/activar/cambiar: siempre visible (así nunca falta el botón de pago)
+  btnUpgrade.style.display = 'inline-flex'
+  btnUpgrade.textContent = sinPlanPago ? '✨ Activar plan' : '✨ Cambiar de plan'
+  // Cancelar: solo si hay una suscripción en prueba o activa
+  btnCancel.style.display = (subSt === 'trialing' || subSt === 'active') ? 'inline-flex' : 'none'
 
   // Cargar historial de pagos
   loadPaymentsHistory()
@@ -10335,24 +10335,19 @@ window.confirmCancelPlan = async function () {
     return
   }
 
-  // TODO: Implementar cancelación vía API de MercadoPago
-  // Por ahora, solo actualizar en Supabase
   try {
-    await restaurants.update(currentRestaurant.id, {
-      subscription_status: 'cancelled',
-      subscription_tier: 'free',
-      can_take_orders: false,
-      tano_messages_limit: 75,
+    // Cancela DE VERDAD en MercadoPago (para que dejen de cobrar) + marca en la DB
+    const res = await fetch(WORKER_URL + '/api/mp/cancelar-suscripcion', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurantId: currentRestaurant.id }),
     })
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data.ok) throw new Error(data.error || 'No se pudo cancelar')
 
-    Object.assign(currentRestaurant, {
-      subscription_status: 'cancelled',
-      subscription_tier: 'free',
-      can_take_orders: false,
-      tano_messages_limit: 75,
-    })
-
-    showToast('Suscripción cancelada. Tu plan se desactivará al finalizar el período actual.', 'success')
+    Object.assign(currentRestaurant, { subscription_status: 'cancelled' })
+    showToast(data.mpCancelled
+      ? 'Suscripción cancelada en MercadoPago ✓. No se te cobrará más.'
+      : (data.warning || 'Suscripción cancelada.'), 'success')
     loadFacturacion()
   } catch (e) {
     showToast('Error cancelando suscripción: ' + e.message, 'error')
