@@ -8426,15 +8426,15 @@ window.openUpgradeModal = async function () {
 
   const planesRestaurante = [
     {
-      id: 'rest-menu', nombre: 'Solo Menú', precioUSD: 27,
+      id: 'rest-menu', nombre: 'Solo Menú', precioUSD: 27, recommended: true,
       features: ['Menú QR ilimitado · ES/EN/PT', 'Asistente Tano ilimitado + agrega al carrito', 'Pedidos online + pantalla de cocina', 'Pagos con MercadoPago', '✅ WhatsApp Business incluido'],
     },
     {
-      id: 'rest-mkt', nombre: 'Marketing', precioUSD: 57,
+      id: 'rest-mkt', nombre: 'Marketing', precioUSD: 57, paused: true,
       features: ['Viti: estrategia mensual IA', '30 publicaciones auto/mes', 'Google · Instagram · Facebook', 'Viti responde reseñas automáticamente', 'Análisis de competidores · Informe PDF', '✅ WhatsApp Business incluido', '🎁 Al pagar: $10 USD para tu primera campaña con Viti'],
     },
     {
-      id: 'rest-combo', nombre: 'Combo', precioUSD: 70, recommended: true,
+      id: 'rest-combo', nombre: 'Combo', precioUSD: 70, paused: true,
       features: ['Todo Solo Menú +', 'Todo Marketing +', 'Asistente IA + Viti trabajando juntos', 'Panel unificado operaciones + marketing', '✅ WhatsApp Business incluido', 'Ahorrás USD 14 vs contratar separado', '🎁 Al pagar: $10 USD para tu primera campaña con Viti'],
     },
   ]
@@ -8451,11 +8451,13 @@ window.openUpgradeModal = async function () {
   const grid = document.getElementById('upgrade-plans-grid')
   grid.innerHTML = planes.map(plan => {
     const precioARS = Math.round(plan.precioUSD * tc)
-    const recommendedBadge = plan.recommended
+    const recommendedBadge = plan.paused
+      ? '<div style="background:var(--cream2);color:var(--muted);font-size:10px;font-weight:600;padding:3px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:.06em;width:fit-content;margin-bottom:8px">Próximamente</div>'
+      : plan.recommended
       ? '<div style="background:var(--gold);color:var(--white);font-size:10px;font-weight:600;padding:3px 10px;border-radius:8px;text-transform:uppercase;letter-spacing:.06em;width:fit-content;margin-bottom:8px">Recomendado</div>'
       : ''
     return `
-      <div class="plan-card ${plan.recommended ? 'recommended' : ''}" onclick="selectPlan('${plan.id}', '${plan.nombre}', ${plan.precioUSD})">
+      <div class="plan-card ${plan.recommended && !plan.paused ? 'recommended' : ''}" style="${plan.paused ? 'opacity:.62' : ''}" ${plan.paused ? '' : `onclick="selectPlan('${plan.id}', '${plan.nombre}', ${plan.precioUSD})"`}>
         ${recommendedBadge}
         <div class="plan-card-name">${plan.nombre}</div>
         <div>
@@ -8465,9 +8467,9 @@ window.openUpgradeModal = async function () {
         <div class="plan-card-features">
           ${plan.features.map(f => `<div class="plan-card-feature">${f}</div>`).join('')}
         </div>
-        <button class="plan-card-btn" onclick="event.stopPropagation();selectPlan('${plan.id}', '${plan.nombre}', ${plan.precioUSD})">
-          Elegir ${plan.nombre}
-        </button>
+        ${plan.paused
+          ? `<button class="plan-card-btn" disabled style="opacity:.6;cursor:not-allowed">Próximamente</button>`
+          : `<button class="plan-card-btn" onclick="event.stopPropagation();selectPlan('${plan.id}', '${plan.nombre}', ${plan.precioUSD})">Elegir ${plan.nombre}</button>`}
       </div>`
   }).join('')
 
