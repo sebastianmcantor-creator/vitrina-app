@@ -103,7 +103,8 @@ Restaurante/Bar/Café · Heladería/Pastelería · Rotisería/Delivery · Dieté
 
 **Estado ACTIVO en el panel (restaurante-only, decisión de Sebastián 2026-06-22):** el selector de onboarding (`panel.html`, PASO 1) ofrece **solo Restaurante/Bar/Café**. Los botones de local/ecommerce/services tienen `display:none`. **MercadoPago** también es solo-restaurante (`renderMpCard` gatea a `business_type === 'restaurant'`). La infraestructura de los demás rubros (BIZ_CONFIG, navVis por `esLocal`, plan `local-mkt`, secciones Catálogo/Etiquetas/Proveedores) ya existe completa; para reactivar un rubro, sacar el `display:none` de su botón + el gate de `renderMpCard`. NO reactivar sin pedido explícito de Sebastián.
 - La sección **"Agente de Ventas"** del panel es una **herramienta interna de prospección de Vitrina** (encontrar/contactar restaurantes potenciales), NO una función del cliente. Visible solo para admins (`nav-sales-agent` con `display:none` + reveal por email admin). El comentario viejo del código que decía "auto-respuestas MercadoLibre" era incorrecto.
-- Las **respuestas automáticas de MercadoLibre** (preguntas de compradores) viven en Catálogo → "Preguntas de MercadoLibre por aprobar" (tabla `ml_pending_answers`, migración 043) — relevante cuando se reactiven los rubros de comercio.
+- **MercadoLibre / comercios: FUERA de alcance (decisión de Sebastián 2026-06-25).** Vitrina es **solo gastronomía** por ahora. La función de preguntas de ML (`ml_pending_answers`, migración 043) quedó construida pero **DORMIDA**: **NO correr la migración 043** ni reactivar ML/comercios salvo pedido explícito de Sebastián. La sección Catálogo/ML no se muestra en restaurante-only.
+- **Diseño de posts: motor propio (canvas, 8 plantillas), NO Canva.** No hace falta conectar la API de Canva.
 
 ---
 
