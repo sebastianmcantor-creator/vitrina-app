@@ -7458,6 +7458,14 @@ const STATUS_NEXT = {
   ready:     { label: 'Entregado',  next: 'delivered' },
 }
 
+// Para el botón "deshacer" (si tocaste un estado sin querer)
+const STATUS_PREV = {
+  confirmed: 'pending',
+  preparing: 'confirmed',
+  ready:     'preparing',
+  delivered: 'ready',
+}
+
 window.loadPedidos = async function () {
   if (!currentRestaurant) return
   pedidosMap = {}
@@ -7601,7 +7609,7 @@ function suscribirPedidosRealtime() {
     }, async payload => {
       const o = payload.new
       const oldId = payload.old?.id ?? o?.id
-      if (payload.eventType === 'DELETE' || o?.status === 'delivered' || o?.status === 'cancelled') {
+      if (payload.eventType === 'DELETE' || o?.status === 'cancelled') {
         delete pedidosMap[oldId]
       } else if (payload.eventType === 'INSERT') {
         const { data } = await supabase.from('orders').select('*, order_items(*)').eq('id', o.id).single()
@@ -7642,8 +7650,10 @@ function renderPedidos() {
   const container = document.getElementById('pedidos-body')
   if (!container) return
   const list = Object.values(pedidosMap).sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+  const activos = list.filter(o => o.status !== 'delivered')
+  const salieron = list.filter(o => o.status === 'delivered')
 
-  setBadgeCount(list.length)
+  setBadgeCount(activos.length)
 
   if (!list.length) {
     container.innerHTML = `<div style="text-align:center;padding:48px 24px">
@@ -7662,14 +7672,16 @@ function renderPedidos() {
     return
   }
 
-  container.innerHTML = '<div class="pedidos-list">' + list.map(o => {
+  const mesaLabel = (currentRestaurant?.business_type || 'restaurant') === 'restaurant' ? 'Mesa' : 'Pedido'
+  const cardHtml = (o, done) => {
     const items = o.order_items ?? []
     const total = '$' + Number(o.total ?? 0).toLocaleString('es-AR')
     const next  = STATUS_NEXT[o.status]
+    const prev  = STATUS_PREV[o.status]
     return `
-      <div class="pedido-card">
+      <div class="pedido-card"${done ? ' style="opacity:.6"' : ''}>
         <div class="pedido-card-header">
-          <div class="pedido-mesa">${(currentRestaurant?.business_type||'restaurant')==='restaurant'?'Mesa':'Pedido'} ${o.table_number}</div>
+          <div class="pedido-mesa">${mesaLabel} ${o.table_number}</div>
           <div class="pedido-hora">${formatHora(o.created_at)} · ${formatElapsedPedido(o.created_at)}</div>
           <span class="pedido-status-badge status-${o.status ?? 'pending'}">${STATUS_LABELS[o.status] ?? o.status}</span>
         </div>
@@ -7684,22 +7696,40 @@ function renderPedidos() {
         <div class="pedido-card-footer">
           <span class="pedido-total">${total}</span>
           <div class="pedido-actions">
-            <button class="btn-secondary" style="padding:7px 14px;font-size:13px" onclick="cancelarPedido('${o.id}')">Cancelar</button>
+            ${prev ? `<button class="btn-secondary" style="padding:7px 12px;font-size:13px" onclick="retrocederEstado('${o.id}')" title="Deshacer (volver al estado anterior)">↩ Deshacer</button>` : ''}
+            ${!done ? `<button class="btn-secondary" style="padding:7px 14px;font-size:13px" onclick="cancelarPedido('${o.id}')">Cancelar</button>` : ''}
             ${next ? `<button class="btn-primary" style="padding:7px 14px;font-size:13px" onclick="avanzarEstado('${o.id}','${next.next}')">${next.label}</button>` : ''}
           </div>
         </div>
       </div>`
-  }).join('') + '</div>'
+  }
+
+  let html = '<div class="pedidos-list">' + activos.map(o => cardHtml(o, false)).join('') + '</div>'
+  if (salieron.length) {
+    html += `<div style="margin:20px 0 8px;font-size:13px;font-weight:600;color:var(--muted)">✅ Ya salieron (${salieron.length})</div>`
+      + '<div class="pedidos-list">' + salieron.slice().reverse().map(o => cardHtml(o, true)).join('') + '</div>'
+  }
+  container.innerHTML = html
 }
 
 window.avanzarEstado = async function (id, status) {
   try {
     await orders.updateStatus(id, status)
-    if (status === 'delivered') {
-      delete pedidosMap[id]
-    } else {
-      if (pedidosMap[id]) pedidosMap[id] = { ...pedidosMap[id], status }
-    }
+    // Los entregados NO se borran: quedan visibles en "Ya salieron" (con Deshacer).
+    if (pedidosMap[id]) pedidosMap[id] = { ...pedidosMap[id], status }
+    renderPedidos()
+  } catch (e) { showToast('Error: ' + e.message, 'error') }
+}
+
+// Deshacer: vuelve el pedido al estado anterior (por si tocaste sin querer)
+window.retrocederEstado = async function (id) {
+  const o = pedidosMap[id]
+  if (!o) return
+  const prev = STATUS_PREV[o.status]
+  if (!prev) return
+  try {
+    await orders.updateStatus(id, prev)
+    pedidosMap[id] = { ...o, status: prev }
     renderPedidos()
   } catch (e) { showToast('Error: ' + e.message, 'error') }
 }
