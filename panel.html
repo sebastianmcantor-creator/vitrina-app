@@ -3637,6 +3637,15 @@ div:has(> #trial-banner-text) {
           <div class="page-subtitle" id="config-page-subtitle">Plan, equipo, WhatsApp, horarios y asistente. Todos los ajustes de tu negocio en un lugar.</div>
         </div>
 
+        <!-- MercadoPago — cobros (acceso intuitivo desde Configuración) -->
+        <div class="card" id="mp-connect-card-cfg" style="display:none">
+          <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <span>💳 Cobros con MercadoPago</span>
+            <button id="btn-connect-mp-cfg" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectMercadoPago()">Conectar cuenta</button>
+          </div>
+          <div id="mp-connect-content-cfg" style="margin-top:16px"></div>
+        </div>
+
         <!-- Plan actual -->
         <div class="card" id="plan-card-section">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
@@ -7868,6 +7877,7 @@ window.downgradePlan = function () {
 window.loadConfig = async function () {
   if (!currentRestaurant) return
   renderPlanSection()
+  renderMpCard('-cfg')  // tarjeta de cobros MP también en Configuración (acceso intuitivo)
 
   // Mostrar alerta si quiso WhatsApp pero no está configurado
   if (currentRestaurant.wants_whatsapp && !currentRestaurant.whatsapp_operativo) {
@@ -10447,8 +10457,8 @@ window.saveWaFollowupConfig = async function () {
 }
 
 // ── MercadoPago OAuth ─────────────────────────────────────────────────────────
-function renderMpCard() {
-  const card = document.getElementById('mp-connect-card')
+function renderMpCard(sfx = '') {
+  const card = document.getElementById('mp-connect-card' + sfx)
   if (!card) return
 
   // Solo para restaurantes
@@ -10456,8 +10466,8 @@ function renderMpCard() {
   if (btype !== 'restaurant') { card.style.display = 'none'; return }
   card.style.display = 'block'
 
-  const btn     = document.getElementById('btn-connect-mp')
-  const content = document.getElementById('mp-connect-content')
+  const btn     = document.getElementById('btn-connect-mp' + sfx)
+  const content = document.getElementById('mp-connect-content' + sfx)
   const isConn  = !!(currentRestaurant.mp_connected && currentRestaurant.mp_access_token)
 
   if (isConn) {
