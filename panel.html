@@ -13739,6 +13739,46 @@ async function importarDeWeb() {
 }
 window.importarDeWeb = importarDeWeb
 
+// Viti arma el guión para que el cliente filme su propio video (reemplaza el video con IA)
+window.videoGuia = async function () {
+  if (!currentRestaurant) return
+  var btn = document.getElementById('btn-video-guia')
+  var orig = btn.textContent
+  btn.disabled = true; btn.textContent = '🎬 Pensando...'
+  var g = document.getElementById('sug-img-gallery')
+  try {
+    var caption = (document.getElementById('post-caption') ? document.getElementById('post-caption').value : '').trim().slice(0, 200)
+    var res = await fetch(WORKER_URL + '/api/marketing/video-brief', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ businessName: currentRestaurant.name, businessType: currentRestaurant.business_type || 'restaurant', topic: caption }),
+    })
+    var data = await res.json()
+    if (!data.ok || !data.brief) throw new Error(data.error || 'No se pudo armar la guía')
+    var b = data.brief
+    g.style.display = 'block'
+    g.innerHTML = '<div style="border:1px solid var(--border);border-radius:10px;padding:14px;background:#fffaf3">'
+      + '<div style="font-weight:600;font-size:13.5px;margin-bottom:8px">🎬 Guía de Viti para filmar tu video</div>'
+      + '<div style="font-size:13px;color:var(--ink);margin-bottom:8px"><strong>Idea:</strong> ' + escHtml(b.idea || '') + '</div>'
+      + '<div style="font-size:12.5px;color:var(--muted);margin-bottom:8px"><strong>Duración:</strong> ' + escHtml(b.duracion || '') + '</div>'
+      + '<div style="font-size:13px;margin-bottom:4px"><strong>Tomas:</strong></div><ol style="margin:0 0 8px 18px;font-size:12.5px;color:var(--ink);line-height:1.6">' + (b.tomas || []).map(function (t) { return '<li>' + escHtml(t) + '</li>' }).join('') + '</ol>'
+      + '<div style="font-size:13px;margin-bottom:4px"><strong>Tips:</strong></div><ul style="margin:0 0 8px 18px;font-size:12.5px;color:var(--muted);line-height:1.6">' + (b.tips || []).map(function (t) { return '<li>' + escHtml(t) + '</li>' }).join('') + '</ul>'
+      + (b.textoSugerido ? '<div style="font-size:12.5px;background:var(--cream2);border-radius:8px;padding:8px 10px;margin-top:6px"><strong>Texto sugerido:</strong> ' + escHtml(b.textoSugerido) + ' &nbsp;<button onclick="usarTextoVideo(\'' + encodeURIComponent(b.textoSugerido) + '\')" style="background:none;border:none;color:var(--terra);cursor:pointer;font-size:12px;font-weight:600">Usar este texto</button></div>' : '')
+      + '<div style="font-size:12px;color:var(--muted);margin-top:10px">Filmalo con el celu siguiendo la guía y después tocá <strong>📹 Subir un video</strong>.</div>'
+      + '</div>'
+  } catch (e) {
+    alert('No se pudo armar la guía: ' + (e.message || e))
+  } finally {
+    btn.disabled = false; btn.textContent = orig
+  }
+}
+
+window.usarTextoVideo = function (enc) {
+  var t = decodeURIComponent(enc)
+  var ta = document.getElementById('post-caption')
+  if (ta) { ta.value = t; if (typeof updatePreview === 'function') updatePreview() }
+  showToast('Texto puesto en el post ✓', 'success')
+}
+
 // Genera una imagen con IA (Cloudflare Flux) a partir de una descripción y la sube
 // a Storage para tener una URL pública (Instagram no acepta base64).
 async function generarImagenIA() {
@@ -16166,7 +16206,7 @@ window.guardarVentasCanal = async function () {
             <button id="btn-import-web" onclick="importarDeWeb()" class="btn-secondary" style="flex:1;font-size:12.5px;padding:7px 12px;min-width:140px">🌐 Traer de mi web</button>
           </div>
           <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-            <button id="btn-ai-gen-video" onclick="generarVideoIA()" class="btn-secondary" style="flex:1;min-width:140px;font-size:12.5px;padding:7px 12px">🎬 Generar video con IA</button>
+            <button id="btn-video-guia" onclick="videoGuia()" class="btn-secondary" style="flex:1;min-width:140px;font-size:12.5px;padding:7px 12px">🎬 Viti te arma el guión del video</button>
             <button id="btn-upload-video" onclick="document.getElementById('video-file-input').click()" class="btn-secondary" style="flex:1;min-width:140px;font-size:12.5px;padding:7px 12px">📹 Subir un video</button>
           </div>
           <input type="file" id="video-file-input" accept="video/*" style="display:none" onchange="handleVideoUpload(this)">
