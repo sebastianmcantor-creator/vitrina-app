@@ -5518,16 +5518,26 @@ function fillForm(rest) {
   previewImgFromUrl('logo',  rest.logo_url  || '')
   previewImgFromUrl('cover', rest.cover_url || '')
 
-  // Mostrar banner de trial si aplica
-  if (rest.trial_end && (rest.subscription_status === 'trialing' || rest.subscription_status === 'free')) {
+  // Banner de prueba / prueba vencida — siempre con CTA para pagar
+  if (rest.trial_end && (rest.subscription_status === 'trialing' || rest.subscription_status === 'free' || !rest.subscription_status)) {
     const daysLeft = Math.ceil((new Date(rest.trial_end) - Date.now()) / 86400000)
     const banner = document.getElementById('trial-banner')
     const bannerText = document.getElementById('trial-banner-text')
-    if (banner && daysLeft > 0 && daysLeft <= 14) {
-      banner.style.display = 'block'
-      bannerText.textContent = daysLeft === 1
-        ? '⚠️ Tu prueba gratuita vence mañana'
-        : `⏳ Tu prueba gratuita vence en ${daysLeft} días`
+    if (banner && bannerText) {
+      const irAPagar = () => switchSection('facturacion', document.querySelector('[data-section="facturacion"]'))
+      if (daysLeft <= 0) {
+        // Prueba VENCIDA — banner rojo, claro, con CTA
+        banner.style.display = 'block'
+        banner.style.background = 'linear-gradient(135deg,#b3261e,#8f1d18)'
+        banner.style.cursor = 'pointer'
+        banner.onclick = irAPagar
+        bannerText.innerHTML = '⛔ Tu prueba gratuita terminó — <strong>activá tu plan para seguir usando Vitrina</strong> &nbsp;<span style="text-decoration:underline">Activar plan →</span>'
+      } else if (daysLeft <= 14) {
+        banner.style.display = 'block'
+        banner.style.cursor = 'pointer'
+        banner.onclick = irAPagar
+        bannerText.innerHTML = (daysLeft <= 3 ? '⚠️' : '⏳') + ' Tu prueba gratuita vence ' + (daysLeft === 1 ? 'mañana' : 'en ' + daysLeft + ' días') + ' &nbsp;<span style="text-decoration:underline">Activar plan →</span>'
+      }
     }
   }
 }
@@ -8394,11 +8404,11 @@ function checkAccountStatus(rest) {
   const status = rest.subscription_status ?? 'active'
   const trialEnd = rest.trial_end ? new Date(rest.trial_end) : null
 
-  // Si el plan es free o activo, no suspender
-  if (plan === 'free' || status === 'active' || status === 'trialing') return false
+  // Plan free (retención) o pago activo: nunca suspender
+  if (plan === 'free' || status === 'active') return false
 
-  // Si está cancelled Y han pasado más de 3 días de gracia desde trial_end
-  if (status === 'cancelled' && trialEnd) {
+  // Prueba vencida, cancelada o impaga: tras 3 días de gracia desde trial_end → suspender
+  if ((status === 'trialing' || status === 'cancelled' || status === 'past_due') && trialEnd) {
     const gracePeriod = 3 * 24 * 60 * 60 * 1000 // 3 días
     if (Date.now() - trialEnd.getTime() > gracePeriod) {
       const params = new URLSearchParams({
