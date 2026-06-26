@@ -7782,7 +7782,7 @@ const PLAN_FEATURES = {
 function renderPlanSection() {
   if (!currentRestaurant) return
   const plan = getPlanKey(currentRestaurant)
-  const status = currentRestaurant.plan_status ?? 'active'
+  const status = currentRestaurant.subscription_status ?? 'trialing'
 
   // Badge del plan actual
   const badge = document.getElementById('plan-current-badge')
@@ -7797,10 +7797,18 @@ function renderPlanSection() {
     msg.textContent = _bt==='restaurant'
       ? 'Estás en el plan gratuito. Upgradear desbloquea pedidos, cocina y pagos.'
       : 'Estás en el plan gratuito. Upgradear desbloquea pedidos, asistente ilimitado y pagos.'
+  } else if (status === 'trialing') {
+    const dl = currentRestaurant.trial_end ? Math.ceil((new Date(currentRestaurant.trial_end) - Date.now()) / 86400000) : null
+    msg.innerHTML = (dl != null && dl > 0)
+      ? `🎉 Prueba gratuita · <strong>${dl} día${dl !== 1 ? 's' : ''}</strong> restante${dl !== 1 ? 's' : ''}. Activá tu plan antes de que termine para no perder el servicio (todavía no estás pagando nada).`
+      : `<span style="color:var(--terra)">⚠️ Tu prueba terminó. Activá tu plan para seguir usando Vitrina.</span>`
   } else if (status === 'active') {
     msg.textContent = `Plan activo · Se renueva automáticamente cada mes vía MercadoPago.`
-  } else if (status === 'cancelled' || status === 'paused') {
-    msg.innerHTML = `<span style="color:var(--terra)">⚠️ Tu plan está ${status === 'cancelled' ? 'cancelado' : 'pausado'}. Renovalo para restablecer las funciones.</span>`
+  } else if (status === 'cancelled' || status === 'past_due' || status === 'paused') {
+    const t = status === 'cancelled' ? 'cancelado' : status === 'past_due' ? 'con un pago pendiente' : 'pausado'
+    msg.innerHTML = `<span style="color:var(--terra)">⚠️ Tu plan está ${t}. Activá tu plan para restablecer las funciones.</span>`
+  } else {
+    msg.textContent = 'Plan gratuito.'
   }
 
   // Bloque de uso de Tano (solo free)
