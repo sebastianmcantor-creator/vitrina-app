@@ -2603,13 +2603,17 @@ div:has(> #trial-banner-text) {
     </div>
 
     <div class="card">
-      <div class="card-title">➕ Extender cupo</div>
+      <div class="card-title">➕ Sumar mensajes</div>
+      <div style="font-size:12.5px;color:var(--muted);line-height:1.6;margin-bottom:12px">
+        <div style="margin-bottom:4px"><strong style="color:var(--ink)">📩 Operativos</strong> — confirmaciones, "tu pedido está listo", recordatorios de reserva. <strong>Nunca se pausan.</strong></div>
+        <div><strong style="color:var(--ink)">📣 Marketing</strong> — promociones y campañas que mandás a tus clientes. Se pausan al llegar al límite del mes.</div>
+      </div>
       <div style="display:flex;gap:12px;flex-wrap:wrap">
-        <button class="btn-secondary" onclick="waExtend('utility', 1)">+50 utility · USD 2</button>
+        <button class="btn-secondary" onclick="waExtend('utility', 1)">+50 operativos · USD 2</button>
         <button class="btn-secondary" onclick="waExtend('marketing', 1)">+50 marketing · USD 3</button>
       </div>
       <div style="font-size:12px;color:var(--muted);margin-top:10px">
-        Los bloques extra duran el mes corriente. Mensajes operativos (utility) nunca se pausan.
+        Pago único por MercadoPago (no se debita todos los meses). Los mensajes extra duran el mes corriente.
       </div>
     </div>
   </div>
@@ -8075,7 +8079,8 @@ window.waProvisionRequest = async function () {
 window.waExtend = async function (type, blocks) {
   if (!currentRestaurant) return
   const price = type === 'utility' ? 2 : 3
-  if (!confirm(`Agregar ${blocks * 50} mensajes ${type} por USD ${price * blocks}?`)) return
+  const nombre = type === 'utility' ? 'operativos' : 'de marketing'
+  if (!confirm(`¿Sumar ${blocks * 50} mensajes ${nombre} por USD ${price * blocks}?\n\nTe llevamos a MercadoPago para pagarlo (es un pago único, no se debita todos los meses). El cupo se suma apenas se confirma el pago.`)) return
   try {
     const res = await fetch(`${WORKER_URL}/api/wa/extend`, {
       method: 'POST',
@@ -8083,9 +8088,8 @@ window.waExtend = async function (type, blocks) {
       body: JSON.stringify({ restaurant_id: currentRestaurant.id, type, blocks }),
     })
     const data = await res.json()
-    if (data.ok) {
-      showToast(`Listo, ${blocks * 50} ${type} añadidos.`, 'success')
-      loadWaStatusAndUsage()
+    if (data.ok && data.init_point) {
+      window.location.href = data.init_point  // pago único en MercadoPago
     } else {
       showToast('Error: ' + (data.error || 'no se pudo'), 'error')
     }
