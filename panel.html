@@ -3657,6 +3657,7 @@ div:has(> #trial-banner-text) {
             <span id="plan-current-badge" class="plan-badge free">Free</span>
           </div>
           <div id="plan-status-msg" style="font-size:13.5px;color:var(--muted);margin:8px 0 0"></div>
+          <div id="plan-actions-row" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px"></div>
 
           <!-- Uso de Tano (solo plan free) -->
           <div id="tano-usage-block" style="display:none;margin-top:16px;padding:14px 16px;background:var(--cream);border-radius:10px;border:1px solid var(--border)">
@@ -7779,6 +7780,10 @@ const PLAN_FEATURES = {
   'local-mkt':  ['Catálogo QR ilimitado', 'MercadoLibre: publicaciones y stock automático', 'Tienda Nube: sincronización bidireccional', 'Viti: estrategia y análisis', '30 publicaciones auto/mes', 'WhatsApp Business incluido'],
 }
 
+window.irAContratar = function () {
+  switchSection('facturacion', document.querySelector('[data-section="facturacion"]'))
+}
+
 function renderPlanSection() {
   if (!currentRestaurant) return
   const plan = getPlanKey(currentRestaurant)
@@ -7811,6 +7816,13 @@ function renderPlanSection() {
     msg.textContent = 'Plan gratuito.'
   }
 
+  // Botón para contratar/activar el plan (lo que el dueño busca para empezar a pagar)
+  const planActions = document.getElementById('plan-actions-row')
+  if (planActions) {
+    const yaPaga = status === 'active'
+    planActions.innerHTML = `<button class="btn-primary" style="font-size:13px;padding:8px 16px" onclick="irAContratar()">${yaPaga ? '✨ Cambiar de plan' : '✨ Activar mi plan y empezar a pagar'}</button>`
+  }
+
   // Bloque de uso de Tano (solo free)
   const tanoBlock = document.getElementById('tano-usage-block')
   if (plan === 'free' || !plan) {
@@ -7837,7 +7849,7 @@ function renderPlanSection() {
 
   // Tarjetas de planes
   const grid = document.getElementById('plan-cards-grid')
-  const planesAMostrar = ['free', 'pro', 'full']
+  const planesAMostrar = ['free', 'pro', 'full'].filter(pid => PLAN_INFO[pid]) // evita throw por claves viejas (pro/full ya no existen)
   const _btype = currentRestaurant?.business_type || 'restaurant'
   const _asist = _btype === 'restaurant' ? 'Tano' : 'Asistente IA'
   grid.innerHTML = planesAMostrar.map(pid => {
