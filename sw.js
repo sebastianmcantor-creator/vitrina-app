@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vitrina-v2';
+const CACHE_NAME = 'vitrina-v3';
 const STATIC_ASSETS = [
   '/lib/vitrina-tokens.css',
 ];
@@ -33,9 +33,9 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // HTML / navegación: SIEMPRE fresco (evita que el panel quede cacheado y viejo).
+  // HTML y JS: SIEMPRE frescos (el panel y lib/*.js no deben quedar cacheados/viejos).
   // Bypassa el caché del navegador; si no hay red, cae al caché como fallback.
-  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html') || url.pathname.endsWith('.js')) {
     event.respondWith(
       fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
     );

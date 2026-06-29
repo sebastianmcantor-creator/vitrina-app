@@ -5055,7 +5055,7 @@ function renderSidebarRestaurant(rest) {
   const navVis = btypeUnset ? {
     reservas: false, agenda: false, mesas: false, catalogo: false,
     reminders: false, etiquetas: false, proveedores: false,
-    delivery: false, caja: false,
+    delivery: false, caja: false, marketing: false, campanas: false,
   } : {
     reservas:      esResto,
     agenda:        esResto || esServ,
@@ -5066,6 +5066,9 @@ function renderSidebarRestaurant(rest) {
     proveedores:   esLocal,
     delivery:      esResto || esLocal, // rentabilidad Rappi/PedidosYa
     caja:          esResto || esLocal,
+    // Marketing/Campañas: ocultos — solo se vende "Solo Menú" (no incluye marketing).
+    marketing:     false,
+    campanas:      false,
   }
   Object.entries(navVis).forEach(([section, visible]) => {
     const btn = document.querySelector(`[data-section="${section}"]`)
@@ -8523,7 +8526,8 @@ window.openUpgradeModal = async function () {
     },
   ]
 
-  const planes = isLocal ? planesLocal : planesRestaurante
+  // Solo mostramos los planes activos (no los pausados: Marketing/Combo quedan fuera).
+  const planes = (isLocal ? planesLocal : planesRestaurante).filter(p => !p.paused)
 
   const grid = document.getElementById('upgrade-plans-grid')
   grid.innerHTML = planes.map(plan => {
