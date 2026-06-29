@@ -7782,6 +7782,8 @@ const PLAN_FEATURES = {
 
 window.irAContratar = function () {
   switchSection('facturacion', document.querySelector('[data-section="facturacion"]'))
+  // Abrir directo la selección de plan para elegir y pagar
+  setTimeout(() => { if (typeof openUpgradeModal === 'function') openUpgradeModal() }, 200)
 }
 
 function renderPlanSection() {
@@ -7930,8 +7932,8 @@ window.downgradePlan = function () {
 // ── loadConfig ────────────────────────────────────────────────────────────────
 window.loadConfig = async function () {
   if (!currentRestaurant) return
+  renderMpCard('-cfg')  // PRIMERO: que la card de cobros aparezca aunque algo más falle
   renderPlanSection()
-  renderMpCard('-cfg')  // tarjeta de cobros MP también en Configuración (acceso intuitivo)
 
   // Mostrar alerta si quiso WhatsApp pero no está configurado
   if (currentRestaurant.wants_whatsapp && !currentRestaurant.whatsapp_operativo) {
@@ -8328,7 +8330,7 @@ window.loadFacturacion = async function () {
   if (isTrial) {
     trialAlert.style.display = 'block'
     document.getElementById('fact-trial-text').textContent =
-      `Tenés ${trialDays} día${trialDays !== 1 ? 's' : ''} restante${trialDays !== 1 ? 's' : ''} de prueba gratuita. Después se cobrará automáticamente.`
+      `Tenés ${trialDays} día${trialDays !== 1 ? 's' : ''} restante${trialDays !== 1 ? 's' : ''} de prueba gratuita. Para seguir usándolo después, activá tu plan — todavía no cargaste un medio de pago, así que no se te cobra nada solo.`
   } else {
     trialAlert.style.display = 'none'
   }
