@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vitrina-v1';
+const CACHE_NAME = 'vitrina-v2';
 const STATIC_ASSETS = [
   '/lib/vitrina-tokens.css',
 ];
@@ -30,6 +30,15 @@ self.addEventListener('fetch', event => {
     url.hostname.includes('anthropic') ||
     url.pathname.includes('/api/')
   ) {
+    return;
+  }
+
+  // HTML / navegación: SIEMPRE fresco (evita que el panel quede cacheado y viejo).
+  // Bypassa el caché del navegador; si no hay red, cae al caché como fallback.
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request, { cache: 'no-store' }).catch(() => caches.match(event.request))
+    );
     return;
   }
 
