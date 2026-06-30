@@ -19,9 +19,19 @@
 ## Mensaje 2 · WhatsApp (primer contacto)
 > Hola [NOMBRE]! Te escribo de Vitrina. Ayudamos a restaurantes a tener su menú con QR + pedidos + cobro desde la mesa, por $27 al mes. Te armo una demo con tu carta sin compromiso, ¿te interesa que te pase el link?
 
+## Demos listas para mostrar (navegables, con menú real)
+Mandalas como "mirá cómo queda" para que el prospecto lo vea funcionando:
+- 🥩 **Parrilla Don Nico** → https://www.vitrinaapp.com.ar/menu.html?slug=demo-don-nico
+- ☕ **Café Botánico** → https://www.vitrinaapp.com.ar/menu.html?slug=demo-cafe-botanico
+- 🍣 **Sushi Nami** → https://www.vitrinaapp.com.ar/menu.html?slug=demo-sushi-nami
+- 🍕 **Pizzería La Rueda** → https://www.vitrinaapp.com.ar/menu.html?slug=demo-la-rueda
+- 🍔 **Bar de la Esquina** → https://www.vitrinaapp.com.ar/menu.html?slug=demo-bar-esquina
+
+*Tip: mandá el demo del rubro del prospecto (a una parrilla, Don Nico; a un café, Botánico).*
+
 ## Mensaje 3 · Con demo lista (el gancho que más cierra)
 > Te dejé armado el menú de [NOMBRE] para que lo veas funcionando 👇
-> [LINK DEMO]
+> [LINK DEMO — usá el del rubro de arriba]
 > Escaneá el QR como si fueras un cliente: vas a ver las fotos, vas a poder "pedir" y preguntarle al asistente. Si te gusta, lo dejamos activo y lo usás en el local. 14 días gratis.
 
 ## Mensaje 4 · Seguimiento (si no contestó en 2-3 días)
