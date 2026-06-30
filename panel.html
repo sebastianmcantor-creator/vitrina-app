@@ -1174,6 +1174,8 @@ html, body {
 .plan-card-features li { padding: 4px 0; display: flex; gap: 8px; align-items: flex-start; }
 .plan-card-features li::before { content: '✓'; color: var(--terra); flex-shrink: 0; }
 .plan-card-features li.no::before { content: '–'; color: var(--border); }
+.plan-card-features li.soon { color: var(--muted); }
+.plan-card-features li.soon::before { content: '🕓'; color: var(--muted); }
 .plan-card .btn-plan {
   width: 100%; padding: 10px; border-radius: 10px; border: none; cursor: pointer;
   font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500;
@@ -3702,8 +3704,8 @@ div:has(> #trial-banner-text) {
           </div>
         </div>
 
-        <!-- Notificaciones WhatsApp -->
-        <div class="card">
+        <!-- Notificaciones WhatsApp — OCULTO hasta que WhatsApp esté 100% (próximamente) -->
+        <div class="card" id="wa-notif-card" style="display:none">
           <div class="card-title">📲 Notificaciones WhatsApp</div>
           <div style="font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.6">
             Configurá los números que reciben alertas. Se usa el formato internacional sin el +: <code style="background:var(--cream);padding:2px 6px;border-radius:4px;font-size:12px">5491155556666</code>
@@ -5056,6 +5058,7 @@ function renderSidebarRestaurant(rest) {
     reservas: false, agenda: false, mesas: false, catalogo: false,
     reminders: false, etiquetas: false, proveedores: false,
     delivery: false, caja: false, marketing: false, campanas: false,
+    whatsapp: false,
   } : {
     reservas:      esResto,
     agenda:        esResto || esServ,
@@ -5069,6 +5072,9 @@ function renderSidebarRestaurant(rest) {
     // Marketing/Campañas: ocultos — solo se vende "Solo Menú" (no incluye marketing).
     marketing:     false,
     campanas:      false,
+    // WhatsApp Business: oculto hasta estar 100% (sender + templates aprobados en Meta).
+    // En la card del plan figura "próximamente". No hay acceso ni en prueba ni pagando.
+    whatsapp:      false,
   }
   Object.entries(navVis).forEach(([section, visible]) => {
     const btn = document.querySelector(`[data-section="${section}"]`)
@@ -6205,7 +6211,10 @@ window.selectBusinessType = function (type) {
   if (waDesc) waDesc.textContent = cfg.waDesc
   const waCard = document.getElementById('setup-wa-option')
   if (waCard) {
+    // WhatsApp está "próximamente": no se ofrece en el alta. Card oculta + opción apagada.
+    waCard.style.display = 'none'
     waCard.classList.remove('active')
+    setupWAEnabled = false
     const waEnabled = document.getElementById('setup-wa-enabled')
     if (waEnabled) waEnabled.style.display = 'none'
   }
@@ -7763,7 +7772,7 @@ async function adminFetch(url, opts = {}) {
 
 const PLAN_INFO = {
   'free':       { nombre: 'Free',       precioUSD: 0,  descripcion: 'Hasta 45 platos · 75 msgs Tano/mes · Sin pedidos' },
-  'rest-menu':  { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado · WhatsApp' },
+  'rest-menu':  { nombre: 'Solo Menú',  precioUSD: 27, descripcion: 'Pedidos · Cocina · Pagos · Tano ilimitado' },
   'rest-mkt':   { nombre: 'Marketing',  precioUSD: 57, descripcion: 'Viti · Redes · Google · Competidores · Informe PDF · WhatsApp' },
   'rest-combo': { nombre: 'Combo',      precioUSD: 70, descripcion: 'Todo Solo Menú + Todo Marketing · Ahorrás USD 14 · WhatsApp' },
   'local-mkt':  { nombre: 'Marketing',  precioUSD: 62, descripcion: 'Catálogo · ML · TN · Viti · Redes · WhatsApp' },
@@ -7777,7 +7786,7 @@ const PLAN_INFO = {
 
 const PLAN_FEATURES = {
   'free':       ['75 mensajes Tano por mes', 'Hasta 45 platos', 'Menú en múltiples idiomas', { no: 'Pedidos online' }, { no: 'Pantalla de cocina' }, { no: 'WhatsApp Business' }],
-  'rest-menu':  ['Tano ilimitado · ES/EN/PT', 'Pedidos en tiempo real', 'Pantalla de cocina', 'Pagos con MercadoPago', 'Fotos de platos con IA', 'WhatsApp Business incluido'],
+  'rest-menu':  ['Tano ilimitado · ES/EN/PT', 'Pedidos en tiempo real', 'Pantalla de cocina', 'Pagos con MercadoPago', 'Fotos de platos con IA', { soon: 'WhatsApp Business' }],
   'rest-mkt':   ['Viti: estrategia mensual IA', '30 publicaciones auto/mes', 'Google Business + Instagram + Facebook', 'Análisis de 5 competidores', 'Informe PDF mensual', 'WhatsApp Business incluido'],
   'rest-combo': ['Todo Solo Menú +', 'Todo Marketing +', 'Tano + Viti trabajando juntos', 'Panel unificado operaciones + marketing', 'WhatsApp Business incluido'],
   'local-mkt':  ['Catálogo QR ilimitado', 'MercadoLibre: publicaciones y stock automático', 'Tienda Nube: sincronización bidireccional', 'Viti: estrategia y análisis', '30 publicaciones auto/mes', 'WhatsApp Business incluido'],
@@ -7873,6 +7882,7 @@ function renderPlanSection() {
 
     const featHtml = feats.map(f => {
       if (typeof f === 'object' && f.no) return `<li class="no">${f.no}</li>`
+      if (typeof f === 'object' && f.soon) return `<li class="soon">${f.soon} <span style="font-size:11px;color:var(--muted);font-weight:600">próximamente</span></li>`
       return `<li>${f}</li>`
     }).join('')
 
