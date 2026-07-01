@@ -11805,7 +11805,16 @@ window.processMenuPhoto = async function (input) {
       }),
     })
 
-    if (!res.ok) throw new Error('Error de IA')
+    if (!res.ok) {
+      let msg = 'El servicio de IA no está disponible en este momento. Probá de nuevo en un rato.'
+      try {
+        const eb = await res.json()
+        const m = eb?.error?.message || ''
+        if (/credit|billing/i.test(m)) msg = 'El servicio de IA está sin crédito. Avisá al soporte de Vitrina.'
+        console.error('import IA error:', res.status, m)
+      } catch {}
+      throw new Error(msg)
+    }
     const data = await res.json()
     const text = data.content?.[0]?.text || ''
 
