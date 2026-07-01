@@ -2798,13 +2798,14 @@ div:has(> #trial-banner-text) {
         <div class="card">
           <div class="card-title" style="display:flex;align-items:center;justify-content:space-between">
             <span>🏢 Google Business Profile</span>
-            <button id="btn-connect-google" class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="connectGoogleBusiness()">
-              Conectar cuenta
+            <button class="btn-secondary" style="font-size:13px;padding:7px 14px" onclick="openGoogleAccessModal()">
+              📋 Cómo dar acceso
             </button>
           </div>
           <div id="google-business-content" style="margin-top:16px">
             <div style="color:var(--muted);font-size:13.5px;text-align:center;padding:20px">
-              Conectá tu cuenta de Google Business para ver análisis de búsquedas, vistas y reseñas.
+              Dale acceso a Vitrina a tu ficha de Google para que gestionemos tus reseñas y publicaciones.
+              <button class="btn-primary" style="display:block;margin:14px auto 0;font-size:13px" onclick="openGoogleAccessModal()">Ver cómo conectar (2 min)</button>
             </div>
           </div>
           <div id="google-reviews-content" style="margin-top:8px"></div>
@@ -4514,6 +4515,34 @@ div:has(> #trial-banner-text) {
     <div class="modal-footer">
       <button class="btn-secondary" onclick="closeModal('modal-cat')">Cancelar</button>
       <button class="btn-primary" id="btn-save-cat" onclick="saveCategoryModal()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: cómo dar acceso a Google Business -->
+<div class="modal-overlay" id="modal-google-access" onclick="if(event.target===this)closeModal('modal-google-access')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🏢 Conectá tu Google Business</div>
+      <button class="modal-close" onclick="closeModal('modal-google-access')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+        Agregá a Vitrina como <b>administrador</b> de tu ficha de Google. Así podemos gestionar tus <b>reseñas y publicaciones</b> por vos. Tarda 2 minutos:
+      </p>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">1</div>
+          <div style="font-size:13.5px;line-height:1.55">Entrá a <a href="https://business.google.com" target="_blank" rel="noopener" style="color:var(--terra)">business.google.com</a> con la cuenta que maneja tu ficha (o buscá el nombre de tu local en Google estando logueado).</div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">2</div>
+          <div style="font-size:13.5px;line-height:1.55">Andá a <b>Configuración del perfil de empresa → "Personas y acceso"</b> (o "Administradores").</div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start"><div style="flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--terra);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">3</div>
+          <div style="font-size:13.5px;line-height:1.55">Tocá <b>"Agregar"</b> → pegá el email de abajo → elegí rol <b>"Administrador"</b> → <b>Invitar</b>.</div></div>
+      </div>
+      <div style="margin-top:18px;padding:14px 16px;background:var(--cream2);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <code style="font-size:14px;font-weight:600;color:var(--ink)">contacto@vitrinaapp.com.ar</code>
+        <button class="btn-secondary" style="font-size:12px;padding:6px 12px" onclick="copyVitrinaEmail(this)">Copiar email</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5">Cuando lo agregues, avisanos a <a href="mailto:contacto@vitrinaapp.com.ar" style="color:var(--terra)">contacto@vitrinaapp.com.ar</a> y activamos la gestión de tus reseñas.</div>
     </div>
   </div>
 </div>
@@ -6360,7 +6389,8 @@ window.createRestaurant = async function () {
     renderSidebarRestaurant(currentRestaurant)
     renderRestSwitcher()
     fillForm(currentRestaurant)
-    showSection('info')
+    // Onboarding: lo primero que ve es "¿Cómo querés cargar tu menú?" (selector simple)
+    switchSection('menu', document.querySelector('[data-section="menu"]'))
     // Re-evaluar el checklist con el negocio nuevo (bug QA: quedaba el del
     // negocio anterior, con su terminología y sus ítems marcados)
     renderGettingStarted()
@@ -11797,6 +11827,16 @@ window.toggleAllItemsAvailability = async function (available) {
   } catch (e) {
     showToast('Error: ' + e.message, 'error')
   }
+}
+
+window.openGoogleAccessModal = function () {
+  document.getElementById('modal-google-access').classList.add('open')
+}
+window.copyVitrinaEmail = function (btn) {
+  const email = 'contacto@vitrinaapp.com.ar'
+  const done = () => { if (btn) { const t = btn.textContent; btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = t, 1600) } }
+  if (navigator.clipboard?.writeText) navigator.clipboard.writeText(email).then(done).catch(done)
+  else { const ta = document.createElement('textarea'); ta.value = email; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy') } catch {}; ta.remove(); done() }
 }
 
 window.openImportMenuModal = function (mode) {
