@@ -134,6 +134,14 @@
     .checkout-btn:hover:not(:disabled) { background: #a04d29; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(184,90,48,0.4); }
     .checkout-btn:active:not(:disabled) { transform: translateY(0); }
     .checkout-btn:disabled { opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+    /* Upsell en el carrito */
+    .upsell-strip { margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--border); }
+    .upsell-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 9px; }
+    .upsell-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .upsell-chip { flex-shrink: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; background: color-mix(in srgb, var(--accent) 7%, var(--surface)); border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border)); border-radius: 12px; padding: 9px 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: left; transition: transform .1s, background .15s; max-width: 190px; }
+    .upsell-chip:active { transform: scale(0.97); }
+    .upsell-chip-name { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 165px; }
+    .upsell-chip-add { font-size: 12px; font-weight: 600; color: var(--accent); }
 
     .cerrado-banner { background: #fff3cd; border-bottom: 1px solid #ffc107; padding: 10px 20px; display: none; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; color: #856404; }
     .mesa-warning { font-size: 12px; color: #856404; background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 7px 12px; margin-bottom: 10px; display: none; }
@@ -346,6 +354,12 @@
       <div class="confirm-heading">Tus pedidos</div>
       <div class="confirm-mesa-label" id="confirm-mesa-label">Mesa</div>
       <div class="confirm-list" id="confirm-list"></div>
+      <!-- Reseña de Google — aparece cuando el pedido ya salió (pico de satisfacción) -->
+      <div id="review-card" style="display:none;background:#fff7f1;border:1px solid #f0d9c8;border-radius:14px;padding:14px 16px;margin-bottom:12px;text-align:center">
+        <div style="font-size:14px;font-weight:600;color:#1a1208;margin-bottom:4px">¿Nos dejás una reseña? ⭐</div>
+        <div style="font-size:12.5px;color:#8a7a6a;margin-bottom:10px">Nos ayudás un montón y tardás 20 segundos 🙏</div>
+        <a id="review-link" href="#" target="_blank" rel="noopener" class="checkout-btn" style="display:block;text-decoration:none;background:#f8b400;color:#1a1208;box-shadow:none">⭐ Dejar reseña en Google</a>
+      </div>
       <div id="wa-confirm-wrap" style="display:none">
         <a id="wa-confirm-btn" class="wa-confirm-btn" href="#" target="_blank">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
@@ -930,6 +944,24 @@
       document.getElementById('cart-drawer').classList.remove('open')
     }
 
+    // ─── Upsell: qué sugerir para agrandar el pedido ────────────────────────────
+    function catNameOf(item) {
+      const c = (rest.menu_categories || []).find(c => c.id === item.category_id)
+      return c ? (c.name || '') : ''
+    }
+    const UPSELL_RE = /postre|bebida|café|cafe|gaseosa|trago|acompañ|guarnic|extra|dulce|helado|cerveza|vino|jugo|limonada|agua|dip|salsa/i
+    function upsellCandidates() {
+      const inCart = new Set(Object.keys(cart).filter(id => cart[id] > 0))
+      const all = Object.values(itemsById).filter(it => it.is_visible && it.is_available && it.price > 0 && !inCart.has(it.id))
+      const isExtra = it => UPSELL_RE.test(catNameOf(it) + ' ' + (it.name || ''))
+      const extras   = all.filter(isExtra)
+      const featured = all.filter(it => it.is_featured && !isExtra(it))
+      const pool = [...extras, ...featured]
+      const seen = new Set(), out = []
+      for (const it of pool) { if (seen.has(it.id)) continue; seen.add(it.id); out.push(it); if (out.length >= 3) break }
+      return out
+    }
+
     function renderCartItems() {
       const container = document.getElementById('cart-items')
       const footer = document.getElementById('cart-footer')
@@ -940,7 +972,7 @@
         return
       }
       let total = 0
-      container.innerHTML = ids.map(id => {
+      const itemsHtml = ids.map(id => {
         const item = itemsById[id]
         const qty = cart[id]
         const sub = Number(item.price) * qty
@@ -955,6 +987,19 @@
           + '<div class="cart-item-price">$' + sub.toLocaleString('es-AR') + '</div>'
           + '</div>'
       }).join('')
+      // Upsell: sugerencias para agrandar el pedido (postres, bebidas, destacados)
+      const sugs = upsellCandidates()
+      const sugHtml = sugs.length ? (
+        '<div class="upsell-strip"><div class="upsell-title">¿Le sumás algo? 😋</div><div class="upsell-row">'
+        + sugs.map(s =>
+            '<button class="upsell-chip" onclick="addItem(\'' + s.id + '\')">'
+            + '<span class="upsell-chip-name">' + (s.emoji ? s.emoji + ' ' : '') + esc(s.name) + '</span>'
+            + '<span class="upsell-chip-add">+ $' + Number(s.price).toLocaleString('es-AR') + '</span>'
+            + '</button>'
+          ).join('')
+        + '</div></div>'
+      ) : ''
+      container.innerHTML = itemsHtml + sugHtml
       const totalEl = document.getElementById('cart-total')
       if (totalEl) {
         totalEl.textContent = '$' + total.toLocaleString('es-AR')
@@ -1171,6 +1216,13 @@
       return html + '</div>'
     }
 
+    function googleReviewUrl() {
+      if (rest.google_review_url) return rest.google_review_url
+      if (rest.google_place_id) return 'https://search.google.com/local/writereview?placeid=' + rest.google_place_id
+      const q = encodeURIComponent([rest.name, rest.city, rest.address].filter(Boolean).join(' '))
+      return 'https://www.google.com/maps/search/?api=1&query=' + q
+    }
+
     function renderConfirmList(lista) {
       document.getElementById('confirm-list').innerHTML = pedidosSesion.map(id => {
         const p = lista.find(x => x.id === id)
@@ -1181,6 +1233,18 @@
           + pasoHtml(p.status)
           + '</div>'
       }).filter(Boolean).join('')
+
+      // Reseña de Google: mostrar cuando al menos un pedido ya fue entregado
+      const algunoEntregado = pedidosSesion.some(id => (lista.find(x => x.id === id) || {}).status === 'delivered')
+      const reviewCard = document.getElementById('review-card')
+      if (reviewCard && rest.business_type !== 'services') {
+        if (algunoEntregado) {
+          document.getElementById('review-link').href = googleReviewUrl()
+          reviewCard.style.display = 'block'
+        } else {
+          reviewCard.style.display = 'none'
+        }
+      }
     }
 
     function notifyOrderReady(orderId) {
