@@ -45,6 +45,25 @@ Fudo es para **gestionar** la cocina/caja (back-office). Vitrina es para que **e
 - [ ] Mensaje de posicionamiento claro ("atiende/cobra/responde solo", no "menú QR")
 - [ ] Decisión de precio (USD 27 vs ARS / plan de entrada)
 
+## Cómo ser SUPERADORES (no solo más baratos)
+La clave: **Fudo es una herramienta para el PERSONAL** (POS/back-office: caja, cocina, stock). **Vitrina es para el CLIENTE** (autoservicio + IA + reputación). No pelear en POS (ahí Fudo gana y es más barato). Ganar en lo que Fudo NO hace: **vender más en la mesa y traer clientes nuevos.**
+
+Diferenciadores con impacto real (ordenados por fuerza):
+
+1. **Tano que VENDE (upsell en el pedido).** Cuando el comensal pide, Tano sugiere: "¿le sumás papas?", "¿un postre?", "lo más pedido de la casa". **Sube el ticket promedio** — ROI que el dueño siente en la caja. *Fudo no lo hace: su IA es una recepcionista de WhatsApp ($55k/mes), no vende en la mesa.* → **Nuestro golpe más fuerte.** ("Vitrina no solo toma el pedido, lo agranda.")
+
+2. **Reputación: reseñas de Google.** Después de pagar, invitar al comensal a dejar una reseña de Google con 1 toque, y responder reseñas con IA. **Más reseñas = más clientes nuevos.** *Fudo no gestiona tu reputación.*
+
+3. **Time-to-value / cero fricción.** Sin hardware, sin capacitar a nadie, menú en 10 min (foto/texto). *Fudo es un sistema que hay que adoptar y aprender.* Para el resto chico: "en 10 minutos estás vendiendo".
+
+4. **Experiencia del comensal + marca.** Menú premium con fotos IA, multi-idioma para turistas. *La carta de Fudo es funcional, no una experiencia de marca.*
+
+5. **Insights en lenguaje natural para el dueño.** "¿Cuáles son mis platos más pedidos? ¿Qué conviene promocionar?" *Fudo tiene tableros; nosotros, respuestas.*
+
+### Posicionamiento ganador (1 frase)
+> **"El vendedor digital de tu mesa: toma el pedido, lo agranda, cobra y te consigue reseñas — en 3 idiomas."**
+Fudo maneja tu caja; Vitrina maneja tu mesa, tu cliente y tu reputación. **Pueden convivir.**
+
 ## Fuentes
 - [CartaQR (Fudo)](https://cartaqr.tudelivery.com/)
 - [Fudo — precios](https://fu.do/es-ar/precios/)
