@@ -782,6 +782,18 @@ html, body {
 .coming-soon-label, .menu-empty-label { font-size: 16px; font-weight: 500; color: var(--ink); }
 .coming-soon-desc, .menu-empty-desc { font-size: 13.5px; color: var(--muted); max-width: 300px; line-height: 1.5; }
 
+/* Selector "cómo cargar tu menú" */
+.menu-load-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; width: 100%; max-width: 620px; margin-top: 20px; }
+.menu-load-card {
+  display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+  background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 22px 16px;
+  cursor: pointer; transition: border-color .15s, transform .1s, box-shadow .15s; font-family: inherit;
+}
+.menu-load-card:hover { border-color: var(--terra); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,.06); }
+.menu-load-card .mlc-icon { font-size: 30px; line-height: 1; }
+.menu-load-card .mlc-title { font-size: 15px; font-weight: 600; color: var(--ink); }
+.menu-load-card .mlc-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
 .cat-block {
   background:var(--card); border:1px solid var(--border);
   border-radius:16px; margin-bottom:16px; overflow:hidden;
@@ -2219,7 +2231,7 @@ div:has(> #trial-banner-text) {
           <button class="btn-primary" onclick="openCategoryModal()" style="flex-shrink:0;margin-top:4px">+ Nueva categoría</button>
           <div style="display:flex;gap:6px;flex-shrink:0;margin-top:4px;flex-wrap:wrap">
             <button class="btn-secondary" onclick="openImportMenuModal()" style="font-size:13px">
-              📸 Importar desde foto
+              📸 Importar carta (foto/PDF/texto)
             </button>
             <button class="btn-secondary" onclick="downloadCatalogTemplate()" style="font-size:13px;padding:7px 14px">
               ⬇️ Plantilla CSV
@@ -2239,10 +2251,26 @@ div:has(> #trial-banner-text) {
         <div id="menu-body">
           <div class="menu-empty">
             <div class="menu-empty-icon">📋</div>
-            <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
-            <div class="menu-empty-desc" id="menu-empty-desc">Creá la primera categoría y agregá tus productos o platos. También podés importar desde una foto de tu menú actual.</div>
-            <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
-            <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
+            <div class="menu-empty-label" id="menu-empty-label">¿Cómo querés cargar tu menú?</div>
+            <div class="menu-empty-desc" id="menu-empty-desc">Elegí la forma más cómoda. Después podés editar todo.</div>
+            <div class="menu-load-grid">
+              <button class="menu-load-card" onclick="openImportMenuModal()">
+                <div class="mlc-icon">📸</div>
+                <div class="mlc-title">Foto o PDF</div>
+                <div class="mlc-desc">Sacale una foto a tu carta y la detectamos con IA</div>
+              </button>
+              <button class="menu-load-card" onclick="openImportMenuModal('texto')">
+                <div class="mlc-icon">📝</div>
+                <div class="mlc-title">Pegar texto</div>
+                <div class="mlc-desc">Copiá y pegá tu carta. Siempre funciona, sin IA</div>
+              </button>
+              <button class="menu-load-card" onclick="openCategoryModal()">
+                <div class="mlc-icon">✍️</div>
+                <div class="mlc-title">A mano</div>
+                <div class="mlc-desc">Cargá tus categorías y platos uno por uno</div>
+              </button>
+            </div>
+            <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:14px;display:block">Ver un ejemplo completo →</a>
           </div>
         </div>
       </div>
@@ -4507,6 +4535,14 @@ div:has(> #trial-banner-text) {
         <div style="font-size:12px;color:var(--muted);margin-top:4px">JPG, PNG o PDF · máx 10MB</div>
         <input type="file" id="import-menu-file" accept="image/*,application/pdf" style="display:none" onchange="processMenuPhoto(this)">
       </div>
+
+      <div style="text-align:center;color:var(--muted);font-size:12px;margin:16px 0 10px;position:relative">
+        <span style="background:var(--card);padding:0 12px;position:relative;z-index:1">— o pegá el texto de tu carta —</span>
+        <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:var(--border)"></div>
+      </div>
+      <textarea id="import-menu-text" class="form-input" rows="5" placeholder="Un plato por línea, con su precio. Ej:&#10;Milanesa napolitana 5000&#10;Provoleta a la parrilla - $4500&#10;Flan casero 3000" style="width:100%;resize:vertical;font-size:13.5px;line-height:1.5"></textarea>
+      <button class="btn-secondary" onclick="parseMenuText()" style="width:100%;margin-top:8px">🔍 Detectar del texto (sin IA)</button>
+
       <div id="import-menu-status" style="display:none;margin-top:16px"></div>
       <div id="import-menu-results" style="margin-top:16px;display:none">
         <div class="card-title" style="margin-bottom:10px" id="import-detected-title">Ítems detectados</div>
@@ -11763,12 +11799,57 @@ window.toggleAllItemsAvailability = async function (available) {
   }
 }
 
-window.openImportMenuModal = function () {
+window.openImportMenuModal = function (mode) {
   importedMenuItems = []
   document.getElementById('import-menu-status').style.display = 'none'
   document.getElementById('import-menu-results').style.display = 'none'
   document.getElementById('import-menu-file').value = ''
+  const txt = document.getElementById('import-menu-text')
+  if (txt) txt.value = ''
   document.getElementById('modal-import-menu').classList.add('open')
+  if (mode === 'texto' && txt) setTimeout(() => txt.focus(), 120)
+}
+
+// Muestra los ítems detectados (editables) — compartido entre foto/PDF y texto
+window.renderImportResults = function () {
+  const statusEl  = document.getElementById('import-menu-status')
+  const resultsEl = document.getElementById('import-menu-results')
+  const itemsEl   = document.getElementById('import-menu-items')
+  statusEl.style.display = 'block'
+  statusEl.innerHTML = `<div style="text-align:center;padding:8px;color:var(--sage);font-size:13px">✅ Se encontraron ${importedMenuItems.length} ítems</div>`
+  resultsEl.style.display = 'block'
+  itemsEl.innerHTML = importedMenuItems.map((item, i) => `
+    <div style="display:flex;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+      <input class="form-input" style="flex:2;font-size:13px" value="${escHtml(item.name)}" oninput="importedMenuItems[${i}].name=this.value" placeholder="Nombre">
+      <input class="form-input" style="flex:1;font-size:13px" type="number" value="${item.price || ''}" oninput="importedMenuItems[${i}].price=parseFloat(this.value)||0" placeholder="Precio">
+      <button onclick="importedMenuItems.splice(${i},1);renderImportResults()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px" title="Eliminar">✕</button>
+    </div>`).join('')
+}
+
+// Parser sin IA: una línea = un ítem. Toma el último número como precio.
+window.parseMenuText = function () {
+  const raw = (document.getElementById('import-menu-text').value || '').trim()
+  const statusEl = document.getElementById('import-menu-status')
+  if (!raw) { statusEl.style.display = 'block'; statusEl.innerHTML = '<div style="text-align:center;padding:10px;color:var(--muted);font-size:13px">Pegá tu carta en el recuadro de arriba.</div>'; return }
+  const items = []
+  for (const line of raw.split('\n').map(l => l.trim()).filter(Boolean)) {
+    // Último número de la línea (con $ y separadores de miles opcionales)
+    const m = line.match(/\$?\s?\d[\d.,]*\s*$/)
+    let price = 0, name = line
+    if (m) {
+      // Quita $ y espacios, descarta centavos (coma/punto + 2 dígitos al final), luego separadores de miles
+      price = parseInt(m[0].replace(/[$\s]/g, '').replace(/[.,]\d{2}$/, '').replace(/[^\d]/g, ''), 10) || 0
+      name = line.slice(0, m.index).replace(/[\-–—:·.\s]+$/, '').trim()
+    }
+    if (name) items.push({ name, price, description: '' })
+  }
+  if (!items.length) {
+    statusEl.style.display = 'block'
+    statusEl.innerHTML = '<div style="text-align:center;padding:10px;color:var(--bad);font-size:13px">No se detectaron ítems. Poné un plato por línea, con su precio.</div>'
+    return
+  }
+  importedMenuItems = items
+  renderImportResults()
 }
 
 window.processMenuPhoto = async function (input) {
