@@ -59,10 +59,10 @@ Español, inglés y portugués, automático. Más ventas y cero "no entiendo qu�
 
 ## 8 · Precio / ROI
 **Copy:**
-$27 por mes. Menos que 2 cafés con leche por día. ☕☕
-Eso te da: menú QR, pedidos, cobros, cocina y Tano.
-¿Cuánto vale no perder una sola mesa? 14 días gratis.
-**Visual:** número grande **$27/mes** sobre fondo negro + dorado.
+US$ 27 por mes. Todo incluido: menú QR, pedidos, cobros, cocina y Tano ilimitado.
+Con que no pierdas una sola mesa al mes, ya se paga. 💡
+14 días gratis, sin tarjeta.
+**Visual:** número grande **US$ 27/mes** sobre fondo negro + dorado.
 
 ## 9 · Fotos de platos con IA
 **Copy:**

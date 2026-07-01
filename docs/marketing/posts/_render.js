@@ -14,7 +14,7 @@ const POSTS = [
   { name:'02-que-es', bg:CREAM, fg:INK, accent:TERRA, kicker:'MENÚ DIGITAL CON QR',
     lines:['Tu carta,','ahora atiende','sola.'],
     sub:'Menú con fotos + Tano que responde en español, inglés y portugués. El cliente pide y paga desde la mesa.',
-    cta:'Desde $27/mes' },
+    cta:'USD 27/mes' },
   { name:'03-cobros', bg:INK, fg:CREAM, accent:'#00a8e8', kicker:'COBROS DESDE LA MESA',
     lines:['Cobrá antes','de que se','levanten.'],
     sub:'Pago con MercadoPago desde la mesa. La plata cae directo a tu cuenta y las mesas rotan más rápido.',
@@ -26,7 +26,7 @@ const POSTS = [
   { name:'05-tano', bg:INK, fg:GOLD, accent:GOLD, kicker:'ASISTENTE 24/7',
     lines:['Tano no se','toma franco.'],
     sub:'Responde qué lleva el plato, si hay opción sin TACC, qué recomendás hoy. A cualquier hora, en 3 idiomas.',
-    cta:'Tu mejor mozo · $27/mes', subColor:'rgba(232,200,122,.75)' },
+    cta:'Tu mejor mozo · USD 27', subColor:'rgba(232,200,122,.75)' },
   { name:'06-antes-despues', bg:CREAM, fg:INK, accent:TERRA, kicker:'ANTES  /  DESPUÉS',
     lines:['Carta de papel','manchada.','O un QR con','fotos que venden.'],
     sub:'Precios al día en 1 clic. ¿De qué lado está tu restaurante?',
@@ -35,9 +35,9 @@ const POSTS = [
     lines:['Tu menú,','en su idioma.'],
     sub:'Llega un turista y lee tu carta en español, inglés o portugués. Automático. Más ventas, cero confusión.',
     cta:'14 días gratis' },
-  { name:'08-precio', bg:INK, fg:CREAM, accent:GOLD, kicker:'TODO INCLUIDO',
-    lines:[], big:'$27', bigUnit:'/mes',
-    sub:'Menú QR, pedidos, cobros, cocina y Tano. Menos que 2 cafés con leche por día.',
+  { name:'08-precio', bg:INK, fg:CREAM, accent:GOLD, kicker:'TODO INCLUIDO POR',
+    lines:[], big:'27', bigPrefix:'US$ ', bigUnit:'/mes',
+    sub:'Menú QR, pedidos, cobros, cocina y Tano ilimitado. Con que no pierdas una sola mesa al mes, ya se paga.',
     cta:'14 días gratis · sin tarjeta' },
   { name:'09-fotos-ia', bg:CREAM, fg:INK, accent:TERRA, kicker:'FOTOS DE PLATOS CON IA',
     lines:['Se come con','los ojos.'],
@@ -58,7 +58,10 @@ function buildSVG(p){
   body += `<text x="${cx}" y="180" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="26" letter-spacing="6" font-weight="700" fill="${p.accent}">${esc(p.kicker)}</text>`;
   body += `<rect x="${cx-44}" y="208" width="88" height="4" rx="2" fill="${p.accent}"/>`;
   if(p.big){
-    body += `<text x="${cx}" y="600" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="360" font-weight="700" fill="${p.fg}">${esc(p.big)}<tspan font-size="120" fill="${p.accent}">${esc(p.bigUnit||'')}</tspan></text>`;
+    body += `<text x="${cx}" y="580" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-weight="700" fill="${p.fg}">`+
+      `<tspan font-size="120">${esc(p.bigPrefix||'')}</tspan>`+
+      `<tspan font-size="290">${esc(p.big)}</tspan>`+
+      `<tspan font-size="120" fill="${p.accent}">${esc(p.bigUnit||'')}</tspan></text>`;
   } else {
     const fs = p.lines.length>=4 ? 86 : 100;
     const lh = p.lines.length>=4 ? 104 : 120;
@@ -77,9 +80,16 @@ function buildSVG(p){
     body += `<text x="${cx}" y="${y}" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="32" fill="${muted}">${esc(l)}</text>`;
     y += 44;
   });
-  const fy=988, gx=70;
-  body += `<g transform="translate(${gx},${fy-22})"><rect x="0" y="0" width="34" height="34" rx="6" fill="none" stroke="${p.fg}" stroke-width="3"/><line x1="17" y1="0" x2="17" y2="34" stroke="${p.fg}" stroke-width="3"/><line x1="0" y1="17" x2="34" y2="17" stroke="${p.fg}" stroke-width="3"/></g>`;
-  body += `<text x="${gx+48}" y="${fy+4}" font-family="Georgia,serif" font-size="34" font-weight="700" fill="${p.fg}">Vitrina</text>`;
+  const fy=988, gx=70, s=0.10;
+  // Logo real: campana (cloche) dorada — mismo trazo que vitrina-logo.svg
+  body += `<g transform="translate(${gx},${fy-42}) scale(${s})">
+    <rect x="60" y="432" width="392" height="36" rx="18" fill="${p.fg}"/>
+    <rect x="60" y="180" width="36" height="252" rx="18" fill="${p.fg}"/>
+    <rect x="416" y="180" width="36" height="252" rx="18" fill="${p.fg}"/>
+    <path d="M96 180 Q256 48 416 180" stroke="${p.fg}" stroke-width="36" fill="none" stroke-linecap="round"/>
+    <circle cx="256" cy="68" r="22" fill="${p.accent}"/>
+  </g>`;
+  body += `<text x="${gx+64}" y="${fy+4}" font-family="Georgia,serif" font-size="34" font-weight="700" fill="${p.fg}">Vitrina</text>`;
   const ctaText=p.cta, pad=28;
   const approxW = ctaText.length*15 + pad*2;
   const px = W-70-approxW;
