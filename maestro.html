@@ -2016,7 +2016,7 @@ async function renderClients() {
           <td style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <a href="/panel.html" onclick="localStorage.setItem('maestro_view_rest','${r.id}')" target="_blank" style="font-size:12px;color:var(--terra);text-decoration:none;font-weight:500">Ver →</a>
             ${r.wants_whatsapp ? '<span style="background:#e8f5e9;color:#2e7d32;font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;white-space:nowrap">📱 WA</span>' : ''}
-            ${(r.subscription_status !== 'active' && r.subscription_status !== 'trialing') ? `<button onclick="activarCortesia('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;color:#92400e;font-family:'DM Sans',sans-serif;font-weight:600" title="Activar mes gratis">🎁 Cortesía</button>` : ''}
+            <button onclick="activarCortesia('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;cursor:pointer;color:#92400e;font-family:'DM Sans',sans-serif;font-weight:600" title="Gestionar plan: cortesía, gratis permanente, extender prueba o volver a Free">🎁 Plan</button>
             <button onclick="entrarComoSoporte('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:#e8f0fe;border:1px solid #4a90d9;border-radius:6px;cursor:pointer;color:#1a5fb4;font-family:'DM Sans',sans-serif;font-weight:600" title="Entrar al panel de este cliente para asistirlo">🛠 Soporte</button>
             <button onclick="deleteRestaurant('${r.id}','${r.name.replace(/'/g,'')}')" style="font-size:11px;padding:3px 8px;background:none;border:1px solid #ddd;border-radius:6px;cursor:pointer;color:#aaa;font-family:'DM Sans',sans-serif" title="Eliminar">🗑️</button>
           </td>
@@ -2156,20 +2156,46 @@ function renderCosts() {
   `
 }
 
+// Gestión de plan de un cliente desde el maestro. Poderes del admin:
+// cortesía temporal, plan gratis permanente, extender prueba, volver a Free.
+// Nada de esto toca MercadoPago (no hay preapproval) → nunca se le cobra.
 window.activarCortesia = async function (id, name) {
-  if (!confirm(`🎁 Activar plan cortesía para "${name}"?\n\nEsto les da acceso completo al plan Combo durante 30 días sin cargo.\nVas a recibir un alerta antes de que expire.`)) return
+  const op = prompt(
+    `🎁 Gestionar plan de "${name}"\n\nEscribí el número de la opción:\n\n` +
+    `1 = Cortesía 30 días (Solo Menú completo, gratis 30 días)\n` +
+    `2 = Solo Menú GRATIS permanente (sin costo, sin vencimiento)\n` +
+    `3 = Extender la prueba (elegís cuántos días)\n` +
+    `4 = Volver a Free (pierde pedidos, cocina y cobros)`,
+    '1')
+  if (!op) return
+
+  let updates = null, msg = ''
+  if (op.trim() === '1') {
+    const end = new Date(Date.now() + 30 * 864e5).toISOString()
+    updates = { subscription_tier: 'rest-menu', subscription_status: 'trialing', trial_end: end, trial_ends_at: end, can_take_orders: true, tano_messages_limit: 999999 }
+    msg = `Cortesía activada: Solo Menú gratis hasta ${new Date(end).toLocaleDateString('es-AR')}. Hacé seguimiento antes de que venza.`
+  } else if (op.trim() === '2') {
+    if (!confirm(`¿Plan Solo Menú GRATIS permanente para "${name}"?\n\nNo se le cobra nunca (no existe suscripción de MP). Reversible con la opción 4.`)) return
+    updates = { subscription_tier: 'rest-menu', subscription_status: 'active', can_take_orders: true, tano_messages_limit: 999999 }
+    msg = 'Plan Solo Menú sin costo activado (permanente).'
+  } else if (op.trim() === '3') {
+    const dias = parseInt(prompt('¿Hasta cuántos días desde HOY extiendo la prueba?', '14'), 10)
+    if (!dias || dias < 1) return
+    const end = new Date(Date.now() + dias * 864e5).toISOString()
+    updates = { subscription_tier: 'rest-menu', subscription_status: 'trialing', trial_end: end, trial_ends_at: end, can_take_orders: true }
+    msg = `Prueba extendida hasta ${new Date(end).toLocaleDateString('es-AR')}.`
+  } else if (op.trim() === '4') {
+    if (!confirm(`¿Pasar "${name}" a Free?\n\nPierde pedidos online, pantalla de cocina y cobros.`)) return
+    updates = { subscription_tier: 'free', subscription_status: null, can_take_orders: false, tano_messages_limit: 75 }
+    msg = 'Cliente pasado a Free.'
+  } else { alert('Opción inválida (1 a 4).'); return }
 
   try {
-    const trialEnd = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
-    const { error } = await supabase.from('restaurants').update({
-      subscription_tier:    'rest-combo',
-      subscription_status:  'trialing',
-      trial_ends_at:        trialEnd,
-      can_take_orders:      true,
-      tano_messages_limit:  999999,
-    }).eq('id', id)
+    // .select('id') para detectar el fallo silencioso de RLS (0 filas = policy falta)
+    const { data, error } = await supabase.from('restaurants').update(updates).eq('id', id).select('id')
     if (error) throw error
-    alert(`✅ Plan cortesía activado para "${name}".\nTiene acceso completo hasta ${new Date(trialEnd).toLocaleDateString('es-AR')}.\nRecordá hacer seguimiento antes de que venza.`)
+    if (!data || !data.length) throw new Error('RLS bloqueó el cambio. Verificá que la migración 041 (restaurants_admin_all) esté corrida en Supabase.')
+    alert('✅ ' + msg)
     await renderClients()
   } catch (e) {
     alert('Error: ' + e.message)
