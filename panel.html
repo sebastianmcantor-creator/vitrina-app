@@ -2221,32 +2221,33 @@ div:has(> #trial-banner-text) {
         </div>
       </div>
 
-      <!-- ══ Secciones proximamente ══ -->
+      <!-- ══ Menú / Carta ══ -->
       <div id="section-menu" class="panel-section">
-        <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
-          <div>
-            <div class="page-title" id="menu-page-title">Menú</div>
-            <div class="page-subtitle" id="menu-page-subtitle">Categorías e ítems de tu negocio</div>
+        <div class="page-header">
+          <div class="page-title" id="menu-page-title">Menú</div>
+          <div class="page-subtitle" id="menu-page-subtitle">Acá armás tu carta digital.</div>
+        </div>
+
+        <!-- Cómo funciona (3 pasos claros) -->
+        <div id="menu-howto" style="background:var(--cream2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:16px">
+          <div style="font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:8px">¿Cómo cargo mi <span class="_menu-word">carta</span>?</div>
+          <div style="display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);line-height:1.5">
+            <div style="flex:1;min-width:210px">
+              <b style="color:var(--ink)">Rápido (recomendado):</b> tocá <b>📸 Cargar carta</b> y subí una <b>foto o PDF</b> de tu menú (o pegá el texto). Detectamos los <span class="_item-word-pl">platos</span> y precios solos.
+            </div>
+            <div style="flex:1;min-width:210px">
+              <b style="color:var(--ink)">A mano:</b> creá una <b>categoría</b> (Entradas, Principales, Postres…) y adentro tocá <b>+ Agregar <span class="_item-word">plato</span></b>. Repetí por cada sección.
+            </div>
           </div>
-          <button class="btn-primary" onclick="openCategoryModal()" style="flex-shrink:0;margin-top:4px">+ Nueva categoría</button>
-          <div style="display:flex;gap:6px;flex-shrink:0;margin-top:4px;flex-wrap:wrap">
-            <button class="btn-secondary" onclick="openImportMenuModal()" style="font-size:13px">
-              📸 Importar carta (foto/PDF/texto)
-            </button>
-            <button class="btn-secondary" onclick="downloadCatalogTemplate()" style="font-size:13px;padding:7px 14px">
-              ⬇️ Plantilla CSV
-            </button>
-            <label class="btn-secondary" style="cursor:pointer;font-size:13px;padding:7px 14px;display:inline-flex;align-items:center;gap:6px">
-              📥 Importar CSV
-              <input type="file" id="catalog-csv-input" accept=".csv" onchange="importCatalogCSV(this)" style="display:none">
-            </label>
-            <button class="btn-secondary" onclick="toggleAllItemsAvailability(true)" style="font-size:12px;padding:6px 12px" title="Marcar todos disponibles">
-              ✅ Todo disponible
-            </button>
-            <button class="btn-secondary" onclick="toggleAllItemsAvailability(false)" style="font-size:12px;padding:6px 12px" title="Cerrar todo temporalmente">
-              🔴 Cerrar todo
-            </button>
-          </div>
+        </div>
+
+        <!-- Acciones principales -->
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;align-items:center">
+          <button class="btn-primary" onclick="openImportMenuModal()">📸 Cargar carta (foto / PDF / texto)</button>
+          <button class="btn-secondary" onclick="openCategoryModal()">+ Nueva categoría</button>
+          <span style="flex:1"></span>
+          <button class="btn-secondary" onclick="toggleAllItemsAvailability(true)" style="font-size:12px;padding:6px 12px" title="Marcar todos los ítems como disponibles">✅ Marcar todo disponible</button>
+          <button class="btn-secondary" onclick="toggleAllItemsAvailability(false)" style="font-size:12px;padding:6px 12px" title="Marcar todo como no disponible (ej: fin del día)">🔴 Cerrar todo</button>
         </div>
         <div id="menu-body">
           <div class="menu-empty">
@@ -5262,6 +5263,17 @@ function renderSidebarRestaurant(rest) {
     }
     menuPageSubtitle.textContent = subtitles[btype] || subtitles.restaurant
   }
+
+  // Palabras del instructivo "¿cómo cargo mi carta?" según el rubro
+  const words = {
+    restaurant: { menu: 'carta',    item: 'plato',    itemPl: 'platos' },
+    local:      { menu: 'catálogo', item: 'producto', itemPl: 'productos' },
+    services:   { menu: 'lista',    item: 'servicio', itemPl: 'servicios' },
+    ecommerce:  { menu: 'catálogo', item: 'producto', itemPl: 'productos' },
+  }[btype] || { menu: 'carta', item: 'plato', itemPl: 'platos' }
+  document.querySelectorAll('._menu-word').forEach(el => el.textContent = words.menu)
+  document.querySelectorAll('._item-word').forEach(el => el.textContent = words.item)
+  document.querySelectorAll('._item-word-pl').forEach(el => el.textContent = words.itemPl)
 
   // Texto vacío del menú
   const menuEmptyDesc = document.getElementById('menu-empty-desc')
