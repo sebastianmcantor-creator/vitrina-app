@@ -4578,30 +4578,8 @@ div:has(> #trial-banner-text) {
         <div id="import-menu-items"></div>
 
         <div class="card-title" style="margin:18px 0 8px">Fotos de los platos</div>
-        <div style="display:flex;flex-direction:column;gap:9px;font-size:13.5px;color:var(--ink)">
-          <label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer">
-            <input type="radio" name="import-photo-mode" value="none" checked style="margin-top:3px;accent-color:var(--terra)" onchange="document.getElementById('import-style-picker').style.display='none'">
-            <span>Sin fotos por ahora<br><span style="font-size:12px;color:var(--muted)">Si ya tenés fotos propias, las subís después desde cada plato (botón Subir).</span></span>
-          </label>
-          <label style="display:flex;gap:9px;align-items:flex-start;cursor:pointer">
-            <input type="radio" name="import-photo-mode" value="ai" style="margin-top:3px;accent-color:var(--terra)" onchange="document.getElementById('import-style-picker').style.display='block'">
-            <span>Generar una foto profesional con IA para cada plato<br><span style="font-size:12px;color:var(--muted)">Gratis, incluido en tu plan. Elegí el estilo abajo.</span></span>
-          </label>
-        </div>
-        <div id="import-style-picker" style="display:none;margin:10px 0 0 26px;padding:12px;background:var(--cream2);border:1px solid var(--border);border-radius:10px">
-          <div style="font-size:12.5px;font-weight:600;margin-bottom:8px">Elegí el estilo para todo tu menú:</div>
-          <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;cursor:pointer">
-            <input type="radio" name="import-photo-style" value="professional" style="margin-top:3px;accent-color:var(--terra)">
-            <span style="font-size:12.5px"><b>Catálogo claro</b> — fondo blanco limpio, luz uniforme</span>
-          </label>
-          <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;cursor:pointer">
-            <input type="radio" name="import-photo-style" value="warm" checked style="margin-top:3px;accent-color:var(--terra)">
-            <span style="font-size:12.5px"><b>Cálido de bodegón</b> — madera, luz dorada, acogedor</span>
-          </label>
-          <label style="display:flex;gap:8px;align-items:flex-start;cursor:pointer">
-            <input type="radio" name="import-photo-style" value="dark">
-            <span style="font-size:12.5px"><b>Premium oscuro</b> — fondo negro, spotlight, exclusivo</span>
-          </label>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6;background:var(--cream2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
+          📷 Cada plato se muestra con su <b>emoji</b> hasta que le subas una foto. Recomendamos <b>fotos reales</b>: sacala con el celu, subila desde el plato (✏️) y usá <b>✨ Mejorar</b> para darle look profesional. Lo que se ve en el menú es lo que llega a la mesa.
         </div>
 
         <button class="btn-primary" onclick="confirmImportMenu()" id="btn-confirm-import" style="margin-top:14px;width:100%">
@@ -4648,9 +4626,7 @@ div:has(> #trial-banner-text) {
         <label class="form-label">URL de imagen</label>
         <div style="display:flex;gap:8px;align-items:flex-start">
           <input class="form-input" id="item-image-url" placeholder="https://... (opcional)" style="flex:1" oninput="document.getElementById('btn-enhance-image').style.display=this.value.trim().startsWith('http')?'':'none'">
-          <button class="btn-secondary" onclick="generateImageAI()" id="btn-generate-image" title="Generar foto con IA" style="padding:8px 12px;font-size:12px;white-space:nowrap">
-            🤖 Generar
-          </button>
+          <!-- "Generar con IA" removido a propósito: solo fotos reales (+ retoque) o emoji. -->
           <button class="btn-secondary" onclick="enhanceImage()" id="btn-enhance-image" title="Mejorar foto existente con IA" style="padding:8px 12px;font-size:12px;white-space:nowrap;display:none">
             ✨ Mejorar
           </button>
@@ -4663,11 +4639,10 @@ div:has(> #trial-banner-text) {
           <img id="item-image-preview" src="" alt="Preview" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;border:1px solid var(--border)">
           <div style="display:flex;gap:6px;margin-top:6px">
             <button class="btn-secondary" onclick="acceptGeneratedImage()" style="font-size:12px;padding:5px 12px">✓ Usar esta foto</button>
-            <button class="btn-secondary" onclick="generateImageAI()" style="font-size:12px;padding:5px 12px">🔄 Generar otra</button>
             <button class="btn-secondary" onclick="document.getElementById('item-image-preview-wrap').style.display='none'" style="font-size:12px;padding:5px 12px;color:var(--muted)">✕</button>
           </div>
         </div>
-        <span class="form-hint" id="item-image-hint">Imagen que se muestra en el menú público. Usá 🤖 para generar una foto profesional con IA.</span>
+        <span class="form-hint" id="item-image-hint">Foto real del plato (📷 Subir). Con ✨ Mejorar le damos look profesional. Sin foto, el menú muestra el emoji.</span>
       </div>
       <div class="form-field">
         <label class="form-label">Etiquetas</label>
@@ -6905,13 +6880,12 @@ function renderMenu() {
     return
   }
 
-  // Aviso de fotos faltantes: sugerir subir las propias o generar todas con IA
+  // Aviso de fotos faltantes: fotos REALES (retocables con IA). Sin foto se muestra el emoji.
   const allItems = menuCats.flatMap(c => menuItemsMap[c.id] ?? [])
   const sinFoto = allItems.filter(i => !i.image_url)
   const fotosBanner = sinFoto.length >= 2 ? `
     <div id="fotos-banner" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff8e1;border:1px solid #f0d9a0;border-radius:12px;padding:12px 16px;margin-bottom:14px">
-      <span style="font-size:13.5px;color:#6d5410;flex:1;min-width:200px">📷 <b>${sinFoto.length} ${sinFoto.length === 1 ? 'plato' : 'platos'} sin foto.</b> Los platos con foto se piden más: subí las tuyas desde cada plato (✏️) o generalas con IA.</span>
-      <button class="btn-primary" style="font-size:13px;padding:8px 14px;flex-shrink:0" onclick="generarFotosFaltantes()">✨ Generar todas con IA</button>
+      <span style="font-size:13.5px;color:#6d5410;flex:1;min-width:200px">📷 <b>${sinFoto.length} ${sinFoto.length === 1 ? 'plato' : 'platos'} sin foto.</b> Los platos con foto real se piden más: sacale una foto con el celu, subila desde el plato (✏️) y usá <b>✨ Mejorar</b> para que quede profesional. Mientras tanto, el menú muestra el emoji del plato.</span>
     </div>` : ''
 
   container.innerHTML = fotosBanner + menuCats.map(cat => {
@@ -12090,73 +12064,13 @@ window.confirmImportMenu = async function () {
     } catch {}
   }
 
-  // Fotos con IA para todo el lote (si el dueño lo eligió)
-  const fotoMode = document.querySelector('input[name="import-photo-mode"]:checked')?.value
-  if (fotoMode === 'ai' && createdItems.length) {
-    const styleKey = document.querySelector('input[name="import-photo-style"]:checked')?.value || 'warm'
-    const r = await generarFotosImportadas(createdItems, styleKey)
-    closeModal('modal-import-menu')
-    renderMenu()
-    showToast(`✅ ${created} platos importados · ${r.done} fotos generadas${r.fails ? ' (' + r.fails + ' fallaron, regenerables desde cada plato)' : ''}`, 'success')
-  } else {
-    closeModal('modal-import-menu')
-    renderMenu()
-    showToast(`✅ ${created} platos importados a la categoría "Importados"`, 'success')
-  }
-  btn.disabled = false; btn.textContent = '✓ Importar todos los platos'
-}
-
-// Genera una foto IA por cada plato importado, la sube a Storage y la asocia.
-// Secuencial a propósito: no satura el worker y permite mostrar progreso.
-// Genera con IA las fotos de todos los platos que no tienen (banner del menú).
-window.generarFotosFaltantes = async function () {
-  const faltan = menuCats.flatMap(c => menuItemsMap[c.id] ?? []).filter(i => !i.image_url)
-  if (!faltan.length) { showToast('Todos tus platos ya tienen foto ✓', 'success'); return }
-  if (!confirm(`Se van a generar ${faltan.length} fotos con IA (estilo cálido de restaurante). Tardá ~${Math.ceil(faltan.length * 8 / 60) || 1} min. ¿Dale?`)) return
-  const banner = document.getElementById('fotos-banner')
-  const prog = (n, total, name) => {
-    if (banner) banner.innerHTML = `<span style="font-size:13.5px;color:#6d5410">🎨 Generando fotos con IA… <b>${n} de ${total}</b> — "${escHtml(name)}". No cierres esta pestaña.</span>`
-  }
-  const r = await generarFotosImportadas(faltan, 'warm', prog)
+  // Sin generación de fotos con IA: el menú muestra el emoji del plato hasta que
+  // el dueño suba una foto REAL (retocable con ✨ Mejorar). Decisión: nada de
+  // imágenes inventadas que no se correspondan con lo que llega a la mesa.
+  closeModal('modal-import-menu')
   renderMenu()
-  showToast(`✨ ${r.done} fotos generadas${r.fails ? ` · ${r.fails} fallaron (podés reintentar)` : ''}`, r.fails ? 'error' : 'success')
-}
-
-async function generarFotosImportadas(items, styleKey, onProgress) {
-  const statusEl = document.getElementById('import-menu-status')
-  const total = items.length
-  let done = 0, fails = 0
-  for (const it of items) {
-    if (onProgress) {
-      onProgress(done + fails + 1, total, it.name)
-    } else if (statusEl) {
-      statusEl.style.display = 'block'
-      statusEl.innerHTML = `<div style="text-align:center;padding:10px;font-size:13px;color:var(--muted)">
-        🎨 Generando fotos con IA… <b>${done + fails + 1} de ${total}</b><br>
-        <span style="font-size:11.5px">"${escHtml(it.name)}" — no cierres esta ventana</span></div>`
-    }
-    try {
-      const prompt = it.name + (it.description ? ', ' + it.description : '') + '. Comida argentina, plato de restaurante.'
-      const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/cf-ai/generate-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompt, style: styleKey }),
-      })
-      const data = await res.json()
-      if (!data.imageBase64) throw new Error('sin imagen')
-      const blob = await (await fetch(data.imageBase64)).blob()
-      const path = currentRestaurant.id + '/items/import-' + it.id + '.jpg'
-      const { error: upErr } = await supabase.storage.from('restaurant-images')
-        .upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
-      if (upErr) throw upErr
-      const { data: urlData } = supabase.storage.from('restaurant-images').getPublicUrl(path)
-      await menuItems.update(it.id, { image_url: urlData.publicUrl })
-      const arr = menuItemsMap[it.category_id]
-      if (arr) menuItemsMap[it.category_id] = arr.map(x => x.id === it.id ? { ...x, image_url: urlData.publicUrl } : x)
-      done++
-    } catch (e) { fails++ }
-  }
-  return { done, fails }
+  showToast(`✅ ${created} platos importados a la categoría "Importados"`, 'success')
+  btn.disabled = false; btn.textContent = '✓ Importar todos los platos'
 }
 
 window.openReservaModal = function () {
@@ -14860,8 +14774,8 @@ async function loadRemindersDrafts() {
         <div style="padding:16px 0;border-bottom:1px solid var(--border)" id="reminder-card-${c.id}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
             <div>
-              <div style="font-weight:600;font-size:14px;color:var(--ink)">${name}</div>
-              <div style="font-size:12px;color:var(--muted)">${c.phone || 'Sin teléfono'} · Próxima visita estimada: <strong>${nextVisit}</strong></div>
+              <div style="font-weight:600;font-size:14px;color:var(--ink)">${escapeHtml(name)}</div>
+              <div style="font-size:12px;color:var(--muted)">${escapeHtml(c.phone || 'Sin teléfono')} · Próxima visita estimada: <strong>${nextVisit}</strong></div>
             </div>
           </div>
           ${hasDraft ? `

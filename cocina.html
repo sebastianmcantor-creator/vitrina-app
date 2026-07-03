@@ -774,7 +774,7 @@
                     + (esNuevo ? ' <span class="nuevo-badge">NUEVO</span>' : '') + '</div>'
                   : (esNuevo ? '<div class="pedido-num"><span class="nuevo-badge">NUEVO</span></div>' : ''))
           +     '<div class="pedido-id">#' + p.id.slice(-6).toUpperCase() + '</div>'
-          +     (p.customer_name ? '<div style="font-size:12px;color:#c8a84a;margin-top:2px">👤 ' + p.customer_name + '</div>' : '')
+          +     (p.customer_name ? '<div style="font-size:12px;color:#c8a84a;margin-top:2px">👤 ' + esc(p.customer_name) + '</div>' : '')
           +   '</div>'
           +   '<div style="text-align:right">'
           +     '<span class="estado-badge ' + (BADGE_CLASS[p.status] || '') + '">' + (BADGE_LABEL[p.status] || p.status) + '</span>'
