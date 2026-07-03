@@ -4950,9 +4950,28 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (qp.get('mp') === 'ok') {
       const planActivado = qp.get('plan')
       const planNombre = PLAN_INFO[planActivado]?.nombre ?? planActivado
-      showToast(`🎉 ¡Suscripción activada! Bienvenido al plan ${planNombre}.`, 'success')
       history.replaceState({}, '', '/panel.html')
-      setTimeout(() => switchSection('config', document.querySelector('[data-section="config"]')), 800)
+      // Sincronizar con MP el estado REAL de la suscripción (red de seguridad:
+      // activa el plan aunque el webhook de MP no llegue). Antes solo se
+      // mostraba el toast y la cuenta podía quedar "en prueba" tras pagar.
+      showToast('Verificando tu suscripción con MercadoPago…', 'info')
+      try {
+        const r = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/mp/sync-suscripcion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ restaurantId: currentRestaurant?.id }),
+        })
+        const d = await r.json().catch(() => ({}))
+        if (d.synced && d.status === 'active') {
+          if (currentRestaurant) { currentRestaurant.subscription_status = 'active'; currentRestaurant.subscription_tier = currentRestaurant.subscription_tier || planActivado }
+          showToast(`🎉 ¡Suscripción activada! Bienvenido al plan ${planNombre}.`, 'success')
+        } else if (d.status === 'pending') {
+          showToast('⚠️ MercadoPago todavía figura pendiente. Si terminaste la autorización, se activa en unos minutos.', 'error')
+        } else {
+          showToast(`🎉 ¡Listo! Tu plan ${planNombre} se está activando.`, 'success')
+        }
+      } catch { showToast(`🎉 ¡Listo! Tu plan ${planNombre} se está activando.`, 'success') }
+      setTimeout(() => switchSection('config', document.querySelector('[data-section="config"]')), 900)
     }
     if (qp.get('oauth') === 'ml_ok') {
       showToast('✅ MercadoLibre conectado correctamente.', 'success')
@@ -7872,6 +7891,15 @@ window.avanzarEstado = async function (id, status) {
     // Los entregados NO se borran: quedan visibles en "Ya salieron" (con Deshacer).
     if (pedidosMap[id]) pedidosMap[id] = { ...pedidosMap[id], status }
     renderPedidos()
+    // Al marcar LISTO, avisar al cliente por WhatsApp (si dejó su teléfono).
+    // Antes solo lo hacía la pantalla de cocina — desde el panel no se avisaba.
+    if (status === 'ready' && currentRestaurant) {
+      fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notificar-pedido-listo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId: id, restaurantId: currentRestaurant.id }),
+      }).catch(() => {})
+    }
   } catch (e) { showToast('Error: ' + e.message, 'error') }
 }
 
@@ -8637,6 +8665,14 @@ function checkAccountStatus(rest) {
   const plan   = rest.plan ?? 'free'
   const status = rest.subscription_status ?? 'active'
   const trialEnd = rest.trial_end ? new Date(rest.trial_end) : null
+
+  // Viene de suspended.html a pagar: NO redirigir de vuelta (antes era un loop:
+  // suspendido → "Renovar" → panel → suspendido — nunca podía pagar). Se lo deja
+  // entrar y se le abre directo la selección de plan.
+  if (new URLSearchParams(location.search).get('reactivar') === '1') {
+    setTimeout(() => { try { irAContratar() } catch {} }, 700)
+    return false
+  }
 
   // Plan free (retención) o pago activo: nunca suspender
   if (plan === 'free' || status === 'active') return false
