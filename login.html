@@ -228,11 +228,19 @@ body::before {
       Continuar con Google
     </button>
 
-    <div class="divider">o</div>
+    <div class="divider">o con tu email</div>
 
-    <p class="card-subtitle" style="margin-top:0">
-      ¿Todavía no tenés cuenta?<br>
-      Ingresá con Google y te la creamos automáticamente.
+    <div id="email-login">
+      <input type="email" id="login-email" placeholder="tu@email.com" autocomplete="email"
+        style="width:100%;padding:13px 14px;border:1px solid #e0d8cf;border-radius:10px;font-size:15px;box-sizing:border-box;outline:none;margin-bottom:8px">
+      <button class="btn-google" id="btn-email" onclick="handleEmailLogin()" style="justify-content:center">
+        ✉️ Enviarme un enlace para entrar
+      </button>
+      <div id="email-ok" style="display:none;margin-top:10px;padding:10px 12px;background:#e8f5e9;border:1px solid #b2dec4;border-radius:10px;font-size:13px;color:#2e7d32"></div>
+    </div>
+
+    <p class="card-subtitle" style="margin-top:14px">
+      ¿Todavía no tenés cuenta? Con cualquiera de las dos opciones te la creamos automáticamente.
     </p>
   </div>
 
@@ -244,7 +252,35 @@ body::before {
 </div>
 
 <script type="module">
-import { getUser, signInWithGoogle } from './lib/auth.js'
+import { getUser, signInWithGoogle, signInWithEmail } from './lib/auth.js'
+
+window.handleEmailLogin = async function () {
+  const input = document.getElementById('login-email')
+  const btn = document.getElementById('btn-email')
+  const okEl = document.getElementById('email-ok')
+  const errEl = document.getElementById('error-msg')
+  const email = (input.value || '').trim()
+  errEl.classList.remove('visible')
+  if (!email || !email.includes('@')) {
+    errEl.textContent = 'Escribí un email válido.'
+    errEl.classList.add('visible')
+    return
+  }
+  btn.disabled = true
+  btn.innerHTML = '<span class="spinner"></span> Enviando...'
+  try {
+    await signInWithEmail(email)
+    okEl.style.display = 'block'
+    okEl.innerHTML = '✅ Te enviamos un enlace a <strong>' + email + '</strong>. Abrí tu correo y tocá el link para entrar.'
+    btn.style.display = 'none'
+    input.disabled = true
+  } catch (err) {
+    errEl.textContent = err.message || 'No se pudo enviar el enlace. Probá de nuevo.'
+    errEl.classList.add('visible')
+    btn.disabled = false
+    btn.innerHTML = '✉️ Enviarme un enlace para entrar'
+  }
+}
 
 // Si ya está autenticado, ir directo al panel
 ;(async () => {
