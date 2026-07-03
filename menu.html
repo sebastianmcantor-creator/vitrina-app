@@ -1373,42 +1373,80 @@
     }
 
     // Genera link de pago MP con el total consolidado de todos los pedidos de la visita
+    // Paso 1: elegir cómo pagar (online / efectivo / tarjeta en la mesa)
     window.pedirLaCuenta = async function () {
-      if (!pedidosSesion.length) {
-        alert('No hay pedidos en esta visita.')
-        return
-      }
-      // Solo para restaurantes
+      if (!pedidosSesion.length) { alert('No hay pedidos en esta visita.'); return }
       if ((rest?.business_type || 'restaurant') !== 'restaurant') return
 
-      const btn = document.getElementById('btn-pedir-cuenta')
-      const btnOverlay = document.querySelector('#pedir-cuenta-wrap .checkout-btn')
-      const setBusy = (b) => {
-        if (btn)       { btn.disabled = b; btn.textContent = b ? 'Generando...' : 'Pedir la cuenta 💳' }
-        if (btnOverlay) { btnOverlay.disabled = b; btnOverlay.textContent = b ? 'Generando link de pago...' : '💳 Pedir la cuenta' }
+      const total = await calcularTotalAcumulado()
+      const totalStr = '$' + Number(total || 0).toLocaleString('es-AR')
+      let ov = document.getElementById('pay-method-overlay')
+      if (!ov) {
+        ov = document.createElement('div')
+        ov.id = 'pay-method-overlay'
+        ov.className = 'confirm-overlay'
+        document.body.appendChild(ov)
       }
-      setBusy(true)
+      ov.innerHTML = `
+        <div class="confirm-box" style="max-width:360px">
+          <div class="confirm-heading">¿Cómo querés pagar?</div>
+          <div style="font-size:13px;color:#8a7a6a;margin-bottom:16px">Total de tu visita: <strong style="color:#1a1208">${totalStr}</strong></div>
+          <button class="checkout-btn" style="margin-bottom:10px" onclick="pagarOnline()">💳 Pagar ahora online</button>
+          <button class="checkout-btn" style="margin-bottom:10px;background:#2e7d32" onclick="solicitarCobro('efectivo')">💵 Efectivo — llamar al mozo</button>
+          <button class="checkout-btn" style="margin-bottom:10px;background:#455a64" onclick="solicitarCobro('tarjeta')">💳 Tarjeta en la mesa — llamar al mozo</button>
+          <button class="confirm-close" onclick="document.getElementById('pay-method-overlay').classList.remove('open')" style="width:100%;text-align:center">Cerrar</button>
+        </div>`
+      ov.classList.add('open')
+    }
+
+    // Opción online: genera el link de MercadoPago (flujo original)
+    window.pagarOnline = async function () {
+      const ov = document.getElementById('pay-method-overlay')
+      const btns = ov ? ov.querySelectorAll('button') : []
+      btns.forEach(b => b.disabled = true)
       try {
         const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/mp/crear-preferencia', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            restaurantId: rest.id,
-            tableNumber:  mesaEfectiva(),
-            orderIds:     pedidosSesion,
-            currency:     rest.currency || 'ARS',
+            restaurantId: rest.id, tableNumber: mesaEfectiva(),
+            orderIds: pedidosSesion, currency: rest.currency || 'ARS',
           }),
         })
         const data = await res.json()
         if (!res.ok || !data.init_point) {
-          alert('No se pudo generar el link de pago. Por favor, pedile al mozo que te traiga la cuenta.')
-          return
+          alert('No se pudo generar el link de pago. Pedile al mozo que te traiga la cuenta.')
+          btns.forEach(b => b.disabled = false); return
         }
         window.location.href = data.init_point
       } catch {
-        alert('Error de conexión. Por favor, pedile al mozo que te traiga la cuenta.')
-      } finally {
-        setBusy(false)
+        alert('Error de conexión. Pedile al mozo que te traiga la cuenta.')
+        btns.forEach(b => b.disabled = false)
+      }
+    }
+
+    // Opción efectivo / tarjeta física: avisa al restaurante que se acerque a cobrar
+    window.solicitarCobro = async function (metodo) {
+      const ov = document.getElementById('pay-method-overlay')
+      const btns = ov ? ov.querySelectorAll('button') : []
+      btns.forEach(b => b.disabled = true)
+      try {
+        const total = await calcularTotalAcumulado()
+        const res = await fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/solicitar-cobro', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            restaurantId: rest.id, tableNumber: mesaEfectiva(),
+            metodo, total, orderIds: pedidosSesion, currency: rest.currency || 'ARS',
+          }),
+        })
+        // Aunque falle la notificación, no dejamos al cliente sin respuesta.
+        if (ov) ov.classList.remove('open')
+        const label = metodo === 'efectivo' ? 'en efectivo 💵' : 'con tarjeta 💳'
+        showToast('✅ Ya le avisamos al mozo — se acerca a cobrarte ' + label, 4500)
+      } catch {
+        if (ov) ov.classList.remove('open')
+        showToast('Avisale al mozo que querés pagar ' + (metodo === 'efectivo' ? 'en efectivo' : 'con tarjeta') + ' 🙌', 4500)
       }
     }
 

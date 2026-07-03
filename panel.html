@@ -7908,6 +7908,14 @@ const PLAN_FEATURES = {
   'local-mkt':  ['Catálogo QR ilimitado', 'MercadoLibre: publicaciones y stock automático', 'Tienda Nube: sincronización bidireccional', 'Viti: estrategia y análisis', '30 publicaciones auto/mes', 'WhatsApp Business incluido'],
 }
 
+// Tipo de cambio para mostrar el ≈ARS de los planes. Se actualiza en segundo
+// plano; arranca con un valor razonable para que el render nunca falle.
+let __PLAN_TC = 1510
+fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/tipo-cambio')
+  .then(r => r.json())
+  .then(d => { if (d?.oficial) { __PLAN_TC = d.oficial; if (typeof renderPlanSection === 'function' && document.getElementById('plan-cards-grid')) try { renderPlanSection() } catch {} } })
+  .catch(() => {})
+
 window.irAContratar = function () {
   switchSection('facturacion', document.querySelector('[data-section="facturacion"]'))
   // Abrir directo la selección de plan para elegir y pagar
@@ -7979,7 +7987,14 @@ function renderPlanSection() {
 
   // Tarjetas de planes
   const grid = document.getElementById('plan-cards-grid')
-  const planesAMostrar = ['free', 'pro', 'full'].filter(pid => PLAN_INFO[pid]) // evita throw por claves viejas (pro/full ya no existen)
+  // Solo se ofrece Free y Solo Menú (rest-menu). Antes usaba alias viejos
+  // 'pro'/'full' → mostraba 2 "Solo Menú" duplicados y mandaba planId inválido
+  // al worker (por eso no llevaba a pagar).
+  const planesAMostrar = ['free', 'rest-menu'].filter(pid => PLAN_INFO[pid])
+  // "Plan actual" (card deshabilitada) SOLO si realmente pagó — en la prueba
+  // gratuita las cards quedan activables para poder contratar y pagar.
+  const paidTier = (status === 'active' || status === 'paused' || status === 'past_due')
+    ? plan : null
   const _btype = currentRestaurant?.business_type || 'restaurant'
   const _asist = _btype === 'restaurant' ? 'Tano' : 'Asistente IA'
   grid.innerHTML = planesAMostrar.map(pid => {
@@ -7992,8 +8007,8 @@ function renderPlanSection() {
       }
       return f
     })
-    const isCurrent = plan === pid
-    const isFeatured = pid === 'pro'
+    const isCurrent = paidTier === pid
+    const isFeatured = pid === 'rest-menu'
     const classes = ['plan-card', isCurrent ? 'current' : '', isFeatured && !isCurrent ? 'featured' : ''].filter(Boolean).join(' ')
 
     const featHtml = feats.map(f => {
@@ -8002,10 +8017,13 @@ function renderPlanSection() {
       return `<li>${f}</li>`
     }).join('')
 
+    // ARS calculado con TC cacheado (info.precioARS no existía → tiraba error y
+    // rompía todo el render de planes). __PLAN_TC se actualiza en segundo plano.
+    const precioARS = Math.round(info.precioUSD * __PLAN_TC)
     const priceHtml = pid === 'free'
       ? `<div class="plan-card-price">Gratis <span></span></div>`
       : `<div class="plan-card-price">USD ${info.precioUSD}<span>/mes</span></div>
-         <div style="font-size:12px;color:var(--muted)">≈ $${info.precioARS.toLocaleString('es-AR')} ARS</div>`
+         <div style="font-size:12px;color:var(--muted)">≈ $${precioARS.toLocaleString('es-AR')} ARS</div>`
 
     const btnHtml = isCurrent
       ? `<button class="btn-plan" disabled>✓ Plan actual</button>`
