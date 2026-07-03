@@ -22,7 +22,7 @@
   --cream:      #F7F2EA;
   --cream2:     #EDE5D8;
   --white:      #FDFAF6;
-  --muted:      #8A7E74;
+  --muted:      #756A61;
   --border:     #DDD5C8;
   --card:       #FEFCF8;
   --bad:        #B83030;
@@ -847,6 +847,10 @@ html, body {
 .modal-overlay.open { display: flex; }
 @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
 .modal-box { background: var(--cream, #fdfaf6); border-radius: 20px; max-width: 520px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.2); animation: modalIn 0.2s cubic-bezier(0.34, 1.2, 0.64, 1); }
+/* .modal (alias de .modal-box): 4 modales usan esta clase que no tenía regla →
+   quedaban SIN fondo (transparentes sobre la página, texto ilegible). Fondo
+   sólido --card para máximo contraste del contenido. */
+.modal { background: var(--card, #FEFCF8); border-radius: 20px; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.28); animation: modalIn 0.2s cubic-bezier(0.34, 1.2, 0.64, 1); }
 @keyframes modalIn { from { opacity: 0; transform: scale(0.95) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .modal-header {
   display:flex; align-items:center; justify-content:space-between;
@@ -1562,7 +1566,7 @@ input:checked + .toggle-slider:before {
   --cream2: #F1EAE0;
   --border: #E8DDD0;
   --card:   #FFFFFF;
-  --muted:  #8A7A6A;
+  --muted:  #756A61;
 }
 html, body { font-family: 'Plus Jakarta Sans', sans-serif; }
 
@@ -5035,12 +5039,12 @@ function renderSidebarRestaurant(rest) {
   const planEl = document.getElementById('sidebar-rest-plan')
   if (planEl) {
     const colors = {
-      free: '#8a7e74',
+      free: '#756A61',
       'rest-menu': '#22863a',
       'rest-mkt': '#4a90d9', 'local-mkt': '#4a90d9',
       'rest-combo': '#b85a30',
     }
-    planEl.style.color = colors[sidebarPlanKey] || '#8a7e74'
+    planEl.style.color = colors[sidebarPlanKey] || '#756A61'
   }
   // Badge de estado del trial junto al nombre
   const sidebarPlan = document.getElementById('sidebar-rest-plan')
@@ -5784,7 +5788,7 @@ function descargarTarjetaQrMesa(url, num) {
     x.drawImage(qrImg, 40, 88, 400, 400)
     x.fillStyle = '#B85A30'; x.font = '700 42px "Plus Jakarta Sans", sans-serif'
     x.fillText('MESA ' + num, W / 2, 548)
-    x.fillStyle = '#8A7A6A'; x.font = '400 16px "Plus Jakarta Sans", sans-serif'
+    x.fillStyle = '#756A61'; x.font = '400 16px "Plus Jakarta Sans", sans-serif'
     x.fillText('Escaneá para ver el menú y pedir', W / 2, 580)
     cv.toBlob(b => {
       const a = document.createElement('a')
@@ -5841,7 +5845,7 @@ window.descargarQrsTodasLasMesas = function () {
   .rest { font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; margin-bottom: 8px; }
   .qr-card img { width: 130px; height: 130px; }
   .mesa { font-size: 21px; font-weight: 700; letter-spacing: 2px; color: #B85A30; margin-top: 8px; }
-  .hint { font-size: 9.5px; color: #8A7A6A; margin-top: 3px; }
+  .hint { font-size: 9.5px; color: #756A61; margin-top: 3px; }
 </style></head><body><div class="grid">${cards}</div></body></html>`
   document.body.appendChild(frame)
   showToast('⏳ Preparando ' + n + ' QRs…', 'info')
@@ -9059,8 +9063,8 @@ window.showBetaGate = function (provider) {
       <input id="beta-fb-email" placeholder="Email para avisarte (opcional)" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:10px;background:white">
       <input id="beta-fb-name" placeholder="Tu nombre (opcional)" style="width:100%;padding:11px 14px;border:1px solid var(--border,#E8DDD0);border-radius:10px;font-size:14px;margin-bottom:16px;background:white">
       <button id="beta-submit" style="width:100%;padding:13px;background:var(--terra,#B85A30);color:white;border:none;border-radius:11px;font-size:14.5px;font-weight:600;cursor:pointer">Pedir acceso a la beta</button>
-      <button id="beta-already" style="width:100%;padding:11px;background:none;border:none;color:var(--muted,#8A7A6A);font-size:13px;cursor:pointer;margin-top:8px;text-decoration:underline">Ya me habilitaron → conectar ahora</button>
-      <button id="beta-close" style="position:absolute;top:18px;right:22px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted,#8A7A6A)">✕</button>
+      <button id="beta-already" style="width:100%;padding:11px;background:none;border:none;color:var(--muted,#756A61);font-size:13px;cursor:pointer;margin-top:8px;text-decoration:underline">Ya me habilitaron → conectar ahora</button>
+      <button id="beta-close" style="position:absolute;top:18px;right:22px;background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted,#756A61)">✕</button>
     </div>`
   document.body.appendChild(ov)
   ov.addEventListener('click', e => { if (e.target === ov) ov.remove() })

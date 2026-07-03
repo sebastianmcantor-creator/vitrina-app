@@ -16,7 +16,7 @@
   --cream:      #F7F2EA;
   --cream2:     #EDE5D8;
   --white:      #FDFAF6;
-  --muted:      #8A7E74;
+  --muted:      #756A61;
   --border:     #DDD5C8;
   --good:       #10B981;
   --bad:        #EF4444;
@@ -1997,8 +1997,8 @@ async function renderClients() {
       const createdAt = r.created_at ? new Date(r.created_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'2-digit' }) : '—'
       const lastActivity = r.updated_at ? new Date(r.updated_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short' }) : '—'
       const isNew = r.created_at && (Date.now() - new Date(r.created_at).getTime()) < 7 * 24 * 3600 * 1000
-      const planColors = { free: '#8a7e74', basico: '#22863a', pro: '#b85a30', full: '#c8963c', marketing: '#1565c0' }
-      const planColor = planColors[plan] || '#8a7e74'
+      const planColors = { free: '#756A61', basico: '#22863a', pro: '#b85a30', full: '#c8963c', marketing: '#1565c0' }
+      const planColor = planColors[plan] || '#756A61'
 
       return `
         <tr style="${isNew ? 'background:rgba(184,90,48,.04)' : ''}">
