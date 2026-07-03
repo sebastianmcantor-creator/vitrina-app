@@ -5123,17 +5123,20 @@ function renderSidebarRestaurant(rest) {
     reservas: false, agenda: false, mesas: false, catalogo: false,
     reminders: false, etiquetas: false, proveedores: false,
     delivery: false, caja: false, marketing: false, campanas: false,
-    whatsapp: false,
+    whatsapp: false, crm: false, informes: false,
   } : {
     reservas:      esResto,
-    agenda:        esResto || esServ,
+    agenda:        esServ,             // restaurantes usan Reservas; agenda duplicaba
     mesas:         esResto,
     catalogo:      esLocal,
     reminders:     esServ,             // recordatorios de visita (peluquería etc.)
     etiquetas:     esLocal,
     proveedores:   esLocal,
-    delivery:      esResto || esLocal, // rentabilidad Rappi/PedidosYa
+    delivery:      esLocal,            // rentabilidad Rappi/PyA: rebuscado para Solo Menú
     caja:          esResto || esLocal,
+    // Solo Menú simple: CRM e Informes son features del plan Marketing.
+    crm:           esLocal,
+    informes:      false,
     // Marketing/Campañas: ocultos — solo se vende "Solo Menú" (no incluye marketing).
     marketing:     false,
     campanas:      false,
@@ -6874,17 +6877,44 @@ function escHtml(str) {
 function renderMenu() {
   const container = document.getElementById('menu-body')
   if (!menuCats.length) {
+    // Mismo selector simple del estado inicial: foto/PDF · pegar texto · a mano
     container.innerHTML = `
       <div class="menu-empty">
         <div class="menu-empty-icon">📋</div>
-        <div class="menu-empty-label">Empezá a cargar tu catálogo</div>
-        <div class="menu-empty-desc">${document.getElementById('menu-empty-desc')?.textContent || 'Creá la primera categoría y agregá tus ítems.'}</div>
-        <button class="btn-primary" onclick="openCategoryModal()" style="margin-top:16px;font-size:14px">+ Crear primera categoría</button>
-        <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:10px;display:block">Ver un ejemplo completo →</a>
+        <div class="menu-empty-label">¿Cómo querés cargar tu menú?</div>
+        <div class="menu-empty-desc">Elegí la forma más cómoda. Después podés editar todo.</div>
+        <div class="menu-load-grid">
+          <button class="menu-load-card" onclick="openImportMenuModal()">
+            <div class="mlc-icon">📸</div>
+            <div class="mlc-title">Foto o PDF</div>
+            <div class="mlc-desc">Sacale una foto a tu carta y la detectamos con IA</div>
+          </button>
+          <button class="menu-load-card" onclick="openImportMenuModal('texto')">
+            <div class="mlc-icon">📝</div>
+            <div class="mlc-title">Pegar texto</div>
+            <div class="mlc-desc">Copiá y pegá tu carta. Siempre funciona, sin IA</div>
+          </button>
+          <button class="menu-load-card" onclick="openCategoryModal()">
+            <div class="mlc-icon">✍️</div>
+            <div class="mlc-title">A mano</div>
+            <div class="mlc-desc">Cargá tus categorías y platos uno por uno</div>
+          </button>
+        </div>
+        <a href="/demo.html" target="_blank" rel="noopener noreferrer" style="font-size:13px;color:var(--muted);text-decoration:none;margin-top:14px;display:block">Ver un ejemplo completo →</a>
       </div>`
     return
   }
-  container.innerHTML = menuCats.map(cat => {
+
+  // Aviso de fotos faltantes: sugerir subir las propias o generar todas con IA
+  const allItems = menuCats.flatMap(c => menuItemsMap[c.id] ?? [])
+  const sinFoto = allItems.filter(i => !i.image_url)
+  const fotosBanner = sinFoto.length >= 2 ? `
+    <div id="fotos-banner" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff8e1;border:1px solid #f0d9a0;border-radius:12px;padding:12px 16px;margin-bottom:14px">
+      <span style="font-size:13.5px;color:#6d5410;flex:1;min-width:200px">📷 <b>${sinFoto.length} ${sinFoto.length === 1 ? 'plato' : 'platos'} sin foto.</b> Los platos con foto se piden más: subí las tuyas desde cada plato (✏️) o generalas con IA.</span>
+      <button class="btn-primary" style="font-size:13px;padding:8px 14px;flex-shrink:0" onclick="generarFotosFaltantes()">✨ Generar todas con IA</button>
+    </div>` : ''
+
+  container.innerHTML = fotosBanner + menuCats.map(cat => {
     const items = menuItemsMap[cat.id] ?? []
     const withoutPhoto = items.filter(i => !i.image_url).length
     const photoWarning = withoutPhoto > 0
@@ -7779,6 +7809,7 @@ function renderPedidos() {
         <div class="pedido-card-footer">
           <span class="pedido-total">${total}</span>
           <div class="pedido-actions">
+            <button class="btn-secondary" style="padding:7px 12px;font-size:13px" onclick="imprimirComanda('${o.id}')" title="Imprimir comanda (ticket para cocina/caja)">🖨️</button>
             ${prev ? `<button class="btn-secondary" style="padding:7px 12px;font-size:13px" onclick="retrocederEstado('${o.id}')" title="Deshacer (volver al estado anterior)">↩ Deshacer</button>` : ''}
             ${!done ? `<button class="btn-secondary" style="padding:7px 14px;font-size:13px" onclick="cancelarPedido('${o.id}')">Cancelar</button>` : ''}
             ${next ? `<button class="btn-primary" style="padding:7px 14px;font-size:13px" onclick="avanzarEstado('${o.id}','${next.next}')">${next.label}</button>` : ''}
@@ -7793,6 +7824,51 @@ function renderPedidos() {
       + '<div class="pedidos-list">' + salieron.slice().reverse().map(o => cardHtml(o, true)).join('') + '</div>'
   }
   container.innerHTML = html
+}
+
+// Imprime la comanda en formato ticket 80mm (impresora térmica o común).
+window.imprimirComanda = function (id) {
+  const o = pedidosMap[id]
+  if (!o) return
+  const items = o.order_items ?? []
+  const mesaLabel = (currentRestaurant?.business_type || 'restaurant') === 'restaurant' ? 'MESA' : 'PEDIDO'
+  const fecha = new Date(o.created_at)
+  const hora = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+  const dia  = fecha.toLocaleDateString('es-AR')
+  const w = window.open('', '_blank', 'width=400,height=620')
+  if (!w) { showToast('Permití las ventanas emergentes para imprimir', 'error'); return }
+  w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Comanda</title>
+<style>
+  @page { size: 80mm auto; margin: 4mm; }
+  body { font-family: 'Courier New', monospace; width: 72mm; margin: 0 auto; color: #000; font-size: 13px; }
+  .c { text-align: center; }
+  .rest { font-size: 15px; font-weight: bold; }
+  .mesa { font-size: 26px; font-weight: bold; margin: 6px 0; }
+  hr { border: none; border-top: 1px dashed #000; margin: 6px 0; }
+  table { width: 100%; border-collapse: collapse; }
+  td { padding: 3px 0; vertical-align: top; font-size: 14px; }
+  .qty { width: 34px; font-weight: bold; font-size: 16px; }
+  .price { text-align: right; white-space: nowrap; }
+  .total { font-size: 16px; font-weight: bold; }
+  .meta { font-size: 11px; }
+  .nota { font-style: italic; font-size: 12px; }
+</style></head><body>
+  <div class="c rest">${escHtml(currentRestaurant?.name || '')}</div>
+  <div class="c meta">${dia} · ${hora} · #${String(o.id).slice(-6).toUpperCase()}</div>
+  <div class="c mesa">${mesaLabel} ${escHtml(String(o.table_number ?? '—'))}</div>
+  ${o.customer_name ? `<div class="c meta">Cliente: ${escHtml(o.customer_name)}</div>` : ''}
+  <hr>
+  <table>
+    ${items.map(i => `<tr><td class="qty">${i.quantity}×</td><td>${escHtml(i.name)}${i.notes ? `<div class="nota">↳ ${escHtml(i.notes)}</div>` : ''}</td><td class="price">$${Number(i.price * i.quantity).toLocaleString('es-AR')}</td></tr>`).join('')}
+  </table>
+  ${o.notes ? `<hr><div class="nota">Nota: ${escHtml(o.notes)}</div>` : ''}
+  <hr>
+  <table><tr><td class="total">TOTAL</td><td class="price total">$${Number(o.total ?? 0).toLocaleString('es-AR')}</td></tr></table>
+  <hr>
+  <div class="c meta">vitrinaapp.com.ar</div>
+  <script>window.onload = function(){ window.print(); window.onafterprint = function(){ window.close() } }<\/script>
+</body></html>`)
+  w.document.close()
 }
 
 window.avanzarEstado = async function (id, status) {
@@ -12032,12 +12108,28 @@ window.confirmImportMenu = async function () {
 
 // Genera una foto IA por cada plato importado, la sube a Storage y la asocia.
 // Secuencial a propósito: no satura el worker y permite mostrar progreso.
-async function generarFotosImportadas(items, styleKey) {
+// Genera con IA las fotos de todos los platos que no tienen (banner del menú).
+window.generarFotosFaltantes = async function () {
+  const faltan = menuCats.flatMap(c => menuItemsMap[c.id] ?? []).filter(i => !i.image_url)
+  if (!faltan.length) { showToast('Todos tus platos ya tienen foto ✓', 'success'); return }
+  if (!confirm(`Se van a generar ${faltan.length} fotos con IA (estilo cálido de restaurante). Tardá ~${Math.ceil(faltan.length * 8 / 60) || 1} min. ¿Dale?`)) return
+  const banner = document.getElementById('fotos-banner')
+  const prog = (n, total, name) => {
+    if (banner) banner.innerHTML = `<span style="font-size:13.5px;color:#6d5410">🎨 Generando fotos con IA… <b>${n} de ${total}</b> — "${escHtml(name)}". No cierres esta pestaña.</span>`
+  }
+  const r = await generarFotosImportadas(faltan, 'warm', prog)
+  renderMenu()
+  showToast(`✨ ${r.done} fotos generadas${r.fails ? ` · ${r.fails} fallaron (podés reintentar)` : ''}`, r.fails ? 'error' : 'success')
+}
+
+async function generarFotosImportadas(items, styleKey, onProgress) {
   const statusEl = document.getElementById('import-menu-status')
   const total = items.length
   let done = 0, fails = 0
   for (const it of items) {
-    if (statusEl) {
+    if (onProgress) {
+      onProgress(done + fails + 1, total, it.name)
+    } else if (statusEl) {
       statusEl.style.display = 'block'
       statusEl.innerHTML = `<div style="text-align:center;padding:10px;font-size:13px;color:var(--muted)">
         🎨 Generando fotos con IA… <b>${done + fails + 1} de ${total}</b><br>

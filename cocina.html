@@ -789,12 +789,11 @@
               + '</div>'
             ).join('')
           + '</div>'
-          + (canAct || canUndo
-            ? '<div class="pedido-footer">'
-              + (canAct ? '<button class="estado-btn ' + p.status + '" data-id="' + p.id + '" onclick="cambiarEstado(this.dataset.id)">' + labelBtn(p.status) + '</button>' : '')
-              + (canUndo ? '<button class="card-undo-btn" data-id="' + p.id + '" onclick="deshacerEnCard(this.dataset.id)" title="Deshacer">&#8617;</button>' : '')
-              + '</div>'
-            : '')
+          + '<div class="pedido-footer">'
+            + (canAct ? '<button class="estado-btn ' + p.status + '" data-id="' + p.id + '" onclick="cambiarEstado(this.dataset.id)">' + labelBtn(p.status) + '</button>' : '')
+            + (canUndo ? '<button class="card-undo-btn" data-id="' + p.id + '" onclick="deshacerEnCard(this.dataset.id)" title="Deshacer">&#8617;</button>' : '')
+            + '<button class="card-undo-btn" data-id="' + p.id + '" onclick="imprimirComandaCocina(this.dataset.id)" title="Imprimir comanda">&#128424;</button>'
+          + '</div>'
           + (isDone ? '' : (() => {
               const totalSec = Math.floor((Date.now() - new Date(p.created_at).getTime()) / 1000)
               const minElapsed = Math.floor(totalSec / 60)
@@ -936,6 +935,34 @@
       btn.disabled = false
       btn.textContent = '💳 Generar link de pago'
     }
+  }
+
+  // Imprime la comanda en formato ticket 80mm (impresora térmica o común).
+  window.imprimirComandaCocina = function (id) {
+    const p = pedidos[id]
+    if (!p) return
+    const items = p.order_items || []
+    const fecha = new Date(p.created_at)
+    const hora = fecha.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })
+    const dia  = fecha.toLocaleDateString('es-AR')
+    const w = window.open('', '_blank', 'width=400,height=620')
+    if (!w) return
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Comanda</title>'
+      + '<style>@page{size:80mm auto;margin:4mm}body{font-family:\'Courier New\',monospace;width:72mm;margin:0 auto;color:#000;font-size:13px}.c{text-align:center}.rest{font-size:15px;font-weight:bold}.mesa{font-size:26px;font-weight:bold;margin:6px 0}hr{border:none;border-top:1px dashed #000;margin:6px 0}table{width:100%;border-collapse:collapse}td{padding:3px 0;vertical-align:top;font-size:14px}.qty{width:34px;font-weight:bold;font-size:16px}.price{text-align:right;white-space:nowrap}.total{font-size:16px;font-weight:bold}.meta{font-size:11px}.nota{font-style:italic;font-size:12px}</style>'
+      + '</head><body>'
+      + '<div class="c rest">' + esc(rest?.name || '') + '</div>'
+      + '<div class="c meta">' + dia + ' · ' + hora + ' · #' + String(p.id).slice(-6).toUpperCase() + '</div>'
+      + '<div class="c mesa">MESA ' + esc(String(p.table_number ?? '—')) + '</div>'
+      + (p.customer_name ? '<div class="c meta">Cliente: ' + esc(p.customer_name) + '</div>' : '')
+      + '<hr><table>'
+      + items.map(i => '<tr><td class="qty">' + i.quantity + '×</td><td>' + esc(i.name) + '</td><td class="price">$' + Number(i.price * i.quantity).toLocaleString('es-AR') + '</td></tr>').join('')
+      + '</table>'
+      + (p.notes ? '<hr><div class="nota">Nota: ' + esc(p.notes) + '</div>' : '')
+      + '<hr><table><tr><td class="total">TOTAL</td><td class="price total">$' + Number(p.total || 0).toLocaleString('es-AR') + '</td></tr></table>'
+      + '<hr><div class="c meta">vitrinaapp.com.ar</div>'
+      + '<scr' + 'ipt>window.onload=function(){window.print();window.onafterprint=function(){window.close()}}</scr' + 'ipt>'
+      + '</body></html>')
+    w.document.close()
   }
 
   window.cambiarEstado = cambiarEstado
