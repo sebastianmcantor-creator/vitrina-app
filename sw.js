@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vitrina-v4';
+const CACHE_NAME = 'vitrina-v5';
 const STATIC_ASSETS = [
   '/lib/vitrina-tokens.css',
 ];

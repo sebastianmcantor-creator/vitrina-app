@@ -386,7 +386,10 @@
   </a>
 
   <script type="module">
-    import { restaurants, orders, orderSessions, orderItems } from './lib/db.js'
+    // ?v= — cache-buster: garantiza que Safari/SW viejos NO sirvan un db.js
+    // cacheado (el "Error al enviar el pedido" fantasma venía de ahí). Subir el
+    // número cada vez que se toque lib/db.js.
+    import { restaurants, orders, orderSessions, orderItems } from './lib/db.js?v=7'
     import { supabase } from './lib/supabase.js'
 
     const TAG_MAP = {
@@ -1184,7 +1187,10 @@
           waWrap.style.display = 'block'
         }
       } catch (e) {
-        alert('Error al enviar el pedido. Intentá de nuevo.')
+        // Mostrar la causa real: el genérico "intentá de nuevo" nos ocultó
+        // durante días que era un 42501 de RLS / un db.js cacheado.
+        const detalle = (e && (e.message || e.code)) ? ` (${e.message || e.code})` : ''
+        alert('Error al enviar el pedido' + detalle + '. Si se repite, recargá la página y probá de nuevo.')
       } finally {
         const confirmBtn = document.getElementById('btn-confirm-order')
         if (confirmBtn) { confirmBtn.textContent = '✓ Mandar a cocina'; confirmBtn.disabled = false }
@@ -1338,6 +1344,15 @@
 
     function updatePedidosBar() {
       document.getElementById('pedidos-bar').style.display = pedidosSesion.length ? 'flex' : 'none'
+      // "Pedir la cuenta" visible SIEMPRE que haya pedidos en la visita (antes
+      // solo aparecía justo después de enviar un pedido: al recargar la página
+      // el cliente no encontraba cómo pagar).
+      if (pedidosSesion.length && (rest?.business_type || 'restaurant') === 'restaurant') {
+        actualizarBannerAcumulado().catch(() => {})
+      } else {
+        const b = document.getElementById('banner-acumulado')
+        if (b) b.style.display = 'none'
+      }
     }
 
     // ─── Total acumulado de visita + "Pedir la cuenta" — SOLO restaurant ─────────
@@ -1365,8 +1380,14 @@
       if (!banner || !textEl) return
 
       const total = await calcularTotalAcumulado()
+      // Sin saldo pendiente (todo pagado/cancelado) → no ofrecer pagar
+      if (!total || total <= 0) {
+        banner.style.display = 'none'
+        if (cuenta) cuenta.style.display = 'none'
+        return
+      }
       const currency = rest?.currency || 'ARS'
-      textEl.textContent = '✓ Pedido enviado · Total acumulado de la visita: ' + currency + ' $' + total.toLocaleString('es-AR')
+      textEl.textContent = '🧾 Total de tu visita: ' + currency + ' $' + total.toLocaleString('es-AR')
       banner.style.display = 'flex'
       // Mostrar también el botón en el overlay de estado
       if (cuenta) cuenta.style.display = 'block'
