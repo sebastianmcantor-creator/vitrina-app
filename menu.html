@@ -1171,7 +1171,8 @@
         abrirOverlayEstado()
 
         // Banner de total acumulado + botón "Pedir la cuenta" — SOLO restaurant
-        if (btype === 'restaurant') {
+        // OJO: btype es local de init(); acá hay que leer de rest (global) o Safari tira ReferenceError
+        if ((rest?.business_type || 'restaurant') === 'restaurant') {
           actualizarBannerAcumulado()
         }
 
