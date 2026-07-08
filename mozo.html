@@ -48,7 +48,8 @@
     .error-msg { font-size: 12px; color: #8a5a3a; text-align: center; padding: 4px 16px; display: none; flex-shrink: 0; }
 
     .input-area { padding: 10px 14px 24px; display: flex; gap: 8px; align-items: center; border-top: 0.5px solid #2e2410; flex-shrink: 0; }
-    .chat-input { flex: 1; background: #2a2010; border: 0.5px solid #4a3820; border-radius: 22px; padding: 10px 16px; color: #e8c87a; font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; -webkit-appearance: none; transition: border-color 0.2s; }
+    /* 16px mínimo: Safari iOS hace zoom automático al enfocar inputs con font-size < 16px */
+    .chat-input { flex: 1; background: #2a2010; border: 0.5px solid #4a3820; border-radius: 22px; padding: 10px 16px; color: #e8c87a; font-family: 'DM Sans', sans-serif; font-size: 16px; outline: none; -webkit-appearance: none; transition: border-color 0.2s; }
     .chat-input:focus { border-color: #c8a84a; }
     .chat-input::placeholder { color: #5a4a2a; }
     .send-btn { width: 40px; height: 40px; border-radius: 50%; background: #c8a84a; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
