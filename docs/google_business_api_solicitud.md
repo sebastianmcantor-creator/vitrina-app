@@ -2,10 +2,25 @@
 
 **Objetivo:** que Google nos habilite la API de Business Profile para gestionar reseñas y publicaciones de los clientes de Vitrina de forma automática (hoy solo podemos hacerlo a mano como administradores).
 
-## Requisitos (ya los cumplimos ✓)
-- ✅ Cuenta de Google que administra un perfil de empresa verificado: `contacto@vitrinaapp.com.ar` (admin de **Chikpi Hummus & Pita Bar**, perfil activo +60 días).
-- ✅ Proyecto en Google Cloud con OAuth configurado (el que usamos para `/api/google/auth`).
+## ✅ ENVIADA — 2026-07-07
+- **Caso de soporte:** `8-6242000040908` · revisión estimada **7 a 10 días hábiles**.
+- Enviada desde **contacto@vitrinaapp.com.ar** (ya administrador de la ficha verificada de **Chikpi Hummus & Pita Bar** — la invitación del 29/6 estaba sin aceptar; se aceptó hoy).
+- Perfil seleccionado en el formulario: **Chikpi Hummus & Pita Bar** (Verificado).
+- Datos enviados: Nº proyecto Cloud **496787959423** · sitio **https://www.vitrinaapp.com.ar** · motivo = gestión de reseñas/publicaciones/info de clientes desde el panel, con acceso de admin que otorga cada restaurante.
+- **Cómo chequear aprobación:** Cloud Console (proyecto 496787959423) → APIs → cuotas de las Business Profile APIs. **0 QPM = pendiente · 300 QPM = aprobado.** También llega mail al caso.
+- **Al aprobar:** habilitar en Cloud Console "My Business Business Information API", "My Business Account Management API" y "Google My Business API" → probar `/api/google/reviews?restaurant_id=<chikpi>` (debería devolver reseñas en vez de `connected:false`).
+- **Ojo (aparte):** Google muestra un banner "Se requiere verificación para contacto@" en la ficha de Chikpi; es re-verificación del perfil, no bloquea la solicitud de API. Verlo con Chikpi si pide acción.
+
+## Estado real verificado (2026-07-06)
+- ❌ **BLOQUEANTE — Perfil de Negocio administrado:** ninguna cuenta de Google de Vitrina administra hoy una ficha. En el Business Profile Manager, tanto `sebastianmcantor@gmail.com` como `contacto@vitrinaapp.com.ar` muestran **"0 empresas"**. Google exige que el correo que envía la solicitud sea **propietario o administrador de un Perfil verificado y activo +60 días** → hoy NO se cumple.
+- ❌ **Chikpi NO está conectado en Vitrina:** `/api/google/reviews?restaurant_id=<chikpi>` devuelve `connected:false` (no hay token OAuth guardado, provider `google_business` vacío). Lo que Chikpi haya hecho la semana pasada no quedó registrado.
+- ✅ **Proyecto en Google Cloud con OAuth:** "My First Project" — **número 496787959423** (ID `project-7cec6073-9540-4adc-80a`), bajo la org de **`sebastianmcantor@gmail.com`** (NO contacto@). Scope pedido: `business.manage`.
 - ✅ Sitio web propio: `https://www.vitrinaapp.com.ar`.
+
+## Qué falta para poder enviar (en orden)
+1. **Chikpi agrega nuestro correo de Vitrina como Administrador de su ficha** (business.google.com → su Perfil → Configuración/Usuarios → Añadir → rol Administrador). Al aceptar, esa cuenta pasa a "administrar un Perfil verificado" y se cumple el requisito.
+2. **Decidir cuál es el correo Google oficial de Vitrina.** El proyecto Cloud está en el Gmail personal; para marca conviene `contacto@`. Opciones: (a) agregar `contacto@` como propietario del proyecto 496787959423 y usarlo en todo; (b) usar el Gmail personal para la ficha + el formulario. **Lo decide Sebastián.**
+3. Recién ahí: enviar el formulario (project number 496787959423) desde el correo elegido.
 
 ## Pasos (los hace Sebastián — 10 min)
 
