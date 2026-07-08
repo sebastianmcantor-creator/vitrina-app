@@ -6386,6 +6386,9 @@ window.createRestaurant = async function () {
       // No depende del worker (set-trial fallaba en silencio y la cuenta
       // quedaba 'free' + can_take_orders=false: checkout del QR bloqueado).
       subscription_status: 'trialing',
+      // Trial = Solo Menú completo (no existe más el plan Free). El worker corta
+      // Tano ilimitado cuando el trial vence sin suscripción activa.
+      plan: 'rest-menu',
       can_take_orders: true,
     })
 
@@ -8039,7 +8042,8 @@ function renderPlanSection() {
   // Solo se ofrece Free y Solo Menú (rest-menu). Antes usaba alias viejos
   // 'pro'/'full' → mostraba 2 "Solo Menú" duplicados y mandaba planId inválido
   // al worker (por eso no llevaba a pagar).
-  const planesAMostrar = ['free', 'rest-menu'].filter(pid => PLAN_INFO[pid])
+  // Plan Free eliminado (2026-07-08): la única puerta de entrada es el trial de 14 días de Solo Menú.
+  const planesAMostrar = ['rest-menu'].filter(pid => PLAN_INFO[pid])
   // "Plan actual" (card deshabilitada) SOLO si realmente pagó — en la prueba
   // gratuita las cards quedan activables para poder contratar y pagar.
   const paidTier = (status === 'active' || status === 'paused' || status === 'past_due')
