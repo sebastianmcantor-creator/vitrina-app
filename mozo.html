@@ -444,6 +444,11 @@
         + '7. Nunca inventés precios, ingredientes ni disponibilidad. Si no lo tenés en el menú, decís que consulten al equipo.\n'
         + '8. Podés ofrecer agregar al pedido: "¿Lo sumo al pedido?" — usalo cuando tenga sentido, no en cada respuesta.\n'
         + '9. Si hay ingredientes que podrían ser alérgenos y el cliente pregunta, dás la info clara y directa.\n\n'
+        + 'ACCIONES SOBRE EL PEDIDO (marcadores que el cliente NO ve — el sistema los procesa):\n'
+        + '- Si el cliente pide agregar un plato que SÍ está en el menú, confirmalo natural y terminá tu mensaje con una línea aparte EXACTA por cada plato: [[AGREGAR|nombre exacto del plato tal como figura en el menú|cantidad]]\n'
+        + '- NUNCA digas que agregaste algo sin poner su línea [[AGREGAR|...]] — sin esa línea el plato NO se agrega de verdad.\n'
+        + '- Si pide un plato que NO está en el menú, decíselo con amabilidad, sugerí lo más parecido que sí tengas, y terminá el mensaje con la línea: [[NO_DISPONIBLE]]\n'
+        + '- Los marcadores van al final del mensaje, cada uno en su propia línea.\n\n'
         + featuredLine
         + agendaLine + '\n\n'
         + catalogSection
@@ -588,6 +593,53 @@
       }
     }
 
+    // ── Acciones de Tano sobre el pedido ─────────────────────────────────────
+    // Tano emite marcadores [[AGREGAR|nombre|cant]] y [[NO_DISPONIBLE]] que acá
+    // se convierten en acciones reales: escribir el carrito compartido (misma
+    // clave localStorage que menu.html) y registrar experiencia con problemas
+    // (para no invitar a reseñar en Google si faltó un plato).
+    function cartKeyMozo() { return 'vt_cart_' + (slug || 'demo') + '_' + (mesa || '0') }
+    function normalizarNombre(s) {
+      return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
+    }
+    function procesarAccionesTano(reply) {
+      let visible = reply
+      const pedidos = []
+      visible = visible.replace(/\[\[AGREGAR\|([^|\]]+)\|(\d+)\]\]/g, (_, nombre, cant) => {
+        pedidos.push({ nombre: nombre.trim(), cant: Math.max(1, parseInt(cant) || 1) })
+        return ''
+      })
+      const noDisponible = /\[\[NO_DISPONIBLE\]\]/.test(visible)
+      visible = visible.replace(/\[\[NO_DISPONIBLE\]\]/g, '')
+      if (noDisponible) {
+        try { sessionStorage.setItem('vitrina_exp_mala', '1') } catch {}
+      }
+      const agregados = [], noEncontrados = []
+      if (pedidos.length) {
+        const items = (rest.menu_categories || []).flatMap(c => c.menu_items || []).filter(i => i.is_visible !== false)
+        let cart = {}
+        try { cart = JSON.parse(localStorage.getItem(cartKeyMozo()) || '{}') } catch {}
+        for (const p of pedidos) {
+          const buscado = normalizarNombre(p.nombre)
+          const item = items.find(i => normalizarNombre(i.name) === buscado)
+            || items.find(i => normalizarNombre(i.name).includes(buscado) || buscado.includes(normalizarNombre(i.name)))
+          if (item) {
+            cart[item.id] = (cart[item.id] || 0) + p.cant
+            agregados.push(p.cant + '× ' + item.name)
+          } else {
+            noEncontrados.push(p.nombre)
+          }
+        }
+        if (agregados.length) {
+          try {
+            localStorage.setItem(cartKeyMozo(), JSON.stringify(cart))
+            localStorage.setItem(cartKeyMozo() + '_ts', Date.now())
+          } catch {}
+        }
+      }
+      return { visible: visible.replace(/\n{3,}/g, '\n\n').trim(), agregados, noEncontrados }
+    }
+
     async function sendMessage() {
       if (isLoading) return
       const input = document.getElementById('chat-input')
@@ -661,7 +713,11 @@
           const reply = data.content?.[0]?.text || 'No pude procesar tu consulta. ¿Podés repetirla?'
           conversationHistory.push({ role: 'assistant', content: reply })
           showTyping(false)
-          addMessage('assistant', reply)
+          // Procesar acciones de Tano (agregar al pedido / plato no disponible)
+          const acc = procesarAccionesTano(reply)
+          addMessage('assistant', acc.visible || reply)
+          if (acc.agregados.length) addMessage('assistant', '🛒 Listo — agregué al pedido: ' + acc.agregados.join(', ') + '. Lo ves al volver al menú 👈')
+          if (acc.noEncontrados.length) addMessage('assistant', 'Ojo: "' + acc.noEncontrados.join('", "') + '" no lo pude sumar solo — agregalo tocándolo en el menú 🙏')
           errorEl.style.display = 'none'
           break
         } catch {

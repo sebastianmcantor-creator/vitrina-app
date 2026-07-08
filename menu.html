@@ -434,6 +434,7 @@
     let statusInterval = null
     let pedidosStatusCache = {} // { id: status } para evitar flasheo de estado
     let pedidosPaidCache = {}   // { id: paid_at } para la tarjeta de reseña post-pago
+    let pedidosCreatedCache = {} // { id: created_at } para detectar demoras
 
     // Auto-reset si la sesión tiene más de 3 horas (nuevo comensal en la misma mesa)
     const sesionTs = Number(sessionStorage.getItem(SESSION_TS_KEY) || 0)
@@ -449,6 +450,7 @@
       sessionStorage.removeItem(SESSION_KEY)
       sessionStorage.removeItem(SESSION_TS_KEY)
       sessionStorage.removeItem('vitrina_cobro_elegido')
+      sessionStorage.removeItem('vitrina_exp_mala')
       pedidosSesion = []
       cart = {}
       cerrarOverlay()
@@ -860,6 +862,22 @@
       if (fab) fab.style.display = ''
     }
 
+    // Re-sincronizar el carrito al volver a esta página (p. ej. desde el chat de
+    // Tano, que puede agregar platos escribiendo el carrito compartido). Cubre el
+    // bfcache de Safari iOS, donde init() no vuelve a correr.
+    window.addEventListener('pageshow', () => {
+      if (!rest) return // todavía no terminó el init inicial
+      const antes = JSON.stringify(cart)
+      loadCart()
+      if (JSON.stringify(cart) !== antes) {
+        renderCtrlAll()
+        updateCartCount()
+        syncTanoFab()
+        const agregadosTano = Object.keys(cart).length
+        if (agregadosTano) showToast('🛒 Tano actualizó tu pedido — miralo en el carrito', 3500)
+      }
+    })
+
     // ─── Cart ──────────────────────────────────────────────────────────────────
     function addItem(id) {
       cart[id] = (cart[id] || 0) + 1
@@ -1270,12 +1288,22 @@
 
       // Reseña de Google: se sugiere en el pico de satisfacción — cuando un pedido
       // fue entregado, cuando ya pagó (MP → paid_at) o cuando eligió cómo pagar.
+      // PROTECCIÓN DE REPUTACIÓN: si Vitrina detectó un problema en la visita
+      // (demora larga o un plato buscado que no estaba), NO se invita a reseñar.
+      const DEMORA_LIMITE_MS = 35 * 60 * 1000
+      const huboDemora = pedidosSesion.some(id => {
+        const o = lista.find(x => x.id === id) || {}
+        return ['pending', 'confirmed', 'preparing'].includes(o.status)
+          && o.created_at && (Date.now() - new Date(o.created_at).getTime()) > DEMORA_LIMITE_MS
+      })
+      if (huboDemora) { try { sessionStorage.setItem('vitrina_exp_mala', '1') } catch {} }
+      const expConProblemas = sessionStorage.getItem('vitrina_exp_mala') === '1'
       const algunoEntregado = pedidosSesion.some(id => (lista.find(x => x.id === id) || {}).status === 'delivered')
       const algunoPagado = pedidosSesion.some(id => !!(lista.find(x => x.id === id) || {}).paid_at)
       const cobroElegido = sessionStorage.getItem('vitrina_cobro_elegido') === '1'
       const reviewCard = document.getElementById('review-card')
       if (reviewCard && rest.business_type !== 'services') {
-        if (algunoEntregado || algunoPagado || cobroElegido) {
+        if ((algunoEntregado || algunoPagado || cobroElegido) && !expConProblemas) {
           document.getElementById('review-link').href = googleReviewUrl()
           reviewCard.style.display = 'block'
         } else {
@@ -1325,10 +1353,10 @@
         try {
           const { data } = await supabase
             .from('orders')
-            .select('id, status, paid_at')
+            .select('id, status, paid_at, created_at')
             .in('id', pedidosSesion)
           if (data) {
-            data.forEach(r => { pedidosStatusCache[r.id] = r.status; pedidosPaidCache[r.id] = r.paid_at })
+            data.forEach(r => { pedidosStatusCache[r.id] = r.status; pedidosPaidCache[r.id] = r.paid_at; pedidosCreatedCache[r.id] = r.created_at })
             renderConfirmList(data)
           }
         } catch {}
@@ -1348,10 +1376,12 @@
           // Actualizar cache y re-renderizar sin flasheo
           pedidosStatusCache[payload.new.id] = payload.new.status
           if (payload.new.paid_at) pedidosPaidCache[payload.new.id] = payload.new.paid_at
+          if (payload.new.created_at) pedidosCreatedCache[payload.new.id] = payload.new.created_at
           renderConfirmList(pedidosSesion.map(id => ({
             id,
             status: pedidosStatusCache[id] || 'pending',
-            paid_at: pedidosPaidCache[id] || null
+            paid_at: pedidosPaidCache[id] || null,
+            created_at: pedidosCreatedCache[id] || null
           })))
           // Notificar al cliente si su pedido está listo
           if (payload.new.status === 'ready' && prevStatus !== 'ready') {
@@ -1498,10 +1528,11 @@
         if (ov) ov.classList.remove('open')
         const label = metodo === 'efectivo' ? 'en efectivo 💵' : 'con tarjeta 💳'
         showToast('✅ Ya le avisamos al mozo — se acerca a cobrarte ' + label, 4500)
-        // Momento ideal para sugerir la reseña: ya decidió pagar
+        // Momento ideal para sugerir la reseña: ya decidió pagar.
+        // Salvo que la visita haya tenido problemas (demora/plato faltante).
         sessionStorage.setItem('vitrina_cobro_elegido', '1')
         const rc = document.getElementById('review-card')
-        if (rc && rest.business_type !== 'services') {
+        if (rc && rest.business_type !== 'services' && sessionStorage.getItem('vitrina_exp_mala') !== '1') {
           document.getElementById('review-link').href = googleReviewUrl()
           rc.style.display = 'block'
         }
