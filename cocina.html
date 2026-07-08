@@ -435,12 +435,13 @@
           return
         }
 
-        // Pago confirmado — mostrar toast y remover de la pantalla después de 6 segundos
-        if (order.status === 'paid') {
+        // Pago confirmado (paid_at recién seteado) — toast + chip "Pagado".
+        // OJO: pagar NO es entregar. El pedido SIGUE en su columna y la cocina
+        // lo avanza normalmente hasta Entregado (aviso WhatsApp y reseña incluidos).
+        if (order.paid_at && pedidos[order.id] && !pedidos[order.id].paid_at) {
           const mesa = pedidos[order.id]?.table_number
           const mesaStr = mesa != null ? 'Mesa ' + mesa : 'Pedido'
-          // Actualizar el pedido en memoria para mostrar el badge "Pagado"
-          if (pedidos[order.id]) pedidos[order.id] = { ...pedidos[order.id], status: 'paid' }
+          pedidos[order.id] = { ...pedidos[order.id], ...order }
           renderAll()
           // Toast de confirmación de pago
           const toastMsg = '💳 ' + mesaStr + ' · Pago confirmado'
@@ -451,11 +452,7 @@
           setTimeout(() => {
             toast.style.opacity = '0'
             toast.style.transition = 'opacity .4s'
-            setTimeout(() => {
-              toast.remove()
-              delete pedidos[order.id]
-              renderAll()
-            }, 400)
+            setTimeout(() => toast.remove(), 400)
           }, 5000)
           return
         }
@@ -778,6 +775,7 @@
           +   '</div>'
           +   '<div style="text-align:right">'
           +     '<span class="estado-badge ' + (BADGE_CLASS[p.status] || '') + '">' + (BADGE_LABEL[p.status] || p.status) + '</span>'
+          +     (p.paid_at ? '<span class="estado-badge badge-ready" style="margin-left:4px">💳 Pagado</span>' : '')
           +     '<div class="elapsed ' + elapsedClass(p.created_at, p.status) + '" data-ts="' + p.created_at + '" data-status="' + p.status + '">' + formatElapsed(p.created_at) + '</div>'
           +   '</div>'
           + '</div>'

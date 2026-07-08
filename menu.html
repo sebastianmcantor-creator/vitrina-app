@@ -433,6 +433,7 @@
     let pedidosSesion = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '[]')
     let statusInterval = null
     let pedidosStatusCache = {} // { id: status } para evitar flasheo de estado
+    let pedidosPaidCache = {}   // { id: paid_at } para la tarjeta de reseña post-pago
 
     // Auto-reset si la sesión tiene más de 3 horas (nuevo comensal en la misma mesa)
     const sesionTs = Number(sessionStorage.getItem(SESSION_TS_KEY) || 0)
@@ -447,6 +448,7 @@
       if (!confirm('¿Empezar una sesión nueva? Tus pedidos anteriores no desaparecen de cocina.')) return
       sessionStorage.removeItem(SESSION_KEY)
       sessionStorage.removeItem(SESSION_TS_KEY)
+      sessionStorage.removeItem('vitrina_cobro_elegido')
       pedidosSesion = []
       cart = {}
       cerrarOverlay()
@@ -930,6 +932,27 @@
       el._removeTrap = () => el.removeEventListener('keydown', trap)
     }
 
+    // Bloqueo del scroll del body mientras el carrito está abierto.
+    // Sin esto, Safari iOS desliza la página de fondo al enfocar un input
+    // dentro del drawer fijo (la pantalla "se va sola" para abajo).
+    let _scrollLockY = 0
+    function lockBodyScroll() {
+      _scrollLockY = window.scrollY || 0
+      document.body.style.position = 'fixed'
+      document.body.style.top = (-_scrollLockY) + 'px'
+      document.body.style.left = '0'
+      document.body.style.right = '0'
+      document.body.style.width = '100%'
+    }
+    function unlockBodyScroll() {
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.width = ''
+      window.scrollTo(0, _scrollLockY)
+    }
+
     function toggleCart() {
       const drawer = document.getElementById('cart-drawer')
       const open = drawer.classList.contains('open')
@@ -937,8 +960,10 @@
       document.getElementById('cart-overlay').classList.toggle('open', !open)
       drawer.classList.toggle('open', !open)
       if (!open) {
+        lockBodyScroll()
         setTimeout(() => openWithFocusTrap('cart-drawer'), 50)
       } else {
+        unlockBodyScroll()
         if (drawer._removeTrap) drawer._removeTrap()
       }
     }
@@ -946,6 +971,7 @@
     function closeCart() {
       document.getElementById('cart-overlay').classList.remove('open')
       document.getElementById('cart-drawer').classList.remove('open')
+      unlockBodyScroll()
     }
 
     // ─── Upsell: qué sugerir para agrandar el pedido ────────────────────────────
@@ -1242,11 +1268,14 @@
           + '</div>'
       }).filter(Boolean).join('')
 
-      // Reseña de Google: mostrar cuando al menos un pedido ya fue entregado
+      // Reseña de Google: se sugiere en el pico de satisfacción — cuando un pedido
+      // fue entregado, cuando ya pagó (MP → paid_at) o cuando eligió cómo pagar.
       const algunoEntregado = pedidosSesion.some(id => (lista.find(x => x.id === id) || {}).status === 'delivered')
+      const algunoPagado = pedidosSesion.some(id => !!(lista.find(x => x.id === id) || {}).paid_at)
+      const cobroElegido = sessionStorage.getItem('vitrina_cobro_elegido') === '1'
       const reviewCard = document.getElementById('review-card')
       if (reviewCard && rest.business_type !== 'services') {
-        if (algunoEntregado) {
+        if (algunoEntregado || algunoPagado || cobroElegido) {
           document.getElementById('review-link').href = googleReviewUrl()
           reviewCard.style.display = 'block'
         } else {
@@ -1296,10 +1325,10 @@
         try {
           const { data } = await supabase
             .from('orders')
-            .select('id, status')
+            .select('id, status, paid_at')
             .in('id', pedidosSesion)
           if (data) {
-            data.forEach(r => { pedidosStatusCache[r.id] = r.status })
+            data.forEach(r => { pedidosStatusCache[r.id] = r.status; pedidosPaidCache[r.id] = r.paid_at })
             renderConfirmList(data)
           }
         } catch {}
@@ -1318,9 +1347,11 @@
           const prevStatus = pedidosStatusCache[payload.new.id]
           // Actualizar cache y re-renderizar sin flasheo
           pedidosStatusCache[payload.new.id] = payload.new.status
+          if (payload.new.paid_at) pedidosPaidCache[payload.new.id] = payload.new.paid_at
           renderConfirmList(pedidosSesion.map(id => ({
             id,
-            status: pedidosStatusCache[id] || 'pending'
+            status: pedidosStatusCache[id] || 'pending',
+            paid_at: pedidosPaidCache[id] || null
           })))
           // Notificar al cliente si su pedido está listo
           if (payload.new.status === 'ready' && prevStatus !== 'ready') {
@@ -1364,11 +1395,11 @@
       try {
         const { data } = await supabase
           .from('orders')
-          .select('total, status')
+          .select('total, status, paid_at')
           .in('id', pedidosSesion)
         if (!data) return 0
         return data
-          .filter(o => o.status !== 'cancelled' && o.status !== 'paid')
+          .filter(o => o.status !== 'cancelled' && o.status !== 'paid' && !o.paid_at)
           .reduce((s, o) => s + Number(o.total || 0), 0)
       } catch {
         return 0
@@ -1467,6 +1498,13 @@
         if (ov) ov.classList.remove('open')
         const label = metodo === 'efectivo' ? 'en efectivo 💵' : 'con tarjeta 💳'
         showToast('✅ Ya le avisamos al mozo — se acerca a cobrarte ' + label, 4500)
+        // Momento ideal para sugerir la reseña: ya decidió pagar
+        sessionStorage.setItem('vitrina_cobro_elegido', '1')
+        const rc = document.getElementById('review-card')
+        if (rc && rest.business_type !== 'services') {
+          document.getElementById('review-link').href = googleReviewUrl()
+          rc.style.display = 'block'
+        }
       } catch {
         if (ov) ov.classList.remove('open')
         showToast('Avisale al mozo que querés pagar ' + (metodo === 'efectivo' ? 'en efectivo' : 'con tarjeta') + ' 🙌', 4500)
