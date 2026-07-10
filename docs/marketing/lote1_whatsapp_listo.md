@@ -58,9 +58,24 @@
 ## Seguimiento (2-3 días sin respuesta)
 > Hola! ¿Pudiste ver lo que te escribí? Si querés te dejo armada una demo con la carta de ustedes para que la veas funcionando, sin compromiso 🙌
 
-## Cuando responden con interés — Mensaje 3 (PENDIENTE: recrear demos)
-> Te dejo la demo para que la veas andando 👇 [link de la demo del rubro]
-> Escaneá el QR como cliente: ves las fotos, "pedís" y le preguntás al asistente. Si te gusta, la dejamos activa con SU carta. 14 días gratis.
+## Cuando responden con interés — Mensaje 3 (DEMOS YA FUNCIONANDO ✅)
+> Te dejo la demo para que la veas andando 👇 [LINK DEL RUBRO]
+> Entrá como si fueras un cliente: mirá el menú, "pedí" algo y preguntale al asistente (botón "Consultá al mozo"). Si te gusta, la dejamos activa con TU carta. 14 días gratis.
+
+**Demos vivas (verificadas 10/07):**
+- 🥩 Parrilla / bodegón / resto general → https://www.vitrinaapp.com.ar/menu.html?slug=demo-don-nico
+- ☕ Café / brunch / bistró / veggie → https://www.vitrinaapp.com.ar/menu.html?slug=demo-cafe-botanico
+- 🍣 Sushi / cocina asiática → https://www.vitrinaapp.com.ar/menu.html?slug=demo-sushi-nami
+- 🍕 Pizza / cantina italiana → https://www.vitrinaapp.com.ar/menu.html?slug=demo-la-rueda
+- 🍹 Bar / tragos / cervecería → https://www.vitrinaapp.com.ar/menu.html?slug=demo-bar-esquina
+
+**Qué demo mandarle a cada uno del lote 1:**
+| Prospecto | Demo a enviar |
+|---|---|
+| Hierro Bodegón, Trufa, Mambo, Presencia, Territorio Aura, Ness, Gran Dabbang, El Imperfecto | don-nico (parrilla/resto) |
+| Koala, Silvino, Chuí | cafe-botanico |
+| Anasagasti Omakase, Sudestada | sushi-nami |
+| Del Río Cantina, Orno | la-rueda (pizza/italiano) |
 
 ## Objeciones frecuentes
 - **"Ya tengo QR / un PDF"** → El PDF no toma pedidos, no cobra ni responde. Vitrina sí, y lo actualizás vos en 1 clic.
