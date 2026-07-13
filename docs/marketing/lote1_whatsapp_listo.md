@@ -58,9 +58,10 @@
 ## Seguimiento (2-3 días sin respuesta)
 > Hola! ¿Pudiste ver lo que te escribí? Si querés te dejo armada una demo con la carta de ustedes para que la veas funcionando, sin compromiso 🙌
 
-## Cuando responden con interés — Mensaje 3 (DEMOS YA FUNCIONANDO ✅)
+## Cuando responden con interés — Mensaje 3 (DEMOS YA FUNCIONANDO ✅ + FUNDADORES)
 > Te dejo la demo para que la veas andando 👇 [LINK DEL RUBRO]
-> Entrá como si fueras un cliente: mirá el menú, "pedí" algo y preguntale al asistente (botón "Consultá al mozo"). Si te gusta, la dejamos activa con TU carta. 14 días gratis.
+> Entrá como si fueras un cliente: mirá el menú, "pedí" algo y preguntale al asistente (botón "Consultá al mozo").
+> Si te gusta, te la dejo activa con TU carta. Y como sos de los primeros, entrás al **Programa Fundadores: 3 meses gratis, sin tarjeta** — solo te pido un testimonio si te copa. Cupos para los primeros 10 locales. ¿Te armo el tuyo? Mandame la carta en PDF o fotos y lo tenés hoy.
 
 **Demos vivas (verificadas 10/07):**
 - 🥩 Parrilla / bodegón / resto general → https://www.vitrinaapp.com.ar/menu.html?slug=demo-don-nico
