@@ -769,7 +769,13 @@
         document.getElementById('content').innerHTML = `<div style="text-align:center;padding:80px 24px;color:var(--muted)"><div style="font-size:56px;margin-bottom:16px">${el.emoji}</div><div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:8px">${el.title}</div><div style="font-size:14px;line-height:1.6">${el.desc}</div></div>`
       } else {
         document.getElementById('content').innerHTML = sectionsHtml.join('')
+        // Purgar del carrito items que ya no existen en el menú (carta editada /
+        // re-seed) — si no, renderCartItems y el total crashean con undefined.
+        let purgado = false
+        Object.keys(cart).forEach(id => { if (!itemsById[id]) { delete cart[id]; purgado = true } })
+        if (purgado) saveCart()
         Object.keys(itemsById).forEach(renderCtrl)
+        updateCartCount()
       }
     }
 
@@ -795,7 +801,7 @@
         + (tags ? '<div class="item-tags">' + tags + '</div>' : '')
         + '<div class="item-bottom">'
         + '<div class="item-price">$' + price.toLocaleString('es-AR') + '</div>'
-        + '<div id="ctrl-' + key + '"></div>'
+        + '<div class="item-ctrl" data-ctrl="' + item.id + '"></div>'
         + '</div></div></div>'
     }
 
@@ -824,20 +830,23 @@
     }
 
     function renderCtrl(id) {
-      const key = id.replace(/-/g, '_')
-      const el = document.getElementById('ctrl-' + key)
-      if (!el) return
+      // Puede haber >1 card por item (destacado + su categoría): actualizamos TODAS
+      // con data-ctrl (antes usaba id duplicado y solo pintaba una).
+      const els = document.querySelectorAll('[data-ctrl="' + id + '"]')
+      if (!els.length) return
       const item = itemsById[id]
-      if (!item?.is_available) { el.innerHTML = ''; return }
       const qty = cart[id] || 0
-      const itemName = item.name || ''
-      el.innerHTML = qty === 0
+      const itemName = (item && item.name) || ''
+      const html = (!item || !item.is_available)
+        ? ''
+        : qty === 0
         ? '<button class="add-btn" onclick="addItem(\'' + id + '\')" aria-label="Agregar ' + itemName.replace(/'/g, '&#39;') + ' al pedido">Agregar</button>'
         : '<div class="qty-control">'
           + '<button class="qty-btn" onclick="removeItem(\'' + id + '\')" aria-label="Quitar uno de ' + itemName.replace(/'/g, '&#39;') + '">−</button>'
           + '<span class="qty-num">' + qty + '</span>'
           + '<button class="qty-btn" onclick="addItem(\'' + id + '\')" aria-label="Agregar otro de ' + itemName.replace(/'/g, '&#39;') + '">+</button>'
           + '</div>'
+      els.forEach(el => { el.innerHTML = html })
     }
 
     // ─── Cart localStorage ─────────────────────────────────────────────────────
@@ -896,8 +905,7 @@
         setTimeout(() => { badge.style.transform = 'scale(1)' }, 150)
       }
       // Flash visual en el card
-      const key = id.replace(/-/g, '_')
-      const ctrl = document.getElementById('ctrl-' + key)
+      const ctrl = document.querySelector('[data-ctrl="' + id + '"]')
       if (ctrl) {
         const card = ctrl.closest('.item-card')
         if (card) {
@@ -1016,7 +1024,8 @@
     function renderCartItems() {
       const container = document.getElementById('cart-items')
       const footer = document.getElementById('cart-footer')
-      const ids = Object.keys(cart).filter(id => cart[id] > 0)
+      // Ignorar items que ya no existen en el menú (carta editada) — evita crash.
+      const ids = Object.keys(cart).filter(id => cart[id] > 0 && itemsById[id])
       if (!ids.length) {
         container.innerHTML = '<div class="cart-empty" style="padding:32px 20px;text-align:center;color:var(--muted)"><div style="font-size:32px;margin-bottom:8px">🛒</div><div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">Todavía no elegiste nada</div><div style="font-size:13px">Agregá platos desde el menú</div></div>'
         footer.style.display = 'none'
