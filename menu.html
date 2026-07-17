@@ -866,6 +866,9 @@
     // Tano, que puede agregar platos escribiendo el carrito compartido). Cubre el
     // bfcache de Safari iOS, donde init() no vuelve a correr.
     window.addEventListener('pageshow', () => {
+      // Si la página vuelve del BFCache con el carrito abierto, el body queda
+      // congelado (position:fixed) y no se puede scrollear: soltarlo.
+      if (document.body.style.position === 'fixed') closeCart()
       if (!rest) return // todavía no terminó el init inicial
       const antes = JSON.stringify(cart)
       loadCart()
