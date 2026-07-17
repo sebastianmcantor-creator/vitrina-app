@@ -616,7 +616,7 @@
       }
       const agregados = [], noEncontrados = []
       if (pedidos.length) {
-        const items = (rest.menu_categories || []).flatMap(c => c.menu_items || []).filter(i => i.is_visible !== false)
+        const items = ((currentRestData || {}).menu_categories || []).flatMap(c => c.menu_items || []).filter(i => i.is_visible !== false)
         let cart = {}
         try { cart = JSON.parse(localStorage.getItem(cartKeyMozo()) || '{}') } catch {}
         for (const p of pedidos) {
@@ -665,6 +665,12 @@
         return
       }
 
+      // Fase 1 — SOLO la llamada de red se reintenta. Antes el retry envolvía
+      // también el procesamiento de la respuesta: si procesar tiraba un error
+      // DESPUÉS de pushear el assistant al historial, se reenviaba un historial
+      // terminado en assistant → Anthropic lo toma como prefill completo →
+      // content vacío → "No pude procesar tu consulta".
+      let data = null
       let attempts = 0
       while (attempts < 3) {
         try {
@@ -691,45 +697,48 @@
           }
 
           if (!res.ok) throw new Error('Error ' + res.status)
-
-          const data = await res.json()
-
-          // Manejar límite de Tano
-          if (data.tano_limit_reached) {
-            tanoLimitReached = true
-            document.getElementById('chat-input').disabled = true
-            document.querySelector('.send-btn').disabled = true
-          }
-
-          // Mostrar alerta si quedan pocos mensajes
-          if (data.tano_remaining !== undefined && data.tano_remaining <= 15 && data.tano_remaining > 0) {
-            const alertEl = document.getElementById('tano-limit-alert')
-            if (alertEl) {
-              alertEl.style.display = 'block'
-              alertEl.textContent = `⚠️ Quedan ${data.tano_remaining} respuestas disponibles este mes.`
-            }
-          }
-
-          const reply = data.content?.[0]?.text || 'No pude procesar tu consulta. ¿Podés repetirla?'
-          conversationHistory.push({ role: 'assistant', content: reply })
-          showTyping(false)
-          // Procesar acciones de Tano (agregar al pedido / plato no disponible)
-          const acc = procesarAccionesTano(reply)
-          addMessage('assistant', acc.visible || reply)
-          if (acc.agregados.length) addMessage('assistant', '🛒 Listo — agregué al pedido: ' + acc.agregados.join(', ') + '. Lo ves al volver al menú 👈')
-          if (acc.noEncontrados.length) addMessage('assistant', 'Ojo: "' + acc.noEncontrados.join('", "') + '" no lo pude sumar solo — agregalo tocándolo en el menú 🙏')
-          errorEl.style.display = 'none'
+          data = await res.json()
           break
         } catch {
           attempts++
-          if (attempts >= 3) {
-            showTyping(false)
-            addMessage('assistant', 'Ups, tuve un problema técnico. ¿Podés intentarlo de nuevo?')
-          } else {
-            await new Promise(r => setTimeout(r, 3000))
-          }
+          if (attempts >= 3) break
+          await new Promise(r => setTimeout(r, 3000))
         }
       }
+
+      if (!data || !data.content?.[0]?.text) {
+        showTyping(false)
+        addMessage('assistant', 'Ups, tuve un problema técnico. ¿Podés intentarlo de nuevo?')
+        // No dejar el user colgado en el historial sin respuesta: lo sacamos para
+        // que el próximo envío arranque consistente (user al final = historial válido).
+        if (conversationHistory[conversationHistory.length - 1]?.role === 'user') conversationHistory.pop()
+        isLoading = false
+        return
+      }
+
+      // Fase 2 — procesar la respuesta. Un error acá NUNCA debe reenviar la API.
+      if (data.tano_limit_reached) {
+        tanoLimitReached = true
+        document.getElementById('chat-input').disabled = true
+        document.querySelector('.send-btn').disabled = true
+      }
+      if (data.tano_remaining !== undefined && data.tano_remaining <= 15 && data.tano_remaining > 0) {
+        const alertEl = document.getElementById('tano-limit-alert')
+        if (alertEl) {
+          alertEl.style.display = 'block'
+          alertEl.textContent = `⚠️ Quedan ${data.tano_remaining} respuestas disponibles este mes.`
+        }
+      }
+
+      const reply = data.content[0].text
+      conversationHistory.push({ role: 'assistant', content: reply })
+      showTyping(false)
+      let acc = { visible: reply, agregados: [], noEncontrados: [] }
+      try { acc = procesarAccionesTano(reply) } catch (e) { console.error('procesarAccionesTano:', e) }
+      addMessage('assistant', acc.visible || reply)
+      if (acc.agregados.length) addMessage('assistant', '🛒 Listo — agregué al pedido: ' + acc.agregados.join(', ') + '. Lo ves al volver al menú 👈')
+      if (acc.noEncontrados.length) addMessage('assistant', 'Ojo: "' + acc.noEncontrados.join('", "') + '" no lo pude sumar solo — agregalo tocándolo en el menú 🙏')
+      errorEl.style.display = 'none'
 
       isLoading = false
     }
