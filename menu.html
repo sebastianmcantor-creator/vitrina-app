@@ -769,13 +769,7 @@
         document.getElementById('content').innerHTML = `<div style="text-align:center;padding:80px 24px;color:var(--muted)"><div style="font-size:56px;margin-bottom:16px">${el.emoji}</div><div style="font-size:18px;font-weight:500;color:var(--text);margin-bottom:8px">${el.title}</div><div style="font-size:14px;line-height:1.6">${el.desc}</div></div>`
       } else {
         document.getElementById('content').innerHTML = sectionsHtml.join('')
-        // Purgar del carrito items que ya no existen en el menú (carta editada /
-        // re-seed) — si no, renderCartItems y el total crashean con undefined.
-        let purgado = false
-        Object.keys(cart).forEach(id => { if (!itemsById[id]) { delete cart[id]; purgado = true } })
-        if (purgado) saveCart()
         Object.keys(itemsById).forEach(renderCtrl)
-        updateCartCount()
       }
     }
 
@@ -859,6 +853,13 @@
       const ts = Number(localStorage.getItem(cartKey() + '_ts') || 0)
       if (Date.now() - ts > 4 * 60 * 60 * 1000) { localStorage.removeItem(cartKey()); return }
       try { const s = localStorage.getItem(cartKey()); if (s) cart = JSON.parse(s) } catch {}
+      // Purgar items que ya no existen en el menú (carta editada / re-seed): si no,
+      // el badge cuenta de más y renderCartItems leería un item inexistente (crash).
+      if (Object.keys(itemsById).length) {
+        let changed = false
+        Object.keys(cart).forEach(id => { if (itemsById[id] === undefined) { delete cart[id]; changed = true } })
+        if (changed) saveCart()
+      }
     }
     function clearCartStorage() {
       localStorage.removeItem(cartKey()); localStorage.removeItem(cartKey() + '_ts')
@@ -929,7 +930,7 @@
     }
 
     function updateCartCount() {
-      const total = Object.values(cart).reduce((a, b) => a + b, 0)
+      const total = Object.keys(cart).reduce((a, id) => a + (itemsById[id] ? cart[id] : 0), 0)
       document.getElementById('cart-count').textContent = total
       const cartBtn = document.querySelector('.cart-btn')
       if (cartBtn) cartBtn.classList.toggle('has-items', total > 0)
