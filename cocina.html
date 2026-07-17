@@ -308,7 +308,12 @@
   window.toggleMuteSound = toggleMuteSound
 
   // ── Auth ──────────────────────────────────────────────────────────────────────
+  // Modo demo: las cocinas de los restaurantes de demostración se pueden ver sin
+  // login (solo slugs de demo — las cocinas reales siguen requiriendo sesión).
+  const DEMO_SLUGS = ['somma']
+  const esDemo = !!slug && (slug.startsWith('demo-') || DEMO_SLUGS.includes(slug))
   async function init() {
+    if (esDemo) { await startKitchen(); return }
     const { data: { session } } = await supabase.auth.getSession()
     if (!session) {
       show('login-screen')
@@ -350,6 +355,7 @@
   }
 
   supabase.auth.onAuthStateChange((event, session) => {
+    if (esDemo) return // el modo demo no depende de la sesión
     if (session && !rest) {
       startKitchen()
       return

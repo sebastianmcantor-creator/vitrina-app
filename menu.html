@@ -83,6 +83,13 @@
     .cat-btn { background: none; border: none; border-bottom: 2px solid transparent; padding: 12px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; white-space: nowrap; transition: all 0.15s; }
     .cat-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 500; }
 
+    /* Lightbox: foto ampliada al tocar la miniatura (celu y desktop) */
+    .lightbox { position: fixed; inset: 0; background: rgba(15,10,5,0.93); z-index: 1200; display: none; align-items: center; justify-content: center; flex-direction: column; padding: 24px; cursor: zoom-out; }
+    .lightbox.open { display: flex; }
+    .lightbox img { max-width: min(92vw, 640px); max-height: 76vh; border-radius: 16px; box-shadow: 0 12px 60px rgba(0,0,0,0.6); }
+    .lightbox-name { color: #f7f2ea; font-family: 'DM Sans', sans-serif; font-size: 16px; font-weight: 500; margin-top: 14px; text-align: center; }
+    .lightbox-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; border: none; background: rgba(255,255,255,0.14); color: #fff; font-size: 19px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
     .content { padding: 0 0 120px; }
     .category-section { padding: 24px 16px 8px; }
     .category-title { font-family: 'Playfair Display', serif; font-size: 19px; font-weight: 400; margin-bottom: 4px; }
@@ -781,7 +788,7 @@
         return m ? '<span class="tag ' + m.cls + '">' + m.label + '</span>' : ''
       }).filter(Boolean).join('')
       const img = item.image_url
-        ? '<img src="' + esc(item.image_url) + '" alt="" style="width:80px;height:80px;border-radius:10px;object-fit:cover;flex-shrink:0;">'
+        ? '<img src="' + esc(item.image_url) + '" alt="Foto de ' + esc(item.name) + '" class="item-photo" data-name="' + esc(item.name) + '" onclick="openLightbox(this)" loading="lazy" style="width:80px;height:80px;border-radius:10px;object-fit:cover;flex-shrink:0;cursor:zoom-in;">'
         : '<div class="item-img">' + (item.emoji || '🍽️') + '</div>'
       return '<div class="item-card' + (!item.is_available ? ' item-unavailable' : '') + '" style="animation-delay:' + (idx * 40) + 'ms">'
         + img
@@ -803,6 +810,28 @@
       return String(s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;')
         .replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+    }
+
+    // ─── Lightbox de fotos ────────────────────────────────────────────────────
+    window.openLightbox = function (imgEl) {
+      let lb = document.getElementById('vt-lightbox')
+      if (!lb) {
+        lb = document.createElement('div')
+        lb.id = 'vt-lightbox'
+        lb.className = 'lightbox'
+        lb.innerHTML = '<button class="lightbox-close" aria-label="Cerrar foto">✕</button><img alt=""><div class="lightbox-name"></div>'
+        lb.addEventListener('click', () => window.closeLightbox())
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') window.closeLightbox() })
+        document.body.appendChild(lb)
+      }
+      lb.querySelector('img').src = imgEl.src
+      lb.querySelector('img').alt = imgEl.dataset.name || ''
+      lb.querySelector('.lightbox-name').textContent = imgEl.dataset.name || ''
+      lb.classList.add('open')
+    }
+    window.closeLightbox = function () {
+      const lb = document.getElementById('vt-lightbox')
+      if (lb) lb.classList.remove('open')
     }
 
     function renderCtrlAll() { Object.keys(itemsById).forEach(renderCtrl) }
