@@ -1552,21 +1552,34 @@
       window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 100, behavior: 'smooth' })
     }
 
-    window.addEventListener('scroll', () => {
-      // Include 'featured' section if present
+    // Scroll spy: throttleado con rAF, actualiza SOLO cuando cambia la categoría,
+    // y centra el botón activo moviendo el nav en HORIZONTAL (nunca el scroll
+    // vertical de la página — antes usaba scrollIntoView y hacía "rebotar" el menú).
+    let _spyTicking = false
+    let _spyLastCat = null
+    function _updateCatSpy() {
+      _spyTicking = false
       const allIds = document.getElementById('cat-featured') ? ['featured', ...catIds] : catIds
       let current = allIds[0]
       allIds.forEach(id => {
         const el = document.getElementById('cat-' + id)
         if (el && el.getBoundingClientRect().top < 110) current = id
       })
+      if (current === _spyLastCat) return
+      _spyLastCat = current
       document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.id === current)
       })
-      // Auto-scroll active nav button into view
       const activeBtn = document.querySelector('.cat-btn.active')
-      if (activeBtn) activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' })
-    })
+      const nav = document.getElementById('cat-nav')
+      if (activeBtn && nav) {
+        const target = activeBtn.offsetLeft - (nav.clientWidth / 2) + (activeBtn.offsetWidth / 2)
+        nav.scrollTo({ left: Math.max(0, target), behavior: 'smooth' })
+      }
+    }
+    window.addEventListener('scroll', () => {
+      if (!_spyTicking) { _spyTicking = true; requestAnimationFrame(_updateCatSpy) }
+    }, { passive: true })
 
     // ─── Búsqueda ─────────────────────────────────────────────────────────────
     window.searchMenu = function (q) {
