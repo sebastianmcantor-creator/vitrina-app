@@ -433,7 +433,13 @@
       const nuevos = lista.filter(p => !pedidos[p.id] && (p.status === 'pending' || p.status === 'confirmed'))
       if (nuevos.length > 0) playSound()
       pedidos = {}
-      lista.forEach(p => { normalizarDemo(p); pedidos[p.id] = p })
+      lista.forEach(p => {
+        normalizarDemo(p)
+        // En demo ocultamos pedidos sin items (basura de pruebas previas al fix
+        // del snapshot, que la cocina anónima no podría mostrar de todos modos).
+        if (esDemo && (p.order_items || []).length === 0) return
+        pedidos[p.id] = p
+      })
       setStatus(true)
       renderAll()
     } catch {
@@ -584,6 +590,17 @@
 
     if (btn) btn.disabled = true
 
+    // En demo la cocina es anónima y la policy RLS de update de orders es
+    // solo-staff → persistir tira error y el pedido no avanza. Para que el
+    // prospecto vea el flujo por las columnas, avanzamos el estado en local
+    // (optimista, sin persistir). Al recargar se resetea, aceptable en demo.
+    if (esDemo) {
+      pedidos[id] = { ...pedido, status: siguiente, updated_at: new Date().toISOString() }
+      historial[id] = anterior
+      renderAll()
+      return
+    }
+
     try {
       const updated = await orders.updateStatus(id, siguiente)
       pedidos[id] = { ...pedido, ...updated }
@@ -612,6 +629,11 @@
     const anterior = historial[id]
     if (!anterior) return
     delete historial[id]
+    if (esDemo) {
+      pedidos[id] = { ...pedidos[id], status: anterior, updated_at: new Date().toISOString() }
+      renderAll()
+      return
+    }
     try {
       const updated = await orders.updateStatus(id, anterior)
       pedidos[id] = { ...pedidos[id], ...updated }
@@ -893,6 +915,11 @@
       return k === key && p.status === 'preparing'
     })
     for (const p of pedidosMesa) {
+      if (esDemo) {
+        pedidos[p.id] = { ...pedidos[p.id], status: 'ready', updated_at: new Date().toISOString() }
+        historial[p.id] = 'preparing'
+        continue
+      }
       try {
         const updated = await orders.updateStatus(p.id, 'ready')
         pedidos[p.id] = { ...pedidos[p.id], ...updated }
