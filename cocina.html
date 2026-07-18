@@ -405,6 +405,27 @@
     document.getElementById('conn-label').textContent = online ? 'En línea' : 'Sin conexión'
   }
 
+  // En las demos la cocina corre anónima y la policy RLS de order_items es
+  // solo-staff → no puede leer los items. menu.html guarda un snapshot en `notes`
+  // con el marcador @@ITEMS@@; acá lo expandimos a order_items y limpiamos la nota
+  // para que el JSON nunca aparezca en la comanda impresa. Solo afecta demos.
+  function normalizarDemo(p) {
+    if (!esDemo || !p) return p
+    const tieneItems = (p.order_items || []).length > 0
+    if (!tieneItems && typeof p.notes === 'string' && p.notes.startsWith('@@ITEMS@@')) {
+      try {
+        const items = JSON.parse(p.notes.slice('@@ITEMS@@'.length))
+        p.order_items = items.map(it => ({
+          name: it.name,
+          price: Number(it.price),
+          quantity: Number(it.quantity),
+        }))
+      } catch {}
+      p.notes = null
+    }
+    return p
+  }
+
   // ── Carga inicial ─────────────────────────────────────────────────────────────
   async function fetchPedidos() {
     try {
@@ -412,7 +433,7 @@
       const nuevos = lista.filter(p => !pedidos[p.id] && (p.status === 'pending' || p.status === 'confirmed'))
       if (nuevos.length > 0) playSound()
       pedidos = {}
-      lista.forEach(p => { pedidos[p.id] = p })
+      lista.forEach(p => { normalizarDemo(p); pedidos[p.id] = p })
       setStatus(true)
       renderAll()
     } catch {
@@ -473,6 +494,7 @@
               .single()
             if (data) {
               const esNuevo = !pedidos[data.id]
+              normalizarDemo(data)
               pedidos[data.id] = data
               if (esNuevo) playSound()
             }

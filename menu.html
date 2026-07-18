@@ -1187,6 +1187,21 @@
         const nombreInput = document.getElementById('checkout-nombre')
         const customerName = nombreInput?.value?.trim() || null
 
+        // En las demos la cocina corre sin login (anónima) y la policy RLS de
+        // lectura de order_items es solo-staff → la cocina demo no puede leer los
+        // items y mostraría "0 ítems". Para que el prospecto vea el pedido completo
+        // guardamos un snapshot de los items en `notes` con un marcador que la
+        // cocina demo detecta y NUNCA muestra como nota. Solo para demos: en un
+        // restaurante real la cocina está autenticada y lee order_items normal.
+        let notesDemo = null
+        if (esDemo) {
+          notesDemo = '@@ITEMS@@' + JSON.stringify(ids.map(id => ({
+            name: itemsById[id].name,
+            price: Number(itemsById[id].price),
+            quantity: cart[id],
+          })))
+        }
+
         const order = await orders.create({
           restaurant_id: rest.id,
           session_id: session?.id ?? null,
@@ -1194,6 +1209,7 @@
           total,
           customer_phone: customerPhone || null,
           customer_name: customerName,
+          notes: notesDemo,
         })
         await orderItems.createBatch(ids.map(id => ({
           order_id: order.id,
