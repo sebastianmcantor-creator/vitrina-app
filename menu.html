@@ -1765,7 +1765,7 @@
 
         // Cartas grandes: traducir en tandas de a 30 ítems. Una sola llamada con
         // 145 ítems supera el máximo de salida → JSON truncado → fallaba en silencio.
-        const CHUNK = 10
+        const CHUNK = 12
         const translateChunk = async (itemsChunk, catsChunk) => {
           const prompt = `Translate the following restaurant menu items from Spanish to ${LANG_LABELS[lang]}.
 Return ONLY a valid JSON object with this exact structure:
@@ -1786,23 +1786,29 @@ CATEGORIES: ${JSON.stringify(catsChunk)}`
               max_tokens: 4096,
             })
           })
-          if (!res.ok) throw new Error('Error de traducción')
-          const data = await res.json()
-          const text = data.content?.[0]?.text || ''
-          const jsonMatch = text.match(/\{[\s\S]*\}/)
-          if (!jsonMatch) throw new Error('Respuesta inválida')
-          return JSON.parse(jsonMatch[0])
+          try {
+            if (!res.ok) return null
+            const data = await res.json()
+            const text = data.content?.[0]?.text || ''
+            const jsonMatch = text.match(/\{[\s\S]*\}/)
+            if (!jsonMatch) return null
+            return JSON.parse(jsonMatch[0])
+          } catch { return null }
         }
 
-        const translations = { items: {}, categories: {} }
+        // Tandas EN PARALELO (antes era en serie: ~15 llamadas = 30-40s de espera).
+        const chunks = []
         for (let i = 0; i < itemsToTranslate.length; i += CHUNK) {
-          const part = await translateChunk(
-            itemsToTranslate.slice(i, i + CHUNK),
-            i === 0 ? catNames : []  // categorías solo en la primera tanda
-          )
+          chunks.push({ items: itemsToTranslate.slice(i, i + CHUNK), cats: i === 0 ? catNames : [] })
+        }
+        const parts = await Promise.all(chunks.map(c => translateChunk(c.items, c.cats)))
+        const translations = { items: {}, categories: {} }
+        for (const part of parts) {
+          if (!part) continue // tanda fallida: esos ítems quedan en español, el resto traduce
           Object.assign(translations.items, part.items || {})
           Object.assign(translations.categories, part.categories || {})
         }
+        if (!Object.keys(translations.items).length) throw new Error('Traducción vacía')
 
         translationCache[lang] = translations
         saveLangCache()
