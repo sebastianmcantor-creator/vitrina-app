@@ -1686,7 +1686,12 @@
         nav.scrollTo({ left: Math.max(0, target), behavior: 'smooth' })
       }
     }
+    let _catnavSynced = false
     window.addEventListener('scroll', () => {
+      // Red de seguridad: el header ya tiene su alto real durante el scroll, así
+      // que fijamos --catnav-top acá una vez (el cálculo al mostrar la app a veces
+      // corre antes del layout y queda en 0, tapando el nav bajo el header).
+      if (!_catnavSynced) { syncCatNavTop(); _catnavSynced = true }
       if (!_spyTicking) { _spyTicking = true; requestAnimationFrame(_updateCatSpy) }
     }, { passive: true })
 
