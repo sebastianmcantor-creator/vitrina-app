@@ -1763,25 +1763,25 @@
 
         const catNames = cats.map(c => ({ id: c.id, name: c.name, description: c.description || '' }))
 
-        // Cartas grandes: traducir en tandas de a 30 ítems. Una sola llamada con
-        // 145 ítems supera el máximo de salida → JSON truncado → fallaba en silencio.
-        const CHUNK = 12
-        const translateChunk = async (itemsChunk, catsChunk) => {
-          const prompt = `Translate the following restaurant menu items from Spanish to ${LANG_LABELS[lang]}.
-Return ONLY a valid JSON object with this exact structure:
-{
-  "items": { "<id>": { "name": "...", "description": "..." } },
-  "categories": { "<id>": { "name": "...", "description": "..." } }
-}
-Keep prices, emojis and special characters unchanged. If description is empty, keep it empty. Keep brand names (wines, beers, sodas) unchanged.
+        // Formato de salida por LÍNEAS (id|||nombre|||descripción), NO JSON: la IA a
+        // veces devolvía JSON mal formado (comillas sin escapar) y fallaba TODA la
+        // traducción. Líneas separadas por ||| son imposibles de romper. Tandas en
+        // paralelo (antes en serie: ~15 llamadas = 30-40s de espera).
+        const CHUNK = 14
+        const catIdSet = new Set(catNames.map(c => c.id))
+        const translateRows = async (rows) => {
+          const prompt = `Translate these restaurant menu entries from Spanish to ${LANG_LABELS[lang]}.
+For EACH entry output exactly ONE line with this format: id|||translated name|||translated description
+Rules: keep the id unchanged; use ||| as separator; if the description is empty leave it empty (id|||name|||); replace any line break inside a description with a space; keep brand names (wines, beers, sodas), prices and emojis unchanged.
+Output ONLY those lines, nothing else — no headers, no JSON, no explanations.
 
-ITEMS: ${JSON.stringify(itemsChunk)}
-CATEGORIES: ${JSON.stringify(catsChunk)}`
+ENTRIES:
+${rows.map(r => r.id + ' :: ' + r.name + ' :: ' + (r.description || '')).join('\n')}`
           const res = await fetch(BACKEND + '/api/claude', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              system: 'You are a professional restaurant menu translator. Return only valid JSON, no explanation.',
+              system: 'You are a professional restaurant menu translator. Follow the output format exactly.',
               messages: [{ role: 'user', content: prompt }],
               max_tokens: 4096,
             })
@@ -1790,18 +1790,28 @@ CATEGORIES: ${JSON.stringify(catsChunk)}`
             if (!res.ok) return null
             const data = await res.json()
             const text = data.content?.[0]?.text || ''
-            const jsonMatch = text.match(/\{[\s\S]*\}/)
-            if (!jsonMatch) return null
-            return JSON.parse(jsonMatch[0])
+            const out = { items: {}, categories: {} }
+            text.split('\n').forEach(line => {
+              if (!line.includes('|||')) return
+              const p = line.split('|||')
+              const id = (p[0] || '').trim()
+              const name = (p[1] || '').trim()
+              const description = (p[2] || '').trim()
+              if (!id || !name) return
+              if (catIdSet.has(id)) out.categories[id] = { name, description }
+              else out.items[id] = { name, description }
+            })
+            return out
           } catch { return null }
         }
 
-        // Tandas EN PARALELO (antes era en serie: ~15 llamadas = 30-40s de espera).
         const chunks = []
         for (let i = 0; i < itemsToTranslate.length; i += CHUNK) {
-          chunks.push({ items: itemsToTranslate.slice(i, i + CHUNK), cats: i === 0 ? catNames : [] })
+          const rows = itemsToTranslate.slice(i, i + CHUNK)
+          if (i === 0) rows.push(...catNames) // las categorías van en la primera tanda
+          chunks.push(rows)
         }
-        const parts = await Promise.all(chunks.map(c => translateChunk(c.items, c.cats)))
+        const parts = await Promise.all(chunks.map(rows => translateRows(rows)))
         const translations = { items: {}, categories: {} }
         for (const part of parts) {
           if (!part) continue // tanda fallida: esos ítems quedan en español, el resto traduce
