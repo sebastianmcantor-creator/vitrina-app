@@ -1759,35 +1759,46 @@
 
         const catNames = cats.map(c => ({ id: c.id, name: c.name, description: c.description || '' }))
 
-        const prompt = `Translate the following restaurant menu items from Spanish to ${LANG_LABELS[lang]}.
+        // Cartas grandes: traducir en tandas de a 30 ítems. Una sola llamada con
+        // 145 ítems supera el máximo de salida → JSON truncado → fallaba en silencio.
+        const CHUNK = 20
+        const translateChunk = async (itemsChunk, catsChunk) => {
+          const prompt = `Translate the following restaurant menu items from Spanish to ${LANG_LABELS[lang]}.
 Return ONLY a valid JSON object with this exact structure:
 {
   "items": { "<id>": { "name": "...", "description": "..." } },
   "categories": { "<id>": { "name": "...", "description": "..." } }
 }
-Keep prices, emojis and special characters unchanged. If description is empty, keep it empty.
+Keep prices, emojis and special characters unchanged. If description is empty, keep it empty. Keep brand names (wines, beers, sodas) unchanged.
 
-ITEMS: ${JSON.stringify(itemsToTranslate)}
-CATEGORIES: ${JSON.stringify(catNames)}`
-
-        const res = await fetch(BACKEND + '/api/claude', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            system: 'You are a professional restaurant menu translator. Return only valid JSON, no explanation.',
-            messages: [{ role: 'user', content: prompt }],
-            max_tokens: 4096,
+ITEMS: ${JSON.stringify(itemsChunk)}
+CATEGORIES: ${JSON.stringify(catsChunk)}`
+          const res = await fetch(BACKEND + '/api/claude', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              system: 'You are a professional restaurant menu translator. Return only valid JSON, no explanation.',
+              messages: [{ role: 'user', content: prompt }],
+              max_tokens: 4096,
+            })
           })
-        })
+          if (!res.ok) throw new Error('Error de traducción')
+          const data = await res.json()
+          const text = data.content?.[0]?.text || ''
+          const jsonMatch = text.match(/\{[\s\S]*\}/)
+          if (!jsonMatch) throw new Error('Respuesta inválida')
+          return JSON.parse(jsonMatch[0])
+        }
 
-        if (!res.ok) throw new Error('Error de traducción')
-        const data = await res.json()
-        const text = data.content?.[0]?.text || ''
-
-        // Extraer JSON de la respuesta
-        const jsonMatch = text.match(/\{[\s\S]*\}/)
-        if (!jsonMatch) throw new Error('Respuesta inválida')
-        const translations = JSON.parse(jsonMatch[0])
+        const translations = { items: {}, categories: {} }
+        for (let i = 0; i < itemsToTranslate.length; i += CHUNK) {
+          const part = await translateChunk(
+            itemsToTranslate.slice(i, i + CHUNK),
+            i === 0 ? catNames : []  // categorías solo en la primera tanda
+          )
+          Object.assign(translations.items, part.items || {})
+          Object.assign(translations.categories, part.categories || {})
+        }
 
         translationCache[lang] = translations
         saveLangCache()
