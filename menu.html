@@ -702,6 +702,9 @@
 
       document.getElementById('loading').style.display = 'none'
       document.getElementById('app').style.display = 'block'
+      // El header recién ahora tiene su alto real (antes #app estaba oculto y medía 0),
+      // así que recalculamos la posición del nav de categorías sticky.
+      requestAnimationFrame(syncCatNavTop)
 
       if (!rest.is_open) {
         const banner = document.getElementById('cerrado-banner')
