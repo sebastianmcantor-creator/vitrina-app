@@ -65,7 +65,7 @@
     .cart-btn.has-items { background: var(--accent); }
     .cart-count { background: var(--accent); color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
 
-    .cat-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; overflow-x: auto; scrollbar-width: none; }
+    .cat-nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 16px; display: flex; overflow-x: auto; scrollbar-width: none; position: sticky; top: var(--catnav-top, 0px); z-index: 90; }
     .cat-nav::-webkit-scrollbar { display: none; }
     .search-bar { padding: 8px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
     .diet-filter-bar { padding: 8px 16px 0; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; }
@@ -400,6 +400,25 @@
     import { restaurants, orders, orderSessions, orderItems } from './lib/db.js?v=7'
     import { supabase } from './lib/supabase.js'
 
+    // El nav de categorías queda pegado (sticky) justo debajo del header fijo.
+    // El header solo contiene el nombre + carrito + idiomas, pero su alto varía
+    // (nombre en 2 líneas, portada, cambio de idioma), así que recalculamos
+    // --catnav-top ante cualquier cambio con un ResizeObserver. Sin esto el nav
+    // se pegaría a top:0 y quedaría tapado por el header.
+    function syncCatNavTop() {
+      const header = document.querySelector('.header')
+      if (!header) return
+      const h = Math.round(header.getBoundingClientRect().height)
+      document.documentElement.style.setProperty('--catnav-top', h + 'px')
+    }
+    try {
+      const _hdr = document.querySelector('.header')
+      if (_hdr && 'ResizeObserver' in window) new ResizeObserver(syncCatNavTop).observe(_hdr)
+      window.addEventListener('resize', syncCatNavTop)
+      window.addEventListener('load', syncCatNavTop)
+      syncCatNavTop()
+    } catch {}
+
     const TAG_MAP = {
       veg:     { label: 'Vegetariano', cls: 'tag-veg' },
       vegan:   { label: 'Vegano',      cls: 'tag-vegan' },
@@ -467,6 +486,34 @@
       updatePedidosBar()
       renderCtrlAll()
       showToast('Sesión reiniciada ✓')
+    }
+
+    // DEMO: la cocina corre anónima y la policy RLS de update de orders es
+    // solo-staff → no puede persistir el avance de estado, así que el menú no lo
+    // vería por realtime. Para que el prospecto vea el pedido avanzar en vivo
+    // (Pendiente → Preparando → Listo → Entregado) sincronizamos cocina↔menú por
+    // BroadcastChannel dentro del mismo navegador (así se prueba/muestra la demo).
+    // En un restaurante real esto va por la base (realtime), no por acá.
+    let _demoBC = null
+    if (esDemo && 'BroadcastChannel' in window) {
+      try {
+        _demoBC = new BroadcastChannel('vitrina-demo-' + slug)
+        _demoBC.onmessage = (ev) => {
+          const d = ev.data || {}
+          if (d.type !== 'order-status' || !d.id) return
+          if (!pedidosSesion.includes(d.id)) return
+          const prev = pedidosStatusCache[d.id]
+          pedidosStatusCache[d.id] = d.status
+          renderConfirmList(pedidosSesion.map(id => ({
+            id,
+            status: pedidosStatusCache[id] || 'pending',
+            paid_at: pedidosPaidCache[id] || null,
+            created_at: pedidosCreatedCache[id] || null,
+          })))
+          updatePedidosBar()
+          if (d.status === 'ready' && prev !== 'ready') notifyOrderReady(d.id)
+        }
+      } catch {}
     }
 
     // ─── Init ──────────────────────────────────────────────────────────────────

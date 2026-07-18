@@ -312,6 +312,18 @@
   // login (solo slugs de demo — las cocinas reales siguen requiriendo sesión).
   const DEMO_SLUGS = ['somma']
   const esDemo = !!slug && (slug.startsWith('demo-') || DEMO_SLUGS.includes(slug))
+
+  // DEMO: la cocina anónima no puede persistir el avance de estado (RLS solo-staff),
+  // así que el menú no lo vería por realtime. Emitimos el cambio por BroadcastChannel
+  // para que el menú abierto en otra pestaña del mismo navegador lo refleje en vivo.
+  let _demoBC = null
+  if (esDemo && 'BroadcastChannel' in window) {
+    try { _demoBC = new BroadcastChannel('vitrina-demo-' + slug) } catch {}
+  }
+  function demoBroadcast(id, status) {
+    if (_demoBC) { try { _demoBC.postMessage({ type: 'order-status', id, status }) } catch {} }
+  }
+
   async function init() {
     if (esDemo) { await startKitchen(); return }
     const { data: { session } } = await supabase.auth.getSession()
@@ -597,6 +609,7 @@
     if (esDemo) {
       pedidos[id] = { ...pedido, status: siguiente, updated_at: new Date().toISOString() }
       historial[id] = anterior
+      demoBroadcast(id, siguiente)
       renderAll()
       return
     }
@@ -631,6 +644,7 @@
     delete historial[id]
     if (esDemo) {
       pedidos[id] = { ...pedidos[id], status: anterior, updated_at: new Date().toISOString() }
+      demoBroadcast(id, anterior)
       renderAll()
       return
     }
@@ -918,6 +932,7 @@
       if (esDemo) {
         pedidos[p.id] = { ...pedidos[p.id], status: 'ready', updated_at: new Date().toISOString() }
         historial[p.id] = 'preparing'
+        demoBroadcast(p.id, 'ready')
         continue
       }
       try {
