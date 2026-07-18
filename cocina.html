@@ -611,6 +611,11 @@
       historial[id] = anterior
       demoBroadcast(id, siguiente)
       renderAll()
+      // Persistir para que sincronice ENTRE DISPOSITIVOS (menú en un celu, cocina
+      // en otro): el menú lo ve por realtime de Supabase. Requiere la policy RLS
+      // que habilita al anon a actualizar pedidos de la demo. Si no está, falla
+      // en silencio y quedamos con el update local + broadcast del mismo navegador.
+      orders.updateStatus(id, siguiente).catch(() => {})
       return
     }
 
@@ -646,6 +651,7 @@
       pedidos[id] = { ...pedidos[id], status: anterior, updated_at: new Date().toISOString() }
       demoBroadcast(id, anterior)
       renderAll()
+      orders.updateStatus(id, anterior).catch(() => {})
       return
     }
     try {
@@ -933,6 +939,7 @@
         pedidos[p.id] = { ...pedidos[p.id], status: 'ready', updated_at: new Date().toISOString() }
         historial[p.id] = 'preparing'
         demoBroadcast(p.id, 'ready')
+        orders.updateStatus(p.id, 'ready').catch(() => {})
         continue
       }
       try {
