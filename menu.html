@@ -429,6 +429,9 @@
       throw new Error('Sin slug, deteniendo ejecución')
     }
     const slug = _slug
+    // Demos personalizadas: se puede pedir aunque el resto todavía no habilitó pedidos.
+    const DEMO_SLUGS = ['somma']
+    const esDemo = !!slug && (slug.startsWith('demo-') || DEMO_SLUGS.includes(slug))
     const mesa = params.get('mesa') !== null ? Number(params.get('mesa')) : null
 
     let rest = null
@@ -1147,8 +1150,9 @@
       const ids = Object.keys(cart).filter(id => cart[id] > 0)
       if (!ids.length) return
 
-      // Validar que el restaurante pueda recibir pedidos
-      if (rest.can_take_orders === false) {
+      // Validar que el restaurante pueda recibir pedidos (las demos siempre pueden,
+      // para que el prospecto vea el pedido caer en la cocina).
+      if (rest.can_take_orders === false && !esDemo) {
         alert('Este restaurante no puede recibir pedidos online en este momento. Por favor, llamá al mozo.')
         return
       }
@@ -1761,7 +1765,7 @@
 
         // Cartas grandes: traducir en tandas de a 30 ítems. Una sola llamada con
         // 145 ítems supera el máximo de salida → JSON truncado → fallaba en silencio.
-        const CHUNK = 20
+        const CHUNK = 10
         const translateChunk = async (itemsChunk, catsChunk) => {
           const prompt = `Translate the following restaurant menu items from Spanish to ${LANG_LABELS[lang]}.
 Return ONLY a valid JSON object with this exact structure:
