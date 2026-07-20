@@ -283,7 +283,7 @@
 
 <script type="module">
   import { supabase } from './lib/supabase.js'
-  import { restaurants, orders } from './lib/db.js?v=8'
+  import { restaurants, orders } from './lib/db.js?v=9'
 
   const params = new URLSearchParams(location.search)
   const slug = params.get('slug')
@@ -441,7 +441,9 @@
   // ── Carga inicial ─────────────────────────────────────────────────────────────
   async function fetchPedidos() {
     try {
-      const lista = await orders.listActive(rest.id)
+      // En demo la cocina es anónima → columnas públicas (sin teléfono del cliente).
+      // La cocina real (staff autenticado) lee todo para las notificaciones.
+      const lista = await orders.listActive(rest.id, { publico: esDemo })
       const nuevos = lista.filter(p => !pedidos[p.id] && (p.status === 'pending' || p.status === 'confirmed'))
       if (nuevos.length > 0) playSound()
       pedidos = {}
@@ -502,12 +504,17 @@
           return
         }
 
-        // Para INSERT necesitamos los order_items — hacemos fetch puntual
+        // Para INSERT necesitamos los order_items — hacemos fetch puntual.
+        // En demo (anónimo) pedimos columnas públicas; '*' daría 42501 por la
+        // policy de columnas de orders.
         if (payload.eventType === 'INSERT') {
           try {
+            const selCols = esDemo
+              ? 'id, restaurant_id, session_id, table_number, status, total, notes, channel, customer_name, created_at, updated_at, paid_at, order_items(*)'
+              : '*, order_items(*)'
             const { data } = await supabase
               .from('orders')
-              .select('*, order_items(*)')
+              .select(selCols)
               .eq('id', order.id)
               .single()
             if (data) {
