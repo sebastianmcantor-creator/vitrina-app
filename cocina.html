@@ -283,7 +283,7 @@
 
 <script type="module">
   import { supabase } from './lib/supabase.js'
-  import { restaurants, orders } from './lib/db.js'
+  import { restaurants, orders } from './lib/db.js?v=8'
 
   const params = new URLSearchParams(location.search)
   const slug = params.get('slug')
