@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vitrina · Activá tu cuenta</title>
+<meta name="description" content="Activá tu cuenta de Vitrina con tu menú ya cargado. Prueba gratis, sin tarjeta.">
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:        #1C1612;
+  --terra:      #B85A30;
+  --terra2:     #D4724E;
+  --terra-pale: #F2E6DF;
+  --gold:       #C8963C;
+  --gold-pale:  #FAF3E4;
+  --cream:      #F7F2EA;
+  --cream2:     #EDE5D8;
+  --white:      #FDFAF6;
+  --muted:      #756A61;
+  --border:     #DDD5C8;
+  --card:       #FEFCF8;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  min-height: 100vh;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  background: var(--cream);
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(184,90,48,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(184,90,48,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+.container {
+  position: relative; z-index: 1;
+  width: 100%;
+  max-width: 460px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+.brand { display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; }
+.brand-icon { width:52px; height:52px; background:var(--terra); border-radius:14px; display:flex; align-items:center; justify-content:center; font-size:24px; }
+.brand-name { font-family:'Cormorant Garamond', serif; font-size:30px; font-weight:600; letter-spacing:-0.5px; }
+.card {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 30px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 2px 16px rgba(28,22,18,.06);
+}
+.card-title { font-family:'Cormorant Garamond', serif; font-size:26px; font-weight:600; line-height:1.15; }
+.card-sub { font-size:14px; color:var(--muted); line-height:1.5; }
+.demo-chip {
+  display:flex; align-items:center; gap:12px;
+  background: var(--gold-pale); border:1px solid #EAD9B0; border-radius:14px; padding:12px 14px;
+}
+.demo-chip img { width:42px; height:42px; border-radius:10px; object-fit:contain; background:white; border:1px solid var(--border); }
+.demo-chip .n { font-weight:500; font-size:15px; }
+.demo-chip .d { font-size:12.5px; color:var(--muted); }
+.benefits { display:flex; flex-direction:column; gap:8px; font-size:14px; }
+.benefits div { display:flex; gap:8px; align-items:flex-start; }
+.benefits span { color:var(--terra); }
+label { font-size:13px; font-weight:500; color:var(--ink); display:block; margin-bottom:6px; }
+input[type=text], input[type=email] {
+  width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:12px;
+  font-family:'Outfit',sans-serif; font-size:15px; background:white; color:var(--ink);
+}
+input:focus { outline:none; border-color:var(--terra2); }
+.hint { font-size:12px; color:var(--muted); margin-top:4px; }
+.btn {
+  width:100%; padding:14px; border:none; border-radius:14px; cursor:pointer;
+  font-family:'Outfit',sans-serif; font-size:15.5px; font-weight:500;
+  background:var(--terra); color:white; transition:background .15s;
+}
+.btn:hover { background:var(--terra2); }
+.btn:disabled { opacity:.6; cursor:default; }
+.btn-google {
+  background:white; color:var(--ink); border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.btn-google:hover { background:var(--cream); }
+.divider { display:flex; align-items:center; gap:12px; color:var(--muted); font-size:12.5px; }
+.divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+.msg { font-size:13.5px; padding:10px 14px; border-radius:12px; display:none; }
+.msg.err { background:#FBEAE6; color:#9C3B1E; border:1px solid #EFC4B5; display:block; }
+.msg.ok  { background:#EAF6EC; color:#256B36; border:1px solid #BFE3C8; display:block; }
+.progress { font-size:13.5px; color:var(--muted); display:none; align-items:center; gap:10px; }
+.progress.on { display:flex; }
+.spinner { width:16px; height:16px; border:2px solid var(--border); border-top-color:var(--terra); border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.foot { font-size:12.5px; color:var(--muted); text-align:center; line-height:1.5; }
+.foot a { color:var(--terra); }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="brand">
+    <div class="brand-icon">🏛️</div>
+    <div class="brand-name">Vitrina</div>
+  </div>
+
+  <div class="card" id="card-loading">
+    <div class="card-sub">Cargando…</div>
+  </div>
+
+  <!-- Paso 0: demo no encontrada -->
+  <div class="card" id="card-nodemo" style="display:none">
+    <div class="card-title">Link incompleto</div>
+    <div class="card-sub">Este link de activación no apunta a ninguna demo. Escribinos a <a href="mailto:contacto@vitrinaapp.com.ar">contacto@vitrinaapp.com.ar</a> y te lo reenviamos.</div>
+  </div>
+
+  <!-- Paso 1: pitch + login -->
+  <div class="card" id="card-login" style="display:none">
+    <div class="card-title">Activá tu cuenta<br>con tu menú ya cargado</div>
+    <div class="demo-chip">
+      <img id="demo-logo" src="" alt="" style="display:none">
+      <div>
+        <div class="n" id="demo-name"></div>
+        <div class="d" id="demo-count"></div>
+      </div>
+    </div>
+    <div class="benefits">
+      <div><span>✓</span><div>Todo lo que viste en la demo queda en tu cuenta: carta completa, fotos y el mozo con IA.</div></div>
+      <div><span>✓</span><div>Cambiá precios, fotos o platos cuando quieras — o subí tu carta en PDF y la recargamos.</div></div>
+      <div><span>✓</span><div id="benefit-trial">Prueba gratis, sin tarjeta.</div></div>
+    </div>
+    <button class="btn btn-google" onclick="loginGoogle()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.9 1.2 8 3l5.7-5.7C34.3 6.1 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C36.9 40.4 44 35 44 24c0-1.3-.1-2.6-.4-3.9z"/></svg>
+      Continuar con Google
+    </button>
+    <div class="divider">o con tu email</div>
+    <div>
+      <input type="email" id="email-input" placeholder="tu@email.com" autocomplete="email">
+      <div class="hint">Te mandamos un link para entrar, sin contraseña.</div>
+    </div>
+    <button class="btn" onclick="loginEmail()" id="btn-email">Recibir link de acceso</button>
+    <div class="msg" id="login-msg"></div>
+  </div>
+
+  <!-- Paso 2: logueado → crear la cuenta con el clon -->
+  <div class="card" id="card-create" style="display:none">
+    <div class="card-title">¡Último paso!</div>
+    <div class="card-sub">Estás por crear tu cuenta de <b id="create-demo-name"></b> con todo el menú de la demo ya cargado. Revisá estos datos:</div>
+    <div>
+      <label for="rest-name">Nombre del negocio</label>
+      <input type="text" id="rest-name">
+    </div>
+    <div>
+      <label for="rest-slug">Tu dirección en Vitrina</label>
+      <input type="text" id="rest-slug" style="text-transform:lowercase">
+      <div class="hint">vitrinaapp.com.ar/menu.html?slug=<b id="slug-preview"></b></div>
+    </div>
+    <button class="btn" id="btn-create" onclick="crearCuenta()">Crear mi cuenta con el menú cargado</button>
+    <div class="progress" id="create-progress"><div class="spinner"></div><span id="progress-text">Creando tu cuenta…</span></div>
+    <div class="msg" id="create-msg"></div>
+    <div class="foot">Entraste como <span id="user-email"></span>. <a href="#" onclick="salir(); return false">Cambiar de cuenta</a></div>
+  </div>
+
+  <div class="foot">La demo original no se modifica: tu cuenta es una copia editable, toda tuya.<br>¿Dudas? <a href="mailto:contacto@vitrinaapp.com.ar">contacto@vitrinaapp.com.ar</a></div>
+</div>
+
+<script type="module">
+import { supabase } from './lib/supabase.js'
+import { restaurants } from './lib/db.js?v=9'
+
+const params   = new URLSearchParams(window.location.search)
+const demoSlug = (params.get('demo') || '').trim().toLowerCase()
+const promo    = (params.get('promo') || '').trim().toLowerCase()
+// Oferta fundador (3 meses) vs. prueba estándar (14 días)
+const TRIAL_DIAS = promo === 'fundador' ? 90 : 14
+
+let demoRest = null
+let currentUser = null
+
+function show(id) {
+  ['card-loading','card-nodemo','card-login','card-create'].forEach(c =>
+    document.getElementById(c).style.display = c === id ? 'flex' : 'none')
+}
+function msg(id, text, cls) {
+  const el = document.getElementById(id)
+  el.textContent = text
+  el.className = 'msg ' + cls
+}
+
+// ── Init ────────────────────────────────────────────────────────────────────
+async function init() {
+  if (!demoSlug) { show('card-nodemo'); return }
+  try {
+    demoRest = await restaurants.getBySlug(demoSlug)
+  } catch { demoRest = null }
+  if (!demoRest) { show('card-nodemo'); return }
+
+  const items = (demoRest.menu_categories || []).reduce((s, c) => s + (c.menu_items || []).length, 0)
+  document.getElementById('demo-name').textContent = demoRest.name
+  document.getElementById('demo-count').textContent = (demoRest.menu_categories || []).length + ' categorías · ' + items + ' productos con foto'
+  if (demoRest.logo_url) {
+    const img = document.getElementById('demo-logo')
+    img.src = demoRest.logo_url
+    img.style.display = 'block'
+  }
+  document.getElementById('benefit-trial').textContent = promo === 'fundador'
+    ? '3 meses gratis (oferta fundador), sin tarjeta.'
+    : '14 días de prueba gratis, sin tarjeta.'
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (user) {
+    currentUser = user
+    prepararCreacion()
+  } else {
+    show('card-login')
+  }
+}
+
+// ── Login ───────────────────────────────────────────────────────────────────
+window.loginGoogle = async function() {
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.href },
+  })
+  if (error) msg('login-msg', error.message, 'err')
+}
+
+window.loginEmail = async function() {
+  const email = document.getElementById('email-input').value.trim()
+  if (!email || !email.includes('@')) { msg('login-msg', 'Escribí un email válido.', 'err'); return }
+  const btn = document.getElementById('btn-email')
+  btn.disabled = true
+  const { error } = await supabase.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: true, emailRedirectTo: window.location.href },
+  })
+  if (error) { msg('login-msg', error.message, 'err'); btn.disabled = false; return }
+  msg('login-msg', '¡Listo! Revisá tu correo (' + email + ') y tocá el link para seguir acá.', 'ok')
+}
+
+window.salir = async function() {
+  await supabase.auth.signOut()
+  window.location.reload()
+}
+
+// ── Paso 2 ──────────────────────────────────────────────────────────────────
+function slugify(name) {
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40)
+}
+
+function prepararCreacion() {
+  show('card-create')
+  document.getElementById('create-demo-name').textContent = demoRest.name
+  document.getElementById('user-email').textContent = currentUser.email || ''
+  // Nombre sin el sufijo de marca del demo ("X | Bar & Restaurant" → editable igual)
+  document.getElementById('rest-name').value = demoRest.name
+  const base = slugify(demoRest.name)
+  const slugInput = document.getElementById('rest-slug')
+  slugInput.value = base === demoSlug ? base + '-app' : base
+  document.getElementById('slug-preview').textContent = slugInput.value
+  slugInput.addEventListener('input', () => {
+    document.getElementById('slug-preview').textContent = slugify(slugInput.value)
+  })
+}
+
+window.crearCuenta = async function() {
+  const name = document.getElementById('rest-name').value.trim()
+  const slug = slugify(document.getElementById('rest-slug').value)
+  if (!name) { msg('create-msg', 'Poné el nombre de tu negocio.', 'err'); return }
+  if (!slug) { msg('create-msg', 'La dirección no es válida. Usá letras y números.', 'err'); return }
+  if (slug === demoSlug) { msg('create-msg', 'Esa dirección es la de la demo. Elegí una propia (ej: ' + slug + '-app).', 'err'); return }
+
+  const btn = document.getElementById('btn-create')
+  const prog = document.getElementById('create-progress')
+  const progText = document.getElementById('progress-text')
+  btn.disabled = true
+  prog.classList.add('on')
+  document.getElementById('create-msg').className = 'msg'
+
+  try {
+    progText.textContent = 'Verificando la dirección…'
+    const libre = await restaurants.isSlugAvailable(slug)
+    if (!libre) throw new Error('Esa dirección ya está en uso. Probá con otra.')
+
+    // 1) Crear el restaurante del cliente (mismos campos que el onboarding del
+    //    panel: trial activo desde el INSERT, sin depender del worker).
+    progText.textContent = 'Creando tu cuenta…'
+    const nuevo = await restaurants.create({
+      name,
+      slug,
+      owner_id: currentUser.id,
+      description:      demoRest.description || null,
+      tagline:          demoRest.tagline || null,
+      logo_url:         demoRest.logo_url || null,
+      cover_url:        demoRest.cover_url || null,
+      primary_color:    demoRest.primary_color || null,
+      address:          demoRest.address || null,
+      city:             demoRest.city || null,
+      country:          demoRest.country || null,
+      currency:         demoRest.currency || 'ARS',
+      timezone:         demoRest.timezone || null,
+      business_type:    demoRest.business_type || 'restaurant',
+      instagram_handle: demoRest.instagram_handle || null,
+      facebook_url:     demoRest.facebook_url || null,
+      website_url:      demoRest.website_url || null,
+      opening_hours:    demoRest.opening_hours || null,
+      is_active: true,
+      is_open: true,
+      can_take_orders: true,
+      plan: 'rest-menu',
+      subscription_status: 'trialing',
+      trial_end: new Date(Date.now() + TRIAL_DIAS * 24 * 60 * 60 * 1000).toISOString(),
+    })
+
+    // 2) Clonar categorías (batch)
+    progText.textContent = 'Copiando tu menú…'
+    const cats = (demoRest.menu_categories || []).slice().sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    const catPayload = cats.map(c => ({
+      restaurant_id: nuevo.id,
+      name: c.name,
+      description: c.description ?? null,
+      emoji: c.emoji ?? null,
+      sort_order: c.sort_order ?? 0,
+      is_visible: c.is_visible !== false,
+    }))
+    const { data: newCats, error: catErr } = await supabase
+      .from('menu_categories').insert(catPayload).select('id, name, sort_order')
+    if (catErr) throw catErr
+
+    // Mapear categoría vieja → nueva por nombre+orden
+    const catMap = {}
+    cats.forEach(c => {
+      const match = (newCats || []).find(n => n.name === c.name && (n.sort_order ?? 0) === (c.sort_order ?? 0))
+      if (match) catMap[c.id] = match.id
+    })
+
+    // 3) Clonar items (batch, en tandas de 50 para no pasarnos de payload)
+    const SYS = ['id', 'category_id', 'restaurant_id', 'created_at', 'updated_at']
+    const allItems = []
+    cats.forEach(c => (c.menu_items || []).forEach(it => {
+      if (!catMap[c.id]) return
+      const copia = {}
+      Object.keys(it).forEach(k => { if (!SYS.includes(k)) copia[k] = it[k] })
+      copia.restaurant_id = nuevo.id
+      copia.category_id = catMap[c.id]
+      allItems.push(copia)
+    }))
+    for (let i = 0; i < allItems.length; i += 50) {
+      progText.textContent = 'Copiando tu menú… (' + Math.min(i + 50, allItems.length) + '/' + allItems.length + ')'
+      const { error: itErr } = await supabase.from('menu_items').insert(allItems.slice(i, i + 50))
+      if (itErr) throw itErr
+    }
+
+    // 4) Avisos (fire-and-forget, como el onboarding del panel)
+    try { localStorage.setItem('vitrina_last_restaurant', nuevo.id) } catch {}
+    fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notify/new-registration', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, businessType: nuevo.business_type, city: nuevo.city, email: currentUser.email, source: 'activar-demo:' + demoSlug + (promo ? ':' + promo : '') }),
+    }).catch(() => {})
+    if (currentUser.email) {
+      fetch('https://vitrina-tano.vitrinaapp.workers.dev/api/notify/welcome-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: currentUser.email, name: currentUser.user_metadata?.full_name || '', businessName: name, businessType: nuevo.business_type }),
+      }).catch(() => {})
+    }
+
+    progText.textContent = '¡Listo! Entrando a tu panel…'
+    msg('create-msg', '✓ Cuenta creada con ' + allItems.length + ' productos. Redirigiendo…', 'ok')
+    setTimeout(() => { window.location.href = 'panel.html' }, 1200)
+  } catch (e) {
+    prog.classList.remove('on')
+    btn.disabled = false
+    msg('create-msg', e.message || 'No pudimos crear la cuenta. Probá de nuevo o escribinos.', 'err')
+  }
+}
+
+init()
+</script>
+</body>
+</html>
