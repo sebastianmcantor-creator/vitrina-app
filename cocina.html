@@ -581,8 +581,10 @@
     const cardId = 'card-' + id.replace(/-/g,'_')
     const btn = document.querySelector('#' + cardId + ' .estado-btn')
 
-    // Doble tap para confirmar "Listo" — evita falsos positivos
-    if (siguiente === 'ready' && !_pendingConfirm[id]) {
+    // Doble tap para confirmar "Listo" — evita falsos positivos en una cocina real.
+    // En la demo lo salteamos: la ventana de 2,5s confunde al prospecto (parece que
+    // "no marca listo") y no hay riesgo de falso positivo en una prueba.
+    if (siguiente === 'ready' && !_pendingConfirm[id] && !esDemo) {
       _pendingConfirm[id] = true
       if (btn) {
         btn.textContent = '✓ ¿Confirmar listo?'

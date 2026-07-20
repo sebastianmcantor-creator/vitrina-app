@@ -461,6 +461,7 @@
     const SESSION_TS_KEY = SESSION_KEY + '_ts'
     let pedidosSesion = JSON.parse(sessionStorage.getItem(SESSION_KEY) || '[]')
     let statusInterval = null
+    let statusPoll = null
     let pedidosStatusCache = {} // { id: status } para evitar flasheo de estado
     let pedidosPaidCache = {}   // { id: paid_at } para la tarjeta de reseña post-pago
     let pedidosCreatedCache = {} // { id: created_at } para detectar demoras
@@ -1459,7 +1460,10 @@
       document.getElementById('confirm-overlay').classList.add('open')
       if (statusInterval) return
 
-      // Carga inicial
+      // Carga inicial + refresco periódico. El realtime de Supabase puede no estar
+      // habilitado (o no llegar entre dispositivos distintos), así que además
+      // consultamos el estado cada pocos segundos mientras el overlay está abierto.
+      // Así el comensal ve avanzar su pedido aunque la cocina esté en otra pantalla.
       async function fetchEstados() {
         if (!pedidosSesion.length) return
         try {
@@ -1468,12 +1472,20 @@
             .select('id, status, paid_at, created_at')
             .in('id', pedidosSesion)
           if (data) {
-            data.forEach(r => { pedidosStatusCache[r.id] = r.status; pedidosPaidCache[r.id] = r.paid_at; pedidosCreatedCache[r.id] = r.created_at })
+            data.forEach(r => {
+              const prev = pedidosStatusCache[r.id]
+              pedidosStatusCache[r.id] = r.status
+              pedidosPaidCache[r.id] = r.paid_at
+              pedidosCreatedCache[r.id] = r.created_at
+              if (r.status === 'ready' && prev && prev !== 'ready') notifyOrderReady(r.id)
+            })
             renderConfirmList(data)
           }
         } catch {}
       }
       fetchEstados()
+      if (statusPoll) clearInterval(statusPoll)
+      statusPoll = setInterval(fetchEstados, 6000)
 
       // Realtime: escuchar cambios en los pedidos de esta sesión
       statusInterval = supabase
@@ -1508,6 +1520,7 @@
         supabase.removeChannel(statusInterval)
         statusInterval = null
       }
+      if (statusPoll) { clearInterval(statusPoll); statusPoll = null }
       document.getElementById('confirm-overlay').classList.remove('open')
       updatePedidosBar()
       document.getElementById('wa-confirm-wrap').style.display = 'none'
